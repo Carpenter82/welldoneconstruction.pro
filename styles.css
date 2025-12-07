@@ -73,8 +73,8 @@ body {
   margin: 50px auto;
   padding: 40px 20px;
   text-align: center;
-  background: #ddd;
-  color: #111;
+  background: #ddd; /* light gray background */
+  color: #111; /* dark text for contrast */
 }
 .services h2 {
   font-size: 2rem;
@@ -86,7 +86,7 @@ body {
   gap: 20px;
 }
 .service-card {
-  background: #fff;
+  background: #fff; /* white cards for contrast */
   color: #111;
   padding: 25px;
   border-radius: 6px;
