@@ -80,19 +80,35 @@ body {
   font-size: 2rem;
   margin-bottom: 30px;
 }
+
+/* Grid for services */
 .service-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
+
+/* Service cards */
 .service-card {
-  background: #fff; /* white cards for contrast */
+  background: #fff;
   color: #111;
   padding: 25px;
   border-radius: 6px;
   border: 1px solid #bbb;
   box-shadow: 0 0 8px rgba(0,0,0,0.15);
   font-weight: bold;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+/* Center Maintenance under Handyman */
+.maintenance {
+  grid-column: 2 / 3;
+  justify-self: center;
 }
 
 /* Contact section */
@@ -153,10 +169,5 @@ footer {
     font-size: 1.6rem;
   }
 }
-
-
-
-
- 
 
 
