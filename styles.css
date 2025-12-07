@@ -15,12 +15,13 @@ body {
 /* Logo container */
 .logo-container {
   text-align: center;
-  padding: 20px 0;
-  background: #181818;
-  border-bottom: 2px solid #333;
+  padding: 40px 0;
+  background: #eee; /* light gray background for contrast */
 }
 .logo-container .logo {
-  max-width: 80%;
+  display: block;
+  margin: 0 auto;
+  max-width: 250px; /* adjust if needed */
   height: auto;
 }
 
@@ -50,6 +51,7 @@ body {
   font-size: 1.2rem;
   margin-bottom: 15px;
 }
+
 /* Button */
 .button {
   display: inline-block;
@@ -69,8 +71,10 @@ body {
 .services {
   max-width: 900px;
   margin: 50px auto;
-  padding: 0 20px;
+  padding: 40px 20px;
   text-align: center;
+  background: #ddd; /* light gray background */
+  color: #111; /* dark text for contrast */
 }
 .services h2 {
   font-size: 2rem;
@@ -82,13 +86,13 @@ body {
   gap: 20px;
 }
 .service-card {
-  background: #1d1d1d;
+  background: #fff; /* white cards for contrast */
+  color: #111;
   padding: 25px;
   border-radius: 6px;
-  border: 1px solid #2c2c2c;
-  box-shadow: 0 0 10px rgba(0,0,0,0.25);
+  border: 1px solid #bbb;
+  box-shadow: 0 0 8px rgba(0,0,0,0.15);
   font-weight: bold;
-  color: #fff;
 }
 
 /* Contact section */
@@ -112,5 +116,10 @@ footer {
   color: #aaa;
 }
 
+
+
+
+
+ 
 
 
