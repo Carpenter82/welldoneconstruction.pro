@@ -8,22 +8,40 @@
 </head>
 <body>
 
-<header class="hero">
-    <h1>Well Done Construction</h1>
-    <p>Small-scale projects done right.</p>
+<header>
+    <nav class="navbar">
+        <div class="logo">Well Done Construction</div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <div class="hero" id="home">
+        <div class="hero-overlay">
+            <h1>Small-scale projects done right</h1>
+            <p>Reliable work, selective projects, no nonsense</p>
+            <a class="button" href="#" onclick="alert('Form coming soon'); return false;">Request Work</a>
+        </div>
+    </div>
 </header>
 
 <main>
-    <section class="card">
-        <h2>Welcome</h2>
-        <p>I take on selective projects and bring in extra help when needed. 
-        If you want clear communication and reliable results, you’re in the right place.</p>
+    <section id="services" class="services">
+        <h2>Services</h2>
+        <div class="service-grid">
+            <div class="service-card">Carpentry</div>
+            <div class="service-card">Floor Sanding & Polishing</div>
+            <div class="service-card">Handyman</div>
+            <div class="service-card">Remodeling (non kitchen/bath)</div>
+            <div class="service-card">Window Installation</div>
+        </div>
     </section>
 
-    <section class="card">
-        <h2>Apply or Request Work</h2>
-        <p>When you're ready, use the button below to submit your information.</p>
-        <a class="button" href="#" onclick="alert('Form coming soon'); return false;">Application Form</a>
+    <section id="contact" class="contact">
+        <h2>Contact</h2>
+        <p>Coming soon: form to request work directly.</p>
     </section>
 </main>
 
@@ -33,4 +51,5 @@
 
 </body>
 </html>
+
 
