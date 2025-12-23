@@ -1,67 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>On-Call Employee Packet</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
+<div style="text-align:center; max-width:600px; margin:auto; font-family:Arial, sans-serif; border:1px solid #ccc; padding:30px; box-sizing:border-box; border-radius:8px; background-color:#fff;">
 
-<body style="font-family:Arial, sans-serif; background:#f4f4f4; padding:20px;">
+  <!-- Logo -->
+  <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction" style="max-width:100%; height:auto; margin-bottom:20px;">
 
-  <div style="max-width:600px; margin:auto; background:#fff; padding:30px; border-radius:8px; text-align:center;">
+  <!-- Top Welcome Text -->
+  <p style="font-size:16px; margin-bottom:30px;">Welcome! We’re excited to have you join our team. Please complete the form below to get started.</p>
 
-    <!-- Logo -->
-    <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" 
-         alt="Well Done Construction" style="max-width:100%; height:auto; margin-bottom:20px;">
+  <!-- Form Start -->
+  <form action="https://formspree.io/f/mnjawddk" method="POST" style="text-align:left;">
 
-    <h2>Well Done Construction LLC</h2>
+    <!-- Full Name -->
+    <label for="fullName">Full Name</label><br>
+    <input type="text" id="fullName" name="employeeName" required style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
 
-    <p>
-      Welcome! We’re excited to have you join our team.<br>
-      Please complete the form below to get started.
-    </p>
+    <!-- Email -->
+    <label for="email">Email</label><br>
+    <input type="email" id="email" name="email" required style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
 
-    <form action="https://formspree.io/f/mnjawddk" method="POST" style="text-align:left;">
-      
-      <label>Full Name</label><br>
-      <input type="text" name="employeeName" required style="width:100%; margin-bottom:15px;"><br>
+    <!-- Phone -->
+    <label for="phone">Phone Number</label><br>
+    <input type="tel" id="phone" name="phone" required style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
 
-      <label>Email</label><br>
-      <input type="email" name="email" required style="width:100%; margin-bottom:15px;"><br>
+    <!-- Square Section -->
+    <div style="border:1px solid #ccc; padding:20px; text-align:left; margin:20px 0; border-radius:5px; background-color:#f9f9f9;">
+      <h3 style="text-align:center; margin-top:0;">Work Skills & Acknowledgments</h3>
 
-      <label>Phone Number</label><br>
-      <input type="tel" name="phone" required style="width:100%; margin-bottom:20px;"><br>
+      <p><strong>Work Skills (Select all that apply):</strong></p>
+      <input type="checkbox" name="scope[]" value="General Carpentry"> General Carpentry<br>
+      <input type="checkbox" name="scope[]" value="Repairs / Maintenance"> Repairs / Maintenance<br>
+      <input type="checkbox" name="scope[]" value="Installations"> Installations<br><br>
 
-      <fieldset style="padding:15px; margin-bottom:20px;">
-        <legend><strong>Work Skills</strong></legend>
+      <p><strong>Starting Pay Rate:</strong> $25 per hour (W-2, on-call, rostered until terminated)</p><br>
 
-        <label><input type="checkbox" name="skills[]" value="General Carpentry"> General Carpentry</label><br>
-        <label><input type="checkbox" name="skills[]" value="Repairs / Maintenance"> Repairs / Maintenance</label><br>
-        <label><input type="checkbox" name="skills[]" value="Installations"> Installations</label><br>
-      </fieldset>
+      <input type="checkbox" name="osha10" required> I have OSHA-10 Certification<br>
+      <input type="checkbox" name="ppe" required> I will comply with all PPE and safety rules<br>
+      <input type="checkbox" name="drugFree" required> I will remain drug and alcohol free on job sites<br>
+      <input type="checkbox" name="qualityAck" required> I acknowledge the quality standards<br>
+    </div>
 
-      <p><strong>Starting Pay:</strong> $25/hour (W-2, on-call)</p>
+    <!-- Signature & Date -->
+    <label for="signature">Typed Name / Signature</label><br>
+    <input type="text" id="signature" name="signature" required style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
 
-      <label><input type="checkbox" name="osha10" required> OSHA-10 certified</label><br>
-      <label><input type="checkbox" name="ppe" required> Will follow PPE rules</label><br>
-      <label><input type="checkbox" name="drugFree" required> Drug & alcohol free</label><br>
-      <label><input type="checkbox" name="qualityAck" required> Quality standards acknowledged</label><br><br>
+    <label for="date">Date</label><br>
+    <input type="date" id="date" name="date" required style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
 
-      <label>Typed Name / Signature</label><br>
-      <input type="text" name="signature" required style="width:100%; margin-bottom:15px;"><br>
+    <!-- Submit -->
+    <input type="submit" value="Submit Packet" style="padding:10px 20px; font-size:16px; display:block; margin:auto;">
+  </form>
 
-      <label>Date</label><br>
-      <input type="date" name="date" required style="width:100%; margin-bottom:20px;"><br>
-
-      <button type="submit" style="width:100%; padding:12px;">Submit Packet</button>
-
-    </form>
-
-    <p style="font-size:13px; margin-top:20px;">
-      After review, you will receive a link to sign your official On-Call Employee Agreement.
-    </p>
-
-  </div>
-
-</body>
-</html>
+  <!-- Confirmation Text -->
+  <p style="margin-top:20px; font-size:14px;">After your submission is reviewed, you’ll receive a link to sign your official On-Call Employee Agreement.</p>
+</div>
