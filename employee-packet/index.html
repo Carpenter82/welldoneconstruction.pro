@@ -3,147 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <title>On-Call Employee Packet</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 600px;
-      margin: 40px auto;
-      padding: 30px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    img.logo {
-      max-width: 100%;
-      height: auto;
-      margin-bottom: 20px;
-    }
-    h1 {
-      margin-bottom: 15px;
-    }
-    p {
-      line-height: 1.5;
-      margin-bottom: 25px;
-    }
-    form {
-      text-align: left;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input[type="text"],
-    input[type="email"],
-    input[type="tel"] {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      margin-bottom: 15px;
-      box-sizing: border-box;
-    }
-    .square-section {
-      border: 1px solid #ccc;
-      padding: 20px;
-      border-radius: 5px;
-      background-color: #f9f9f9;
-      margin: 20px 0;
-    }
-    .square-section h3 {
-      text-align: center;
-      margin-top: 0;
-      margin-bottom: 15px;
-    }
-    .square-section input[type="checkbox"] {
-      margin-right: 8px;
-      margin-bottom: 8px;
-    }
-    input[type="submit"] {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      background-color: #0073e6;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    input[type="submit"]:hover {
-      background-color: #005bb5;
-    }
-    .confirmation {
-      margin-top: 20px;
-      font-size: 14px;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-<body>
-  <div class="container">
-    <!-- Logo -->
-    <img class="logo" src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction">
 
-    <!-- Welcome Text -->
-    <h1>Welcome!</h1>
-    <p>We’re excited to have you join our team. Please complete the form below to get started.</p>
+<body style="font-family:Arial, sans-serif; background:#f4f4f4; padding:20px;">
 
-    <!-- Form Start -->
+  <div style="max-width:600px; margin:auto; background:#fff; padding:30px; border-radius:8px;">
+
+    <h2 style="text-align:center;">Well Done Construction LLC</h2>
+
+    <p style="text-align:center;">
+      Welcome! We’re excited to have you join our team.<br>
+      Please complete the form below to get started.
+    </p>
+
     <form action="https://formspree.io/f/mnjawddk" method="POST">
-      
-      <!-- Full Name -->
-      <label for="fullName">Full Name</label>
-      <input type="text" id="fullName" name="employeeName" required>
 
-      <!-- Email -->
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required>
+      <label>Full Name</label><br>
+      <input type="text" name="employeeName" required style="width:100%; margin-bottom:15px;"><br>
 
-      <!-- Phone -->
-      <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" name="phone" required>
+      <label>Email</label><br>
+      <input type="email" name="email" required style="width:100%; margin-bottom:15px;"><br>
 
-      <!-- Job Info -->
-      <label for="jobName">Job / Project Name</label>
-      <input type="text" id="jobName" name="jobName">
+      <label>Phone Number</label><br>
+      <input type="tel" name="phone" required style="width:100%; margin-bottom:20px;"><br>
 
-      <label for="jobAddress">Job Address</label>
-      <input type="text" id="jobAddress" name="jobAddress">
+      <fieldset style="padding:15px; margin-bottom:20px;">
+        <legend><strong>Work Skills</strong></legend>
 
-      <label for="workDates">Scheduled Work Date(s)</label>
-      <input type="text" id="workDates" name="workDates" placeholder="MM/DD/YYYY - MM/DD/YYYY">
+        <label><input type="checkbox" name="skills[]" value="General Carpentry"> General Carpentry</label><br>
+        <label><input type="checkbox" name="skills[]" value="Repairs / Maintenance"> Repairs / Maintenance</label><br>
+        <label><input type="checkbox" name="skills[]" value="Installations"> Installations</label><br>
+      </fieldset>
 
-      <!-- Square Section -->
-      <div class="square-section">
-        <h3>Work Skills & Acknowledgments</h3>
+      <p><strong>Starting Pay:</strong> $25/hour (W-2, on-call)</p>
 
-        <p><strong>Work Skills (Select all that apply):</strong></p>
-        <input type="checkbox" name="scope[]" value="General Carpentry"> General Carpentry<br>
-        <input type="checkbox" name="scope[]" value="Repairs / Maintenance"> Repairs / Maintenance<br>
-        <input type="checkbox" name="scope[]" value="Installations"> Installations<br>
+      <label><input type="checkbox" name="osha10" required> OSHA-10 certified</label><br>
+      <label><input type="checkbox" name="ppe" required> Will follow PPE rules</label><br>
+      <label><input type="checkbox" name="drugFree" required> Drug & alcohol free</label><br>
+      <label><input type="checkbox" name="qualityAck" required> Quality standards acknowledged</label><br><br>
 
-        <p><strong>Starting Pay Rate:</strong> $25/hour (W-2, on-call, rostered until terminated)</p>
+      <label>Typed Name / Signature</label><br>
+      <input type="text" name="signature" required style="width:100%; margin-bottom:15px;"><br>
 
-        <input type="checkbox" name="osha10" required> I have OSHA-10 Certification<br>
-        <input type="checkbox" name="ppe" required> I will comply with all PPE and safety rules<br>
-        <input type="checkbox" name="drugFree" required> I will remain drug and alcohol free on job sites<br>
-        <input type="checkbox" name="qualityAck" required> I acknowledge the quality standards<br>
-      </div>
+      <label>Date</label><br>
+      <input type="date" name="date" required style="width:100%; margin-bottom:20px;"><br>
 
-      <!-- Submit -->
-      <input type="submit" value="Submit Packet">
+      <button type="submit" style="width:100%; padding:12px;">
+        Submit Packet
+      </button>
+
     </form>
 
-    <!-- Confirmation Text -->
-    <p class="confirmation">After your submission is reviewed, you’ll receive a link to sign your official On-Call Employee Agreement.</p>
+    <p style="font-size:13px; margin-top:20px; text-align:center;">
+      After review, you will receive a link to sign your official On-Call Employee Agreement.
+    </p>
+
   </div>
+
 </body>
 </html>
