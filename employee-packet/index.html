@@ -8,12 +8,16 @@
 
   <!-- Form Start -->
   <form action="https://formspree.io/f/mnjawddk" method="POST" style="text-align:left;">
+    
+    <!-- Full Name -->
     <label for="fullName">Full Name</label><br>
     <input type="text" id="fullName" name="employeeName" required style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
 
+    <!-- Email -->
     <label for="email">Email</label><br>
     <input type="email" id="email" name="email" required style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
 
+    <!-- Phone -->
     <label for="phone">Phone Number</label><br>
     <input type="tel" id="phone" name="phone" required style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
 
@@ -22,9 +26,9 @@
       <h3 style="text-align:center; margin-top:0;">Work Skills & Acknowledgments</h3>
 
       <p><strong>Work Skills (Select all that apply):</strong></p>
-      <input type="checkbox" name="workSkills" value="General Carpentry"> General Carpentry<br>
-      <input type="checkbox" name="workSkills" value="Repairs / Maintenance"> Repairs / Maintenance<br>
-      <input type="checkbox" name="workSkills" value="Installations"> Installations<br><br>
+      <input type="checkbox" name="scope[]" value="General Carpentry"> General Carpentry<br>
+      <input type="checkbox" name="scope[]" value="Repairs / Maintenance"> Repairs / Maintenance<br>
+      <input type="checkbox" name="scope[]" value="Installations"> Installations<br><br>
 
       <p><strong>Starting Pay Rate:</strong> $25 per hour (W-2, on-call, rostered until terminated)</p><br>
 
@@ -34,11 +38,10 @@
       <input type="checkbox" name="qualityAck" required> I acknowledge the quality standards<br>
     </div>
 
+    <!-- Submit -->
     <input type="submit" value="Submit" style="padding:10px 20px; font-size:16px; display:block; margin:auto;">
   </form>
 
   <!-- Confirmation Text -->
   <p style="margin-top:20px; font-size:14px;">After your submission is reviewed, you’ll receive a link to sign your official On-Call Employee Agreement.</p>
 </div>
-
-
