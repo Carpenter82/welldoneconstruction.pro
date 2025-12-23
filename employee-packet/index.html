@@ -3,96 +3,143 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Well Done Construction On-Call Employee Packet</title>
+<title>Well Done Construction - On-Call Employee Packet</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; color: #333; }
-  .container { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-  h1, h2 { text-align: center; margin-bottom: 10px; }
-  img.logo { display: block; margin: 0 auto 20px auto; max-width: 300px; height: auto; }
-  form { width: 100%; }
-  label { display: block; margin-top: 15px; font-weight: bold; }
-  input[type="text"], input[type="email"], input[type="date"], textarea { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc; }
-  fieldset { margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 4px; }
-  legend { font-weight: bold; }
-  input[type="checkbox"] { margin-right: 10px; }
-  button { margin-top: 20px; padding: 12px 25px; font-size: 16px; cursor: pointer; background-color: #007acc; color: #fff; border: none; border-radius: 5px; }
-  button:hover { background-color: #005f99; }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f8f8f8;
+    color: #333;
+    text-align: center; /* centers headings and paragraphs */
+  }
+  header {
+    background: #2c3e50;
+    padding: 20px;
+    text-align: center;
+  }
+  header img {
+    max-width: 250px;
+  }
+  main {
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    text-align: left; /* keeps form fields left-aligned */
+  }
+  h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* centers submit button and note */
+  }
+  label {
+    margin: 10px 0 5px;
+    font-weight: bold;
+  }
+  input, select, textarea, button {
+    width: 100%;
+    max-width: 500px;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+  select[multiple] {
+    height: 100px;
+  }
+  .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* keeps checkboxes left-aligned */
+    margin-bottom: 15px;
+  }
+  .checkbox-group label {
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+  }
+  .checkbox-group input {
+    margin-right: 10px;
+  }
+  button {
+    background: #2c3e50;
+    color: #fff;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+  }
+  button:hover {
+    background: #1f2a38;
+  }
+  p.note {
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .pay-rate {
+    font-size: 1em;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction Logo" class="logo">
+<header>
+  <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction Logo">
+</header>
 
-  <h1>Well Done Construction LLC</h1>
-  <h2>On-Call Employee Packet</h2>
+<main>
+<h1>On-Call Employee Packet</h1>
 
-  <form action="https://formspree.io/f/mnjawddk" method="POST">
-    <input type="hidden" name="_next" value="thank-you.html">
+<form action="https://formspree.io/f/mnjawddk" method="POST">
+  
+  <label for="employeeName">Full Name</label>
+  <input type="text" id="employeeName" name="employeeName" required>
 
-    <label for="employeeName">Employee Full Name</label>
-    <input type="text" id="employeeName" name="employeeName" required>
+  <label for="email">Email</label>
+  <input type="email" id="email" name="email" required>
 
-    <label for="email">Email</label>
-    <input type="email" id="email" name="email" required>
+  <label for="phone">Phone Number</label>
+  <input type="tel" id="phone" name="phone" required>
 
-    <label for="phone">Phone Number</label>
-    <input type="text" id="phone" name="phone" required>
+  <label for="scope">Work Skills (Select all that apply)</label>
+  <select name="scope[]" id="scope" multiple required>
+    <option value="General Carpentry">General Carpentry</option>
+    <option value="Repairs / Maintenance">Repairs / Maintenance</option>
+    <option value="Installations">Installations</option>
+  </select>
 
-    <label for="jobName">Job / Project Name</label>
-    <input type="text" id="jobName" name="jobName" required>
+  <div class="pay-rate">
+    Starting Pay Rate: $25 per hour (W-2, on-call, rostered until terminated)
+  </div>
 
-    <label for="jobAddress">Job Address</label>
-    <input type="text" id="jobAddress" name="jobAddress" required>
+  <div class="checkbox-group">
+    <label><input type="checkbox" name="osha10"> OSHA-10 Certification</label>
+    <label><input type="checkbox" name="ppe"> I will comply with all PPE and safety rules</label>
+    <label><input type="checkbox" name="drugFree"> I will remain drug and alcohol free on job sites</label>
+    <label><input type="checkbox" name="qualityAck"> I acknowledge the quality standards</label>
+  </div>
 
-    <label for="workDates">Scheduled Work Date(s)</label>
-    <input type="text" id="workDates" name="workDates" required>
+  <button type="submit">Submit Packet</button>
 
-    <fieldset>
-      <legend>Scope of Work</legend>
-      <label><input type="checkbox" name="scope[]" value="General Carpentry"> General Carpentry</label>
-      <label><input type="checkbox" name="scope[]" value="Repairs"> Repairs / Maintenance</label>
-      <label><input type="checkbox" name="scope[]" value="Installations"> Installations</label>
-      <label><input type="checkbox" name="scope[]" value="Site Visits / Photos"> Site Visits / Photos</label>
-      <label><input type="checkbox" name="scope[]" value="Other"> Other: <input type="text" name="scopeOther"></label>
-    </fieldset>
-
-    <fieldset>
-      <legend>Pay & Acknowledgement</legend>
-      <label>Pay Rate / Terms</label>
-      <input type="text" name="payRate" placeholder="e.g., $25/hour">
-      <label><input type="checkbox" name="ackPay" required> I understand the pay terms and schedule.</label>
-    </fieldset>
-
-    <fieldset>
-      <legend>Safety & Compliance</legend>
-      <label><input type="checkbox" name="osha10" required> OSHA-10 certification verified</label>
-      <label><input type="checkbox" name="ppe" required> I will wear required PPE</label>
-      <label><input type="checkbox" name="drugFree" required> I will remain drug and alcohol free on the job site</label>
-    </fieldset>
-
-    <fieldset>
-      <legend>Work Quality & Termination</legend>
-      <label><input type="checkbox" name="qualityAck" required> I understand substandard work must be corrected and failure to do so may result in immediate termination.</label>
-    </fieldset>
-
-    <fieldset>
-      <legend>Employee Acknowledgement</legend>
-      <label for="signature">Typed Name / Digital Signature</label>
-      <input type="text" id="signature" name="signature" required>
-      <label for="date">Date</label>
-      <input type="date" id="date" name="date" required>
-    </fieldset>
-
-    <p style="font-size: 0.9em; color: #555; margin-top: 15px;">
-  Once approved, you will receive a link to sign your official On-Call Employee Agreement.
-</p>
-
-
-    <button type="submit">Submit Packet</button>
-
-  </form>
-</div>
+  <p class="note">
+    Once approved, you will receive a link to sign your official <strong>On-Call Employee Agreement</strong>.
+  </p>
+</form>
+</main>
 
 </body>
 </html>
