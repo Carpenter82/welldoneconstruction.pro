@@ -1,145 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Well Done Construction - On-Call Employee Packet</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background-color: #f8f8f8;
-    color: #333;
-    text-align: center; /* centers headings and paragraphs */
-  }
-  header {
-    background: #2c3e50;
-    padding: 20px;
-    text-align: center;
-  }
-  header img {
-    max-width: 250px;
-  }
-  main {
-    max-width: 700px;
-    margin: 30px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    text-align: left; /* keeps form fields left-aligned */
-  }
-  h1 {
-    color: #2c3e50;
-    text-align: center;
-    margin-bottom: 25px;
-  }
-  form {
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* centers submit button and note */
-  }
-  label {
-    margin: 10px 0 5px;
-    font-weight: bold;
-  }
-  input, select, textarea, button {
-    width: 100%;
-    max-width: 500px;
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-  }
-  select[multiple] {
-    height: 100px;
-  }
-  .checkbox-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* keeps checkboxes left-aligned */
-    margin-bottom: 15px;
-  }
-  .checkbox-group label {
-    font-weight: normal;
-    display: flex;
-    align-items: center;
-    margin: 5px 0;
-  }
-  .checkbox-group input {
-    margin-right: 10px;
-  }
-  button {
-    background: #2c3e50;
-    color: #fff;
-    padding: 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1em;
-  }
-  button:hover {
-    background: #1f2a38;
-  }
-  p.note {
-    font-size: 0.9em;
-    color: #555;
-    margin-top: 20px;
-    text-align: center;
-  }
-  .pay-rate {
-    font-size: 1em;
-    font-weight: bold;
-    margin-bottom: 15px;
-  }
-</style>
-</head>
-<body>
-
-<header>
-  <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction Logo">
-</header>
-
-<main>
-<h1>On-Call Employee Packet</h1>
-
-<form action="https://formspree.io/f/mnjawddk" method="POST">
+<div style="text-align:center; max-width:600px; margin:auto; font-family:Arial, sans-serif;">
   
-  <label for="employeeName">Full Name</label>
-  <input type="text" id="employeeName" name="employeeName" required>
+  <!-- Logo -->
+  <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction" style="max-width:100%; height:auto; margin-bottom:20px;">
 
-  <label for="email">Email</label>
-  <input type="email" id="email" name="email" required>
+  <h1>On-Call Employee Packet</h1>
 
-  <label for="phone">Phone Number</label>
-  <input type="tel" id="phone" name="phone" required>
+  <p>Welcome! We’re glad to have you join the team. Please fill out the form below to get started.</p>
 
-  <label for="scope">Work Skills (Select all that apply)</label>
-  <select name="scope[]" id="scope" multiple required>
-    <option value="General Carpentry">General Carpentry</option>
-    <option value="Repairs / Maintenance">Repairs / Maintenance</option>
-    <option value="Installations">Installations</option>
-  </select>
+  <form action="https://formspree.io/f/mnjawddk" method="POST">
+    <label for="fullName">Full Name</label><br>
+    <input type="text" id="fullName" name="employeeName" required><br><br>
 
-  <div class="pay-rate">
-    Starting Pay Rate: $25 per hour (W-2, on-call, rostered until terminated)
-  </div>
+    <label for="email">Email</label><br>
+    <input type="email" id="email" name="email" required><br><br>
 
-  <div class="checkbox-group">
-    <label><input type="checkbox" name="osha10"> OSHA-10 Certification</label>
-    <label><input type="checkbox" name="ppe"> I will comply with all PPE and safety rules</label>
-    <label><input type="checkbox" name="drugFree"> I will remain drug and alcohol free on job sites</label>
-    <label><input type="checkbox" name="qualityAck"> I acknowledge the quality standards</label>
-  </div>
+    <label for="phone">Phone Number</label><br>
+    <input type="tel" id="phone" name="phone" required><br><br>
 
-  <button type="submit">Submit Packet</button>
+    <label>Work Skills (Select all that apply)</label><br>
+    <input type="checkbox" name="workSkills" value="General Carpentry"> General Carpentry<br>
+    <input type="checkbox" name="workSkills" value="Repairs / Maintenance"> Repairs / Maintenance<br>
+    <input type="checkbox" name="workSkills" value="Installations"> Installations<br><br>
 
-  <p class="note">
-    Once approved, you will receive a link to sign your official <strong>On-Call Employee Agreement</strong>.
-  </p>
-</form>
-</main>
+    <p>Starting Pay Rate: $25 per hour (W-2, on-call, rostered until terminated)</p>
 
-</body>
-</html>
+    <input type="checkbox" name="osha10" required> I have OSHA-10 Certification<br>
+    <input type="checkbox" name="ppe" required> I will comply with all PPE and safety rules<br>
+    <input type="checkbox" name="drugFree" required> I will remain drug and alcohol free on job sites<br>
+    <input type="checkbox" name="qualityAck" required> I acknowledge the quality standards<br><br>
+
+    <input type="submit" value="Submit Packet" style="padding:10px 20px; font-size:16px;">
+  </form>
+
+  <p>Once approved, you will receive a link to sign your official On-Call Employee Agreement.</p>
+</div>
+
