@@ -29,23 +29,39 @@
   <button id="submitBtn">Submit</button>
   <p id="confirmation" class="success" style="display:none;">Checklist submitted!</p>
 
-  <script>
-    const submitBtn = document.getElementById('submitBtn');
-    const confirmation = document.getElementById('confirmation');
+ <script>
+  const submitBtn = document.getElementById('submitBtn');
+  const confirmation = document.getElementById('confirmation');
 
-    submitBtn.addEventListener('click', () => {
-      const checklist = document.querySelectorAll('#checklist input[type="checkbox"]');
-      const tasks = [];
-      checklist.forEach((item, index) => {
-        tasks.push({ task: item.parentElement.textContent.trim(), done: item.checked });
+  submitBtn.addEventListener('click', () => {
+    const checklistItems = document.querySelectorAll('#checklist input[type="checkbox"]');
+    const tasks = [];
+    checklistItems.forEach(item => {
+      tasks.push({
+        task: item.parentElement.textContent.trim(),
+        done: item.checked
       });
+    });
 
-      // For now, just show confirmation
-      console.log(tasks); // Later this can be sent to Drive or email
+    // POST to Apps Script Web App
+    fetch("https://script.google.com/macros/s/AKfycbxfCfxmqIWsS1oqN9FlIW_qaywU1pszRqRuNiLVbEkzNXvZ45RACgPy_OhM_x8FhID_/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        employee: "Test Employee",  // Replace with dynamic value if needed
+        tasks: tasks
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
       confirmation.style.display = 'block';
       submitBtn.disabled = true;
-    });
-  </script>
+    })
+    .catch(error => console.error('Error:', error));
+  });
+</script>
+
 </body>
 </html>
 
