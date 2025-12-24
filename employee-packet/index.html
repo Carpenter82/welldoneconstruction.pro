@@ -11,22 +11,38 @@
   </p>
 
   <!-- Form Start -->
-  <form action="https://formspree.io/f/mnjawddk" method="POST" style="text-align:left;">
+  <form action="https://hook.us2.make.com/4e6klehicdxxvsa6mtone8yeccegdumx" method="POST" style="text-align:left;">
+
+    <!-- Hidden Form Type -->
+    <input type="hidden" name="FORM_TYPE" value="employee_packet">
 
     <!-- Full Name -->
     <label for="fullName">Full Name</label><br>
-    <input type="text" id="fullName" name="employeeName" required 
+    <input type="text" id="fullName" name="FIRSTNAME" required 
+           style="width:100%; padding:8px; margin:5px 0 15px 0;">
+
+    <!-- Last Name -->
+    <label for="lastName">Last Name</label><br>
+    <input type="text" id="lastName" name="LASTNAME" 
            style="width:100%; padding:8px; margin:5px 0 15px 0;">
 
     <!-- Email -->
     <label for="email">Email</label><br>
-    <input type="email" id="email" name="email" required 
+    <input type="email" id="email" name="EMAIL" required 
            style="width:100%; padding:8px; margin:5px 0 15px 0;">
 
     <!-- Phone -->
     <label for="phone">Phone Number</label><br>
-    <input type="tel" id="phone" name="phone" required 
+    <input type="tel" id="phone" name="PHONE" 
            style="width:100%; padding:8px; margin:5px 0 15px 0;">
+
+    <!-- Project Name -->
+    <label for="projectName">Project Name</label><br>
+    <input type="text" id="projectName" name="PROJECT_NAME" 
+           style="width:100%; padding:8px; margin:5px 0 15px 0;">
+
+    <!-- OPT_IN -->
+    <input type="hidden" name="OPT_IN" value="true">
 
     <!-- Work Skills & Acknowledgements -->
     <div style="border:1px solid #ccc; padding:20px; border-radius:5px; background-color:#f9f9f9; margin:20px 0;">
@@ -45,14 +61,14 @@
       <input type="checkbox" name="qualityAck" required> I acknowledge the quality standards<br>
     </div>
 
-    <!-- Signature -->
+    <!-- Typed Name / Signature -->
     <label for="signature">Typed Name / Digital Signature</label><br>
-    <input type="text" id="signature" name="signature" required 
+    <input type="text" id="signature" name="SIGNATURE" required 
            style="width:100%; padding:8px; margin:5px 0 15px 0;">
 
     <!-- Date -->
     <label for="date">Date</label><br>
-    <input type="date" id="date" name="date" required 
+    <input type="date" id="date" name="DATE" required 
            style="width:100%; padding:8px; margin:5px 0 15px 0;">
 
     <!-- Submit Button -->
