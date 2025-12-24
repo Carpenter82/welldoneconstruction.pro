@@ -1,42 +1,55 @@
-<form action="https://hook.us2.make.com/4e6klehicdxxvsa6mtone8yeccegdumx" method="POST">
-  <!-- Basic Contact Info -->
-  <label>First Name</label><br>
-  <input type="text" name="FIRSTNAME" required><br>
+<div style="text-align:center; max-width:600px; margin:auto; font-family:Arial, sans-serif; border:1px solid #ccc; padding:30px; box-sizing:border-box; border-radius:8px; background-color:#fff;">
 
-  <label>Last Name</label><br>
-  <input type="text" name="LASTNAME"><br>
+  <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction" style="max-width:100%; height:auto; margin-bottom:20px;">
 
-  <label>Email</label><br>
-  <input type="email" name="EMAIL" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"><br>
+  <p style="font-size:16px; margin-bottom:30px;">Welcome! Please complete the Employee Packet below.</p>
 
-  <label>Phone</label><br>
-  <input type="tel" name="SMS"><br>
+  <form action="https://hook.us2.make.com/4e6klehicdxxvsa6mtone8yeccegdumx" method="POST" style="text-align:left;">
 
-  <!-- Optional Attributes -->
-  <input type="hidden" name="EXT_ID" value=""><br>
-  <input type="hidden" name="CONTACT_TIMEZONE" value=""><br>
-  <input type="hidden" name="JOB_TITLE" value=""><br>
-  <input type="hidden" name="LINKEDIN" value=""><br>
-  <input type="hidden" name="WHATSAPP" value=""><br>
-  <input type="hidden" name="DOUBLE_OPT-IN" value=""><br>
-  <input type="hidden" name="PROJECT_NAME" value="Employee Packet"><br>
-  <input type="hidden" name="OPT_IN" value="true"><br>
+    <!-- Contact Info -->
+    <label>First Name</label><br>
+    <input type="text" name="FIRSTNAME" required style="width:100%; padding:8px; margin-bottom:15px;"><br>
 
-  <!-- Acknowledgements -->
-  <h3>Work Skills & Acknowledgements</h3>
-  <input type="checkbox" name="scope[]" value="General Carpentry" required> General Carpentry<br>
-  <input type="checkbox" name="scope[]" value="Repairs / Maintenance" required> Repairs / Maintenance<br>
-  <input type="checkbox" name="scope[]" value="Installations" required> Installations<br>
-  <input type="checkbox" name="osha10" required> OSHA-10 Certification<br>
-  <input type="checkbox" name="ppe" required> Will comply with PPE<br>
-  <input type="checkbox" name="drugFree" required> Drug/alcohol free<br>
-  <input type="checkbox" name="qualityAck" required> Acknowledge quality standards<br>
+    <label>Last Name</label><br>
+    <input type="text" name="LASTNAME" style="width:100%; padding:8px; margin-bottom:15px;"><br>
 
-  <label>Typed Name / Digital Signature</label><br>
-  <input type="text" name="SIGNATURE" required><br>
+    <label>Email</label><br>
+    <input type="email" name="EMAIL" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" style="width:100%; padding:8px; margin-bottom:15px;"><br>
 
-  <label>Date</label><br>
-  <input type="date" name="DATE" required><br>
+    <label>Phone</label><br>
+    <input type="tel" name="SMS" style="width:100%; padding:8px; margin-bottom:15px;"><br>
 
-  <input type="submit" value="Submit Packet">
-</form>
+    <!-- Hidden Brevo Attributes -->
+    <input type="hidden" name="EXT_ID" value="">
+    <input type="hidden" name="CONTACT_TIMEZONE" value="">
+    <input type="hidden" name="JOB_TITLE" value="">
+    <input type="hidden" name="LINKEDIN" value="">
+    <input type="hidden" name="WHATSAPP" value="">
+    <input type="hidden" name="DOUBLE_OPT-IN" value="">
+    <input type="hidden" name="PROJECT_NAME" value="Employee Packet">
+    <input type="hidden" name="OPT_IN" value="true">
+
+    <!-- Work Skills & Acknowledgements -->
+    <div style="border:1px solid #ccc; padding:20px; margin:20px 0; border-radius:5px; background-color:#f9f9f9;">
+      <h3 style="text-align:center; margin-top:0;">Work Skills & Acknowledgements</h3>
+      <input type="checkbox" name="scope[]" value="General Carpentry" required> General Carpentry<br>
+      <input type="checkbox" name="scope[]" value="Repairs / Maintenance" required> Repairs / Maintenance<br>
+      <input type="checkbox" name="scope[]" value="Installations" required> Installations<br><br>
+      <input type="checkbox" name="osha10" required> OSHA-10 Certification<br>
+      <input type="checkbox" name="ppe" required> Will comply with PPE<br>
+      <input type="checkbox" name="drugFree" required> Drug/alcohol free<br>
+      <input type="checkbox" name="qualityAck" required> Acknowledge quality standards<br>
+    </div>
+
+    <!-- Signature & Date -->
+    <label>Typed Name / Digital Signature</label><br>
+    <input type="text" name="SIGNATURE" required style="width:100%; padding:8px; margin-bottom:15px;"><br>
+
+    <label>Date</label><br>
+    <input type="date" name="DATE" required style="width:100%; padding:8px; margin-bottom:15px;"><br>
+
+    <input type="submit" value="Submit Packet" style="padding:10px 20px; font-size:16px; display:block; margin:auto;">
+  </form>
+
+  <p style="margin-top:20px; font-size:14px;">After submission, you’ll receive a link to sign your official On-Call Employee Agreement.</p>
+</div>
