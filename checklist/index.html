@@ -1,1 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WDC Employee Checklist</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f7f6; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        h2 { color: #007bff; }
+        .task { display: block; margin-bottom: 15px; font-size: 1.1em; }
+        input[type="checkbox"] { transform: scale(1.5); margin-right: 10px; }
+        button { background: #28a745; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2 id="title">Checklist</h2>
+    <p id="empName">Loading...</p>
+    <div id="tasks">
+        <label class="task"><input type="checkbox"> Pictures sent to me</label>
+        <label class="task"><input type="checkbox"> Clean up tools</label>
+        <label class="task"><input type="checkbox"> Finished project</label>
+        <label class="task"><input type="checkbox"> Start project</label>
+        <label class="task"><input type="checkbox"> Adequate material/tools</label>
+    </div>
+    <button onclick="sendData()">Submit Checklist</button>
+    <p id="status"></p>
+</div>
 
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get('employee') || "Worker";
+    document.getElementById('empName').innerText = "Employee: " + name;
+
+    async function sendData() {
+        const status = document.getElementById('status');
+        status.innerText = "Sending...";
+        
+        const checklistData = {
+            employee: name,
+            timestamp: new Date().toLocaleString(),
+            tasks: Array.from(document.querySelectorAll('.task')).map(t => ({
+                name: t.innerText.trim(),
+                done: t.querySelector('input').checked
+            }))
+        };
+
+        const scriptURL = "https://script.google.com/macros/s/AKfycbxWvBxZQGQa6y1Bq3hJ9w8kAAHPA0A9UHlAaepVlnFk7YuRaCrUwrBR7fHhh325xKZv/exec";
+
+        try {
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(checklistData)
+            });
+            status.innerText = "✅ Submitted Successfully!";
+            status.style.color = "green";
+        } catch (e) {
+            status.innerText = "❌ Error. Try again.";
+            status.style.color = "red";
+        }
+    }
+</script>
+</body>
+</html>
