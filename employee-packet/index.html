@@ -1,36 +1,43 @@
-<form action="https://script.google.com/macros/s/AKfycbzp9t5zSOwOQ6gdq-a3m70SsfIMnyy1Syf_qKA9Ai7FyCmMmbtSut9kI--dqqMLnWc-/exec" method="POST" style="max-width: 500px; font-family: sans-serif;">
-  
-  <div style="margin-bottom: 15px;">
-    <label>First Name</label><br>
-    <input type="text" name="firstName" required style="width: 100%; padding: 8px;">
-  </div>
+<div style="text-align:center; max-width:600px; margin:auto; font-family:Arial, sans-serif; border:1px solid #ccc; padding:30px; box-sizing:border-box; border-radius:8px; background-color:#fff;">
 
-  <div style="margin-bottom: 15px;">
-    <label>Last Name</label><br>
-    <input type="text" name="lastName" required style="width: 100%; padding: 8px;">
-  </div>
+  <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction" style="max-width:100%; height:auto; margin-bottom:20px;">
 
-  <div style="margin-bottom: 15px;">
-    <label>Email Address</label><br>
-    <input type="email" name="email" required style="width: 100%; padding: 8px;">
-  </div>
+  <p style="font-size:16px; margin-bottom:30px;">Welcome! We’re excited to have you join our team. Please complete the form below to get started.</p>
 
-  <div style="margin-bottom: 15px;">
-    <label>Phone Number</label><br>
-    <input type="tel" name="phone" style="width: 100%; padding: 8px;">
-  </div>
+  <form action="https://script.google.com/macros/s/AKfycbzp9t5zSOwOQ6gdq-a3m70SsfIMnyy1Syf_qKA9Ai7FyCmMmbtSut9kI--dqqMLnWc-/exec" method="POST" style="text-align:left;">
+    
+    <label for="firstName">First Name</label><br>
+    <input type="text" id="firstName" name="firstName" required style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
 
-  <div style="margin-bottom: 15px;">
-    <label>Desired Position</label><br>
-    <select name="role" style="width: 100%; padding: 8px;">
-      <option value="Carpenter">Carpenter</option>
-      <option value="Laborer">Laborer</option>
-      <option value="Foreman">Foreman</option>
-    </select>
-  </div>
+    <label for="lastName">Last Name</label><br>
+    <input type="text" id="lastName" name="lastName" required style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
 
-  <button type="submit" style="background-color: #fcc100; color: black; padding: 12px 20px; border: none; font-weight: bold; cursor: pointer; width: 100%;">
-    Submit Employee Packet
-  </button>
+    <label for="email">Email</label><br>
+    <input type="email" id="email" name="email" required style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
 
-</form>
+    <label for="phone">Phone Number</label><br>
+    <input type="tel" id="phone" name="phone" required style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
+
+    <div style="border:1px solid #ccc; padding:20px; text-align:left; margin:20px 0; border-radius:5px; background-color:#f9f9f9;">
+      <h3 style="text-align:center; margin-top:0;">Work Skills & Acknowledgements</h3>
+
+      <p><strong>Work Skills (Select all that apply):</strong></p>
+      <input type="checkbox" name="skills" value="General Carpentry"> General Carpentry<br>
+      <input type="checkbox" name="skills" value="Repairs / Maintenance"> Repairs / Maintenance<br>
+      <input type="checkbox" name="skills" value="Installations"> Installations<br><br>
+
+      <p><strong>Starting Pay Rate:</strong> $25 per hour (W-2, on-call, rostered until terminated)</p><br>
+
+      <input type="checkbox" name="osha" required> I have OSHA-10 Certification<br>
+      <input type="checkbox" name="safety" required> I will comply with all PPE and safety rules<br>
+      <input type="checkbox" name="drugfree" required> I will remain drug and alcohol free on job sites<br>
+    </div>
+
+    <label for="signature">Typed Name / Digital Signature</label><br>
+    <input type="text" id="signature" name="signature" required style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
+
+    <input type="submit" value="Submit Packet" style="padding:12px 30px; font-size:16px; display:block; margin:auto; background-color:#fcc100; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">
+  </form>
+
+  <p style="margin-top:20px; font-size:14px; color:#666;">After your submission is reviewed, you’ll receive a link to sign your official On-Call Employee Agreement.</p>
+</div>
