@@ -1,67 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Employee Checklist</title>
-  <link rel="stylesheet" href="../styles.css">
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; }
-    h1 { text-align: center; }
-    ul { list-style-type: none; padding: 0; }
-    li { margin: 10px 0; }
-    input[type="checkbox"] { margin-right: 10px; }
-    button { margin-top: 20px; padding: 10px 20px; font-size: 16px; }
-    .success { color: green; font-weight: bold; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Well Done Construction - Employee Checklist</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; background-color: #f4f7f6; color: #333; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
+        h2 { color: #007bff; margin-top: 0; }
+        .employee-name { font-weight: bold; color: #555; margin-bottom: 20px; display: block; }
+        .task-item { display: flex; align-items: center; margin-bottom: 15px; font-size: 1.1em; cursor: pointer; }
+        input[type="checkbox"] { width: 22px; height: 22px; margin-right: 15px; cursor: pointer; }
+        button { background-color: #28a745; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        button:hover { background-color: #218838; }
+        button:disabled { background-color: #ccc; }
+        #statusMessage { margin-top: 15px; text-align: center; font-weight: bold; }
+    </style>
 </head>
 <body>
-  <h1>Employee Checklist</h1>
-  <p>Please check all completed tasks and click "Submit" when finished.</p>
 
-  <ul id="checklist">
-    <li><input type="checkbox"> Review safety procedures</li>
-    <li><input type="checkbox"> Inspect materials</li>
-    <li><input type="checkbox"> Set up workspace</li>
-    <li><input type="checkbox"> Read company policies</li>
-    <li><input type="checkbox"> Complete onboarding forms</li>
-  </ul>
+<div class="card">
+    <h2>Daily Checklist</h2>
+    <span class="employee-name" id="displayName">Loading employee...</span>
 
-  <button id="submitBtn">Submit</button>
-  <p id="confirmation" class="success" style="display:none;">Checklist submitted!</p>
+    <div id="checklist">
+        <label class="task-item"><input type="checkbox" name="Pictures sent to me"> Pictures sent to me</label>
+        <label class="task-item"><input type="checkbox" name="Clean up tools"> Clean up tools</label>
+        <label class="task-item"><input type="checkbox" name="Finished project"> Finished project</label>
+        <label class="task-item"><input type="checkbox" name="Start project"> Start project</label>
+        <label class="task-item"><input type="checkbox" name="Adequate material"> Adequate material and/or tools</label>
+    </div>
 
- <script>
-  const submitBtn = document.getElementById('submitBtn');
-  const confirmation = document.getElementById('confirmation');
+    <button id="submitBtn" onclick="submitForm()">Submit Checklist</button>
+    <div id="statusMessage"></div>
+</div>
 
-  submitBtn.addEventListener('click', () => {
-    const checklistItems = document.querySelectorAll('#checklist input[type="checkbox"]');
-    const tasks = [];
-    checklistItems.forEach(item => {
-      tasks.push({
-        task: item.parentElement.textContent.trim(),
-        done: item.checked
-      });
-    });
+<script>
+    // --- CONFIGURATION ---
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxWvBxZQGQa6y1Bq3hJ9w8kAAHPA0A9UHlAaepVlnFk7YuRaCrUwrBR7fHhh325xKZv/exec";
+    
+    // Get employee name from URL ?employee=John3
+    const urlParams = new URLSearchParams(window.location.search);
+    const employeeName = urlParams.get('employee') || "Unknown Employee";
+    document.getElementById('displayName').innerText = "Employee: " + employeeName;
 
-    // POST to Apps Script Web App
-    fetch("https://script.google.com/macros/s/AKfycbxfCfxmqIWsS1oqN9FlIW_qaywU1pszRqRuNiLVbEkzNXvZ45RACgPy_OhM_x8FhID_/exec", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        employee: "Test Employee",  // Replace with dynamic value if needed
-        tasks: tasks
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log(data);
-      confirmation.style.display = 'block';
-      submitBtn.disabled = true;
-    })
-    .catch(error => console.error('Error:', error));
-  });
+    async function submitForm() {
+        const btn = document.getElementById('submitBtn');
+        const msg = document.getElementById('statusMessage');
+        btn.disabled = true;
+        msg.innerText = "Sending...";
+        msg.style.color = "orange";
+
+        const tasks = [];
+        document.querySelectorAll('#checklist input').forEach(cb => {
+            tasks.push({ task: cb.name, done: cb.checked });
+        });
+
+        const payload = {
+            employee: employeeName,
+            submitted: new Date().toISOString(),
+            tasks: tasks,
+            status: "Pending"
+        };
+
+        try {
+            // Using 'no-cors' for Google Apps Script Web App submissions 
+            // is common, but since we use JSON.parse in GAS, we'll use a standard fetch.
+            const response = await fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors", // Required for cross-domain Google Script
+                cache: "no-cache",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            // Note: with 'no-cors', we can't read the response, but if it doesn't throw, it sent.
+            msg.innerText = "Checklist Submitted Successfully!";
+            msg.style.color = "green";
+        } catch (error) {
+            console.error(error);
+            msg.innerText = "Error submitting. Please try again.";
+            msg.style.color = "red";
+            btn.disabled = false;
+        }
+    }
 </script>
 
 </body>
 </html>
-
