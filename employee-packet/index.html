@@ -1,77 +1,33 @@
-<div style="max-width:600px; margin:auto; font-family:Arial, sans-serif; border:1px solid #ccc; padding:30px; border-radius:8px; background-color:#fff; box-sizing:border-box; text-align:center;">
+<form action="https://hook.us2.make.com/4e6klehicdxxvsa6mtone8yeccegdumx" method="POST">
+  <input type="hidden" name="FORM_TYPE" value="employee_packet">
+  <input type="hidden" name="OPT_IN" value="true">
 
-  <!-- Logo -->
-  <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" 
-       alt="Well Done Construction" 
-       style="max-width:100%; height:auto; margin-bottom:20px;">
+  <label>First Name</label><br>
+  <input type="text" name="FIRSTNAME" required><br>
 
-  <!-- Welcome Text -->
-  <p style="font-size:16px; margin-bottom:30px;">
-    Welcome! We’re excited to have you join our team. Please complete the packet below to get started.
-  </p>
+  <label>Last Name</label><br>
+  <input type="text" name="LASTNAME"><br>
 
-  <!-- Form Start -->
-  <form action="https://hook.us2.make.com/4e6klehicdxxvsa6mtone8yeccegdumx" method="POST" style="text-align:left;">
+  <label>Email</label><br>
+  <input type="email" name="EMAIL" required><br>
 
-    <!-- Hidden Form Type -->
-    <input type="hidden" name="FORM_TYPE" value="employee_packet">
-    <input type="hidden" name="OPT_IN" value="true">
+  <label>Phone</label><br>
+  <input type="tel" name="PHONE"><br>
 
-    <!-- Full Name -->
-    <label for="fullName">First Name</label><br>
-    <input type="text" id="fullName" name="FIRSTNAME" required 
-           style="width:100%; padding:8px; margin:5px 0 15px 0;">
+  <h3>Work Skills & Acknowledgements</h3>
+  <input type="checkbox" name="scope[]" value="General Carpentry" required> General Carpentry<br>
+  <input type="checkbox" name="scope[]" value="Repairs / Maintenance" required> Repairs / Maintenance<br>
+  <input type="checkbox" name="scope[]" value="Installations" required> Installations<br>
+  <input type="checkbox" name="osha10" required> OSHA-10 Certification<br>
+  <input type="checkbox" name="ppe" required> Will comply with PPE<br>
+  <input type="checkbox" name="drugFree" required> Drug/alcohol free<br>
+  <input type="checkbox" name="qualityAck" required> Acknowledge quality standards<br>
 
-    <label for="lastName">Last Name</label><br>
-    <input type="text" id="lastName" name="LASTNAME" 
-           style="width:100%; padding:8px; margin:5px 0 15px 0;">
+  <label>Typed Name / Digital Signature</label><br>
+  <input type="text" name="SIGNATURE" required><br>
 
-    <!-- Email -->
-    <label for="email">Email</label><br>
-    <input type="email" id="email" name="EMAIL" required 
-           style="width:100%; padding:8px; margin:5px 0 15px 0;">
+  <label>Date</label><br>
+  <input type="date" name="DATE" required><br>
 
-    <!-- Phone -->
-    <label for="phone">Phone Number</label><br>
-    <input type="tel" id="phone" name="PHONE" 
-           style="width:100%; padding:8px; margin:5px 0 15px 0;">
-
-    <!-- Work Skills & Acknowledgements -->
-    <div style="border:1px solid #ccc; padding:20px; border-radius:5px; background-color:#f9f9f9; margin:20px 0;">
-      <h3 style="text-align:center; margin-top:0;">Work Skills & Acknowledgements</h3>
-
-      <p><strong>Work Skills (Select all that apply):</strong></p>
-      <input type="checkbox" name="scope[]" value="General Carpentry" required> General Carpentry<br>
-      <input type="checkbox" name="scope[]" value="Repairs / Maintenance" required> Repairs / Maintenance<br>
-      <input type="checkbox" name="scope[]" value="Installations" required> Installations<br><br>
-
-      <p><strong>Starting Pay Rate:</strong> $25/hour (W-2, on-call, rostered until terminated)</p><br>
-
-      <input type="checkbox" name="osha10" required> I have OSHA-10 Certification<br>
-      <input type="checkbox" name="ppe" required> I will comply with all PPE and safety rules<br>
-      <input type="checkbox" name="drugFree" required> I will remain drug and alcohol free on job sites<br>
-      <input type="checkbox" name="qualityAck" required> I acknowledge the quality standards<br>
-    </div>
-
-    <!-- Typed Name / Signature -->
-    <label for="signature">Typed Name / Digital Signature</label><br>
-    <input type="text" id="signature" name="SIGNATURE" required 
-           style="width:100%; padding:8px; margin:5px 0 15px 0;">
-
-    <!-- Date -->
-    <label for="date">Date</label><br>
-    <input type="date" id="date" name="DATE" required 
-           style="width:100%; padding:8px; margin:5px 0 15px 0;">
-
-    <!-- Submit Button -->
-    <input type="submit" value="Submit Packet" 
-           style="display:block; margin:20px auto; padding:10px 20px; font-size:16px; cursor:pointer;">
-
-  </form>
-
-  <!-- Confirmation Text -->
-  <p style="margin-top:20px; font-size:14px;">
-    After your submission is reviewed, you’ll receive a link to sign your official On-Call Employee Agreement.
-  </p>
-
-</div>
+  <input type="submit" value="Submit Packet">
+</form>
