@@ -1,0 +1,31 @@
+async function submitChecklist(employeeName, tasks) {
+  const fileMetadata = {
+    name: "checklist.json",
+    parents: ["<employee-folder-id>"]
+  };
+
+  const fileContent = JSON.stringify({
+    employee: employeeName,
+    submitted: new Date().toISOString(),
+    tasks: tasks.map(t => ({ task: t.name, done: t.done })),
+    status: "Pending"
+  });
+
+  const file = new Blob([fileContent], { type: "application/json" });
+
+  // Upload to Drive (requires OAuth/Google API setup)
+  await gapi.client.drive.files.create({
+    resource: fileMetadata,
+    media: {
+      mimeType: "application/json",
+      body: file
+    },
+    fields: "id"
+  });
+
+  // Notify admin by email
+  await fetch("/sendAdminNotification", {
+    method: "POST",
+    body: JSON.stringify({ employee: employeeName })
+  });
+}
