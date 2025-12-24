@@ -2,10 +2,14 @@
 
   <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction" style="max-width:100%; height:auto; margin-bottom:20px;">
 
-  <div id="thankYouMessage" style="display:none; padding:40px 20px;">
-    <h2 style="color: #222;">Packet Submitted!</h2>
-    <p style="font-size:18px;">Thank you, <span id="userName"></span>. Your profile has been created.</p>
-    <p>Please check your email for next steps regarding your DocHub agreement.</p>
+  <div id="thankYouMessage" style="display:none; padding:40px 20px; text-align: center;">
+    <h2 style="color: #222; text-transform: uppercase; letter-spacing: 1px;">Welcome to the Team!</h2>
+    <div style="width: 50px; height: 4px; background-color: #fcc100; margin: 10px auto 20px auto;"></div>
+    <p style="font-size:18px; color: #333;">Thank you, <span id="userName" style="font-weight:bold;"></span>.</p>
+    <p>Your profile has been successfully created.</p>
+    <p style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; font-size: 14px; color: #666;">
+      Please check your email for next steps and your DocHub agreement link.
+    </p>
   </div>
 
   <form id="employeeForm" style="text-align:left;">
@@ -41,14 +45,15 @@
     <label for="signature">Typed Name / Digital Signature</label><br>
     <input type="text" id="signature" name="signature" required style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
 
-    <input type="submit" id="submitBtn" value="Submit Packet" style="padding:12px 30px; font-size:16px; display:block; margin:auto; background-color:#fcc100; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">
+    <input type="submit" id="submitBtn" value="Submit Packet" style="padding:12px 30px; font-size:16px; display:block; margin:auto; background-color:#fcc100; color: #000; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">
   </form>
 
-  <p id="footerNote" style="margin-top:20px; font-size:14px; color:#666;">After your submission is reviewed, you’ll receive a link to sign your official On-Call Employee Agreement.</p>
+  <p id="footerNote" style="margin-top:20px; font-size:14px; color:#666; text-align: center;">After your submission is reviewed, you’ll receive a link to sign your official On-Call Employee Agreement.</p>
 </div>
 
 <script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbwM8XwHsRkuvqXgdpLTPcyU86r8JGwh7-Mh8WYg2OVGN2GYt05EH2bdUMEKdqOcsS3F/exec';
+  // UPDATED TO VERSION 23
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbwI0Tn4em5uHeQYdxvUClgo_LWTh4_jVfOsLxk7Na-06YyEAMG4Rkarh3iz3noKo3aW/exec';
   const form = document.getElementById('employeeForm');
   const submitBtn = document.getElementById('submitBtn');
   const thankYouMessage = document.getElementById('thankYouMessage');
