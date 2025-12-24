@@ -1,19 +1,28 @@
 <form action="https://hook.us2.make.com/4e6klehicdxxvsa6mtone8yeccegdumx" method="POST">
-  <input type="hidden" name="FORM_TYPE" value="employee_packet">
-  <input type="hidden" name="OPT_IN" value="true">
-
+  <!-- Basic Contact Info -->
   <label>First Name</label><br>
   <input type="text" name="FIRSTNAME" required><br>
 
   <label>Last Name</label><br>
   <input type="text" name="LASTNAME"><br>
 
- <label>Email</label><br>
-<input type="email" name="EMAIL" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"><br>
+  <label>Email</label><br>
+  <input type="email" name="EMAIL" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"><br>
 
   <label>Phone</label><br>
-  <input type="tel" name="PHONE"><br>
+  <input type="tel" name="SMS"><br>
 
+  <!-- Optional Attributes -->
+  <input type="hidden" name="EXT_ID" value=""><br>
+  <input type="hidden" name="CONTACT_TIMEZONE" value=""><br>
+  <input type="hidden" name="JOB_TITLE" value=""><br>
+  <input type="hidden" name="LINKEDIN" value=""><br>
+  <input type="hidden" name="WHATSAPP" value=""><br>
+  <input type="hidden" name="DOUBLE_OPT-IN" value=""><br>
+  <input type="hidden" name="PROJECT_NAME" value="Employee Packet"><br>
+  <input type="hidden" name="OPT_IN" value="true"><br>
+
+  <!-- Acknowledgements -->
   <h3>Work Skills & Acknowledgements</h3>
   <input type="checkbox" name="scope[]" value="General Carpentry" required> General Carpentry<br>
   <input type="checkbox" name="scope[]" value="Repairs / Maintenance" required> Repairs / Maintenance<br>
