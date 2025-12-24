@@ -23,11 +23,11 @@
     <p id="empName" class="sub-text">Loading employee...</p>
     
     <div id="tasks">
-        <label class="task"><input type="checkbox" name="Start project on schedule"> Start project on schedule</label>
-        <label class="task"><input type="checkbox" name="Materials/tools on-site"> Materials/tools on-site</label>
-        <label class="task"><input type="checkbox" name="Work in progress photos sent"> Work in progress photos sent</label>
-        <label class="task"><input type="checkbox" name="Project completed"> Project completed</label>
-        <label class="task"><input type="checkbox" name="Cleanup"> Cleanup</label>
+        <label class="task"><input type="checkbox"> Start project on schedule</label>
+        <label class="task"><input type="checkbox"> Materials/tools on-site</label>
+        <label class="task"><input type="checkbox"> Work in progress photos sent</label>
+        <label class="task"><input type="checkbox"> Project completed</label>
+        <label class="task"><input type="checkbox"> Cleanup</label>
     </div>
 
     <button id="submitBtn" onclick="sendData()">Submit Checklist</button>
@@ -35,6 +35,7 @@
 </div>
 
 <script>
+    // Get employee name from the URL
     const urlParams = new URLSearchParams(window.location.search);
     const name = urlParams.get('employee') || "Worker";
     document.getElementById('empName').innerText = "Employee: " + name;
@@ -42,9 +43,13 @@
     async function sendData() {
         const btn = document.getElementById('submitBtn');
         const status = document.getElementById('status');
+        
+        // Disable button to prevent double clicks
         btn.disabled = true;
         status.innerText = "Processing...";
+        status.style.color = "#65676b";
         
+        // Gather the checklist data
         const checklistData = {
             employee: name,
             submittedAt: new Date().toLocaleString(),
@@ -55,16 +60,23 @@
             status: "Pending Review"
         };
 
-        https://script.google.com/macros/s/AKfycbzP3Yw6YzpqAh4EXxo8FGYWaDu0ATv-Tk6SntW9PF1UxRjZ2_SG2mvl9KkKqETxNBvc/exec
+        // YOUR GOOGLE SCRIPT URL (Version 3)
+        const scriptURL = "https://script.google.com/macros/s/AKfycbzP3Yw6YzpqAh4EXxo8FGYWaDu0ATv-Tk6SntW9PF1UxRjZ2_SG2mvl9KkKqETxNBvc/exec";
+
         try {
             await fetch(scriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify(checklistData)
             });
+            
+            // Show success message
             status.innerText = "✅ Submission Saved to Drive!";
             status.style.color = "green";
+            
         } catch (e) {
+            // Show error message
             status.innerText = "❌ Connection Error. Please try again.";
             status.style.color = "red";
             btn.disabled = false;
