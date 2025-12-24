@@ -1,22 +1,50 @@
-<div style="max-width:600px; margin:auto; font-family:Arial, sans-serif; padding:20px; border:1px solid #ccc; border-radius:8px; background-color:#fff;">
-  <h2 style="text-align:center;">Employee Packet</h2>
-  <form action="YOUR_MAKE_WEBHOOK_URL" method="POST">
-    
-    <label for="firstName">First Name</label><br>
-    <input type="text" id="firstName" name="FIRSTNAME" required style="width:100%; padding:8px; margin-bottom:15px;"><br>
+<form id="employeeForm" action="https://script.google.com/macros/s/YOUR_URL/exec" method="POST">
+  
+  <div class="form-group">
+    <label>First Name</label>
+    <input type="text" name="firstName" required>
+  </div>
 
-    <label for="lastName">Last Name</label><br>
-    <input type="text" id="lastName" name="LASTNAME" required style="width:100%; padding:8px; margin-bottom:15px;"><br>
+  <div class="form-group">
+    <label>Last Name</label>
+    <input type="text" name="lastName" required>
+  </div>
 
-    <label for="email">Email</label><br>
-    <input type="email" id="email" name="EMAIL" required style="width:100%; padding:8px; margin-bottom:15px;"><br>
+  <div class="form-group">
+    <label>Email Address</label>
+    <input type="email" name="email" required>
+  </div>
 
-    <label for="phone">Phone Number</label><br>
-    <input type="tel" id="phone" name="SMS" style="width:100%; padding:8px; margin-bottom:15px;"><br>
+  <div class="form-group">
+    <label>Phone Number</label>
+    <input type="tel" name="phone">
+  </div>
 
-    <label for="jobTitle">Job Title</label><br>
-    <input type="text" id="jobTitle" name="JOB_TITLE" style="width:100%; padding:8px; margin-bottom:15px;"><br>
+  <div class="form-group">
+    <label>Desired Position</label>
+    <select name="role">
+      <option value="Carpenter">Carpenter</option>
+      <option value="Laborer">Laborer</option>
+      <option value="Foreman">Foreman</option>
+    </select>
+  </div>
 
-    <input type="submit" value="Submit Packet" style="width:100%; padding:10px; font-size:16px; background-color:#0073e6; color:white; border:none; border-radius:5px; cursor:pointer;">
-  </form>
+  <button type="submit" style="background: #e6b800; color: #000; padding: 10px 20px; border: none; font-weight: bold; cursor: pointer;">
+    Submit Employee Packet
+  </button>
+
+</form>
+
+<div id="successMessage" style="display:none; color: green; font-weight: bold; margin-top: 20px;">
+  Thank you! Your packet has been submitted. Check your email for confirmation.
 </div>
+
+<script>
+  // Simple script to keep users on your page instead of going to a Google success page
+  const form = document.getElementById('employeeForm');
+  const successMsg = document.getElementById('successMessage');
+
+  form.onsubmit = function(e) {
+    // Optional: add a 'Loading...' state to the button here
+  };
+</script>
