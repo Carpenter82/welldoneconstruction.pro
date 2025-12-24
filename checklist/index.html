@@ -3,28 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WDC Employee Checklist</title>
+    <title>WDC Quick Checklist</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background-color: #f4f7f6; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        h2 { color: #007bff; }
-        .task { display: block; margin-bottom: 15px; font-size: 1.1em; }
-        input[type="checkbox"] { transform: scale(1.5); margin-right: 10px; }
-        button { background: #28a745; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        body { font-family: -apple-system, sans-serif; padding: 20px; background-color: #f0f2f5; color: #1c1e21; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
+        h2 { color: #007bff; margin-bottom: 5px; }
+        .sub-text { color: #65676b; margin-bottom: 25px; font-size: 0.9em; }
+        .task { display: flex; align-items: center; background: #f8f9fa; padding: 15px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #dee2e6; cursor: pointer; transition: 0.2s; }
+        .task:active { background: #e9ecef; }
+        input[type="checkbox"] { width: 20px; height: 20px; margin-right: 15px; cursor: pointer; }
+        button { background: #007bff; color: white; border: none; padding: 18px; width: 100%; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:disabled { background: #ccc; }
+        #status { text-align: center; margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
 <div class="card">
-    <h2 id="title">Checklist</h2>
-    <p id="empName">Loading...</p>
+    <h2>Quick Checklist</h2>
+    <p id="empName" class="sub-text">Loading employee...</p>
+    
     <div id="tasks">
-        <label class="task"><input type="checkbox"> Pictures sent to me</label>
-        <label class="task"><input type="checkbox"> Clean up tools</label>
-        <label class="task"><input type="checkbox"> Finished project</label>
-        <label class="task"><input type="checkbox"> Start project</label>
-        <label class="task"><input type="checkbox"> Adequate material/tools</label>
+        <label class="task"><input type="checkbox" name="Start project on schedule"> Start project on schedule</label>
+        <label class="task"><input type="checkbox" name="Materials/tools on-site"> Materials/tools on-site</label>
+        <label class="task"><input type="checkbox" name="Work in progress photos sent"> Work in progress photos sent</label>
+        <label class="task"><input type="checkbox" name="Project completed"> Project completed</label>
+        <label class="task"><input type="checkbox" name="Cleanup"> Cleanup</label>
     </div>
-    <button onclick="sendData()">Submit Checklist</button>
+
+    <button id="submitBtn" onclick="sendData()">Submit Checklist</button>
     <p id="status"></p>
 </div>
 
@@ -34,16 +40,19 @@
     document.getElementById('empName').innerText = "Employee: " + name;
 
     async function sendData() {
+        const btn = document.getElementById('submitBtn');
         const status = document.getElementById('status');
-        status.innerText = "Sending...";
+        btn.disabled = true;
+        status.innerText = "Processing...";
         
         const checklistData = {
             employee: name,
-            timestamp: new Date().toLocaleString(),
+            submittedAt: new Date().toLocaleString(),
             tasks: Array.from(document.querySelectorAll('.task')).map(t => ({
-                name: t.innerText.trim(),
+                taskName: t.innerText.trim(),
                 done: t.querySelector('input').checked
-            }))
+            })),
+            status: "Pending Review"
         };
 
         const scriptURL = "https://script.google.com/macros/s/AKfycbxWvBxZQGQa6y1Bq3hJ9w8kAAHPA0A9UHlAaepVlnFk7YuRaCrUwrBR7fHhh325xKZv/exec";
@@ -54,11 +63,12 @@
                 mode: 'no-cors',
                 body: JSON.stringify(checklistData)
             });
-            status.innerText = "✅ Submitted Successfully!";
+            status.innerText = "✅ Submission Saved to Drive!";
             status.style.color = "green";
         } catch (e) {
-            status.innerText = "❌ Error. Try again.";
+            status.innerText = "❌ Connection Error. Please try again.";
             status.style.color = "red";
+            btn.disabled = false;
         }
     }
 </script>
