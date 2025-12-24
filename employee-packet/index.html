@@ -55,11 +55,37 @@
 </div>
 
 <script>
-  // LINKED TO APPS SCRIPT VERSION 24
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyO7Yuei3NB1AN1GJXJv6yhJTS3aIGlfDQKbv1U9Ce85yN06kAMfffzwBYI1eWyk92D/exec';
+  // YOUR VERSION 25 URL
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbzbl_DTckys9MpYlQJwN5naNFHnterhPZIDXxGOo3AGse2851hGGQbsvyL6nGE8qu5J/exec';
   const form = document.getElementById('employeeForm');
   const submitBtn = document.getElementById('submitBtn');
-  const thankYouMessage = document.getElementById('thankYouMessage');
-  const footerNote = document.getElementById('footerNote');
 
-  form
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    submitBtn.value = "PROCESSING...";
+    submitBtn.disabled = true;
+
+    // mode: 'no-cors' allows the data to send to Google without being blocked by the browser
+    fetch(scriptURL, { 
+      method: 'POST', 
+      mode: 'no-cors', 
+      body: new FormData(form)
+    })
+    .then(() => {
+        // Since no-cors doesn't return a readable response, we trigger the success message immediately
+        const fName = document.getElementById('firstName').value;
+        document.getElementById('userName').innerText = fName;
+        
+        form.style.display = 'none';
+        document.getElementById('footerNote').style.display = 'none';
+        document.getElementById('thankYouMessage').style.display = 'block';
+        window.scrollTo(0,0);
+    })
+    .catch(error => {
+        console.error('Error!', error.message);
+        alert('There was an error submitting your form. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.value = "SUBMIT PACKET";
+    });
+  });
+</script>
