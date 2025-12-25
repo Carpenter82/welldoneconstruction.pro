@@ -28,20 +28,29 @@
         const scriptURL = "https://script.google.com/macros/s/AKfycbyHFv2lI2whyM63Y3Up_yqeI006GVOpVCgzQUDD8DvWXjdGVvqSkfCvL8wb8Ud8RIaG/exec";
 
         // Fetch the list of workers automatically
-        fetch(scriptURL + "?get=list")
-            .then(res => res.json())
-            .then(names => {
-                const listDiv = document.getElementById('workerList');
+        // Fetch the list with a "No-Cache" rule to force it to be fresh
+    fetch(scriptURL + "?get=list", { cache: "no-store" })
+        .then(res => res.json())
+        .then(names => {
+            const listDiv = document.getElementById('workerList');
+            if (names.length === 0) {
+                listDiv.innerHTML = "No workers found yet.";
+            } else {
                 listDiv.innerHTML = ""; // Clear loader
                 names.forEach(name => {
-                    const id = name.replace(' ', '_');
+                    const id = name.replace(/\s+/g, '_');
                     listDiv.innerHTML += `
-                        <a href="${scriptURL}?id=${id}" class="worker-link">
+                        <a href="${scriptURL}?id=${id}" target="_blank" class="worker-link">
                             <span>${name}</span>
                             <span style="color: #ffd700;">VIEW →</span>
                         </a>`;
                 });
-            });
+            }
+        })
+        .catch(err => {
+            document.getElementById('workerList').innerHTML = "Connection Error. Check Permissions.";
+            console.error(err);
+        });
     </script>
 </body>
 </html>
