@@ -1,104 +1,32 @@
-/* Reset basics */
-body, h1, h2, p, ul, li {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  box-sizing: border-box;
+/* Well Done Construction LLC - Master Styles */
+:root {
+  --wd-green: #33B26E;
+  --wd-dark: #343E47;
+  --wd-slate: #6E797F;
+  --wd-white: #FFFFFF;
 }
 
-body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #F4F7F6; /* Light professional background */
-  color: #343E47; /* Your Dark Charcoal for text */
-  line-height: 1.6;
-}
-
-/* Logo container */
-.logo-container {
-  text-align: center;
-  padding: 40px 20px;
-  background: #FFFFFF; /* Clean white background for the logo */
-  border-bottom: 3px solid #33B26E; /* Brand Green accent line */
-}
-
-.logo-container .logo {
-  display: block;
-  margin: 0 auto;
-  max-width: 250px;
-  height: auto;
-}
-
-/* Hero section */
-.hero {
-  background: url('https://images.unsplash.com/photo-1581092334720-f376f92cfef6?auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
-  height: 400px;
-  position: relative;
-}
-
-.hero-overlay {
-  background: rgba(52, 62, 71, 0.85); /* Dark Charcoal overlay */
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  color: #fff;
-  padding: 0 20px;
-}
-
-/* Button - Updated with your Brand Green */
-.button {
-  display: inline-block;
-  padding: 12px 24px;
-  background: #33B26E; /* Brand Green */
-  color: #fff;
-  text-decoration: none;
+/* Page 1 Button */
+.gatekeeper-btn {
+  background-color: var(--wd-green);
+  color: var(--wd-white);
+  padding: 15px 30px;
   border-radius: 4px;
+  text-decoration: none;
   font-weight: bold;
-  transition: background 0.3s ease;
 }
 
-.button:hover {
-  background: #288e58; /* Darker shade of your green */
-  color: #fff;
+/* Page 2 & 4 Headers/Sidebars */
+.admin-sidebar, .onboarding-header {
+  background-color: var(--wd-dark);
+  color: var(--wd-white);
 }
 
-/* Services section */
-.services {
-  max-width: 900px;
-  margin: 50px auto;
-  padding: 40px 20px;
-  text-align: center;
-  background: #EAECEB; /* Slate-tinted light background */
-  border-radius: 8px;
-  color: #343E47;
+/* Accent lines and borders */
+.accent-border {
+  border-bottom: 3px solid var(--wd-green);
 }
 
-/* Service cards - Clean & Professional */
-.service-card {
-  background: #fff;
-  color: #343E47;
-  padding: 25px;
-  border-radius: 6px;
-  border-left: 5px solid #33B26E; /* Green accent on the side */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  font-weight: bold;
-  transition: transform 0.2s;
-}
-
-.service-card:hover {
-  transform: translateY(-5px);
-  border-left-color: #6E797F; /* Changes to Slate on hover */
-}
-
-/* Footer */
-footer {
-  text-align: center;
-  padding: 30px;
-  margin-top: 40px;
-  background: #343E47; /* Dark Charcoal Footer */
-  color: #D1D5D7; /* Light Slate text */
-  font-size: 0.9rem;
+.slate-text {
+  color: var(--wd-slate);
 }
