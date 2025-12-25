@@ -6,58 +6,80 @@
 <title>Well Done Construction - Onboarding Portal</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
     margin: 0;
-    background-color: #f8f8f8;
-    color: #333;
+    background-color: #F4F7F6; /* Light gray background */
+    color: #343E47; /* Brand Charcoal */
     line-height: 1.6;
     text-align: center;
   }
   header {
-    background: #2c3e50;
-    padding: 20px;
+    background: #343E47; /* Brand Charcoal Header */
+    padding: 25px;
     text-align: center;
+    border-bottom: 4px solid #33B26E; /* Brand Green Accent */
   }
   header img {
     max-width: 250px;
   }
   main {
     max-width: 800px;
-    margin: 30px auto;
-    padding: 25px;
+    margin: 40px auto;
+    padding: 35px;
     background: #fff;
     border-radius: 8px;
-    box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     text-align: left;
   }
   h1, h2 {
-    color: #2c3e50;
-    text-align: center;
+    color: #343E47;
+    text-align: left;
+    border-bottom: 2px solid #EAECEB;
+    padding-bottom: 10px;
   }
-  p {
-    margin-bottom: 15px;
+  h1 { 
+    text-align: center; 
+    border-bottom: none;
+    color: #33B26E; /* Brand Green for Welcome */
   }
-  ul {
-    margin-left: 20px;
+  p { margin-bottom: 15px; }
+  ul { margin-left: 20px; list-style-type: none; padding: 0; }
+  li { 
+    margin-bottom: 12px; 
+    padding-left: 10px;
+    border-left: 3px solid #6E797F; /* Slate accent on list items */
   }
-  li {
-    margin-bottom: 10px;
-  }
+  
+  /* Primary Action Buttons */
+  .button-container { text-align: center; margin-top: 30px; }
+  
   a.button {
     display: inline-block;
-    background: #2c3e50;
+    background: #33B26E; /* Brand Green */
     color: #fff;
-    padding: 12px 25px;
-    border-radius: 6px;
+    padding: 14px 28px;
+    border-radius: 4px;
     text-decoration: none;
-    margin: 15px 0;
+    margin: 10px;
     font-weight: bold;
+    transition: background 0.3s ease;
   }
   a.button:hover {
-    background: #1f2a38;
+    background: #288e58; /* Darker Green */
   }
-  section {
-    margin-bottom: 30px;
+  
+  /* Secondary/Utility Buttons */
+  a.button-secondary {
+    background: #343E47; /* Brand Charcoal */
+  }
+  a.button-secondary:hover {
+    background: #6E797F; /* Slate on hover */
+  }
+
+  footer {
+    padding: 20px;
+    color: #6E797F;
+    font-size: 0.85rem;
   }
 </style>
 </head>
@@ -68,42 +90,41 @@
 </header>
 
 <main>
-<h1>Welcome to Well Done Construction!</h1>
+<h1>Welcome to the Team!</h1>
 
 <section>
 <h2>Our Mission</h2>
-<p>We’re glad to have you join the team! Our mission is to deliver top-quality services with unparalleled convenience, and we believe partnering with dedicated professionals like you is key to our success.</p>
-</section>
-
-<section>
-<h2>Who We Are</h2>
-<p>Well Done Construction is a local Washoe Valley business catering to maintenance and remodel needs of the community.</p>
-</section>
-
-<section>
-<h2>Our Process</h2>
-<p>We provide brief educational overviews of tasks and use high-quality materials to ensure our clients are well-informed and projects are completed efficiently. We focus on collaborative partnerships with our team, clear communication, reliable assignments, and ongoing support to foster long-term success.</p>
+<p>We’re glad to have you join us! Our mission is to deliver top-quality remodeling and maintenance with unparalleled convenience. Dedicated professionals like you are the foundation of <strong>Well Done Construction</strong>.</p>
 </section>
 
 <section>
 <h2>Expectations</h2>
-<p>When your services are requested, you will receive an email stating:</p>
+<p>When your services are requested via your personal portal, you will receive an email containing:</p>
 <ul>
-  <li><strong>Project Overview:</strong> Name and scope of work</li>
-  <li><strong>Timeline:</strong> Estimated completion date</li>
-  <li><strong>Compensation:</strong> Pay for the project</li>
-  <li><strong>Client Information:</strong> Contact and location</li>
+  <li><strong>Project Overview:</strong> Clear scope of work.</li>
+  <li><strong>Timeline:</strong> Estimated completion date.</li>
+  <li><strong>Compensation:</strong> Transparent pay for the project.</li>
+  <li><strong>Client Info:</strong> Location and contact details.</li>
 </ul>
-<p>Please review carefully and follow all instructions.</p>
 </section>
 
-<section>
-<h2>Get Started</h2>
-<a class="button" href="/employee-packet/">Submit Employee Packet</a>
-<a class="button" href="https://dochub.com/m/shared-document/tee-construction/EB5r38Awlmd8oMvRXzZ1kD/on-call-employee-agreement-pdf?dt=Ld8g8Eod_amagDQuWys3" target="_blank">Sign On-Call Employee Agreement</a>
+<section class="button-container">
+  <h2>Action Required</h2>
+  <a class="button" href="https://welldoneconstruction.pro/employee-packet/">1. Submit Employee Packet</a>
+  
+  <a class="button" href="https://dochub.com/m/shared-document/tee-construction/EB5r38Awlmd8oMvRXzZ1kD/on-call-employee-agreement-pdf?dt=Ld8g8Eod_amagDQuWys3" target="_blank">2. Sign On-Call Agreement</a>
+  
+  <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+  
+  <p><small>Already onboarded?</small></p>
+  <a class="button button-secondary" href="https://welldoneconstruction.pro/portal/">Access Personal Portal</a>
 </section>
 
 </main>
+
+<footer>
+  &copy; 2025 Well Done Construction | Washoe County, NV
+</footer>
 
 </body>
 </html>
