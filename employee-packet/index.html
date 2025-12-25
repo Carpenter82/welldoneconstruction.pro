@@ -1,3 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Onboarding | Well Done Construction</title>
+</head>
+<body style="background-color: #f4f4f4; padding: 20px;">
+
 <div id="formContainer" style="text-align:center; max-width:600px; margin:auto; font-family:Arial, sans-serif; border:1px solid #ccc; padding:30px; box-sizing:border-box; border-radius:8px; background-color:#fff;">
 
   <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction" style="max-width:100%; height:auto; margin-bottom:20px;">
@@ -55,7 +64,7 @@
 </div>
 
 <script>
-  // YOUR VERSION 25 URL
+  // YOUR APPS SCRIPT URL
   const scriptURL = 'https://script.google.com/macros/s/AKfycbzbl_DTckys9MpYlQJwN5naNFHnterhPZIDXxGOo3AGse2851hGGQbsvyL6nGE8qu5J/exec';
   const form = document.getElementById('employeeForm');
   const submitBtn = document.getElementById('submitBtn');
@@ -65,14 +74,36 @@
     submitBtn.value = "PROCESSING...";
     submitBtn.disabled = true;
 
-    // mode: 'no-cors' allows the data to send to Google without being blocked by the browser
+    // 1. Gather all form data into a clean JSON object
+    const formData = new FormData(form);
+    const data = {};
+    
+    formData.forEach((value, key) => {
+      // Logic to handle multiple checkboxes for 'skills'
+      if (data[key]) {
+        if (!Array.isArray(data[key])) {
+          data[key] = [data[key]];
+        }
+        data[key].push(value);
+      } else {
+        data[key] = value;
+      }
+    });
+
+    // 2. Add system metadata
+    data.submittedAt = new Date().toLocaleString();
+    data.employee = data.firstName + "_" + data.lastName; // This becomes the folder name
+
+    // 3. Post to Google Apps Script as JSON
     fetch(scriptURL, { 
       method: 'POST', 
       mode: 'no-cors', 
-      body: new FormData(form)
+      cache: 'no-cache',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data) 
     })
     .then(() => {
-        // Since no-cors doesn't return a readable response, we trigger the success message immediately
+        // Since no-cors hides the response, we assume success if no error is caught
         const fName = document.getElementById('firstName').value;
         document.getElementById('userName').innerText = fName;
         
@@ -82,10 +113,13 @@
         window.scrollTo(0,0);
     })
     .catch(error => {
-        console.error('Error!', error.message);
-        alert('There was an error submitting your form. Please try again.');
+        console.error('Submission Error:', error.message);
+        alert('There was an error submitting your packet. Please check your connection and try again.');
         submitBtn.disabled = false;
         submitBtn.value = "SUBMIT PACKET";
     });
   });
 </script>
+
+</body>
+</html>
