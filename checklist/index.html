@@ -9,9 +9,8 @@
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
         h2 { color: #007bff; margin-bottom: 5px; }
         .sub-text { color: #65676b; margin-bottom: 25px; font-size: 0.9em; }
-        .task { display: flex; align-items: center; background: #f8f9fa; padding: 15px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #dee2e6; cursor: pointer; transition: 0.2s; }
-        .task:active { background: #e9ecef; }
-        input[type="checkbox"] { width: 20px; height: 20px; margin-right: 15px; cursor: pointer; }
+        .task { display: flex; align-items: center; background: #f8f9fa; padding: 15px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #dee2e6; cursor: pointer; }
+        input[type="checkbox"] { width: 20px; height: 20px; margin-right: 15px; }
         button { background: #007bff; color: white; border: none; padding: 18px; width: 100%; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 10px; }
         button:disabled { background: #ccc; }
         #status { text-align: center; margin-top: 15px; font-weight: bold; }
@@ -21,7 +20,6 @@
 <div class="card">
     <h2>Quick Checklist</h2>
     <p id="empName" class="sub-text">Loading employee...</p>
-    
     <div id="tasks">
         <label class="task"><input type="checkbox"> Start project on schedule</label>
         <label class="task"><input type="checkbox"> Materials/tools on-site</label>
@@ -29,13 +27,11 @@
         <label class="task"><input type="checkbox"> Project completed</label>
         <label class="task"><input type="checkbox"> Cleanup</label>
     </div>
-
     <button id="submitBtn" onclick="sendData()">Submit Checklist</button>
     <p id="status"></p>
 </div>
 
 <script>
-    // Get employee name from the URL
     const urlParams = new URLSearchParams(window.location.search);
     const name = urlParams.get('employee') || "Worker";
     document.getElementById('empName').innerText = "Employee: " + name;
@@ -43,25 +39,20 @@
     async function sendData() {
         const btn = document.getElementById('submitBtn');
         const status = document.getElementById('status');
-        
-        // Disable button to prevent double clicks
         btn.disabled = true;
         status.innerText = "Processing...";
-        status.style.color = "#65676b";
-        
-        // Gather the checklist data
+
         const checklistData = {
             employee: name,
             submittedAt: new Date().toLocaleString(),
             tasks: Array.from(document.querySelectorAll('.task')).map(t => ({
                 taskName: t.innerText.trim(),
                 done: t.querySelector('input').checked
-            })),
-            status: "Pending Review"
+            }))
         };
 
-        // YOUR GOOGLE SCRIPT URL (Version 3)
-       const scriptURL = "https://script.google.com/macros/s/AKfycbwM6VR5e4nwZuzGWkydUlQegLtLpWycR9gMA4PPjXJsBBVnx4S1YYeHHILVEdLPKDhP/exec";
+        const scriptURL = "https://script.google.com/macros/s/AKfycbwM6VR5e4nwZuzGWkydUlQegLtLpWycR9gMA4PPjXJsBBVnx4S1YYeHHILVEdLPKDhP/exec";
+
         try {
             await fetch(scriptURL, {
                 method: 'POST',
@@ -69,14 +60,10 @@
                 headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify(checklistData)
             });
-            
-            // Show success message
-            status.innerText = "✅ Submission Saved to Drive!";
+            status.innerText = "✅ Submission Saved!";
             status.style.color = "green";
-            
         } catch (e) {
-            // Show error message
-            status.innerText = "❌ Connection Error. Please try again.";
+            status.innerText = "❌ Error. Try again.";
             status.style.color = "red";
             btn.disabled = false;
         }
