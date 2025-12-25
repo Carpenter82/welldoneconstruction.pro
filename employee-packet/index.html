@@ -1,115 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Onboarding | Well Done Construction</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Packet | Well Done Construction LLC</title>
+  <style>
+    :root {
+      --wd-green: #33B26E;
+      --wd-dark: #343E47;
+      --wd-slate: #6E797F;
+      --wd-bg: #F4F7F6;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      background-color: var(--wd-bg);
+      color: var(--wd-dark);
+    }
+
+    /* Page 2 Header - Brand Charcoal */
+    header {
+      background: var(--wd-dark);
+      padding: 25px;
+      text-align: center;
+      border-bottom: 4px solid var(--wd-green);
+    }
+    header img { max-width: 240px; }
+
+    main {
+      max-width: 750px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    h1 { color: var(--wd-dark); margin-bottom: 5px; }
+    .subtitle { color: var(--wd-slate); margin-bottom: 30px; font-style: italic; }
+
+    /* Form Section Styling */
+    h2 { 
+      font-size: 1.1rem; 
+      text-transform: uppercase; 
+      letter-spacing: 1px; 
+      color: var(--wd-green); 
+      border-bottom: 2px solid var(--wd-bg);
+      padding-bottom: 8px;
+      margin-top: 30px;
+    }
+
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--wd-dark); }
+    
+    input[type="text"], input[type="email"], input[type="tel"], select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 1rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--wd-green);
+      box-shadow: 0 0 5px rgba(51, 178, 110, 0.2);
+    }
+
+    .btn-submit {
+      background-color: var(--wd-green);
+      color: white;
+      padding: 16px 32px;
+      border: none;
+      border-radius: 4px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 20px;
+      transition: background 0.3s;
+    }
+
+    .btn-submit:hover { background-color: #2b965c; }
+
+    footer { text-align: center; padding: 40px; color: var(--wd-slate); font-size: 0.85rem; }
+  </style>
 </head>
-<body style="background-color: #f4f4f4; padding: 20px;">
+<body>
 
-<div id="formContainer" style="text-align:center; max-width:600px; margin:auto; font-family:Arial, sans-serif; border:1px solid #ccc; padding:30px; box-sizing:border-box; border-radius:8px; background-color:#fff;">
+<header>
+  <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction LLC">
+</header>
 
-  <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction" style="max-width:100%; height:auto; margin-bottom:20px;">
+<main>
+  <h1>Employee Packet</h1>
+  <p class="subtitle">Please complete this intake form to initialize your personal employee portal.</p>
 
-  <div id="thankYouMessage" style="display:none; padding:40px 20px; text-align: center;">
-    <h2 style="color: #1a1a1a; text-transform: uppercase; letter-spacing: 1px;">Welcome to the Team!</h2>
-    <div style="width: 60px; height: 5px; background-color: #fcc100; margin: 10px auto 20px auto;"></div>
-    <p style="font-size:18px; color: #333;">Thank you, <span id="userName" style="font-weight:bold;"></span>.</p>
-    <p>Your digital profile has been successfully created.</p>
-    <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; font-size: 15px; color: #444; margin-top: 20px; border-left: 4px solid #fcc100;">
-      <strong>Check your email!</strong> We just sent you the next steps. You will also receive a separate email from <b>DocHub</b> shortly to sign your agreement.
+  <form action="#" method="POST">
+    
+    <h2>1. Contact Information</h2>
+    <div class="form-group">
+      <label>Legal First & Last Name</label>
+      <input type="text" name="fname" required>
     </div>
-  </div>
-
-  <form id="employeeForm" style="text-align:left;">
-    <p style="font-size:16px; margin-bottom:30px; text-align:center; color: #555;">Please complete the fields below to begin your onboarding.</p>
-
-    <label style="font-weight:bold;">First Name</label><br>
-    <input type="text" id="firstName" name="firstName" required style="width:100%; padding:10px; margin-top:5px; margin-bottom:15px; border:1px solid #ccc; border-radius:4px;">
-
-    <label style="font-weight:bold;">Last Name</label><br>
-    <input type="text" id="lastName" name="lastName" required style="width:100%; padding:10px; margin-top:5px; margin-bottom:15px; border:1px solid #ccc; border-radius:4px;">
-
-    <label style="font-weight:bold;">Email Address</label><br>
-    <input type="email" id="email" name="email" required style="width:100%; padding:10px; margin-top:5px; margin-bottom:15px; border:1px solid #ccc; border-radius:4px;">
-
-    <label style="font-weight:bold;">Phone Number</label><br>
-    <input type="tel" id="phone" name="phone" required style="width:100%; padding:10px; margin-top:5px; margin-bottom:15px; border:1px solid #ccc; border-radius:4px;">
-
-    <div style="border:2px solid #fcc100; padding:20px; text-align:left; margin:25px 0; border-radius:5px; background-color:#fefcf5;">
-      <h3 style="text-align:center; margin-top:0; text-transform:uppercase; font-size:16px;">Work Skills & Safety</h3>
-
-      <p style="margin-bottom:10px;"><strong>Skills (Select all that apply):</strong></p>
-      <input type="checkbox" name="skills" value="General Carpentry"> General Carpentry<br>
-      <input type="checkbox" name="skills" value="Repairs / Maintenance"> Repairs / Maintenance<br>
-      <input type="checkbox" name="skills" value="Installations"> Installations<br><br>
-
-      <p style="margin-bottom:10px;"><strong>Required Acknowledgements:</strong></p>
-      <input type="checkbox" name="osha" required> I have OSHA-10 Certification<br>
-      <input type="checkbox" name="safety" required> I will comply with all PPE/Safety rules<br>
-      <input type="checkbox" name="drugfree" required> I will remain drug/alcohol free on sites<br>
-      
-      <p style="margin-top:20px; font-size:14px; background:#fff; padding:10px; border:1px solid #ddd;">
-        <strong>Note:</strong> Starting Pay Rate is $25.00/hr (W-2, On-Call).
-      </p>
+    <div class="form-group">
+      <label>Mailing Address</label>
+      <input type="text" name="address" required>
+    </div>
+    <div class="form-group">
+      <label>Primary Phone Number</label>
+      <input type="tel" name="phone" required>
     </div>
 
-    <label style="font-weight:bold;">Digital Signature (Type Full Name)</label><br>
-    <input type="text" id="signature" name="signature" required style="width:100%; padding:10px; margin-top:5px; margin-bottom:20px; border:1px solid #ccc; border-radius:4px;">
+    <h2>2. Employment Details</h2>
+    <div class="form-group">
+      <label>Position / Specialty</label>
+      <select name="specialty">
+        <option value="carpentry">Carpentry</option>
+        <option value="remodeling">Remodeling</option>
+        <option value="maintenance">Maintenance</option>
+        <option value="handyman">Handyman</option>
+      </select>
+    </div>
 
-    <input type="submit" id="submitBtn" value="SUBMIT PACKET" style="width:100%; padding:15px; font-size:18px; background-color:#fcc100; color: #000; border:none; border-radius:4px; font-weight:bold; cursor:pointer; letter-spacing:1px;">
+    <h2>3. Direct Deposit / Admin</h2>
+    <p style="font-size: 0.9rem; color: var(--wd-slate);">Note: Formal tax documents will be handled via the DocHub link sent to your email.</p>
+    <div class="form-group">
+      <label>SSN / Tax ID (Encrypted Field)</label>
+      <input type="text" name="tax_id" placeholder="xxx-xx-xxxx">
+    </div>
+
+    <button type="submit" class="btn-submit">Initialize My Employee Folder</button>
   </form>
+</main>
 
-  <p id="footerNote" style="margin-top:20px; font-size:13px; color:#888; text-align: center;">Well Done Construction LLC | Onboarding Portal</p>
-</div>
-
-<script>
-  // THIS IS YOUR NEW MASTER URL
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyHFv2lI2whyM63Y3Up_yqeI006GVOpVCgzQUDD8DvWXjdGVvqSkfCvL8wb8Ud8RIaG/exec';
-  
-  const form = document.getElementById('employeeForm');
-  const submitBtn = document.getElementById('submitBtn');
-
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    submitBtn.value = "PROCESSING...";
-    submitBtn.disabled = true;
-
-    const formData = new FormData(form);
-    const data = {};
-    formData.forEach((value, key) => {
-      if (data[key]) {
-        if (!Array.isArray(data[key])) { data[key] = [data[key]]; }
-        data[key].push(value);
-      } else {
-        data[key] = value;
-      }
-    });
-
-    data.submittedAt = new Date().toLocaleString();
-    data.employee = data.firstName + "_" + data.lastName;
-
-    fetch(scriptURL, { 
-      method: 'POST', 
-      mode: 'no-cors', 
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data) 
-    })
-    .then(() => {
-        const fName = document.getElementById('firstName').value;
-        document.getElementById('userName').innerText = fName;
-        form.style.display = 'none';
-        document.getElementById('thankYouMessage').style.display = 'block';
-        window.scrollTo(0,0);
-    })
-    .catch(error => {
-        console.error('Error!', error.message);
-        alert('Error submitting. Please try again.');
-        submitBtn.disabled = false;
-        submitBtn.value = "SUBMIT PACKET";
-    });
-  });
-</script>
+<footer>
+  &copy; 2025 Well Done Construction LLC | Washoe County, NV
+</footer>
 
 </body>
 </html>
