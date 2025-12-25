@@ -1,80 +1,137 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Portal | Well Done Construction LLC</title>
   <style>
-    body { font-family: 'Helvetica', Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #1c1e21; }
-    .section-label { font-size: 12px; font-weight: bold; color: #65676b; text-transform: uppercase; margin-bottom: 10px; }
-    
-    /* 1. HEADER STYLE */
-    .header-box { background: #fff; padding: 20px; border-radius: 4px; border: 1px solid #ddd; margin-bottom: 20px; }
-    .header-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .stat { font-size: 14px; } .stat b { color: #000; }
+    :root {
+      --wd-green: #33B26E;
+      --wd-dark: #343E47;
+      --wd-slate: #6E797F;
+      --wd-white: #FFFFFF;
+      --wd-bg: #F4F7F6;
+    }
 
-    /* 2. TIMELINE STYLE */
-    .job-card { background: #fff; padding: 15px; border-radius: 4px; border: 1px solid #ddd; margin-bottom: 15px; position: relative; }
-    .job-card.issue { border-left: 5px solid #d93025; }
-    .job-card.clean { border-left: 5px solid #188038; }
-    .links { margin-top: 10px; }
-    .btn { display: inline-block; padding: 6px 12px; background: #eee; border: 1px solid #ccc; text-decoration: none; color: #333; font-size: 12px; margin-right: 5px; border-radius: 2px; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      background-color: var(--wd-bg);
+    }
 
-    /* 3. ISSUES LOG STYLE */
-    .log-box { background: #333; color: #fff; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 13px; line-height: 1.6; }
-    .log-entry { border-bottom: 1px solid #555; padding: 5px 0; }
-    .timestamp { color: #888; font-size: 11px; }
-    .flag { color: #ff4d4d; font-weight: bold; }
+    /* Sidebar Navigation */
+    nav {
+      width: 260px;
+      background-color: var(--wd-dark);
+      color: var(--wd-white);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    nav img {
+      width: 100%;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--wd-slate);
+    }
+
+    .nav-link {
+      color: var(--wd-white);
+      text-decoration: none;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background-color: var(--wd-green);
+    }
+
+    /* Main Content Area */
+    main {
+      flex-grow: 1;
+      padding: 40px;
+      overflow-y: auto;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    h1 { color: var(--wd-dark); margin: 0; }
+
+    .card {
+      background: var(--wd-white);
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+
+    .folder-link {
+      display: inline-flex;
+      align-items: center;
+      background: var(--wd-bg);
+      padding: 15px 20px;
+      border-radius: 6px;
+      color: var(--wd-dark);
+      text-decoration: none;
+      font-weight: 600;
+      border: 1px solid #ddd;
+    }
+
+    .folder-link:hover {
+      border-color: var(--wd-green);
+      color: var(--wd-green);
+    }
+
+    .status-badge {
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
-  <div class="section-label">1. Staff Record: No Bio / No Opinions</div>
-  <div class="header-box">
-    <div class="header-grid">
-      <div class="stat">NAME/ID: <b><?= profile.name ?> / <?= profile.id ?></b></div>
-      <div class="stat">TRADE: <b><?= profile.trade ?></b></div>
-      <div class="stat">STATUS: <b><?= profile.status ?></b></div>
-      <div class="stat">TRUST LEVEL: <b><?= profile.trust ?></b></div>
+  <nav>
+    <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction">
+    <a href="#" class="nav-link active">Dashboard</a>
+    <a href="#" class="nav-link">My Projects</a>
+    <a href="#" class="nav-link">Documents</a>
+    <a href="https://welldoneconstruction.pro/" class="nav-link" style="margin-top: auto; font-size: 0.9rem; opacity: 0.7;">Logout</a>
+  </nav>
+
+  <main>
+    <div class="header-bar">
+      <h1>Employee Dashboard</h1>
+      <span class="status-badge">Active Status</span>
     </div>
-  </div>
 
-  <div class="section-label">3. Immutable Issues Log (Evidence)</div>
-  <div class="log-box">
-    <? jobs.forEach(function(job) { 
-        job.tasks.forEach(function(task) { 
-          if(!task.done) { ?>
-            <div class="log-entry">
-              <span class="timestamp">[<?= job.submittedAt ?>]</span> 
-              <span class="flag">✖ <?= task.taskName.toUpperCase() ?>:</span> REQUIRED REWORK AT <?= job.jobName ?>
-            </div>
-    <?    } 
-        }); 
-      }); ?>
-    <? if (jobs.every(j => j.tasks.every(t => t.done))) { ?>
-      <div style="color:#888;">> NO ISSUES RECORDED</div>
-    <? } ?>
-  </div>
-
-  <br>
-
-  <div class="section-label">2. Job History Timeline</div>
-  <? jobs.forEach(function(job) { 
-      var hasIssue = job.tasks.some(t => !t.done);
-  ?>
-    <div class="job-card <?= hasIssue ? 'issue' : 'clean' ?>">
-      <div style="float:right; font-size: 12px; color: #777;"><?= job.submittedAt ?></div>
-      <b><?= job.jobName ?></b><br>
-      
-      <div style="margin: 10px 0;">
-        <?= hasIssue ? '<span style="color:#d93025;">✖ Issues Flagged</span>' : '<span style="color:#188038;">✔ Checklist Completed</span>' ?>
-        <br>
-        <span>Payment Status: <b><?= job.paymentStatus || 'Held' ?></b></span>
-      </div>
-
-      <div class="links">
-        <a href="<?= job.pdfLink ?>" class="btn" target="_blank">PDF Checklist</a>
-        <a href="<?= job.photoLink ?>" class="btn" target="_blank">Photo Folder</a>
-      </div>
+    <div class="card">
+      <h3>Your Personal Folder</h3>
+      <p>Access your project assignments, plans, and payout records here.</p>
+      <a href="#" class="folder-link">
+        <span style="margin-right: 10px;">📁</span> Open My Employee Folder
+      </a>
     </div>
-  <? }); ?>
+
+    <div class="card">
+      <h3>Current Projects</h3>
+      <p style="color: var(--wd-slate);">You have no active projects assigned at this moment.</p>
+    </div>
+  </main>
 
 </body>
 </html>
