@@ -51,7 +51,8 @@
             }))
         };
 
-        const scriptURL = "https://script.google.com/macros/s/AKfycbwM6VR5e4nwZuzGWkydUlQegLtLpWycR9gMA4PPjXJsBBVnx4S1YYeHHILVEdLPKDhP/exec";
+        // UPDATED WITH YOUR NEW URL:
+        const scriptURL = "https://script.google.com/macros/s/AKfycbwImj4FnPHWpg1jWIo_Oh5dY0EiYVsficDcnWjmdz7t36e0ihIQnvXLrNk3lrG_JC8i/exec";
 
         try {
             await fetch(scriptURL, {
@@ -63,7 +64,7 @@
             status.innerText = "✅ Submission Saved!";
             status.style.color = "green";
         } catch (e) {
-            status.innerText = "❌ Error. Try again.";
+            status.innerText = "❌ Connection Error.";
             status.style.color = "red";
             btn.disabled = false;
         }
