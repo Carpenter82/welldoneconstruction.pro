@@ -1,62 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Join Well Done Construction LLC</title>
-<style>
-  /* Using your brand colors */
-  body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background-color: #F4F7F6; color: #343E47; line-height: 1.6; text-align: center; }
-  header { background: #343E47; padding: 25px; border-bottom: 4px solid #33B26E; }
-  header img { max-width: 250px; }
-  main { max-width: 800px; margin: 40px auto; padding: 35px; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: left; }
-  h1 { color: #33B26E; text-align: center; }
-  h2 { color: #343E47; border-bottom: 2px solid #EAECEB; padding-bottom: 10px; }
-  
-  /* Your Application Link Button */
-  .button-container { text-align: center; margin-top: 30px; }
-  a.button {
-    display: inline-block;
-    background: #33B26E; /* Brand Green */
-    color: #fff;
-    padding: 16px 30px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 1.1rem;
-    transition: background 0.3s ease;
-  }
-  a.button:hover { background: #288e58; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join Well Done Construction LLC | Professional Remodeling</title>
+  <style>
+    /* Brand Identity Constants */
+    :root {
+      --wd-green: #33B26E;
+      --wd-dark: #343E47;
+      --wd-slate: #6E797F;
+      --wd-white: #FFFFFF;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--wd-white);
+      color: var(--wd-dark);
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 30px 20px;
+      text-align: center;
+      background: var(--wd-white);
+    }
+
+    header img {
+      max-width: 280px;
+      height: auto;
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 60px 20px;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      color: var(--wd-dark);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--wd-slate);
+      margin-bottom: 40px;
+    }
+
+    /* The Primary Action Button */
+    .btn-apply {
+      display: inline-block;
+      background-color: var(--wd-green);
+      color: var(--wd-white);
+      padding: 18px 40px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: transform 0.2s, background-color 0.2s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .btn-apply:hover {
+      background-color: #2b965c;
+      transform: translateY(-2px);
+    }
+
+    /* Features/Info Section */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      padding: 40px 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .info-item {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .info-item h3 {
+      color: var(--wd-green);
+      margin-bottom: 10px;
+    }
+
+    footer {
+      margin-top: 80px;
+      padding: 40px 20px;
+      border-top: 1px solid #eee;
+      text-align: center;
+      color: var(--wd-slate);
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction Logo">
-</header>
+  <header>
+    <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction LLC Logo">
+  </header>
 
-<main>
-<h1>Join Well Done Construction LLC</h1>
+  <main class="hero">
+    <h1>Join Well Done Construction LLC</h1>
+    <p>We are looking for dedicated professionals to join our remodeling and property maintenance team in Washoe County.</p>
+    
+    <a href="https://welldoneconstruction.link/on-call-application/" class="btn-apply">
+      Submit Resume & Application
+    </a>
+  </main>
 
-<section>
-  <h2>Our Mission</h2>
-  <p>We’re glad to have you! Our mission is to deliver top-quality remodeling and maintenance with unparalleled convenience.</p>
-</section>
+  <section class="info-grid">
+    <div class="info-item">
+      <h3>Professional Standards</h3>
+      <p>High-quality materials and a focus on detail for every remodeling project.</p>
+    </div>
+    <div class="info-item">
+      <h3>Reliable Work</h3>
+      <p>Clear communication, consistent assignments, and professional support.</p>
+    </div>
+    <div class="info-item">
+      <h3>Local Growth</h3>
+      <p>Building long-term success through community-focused property maintenance.</p>
+    </div>
+  </section>
 
-<section>
-  <h2>Expectations</h2>
-  <p>When your services are requested, you will receive an email stating the project overview, timeline, and compensation.</p>
-</section>
-
-<div class="button-container">
-  <a class="button" href="https://welldoneconstruction.pro/employee-packet/">Submit Employee Packet</a>
-</div>
-
-</main>
-
-<footer>
-  <p style="color: #6E797F; padding: 20px;">&copy; 2025 Well Done Construction LLC</p>
-</footer>
+  <footer>
+    <p>&copy; 2025 Well Done Construction LLC. All rights reserved.</p>
+  </footer>
 
 </body>
 </html>
