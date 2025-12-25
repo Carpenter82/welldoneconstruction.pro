@@ -64,8 +64,9 @@
 </div>
 
 <script>
-  // YOUR APPS SCRIPT URL
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbzbl_DTckys9MpYlQJwN5naNFHnterhPZIDXxGOo3AGse2851hGGQbsvyL6nGE8qu5J/exec';
+  // THIS IS YOUR NEW MASTER URL
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyHFv2lI2whyM63Y3Up_yqeI006GVOpVCgzQUDD8DvWXjdGVvqSkfCvL8wb8Ud8RIaG/exec';
+  
   const form = document.getElementById('employeeForm');
   const submitBtn = document.getElementById('submitBtn');
 
@@ -74,47 +75,36 @@
     submitBtn.value = "PROCESSING...";
     submitBtn.disabled = true;
 
-    // 1. Gather all form data into a clean JSON object
     const formData = new FormData(form);
     const data = {};
-    
     formData.forEach((value, key) => {
-      // Logic to handle multiple checkboxes for 'skills'
       if (data[key]) {
-        if (!Array.isArray(data[key])) {
-          data[key] = [data[key]];
-        }
+        if (!Array.isArray(data[key])) { data[key] = [data[key]]; }
         data[key].push(value);
       } else {
         data[key] = value;
       }
     });
 
-    // 2. Add system metadata
     data.submittedAt = new Date().toLocaleString();
-    data.employee = data.firstName + "_" + data.lastName; // This becomes the folder name
+    data.employee = data.firstName + "_" + data.lastName;
 
-    // 3. Post to Google Apps Script as JSON
     fetch(scriptURL, { 
       method: 'POST', 
       mode: 'no-cors', 
-      cache: 'no-cache',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data) 
     })
     .then(() => {
-        // Since no-cors hides the response, we assume success if no error is caught
         const fName = document.getElementById('firstName').value;
         document.getElementById('userName').innerText = fName;
-        
         form.style.display = 'none';
-        document.getElementById('footerNote').style.display = 'none';
         document.getElementById('thankYouMessage').style.display = 'block';
         window.scrollTo(0,0);
     })
     .catch(error => {
-        console.error('Submission Error:', error.message);
-        alert('There was an error submitting your packet. Please check your connection and try again.');
+        console.error('Error!', error.message);
+        alert('Error submitting. Please try again.');
         submitBtn.disabled = false;
         submitBtn.value = "SUBMIT PACKET";
     });
