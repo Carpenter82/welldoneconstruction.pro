@@ -1,1 +1,27 @@
+<style>
+  .job-card { border-left: 5px solid #2ecc71; margin-bottom: 20px; padding: 15px; background: #f9f9f9; }
+  .issue { color: #e74c3c; font-weight: bold; }
+  .status-active { color: green; }
+</style>
 
+<h1>Employee: <?= name ?></h1>
+<p>Status: <span class="status-active">Active</span></p>
+
+<hr>
+
+<h3>Job History Timeline</h3>
+<? for(var i=0; i < history.length; i++) { ?>
+  <div class="job-card">
+    <strong>Date: <?= history[i].submittedAt ?></strong><br>
+    
+    <? if (history[i].tasks.find(t => t.taskName === "Cleanup" && !t.done)) { ?>
+      <p class="issue">🚩 Issue: Missed Cleanup</p>
+    <? } ?>
+    
+    <div class="checklist">
+      <? history[i].tasks.forEach(task => { ?>
+        <span><?= task.done ? '✔' : '✖' ?> <?= task.taskName ?></span><br>
+      <? }); ?>
+    </div>
+  </div>
+<? } ?>
