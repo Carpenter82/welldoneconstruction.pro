@@ -5,10 +5,11 @@ body, h1, h2, p, ul, li {
   list-style: none;
   box-sizing: border-box;
 }
+
 body {
-  font-family: Arial, sans-serif;
-  background: #111;
-  color: #eee;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #F4F7F6; /* Light professional background */
+  color: #343E47; /* Your Dark Charcoal for text */
   line-height: 1.6;
 }
 
@@ -16,8 +17,10 @@ body {
 .logo-container {
   text-align: center;
   padding: 40px 20px;
-  background: #eee; /* light gray background */
+  background: #FFFFFF; /* Clean white background for the logo */
+  border-bottom: 3px solid #33B26E; /* Brand Green accent line */
 }
+
 .logo-container .logo {
   display: block;
   margin: 0 auto;
@@ -31,8 +34,9 @@ body {
   height: 400px;
   position: relative;
 }
+
 .hero-overlay {
-  background: rgba(0,0,0,0.6);
+  background: rgba(52, 62, 71, 0.85); /* Dark Charcoal overlay */
   height: 100%;
   width: 100%;
   display: flex;
@@ -43,28 +47,22 @@ body {
   color: #fff;
   padding: 0 20px;
 }
-.hero-overlay h1 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-}
-.hero-overlay p {
-  font-size: 1.2rem;
-  margin-bottom: 15px;
-}
 
-/* Button */
+/* Button - Updated with your Brand Green */
 .button {
   display: inline-block;
-  padding: 12px 20px;
-  background: #333;
+  padding: 12px 24px;
+  background: #33B26E; /* Brand Green */
   color: #fff;
   text-decoration: none;
   border-radius: 4px;
-  transition: background 0.3s, color 0.3s;
+  font-weight: bold;
+  transition: background 0.3s ease;
 }
+
 .button:hover {
-  background: #ffcc00;
-  color: #111;
+  background: #288e58; /* Darker shade of your green */
+  color: #fff;
 }
 
 /* Services section */
@@ -73,101 +71,34 @@ body {
   margin: 50px auto;
   padding: 40px 20px;
   text-align: center;
-  background: #ddd; /* light gray background */
-  color: #111; /* dark text for contrast */
-}
-.services h2 {
-  font-size: 2rem;
-  margin-bottom: 30px;
+  background: #EAECEB; /* Slate-tinted light background */
+  border-radius: 8px;
+  color: #343E47;
 }
 
-/* Grid for services */
-.service-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-/* Service cards */
+/* Service cards - Clean & Professional */
 .service-card {
   background: #fff;
-  color: #111;
+  color: #343E47;
   padding: 25px;
   border-radius: 6px;
-  border: 1px solid #bbb;
-  box-shadow: 0 0 8px rgba(0,0,0,0.15);
+  border-left: 5px solid #33B26E; /* Green accent on the side */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   font-weight: bold;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s;
 }
 
 .service-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-}
-
-/* Center Maintenance under Handyman */
-.maintenance {
-  grid-column: 2 / 3;
-  justify-self: center;
-}
-
-/* Contact section */
-.contact {
-  max-width: 700px;
-  margin: 50px auto;
-  padding: 0 20px;
-  text-align: center;
-}
-.contact h2 {
-  font-size: 2rem;
-  margin-bottom: 15px;
+  border-left-color: #6E797F; /* Changes to Slate on hover */
 }
 
 /* Footer */
 footer {
   text-align: center;
-  padding: 20px;
+  padding: 30px;
   margin-top: 40px;
+  background: #343E47; /* Dark Charcoal Footer */
+  color: #D1D5D7; /* Light Slate text */
   font-size: 0.9rem;
-  color: #aaa;
 }
-
-/* ----------------- Responsive ----------------- */
-@media (max-width: 768px) {
-  .hero {
-    height: 300px;
-  }
-  .hero-overlay h1 {
-    font-size: 2rem;
-  }
-  .hero-overlay p {
-    font-size: 1rem;
-  }
-  .service-grid {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  }
-}
-
-@media (max-width: 480px) {
-  .hero {
-    height: 250px;
-  }
-  .hero-overlay h1 {
-    font-size: 1.6rem;
-  }
-  .hero-overlay p {
-    font-size: 0.9rem;
-  }
-  .logo-container {
-    padding: 30px 10px;
-  }
-  .service-grid {
-    grid-template-columns: 1fr;
-  }
-  .services h2,
-  .contact h2 {
-    font-size: 1.6rem;
-  }
-}
-
-
