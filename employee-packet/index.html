@@ -5,11 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Employee Packet | Well Done Construction LLC</title>
   <style>
+    /* WELL DONE CONSTRUCTION BRAND COLORS */
     :root {
       --wd-green: #33B26E;
       --wd-dark: #343E47;
       --wd-slate: #6E797F;
       --wd-bg: #F4F7F6;
+      --wd-white: #FFFFFF;
     }
 
     body {
@@ -17,30 +19,44 @@
       margin: 0;
       background-color: var(--wd-bg);
       color: var(--wd-dark);
+      line-height: 1.6;
     }
 
-    /* Page 2 Header - Brand Charcoal */
+    /* Header - Professional Charcoal */
     header {
       background: var(--wd-dark);
       padding: 25px;
       text-align: center;
       border-bottom: 4px solid var(--wd-green);
     }
-    header img { max-width: 240px; }
+    header img {
+      max-width: 240px;
+      height: auto;
+    }
 
     main {
       max-width: 750px;
       margin: 40px auto;
-      background: #fff;
+      background: var(--wd-white);
       padding: 40px;
       border-radius: 8px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
 
-    h1 { color: var(--wd-dark); margin-bottom: 5px; }
-    .subtitle { color: var(--wd-slate); margin-bottom: 30px; font-style: italic; }
+    h1 { 
+      color: var(--wd-dark); 
+      margin-bottom: 5px; 
+      text-align: center;
+    }
 
-    /* Form Section Styling */
+    .subtitle { 
+      color: var(--wd-slate); 
+      text-align: center;
+      margin-bottom: 30px; 
+      font-style: italic; 
+    }
+
+    /* Section Headers */
     h2 { 
       font-size: 1.1rem; 
       text-transform: uppercase; 
@@ -48,44 +64,70 @@
       color: var(--wd-green); 
       border-bottom: 2px solid var(--wd-bg);
       padding-bottom: 8px;
-      margin-top: 30px;
+      margin-top: 35px;
     }
 
     .form-group { margin-bottom: 20px; }
-    label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--wd-dark); }
+
+    label { 
+      display: block; 
+      margin-bottom: 8px; 
+      font-weight: 600; 
+      color: var(--wd-dark); 
+    }
     
-    input[type="text"], input[type="email"], input[type="tel"], select {
+    input[type="text"], 
+    input[type="email"], 
+    input[type="tel"], 
+    select {
       width: 100%;
       padding: 12px;
       border: 1px solid #ddd;
       border-radius: 4px;
       box-sizing: border-box;
       font-size: 1rem;
+      font-family: inherit;
     }
 
-    input:focus {
+    input:focus, select:focus {
       outline: none;
       border-color: var(--wd-green);
       box-shadow: 0 0 5px rgba(51, 178, 110, 0.2);
     }
 
+    /* Submit Button - Brand Green */
     .btn-submit {
       background-color: var(--wd-green);
-      color: white;
-      padding: 16px 32px;
+      color: var(--wd-white);
+      padding: 18px 32px;
       border: none;
       border-radius: 4px;
       font-size: 1.1rem;
       font-weight: bold;
       cursor: pointer;
       width: 100%;
-      margin-top: 20px;
+      margin-top: 30px;
       transition: background 0.3s;
     }
 
-    .btn-submit:hover { background-color: #2b965c; }
+    .btn-submit:hover {
+      background-color: #2b965c; /* Darker green */
+    }
 
-    footer { text-align: center; padding: 40px; color: var(--wd-slate); font-size: 0.85rem; }
+    footer {
+      text-align: center;
+      padding: 40px;
+      color: var(--wd-slate);
+      font-size: 0.85rem;
+    }
+
+    .note {
+      background: #fff8e1;
+      padding: 15px;
+      border-left: 4px solid #ffc107;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
@@ -96,48 +138,75 @@
 
 <main>
   <h1>Employee Packet</h1>
-  <p class="subtitle">Please complete this intake form to initialize your personal employee portal.</p>
+  <p class="subtitle">Official Intake & Personal URL Initialization</p>
+
+  <div class="note">
+    <strong>Note:</strong> Formal tax documents and the On-Call Agreement will be sent to your email via DocHub for signature.
+  </div>
 
   <form action="#" method="POST">
     
-    <h2>1. Contact Information</h2>
+    <h2>1. Personal Information</h2>
     <div class="form-group">
-      <label>Legal First & Last Name</label>
-      <input type="text" name="fname" required>
+      <label>Legal Full Name</label>
+      <input type="text" name="full_name" required placeholder="As it appears on your ID">
     </div>
+    
     <div class="form-group">
-      <label>Mailing Address</label>
-      <input type="text" name="address" required>
-    </div>
-    <div class="form-group">
-      <label>Primary Phone Number</label>
-      <input type="tel" name="phone" required>
+      <label>Email Address</label>
+      <input type="email" name="email" required placeholder="email@address.com">
     </div>
 
-    <h2>2. Employment Details</h2>
     <div class="form-group">
-      <label>Position / Specialty</label>
-      <select name="specialty">
-        <option value="carpentry">Carpentry</option>
-        <option value="remodeling">Remodeling</option>
-        <option value="maintenance">Maintenance</option>
-        <option value="handyman">Handyman</option>
+      <label>Phone Number</label>
+      <input type="tel" name="phone" required placeholder="775-xxx-xxxx">
+    </div>
+
+    <div class="form-group">
+      <label>Mailing Address</label>
+      <input type="text" name="address" required placeholder="Street, City, State, Zip">
+    </div>
+
+    <h2>2. Professional Trade</h2>
+    <div class="form-group">
+      <label>Primary Trade</label>
+      <select name="trade" required>
+        <option value="" disabled selected>Select your trade...</option>
+        <option value="plumbing">Plumbing</option>
+        <option value="electrical">Electrical</option>
+        <option value="welding">Welding</option>
+        <option value="carpentry">Carpentry / Framing</option>
+        <option value="hvac">HVAC</option>
+        <option value="painting_drywall">Painting & Drywall</option>
+        <option value="flooring">Flooring Installation</option>
+        <option value="masonry">Masonry / Concrete</option>
+        <option value="roofing">Roofing</option>
+        <option value="general_maintenance">General Maintenance</option>
+        <option value="other">Other Specialized Trade</option>
       </select>
     </div>
 
-    <h2>3. Direct Deposit / Admin</h2>
-    <p style="font-size: 0.9rem; color: var(--wd-slate);">Note: Formal tax documents will be handled via the DocHub link sent to your email.</p>
     <div class="form-group">
-      <label>SSN / Tax ID (Encrypted Field)</label>
-      <input type="text" name="tax_id" placeholder="xxx-xx-xxxx">
+      <label>Years of Experience</label>
+      <input type="text" name="experience" placeholder="e.g. 10 years">
     </div>
 
-    <button type="submit" class="btn-submit">Initialize My Employee Folder</button>
+    <h2>3. Emergency Contact</h2>
+    <div class="form-group">
+      <label>Emergency Contact Name</label>
+      <input type="text" name="emergency_name" required>
+    </div>
+    <div class="form-group">
+      <label>Emergency Contact Phone</label>
+      <input type="tel" name="emergency_phone" required>
+    </div>
+
+    <button type="submit" class="btn-submit">Initialize My Personal URL</button>
   </form>
 </main>
 
 <footer>
-  &copy; 2025 Well Done Construction LLC | Washoe County, NV
+  &copy; 2025 Well Done Construction LLC | Built on Integrity
 </footer>
 
 </body>
