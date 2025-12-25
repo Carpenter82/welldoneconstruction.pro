@@ -1,39 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Well Done Admin</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WD Admin Control</title>
     <style>
-        body { font-family: sans-serif; background: #1a1a1a; color: white; text-align: center; padding: 50px 20px; }
-        .btn { display: block; background: #ffd700; color: black; padding: 20px; margin: 10px auto; 
-               max-width: 300px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px; }
-        .btn-secondary { background: #444; color: white; }
-        h1 { color: #ffd700; }
+        body { font-family: -apple-system, sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; }
+        .container { max-width: 450px; margin: auto; border: 1px solid #333; padding: 20px; border-radius: 15px; background: #111; }
+        .btn { display: block; background: #ffd700; color: #000; padding: 18px; margin: 15px 0; text-decoration: none; font-weight: bold; border-radius: 10px; font-size: 18px; }
+        .worker-link { display: flex; justify-content: space-between; background: #222; padding: 15px; margin: 5px 0; border-radius: 8px; text-decoration: none; color: #fff; border: 1px solid #333; }
+        h2 { color: #ffd700; margin-bottom: 5px; }
+        .loader { color: #888; font-style: italic; margin: 20px 0; }
     </style>
 </head>
 <body>
-    <h1>WELL DONE CONSTRUCTION</h1>
-    <p>Management Control Panel</p>
-
-    <a href="https://welldoneconstruction.pro/employee-packet" class="btn">+ HIRE NEW WORKER</a>
-    
-    <div style="margin-top: 40px;">
-        <p>VIEW WORKER PORTAL:</p>
-        <input type="text" id="workerName" placeholder="Enter First_Last Name" 
-               style="padding: 10px; border-radius: 5px; border: none; width: 250px;">
-        <button onclick="openPortal()" class="btn-secondary" style="padding: 10px; cursor: pointer;">GO</button>
+    <div class="container">
+        <h2>WELL DONE</h2>
+        <p>CONSTRUCTION ADMIN</p>
+        <a href="https://welldoneconstruction.pro/employee-packet" class="btn">HIRE NEW WORKER</a>
+        
+        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+        <p style="text-align: left; color: #888;">WORKER DIRECTORY</p>
+        <div id="workerList" class="loader">Loading workers...</div>
     </div>
 
     <script>
-        function openPortal() {
-            const name = document.getElementById('workerName').value.trim().replace(' ', '_');
-            const baseUrl = "https://script.google.com/macros/s/AKfycbyHFv2lI2whyM63Y3Up_yqeI006GVOpVCgzQUDD8DvWXjdGVvqSkfCvL8wb8Ud8RIaG/exec";
-            if(name) {
-                window.location.href = baseUrl + "?id=" + name;
-            } else {
-                alert("Please enter a name (e.g. John_Doe)");
-            }
-        }
+        const scriptURL = "https://script.google.com/macros/s/AKfycbyHFv2lI2whyM63Y3Up_yqeI006GVOpVCgzQUDD8DvWXjdGVvqSkfCvL8wb8Ud8RIaG/exec";
+
+        // Fetch the list of workers automatically
+        fetch(scriptURL + "?get=list")
+            .then(res => res.json())
+            .then(names => {
+                const listDiv = document.getElementById('workerList');
+                listDiv.innerHTML = ""; // Clear loader
+                names.forEach(name => {
+                    const id = name.replace(' ', '_');
+                    listDiv.innerHTML += `
+                        <a href="${scriptURL}?id=${id}" class="worker-link">
+                            <span>${name}</span>
+                            <span style="color: #ffd700;">VIEW →</span>
+                        </a>`;
+                });
+            });
     </script>
 </body>
 </html>
