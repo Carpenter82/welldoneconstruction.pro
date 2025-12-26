@@ -1,16 +1,34 @@
-<div class="portal-container">
-  <h2 style="text-align:center;">Well Done Staff Portal</h2>
-  <iframe id="staffPortal" 
-          src="https://script.google.com/macros/s/YOUR_EXEC_ID/exec" 
-          style="width:100%; height:900px; border:none; border-radius:12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-  </iframe>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Portal | Well Done Construction</title>
+    <style>
+        body { margin: 0; padding: 0; background-color: #F4F7F6; font-family: sans-serif; }
+        .wrapper { width: 100%; max-width: 900px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
+        iframe { width: 100%; height: 1000px; border: 2px solid #33B26E; border-radius: 12px; background: white; }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <iframe id="staffPortal" 
+            src="https://script.google.com/macros/s/AKfycbx9-7Gn1PEBWa2sJ64jetDFDeOIkA5-KohyKeeYa8BEIaGdUNeT1w4QeIYYBrBpkAhwIg/exec" 
+            allow="camera; geolocation">
+    </iframe>
 </div>
 
 <script>
-  const urlParams = new URLSearchParams(window.location.search);
-  const workerId = urlParams.get('id');
-  if (workerId) {
-    // This tells the window which worker to show
-    document.getElementById('staffPortal').src = "https://script.google.com/macros/s/YOUR_EXEC_ID/exec?id=" + workerId;
-  }
+    // This script checks the URL for a worker ID (e.g., ?id=Carpenter82)
+    const urlParams = new URLSearchParams(window.location.search);
+    const workerId = urlParams.get('id');
+    const baseScriptUrl = "https://script.google.com/macros/s/AKfycbx9-7Gn1PEBWa2sJ64jetDFDeOIkA5-KohyKeeYa8BEIaGdUNeT1w4QeIYYBrBpkAhwIg/exec";
+
+    if (workerId) {
+        document.getElementById('staffPortal').src = baseScriptUrl + "?id=" + workerId;
+    }
 </script>
+
+</body>
+</html>
