@@ -1,18 +1,39 @@
 <div class="card">
   <h3>Employee Profile</h3>
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.95rem;">
-    <div><strong>Name:</strong> Test 22 Test 54</div>
-    <div><strong>Phone:</strong> 445-234-7654</div>
-    <div><strong>Email:</strong> contact@welldoneconstruction.link</div>
-    <div><strong>Skills:</strong> General Carpentry, Repairs, Installations</div>
+    <div><strong>Name:</strong> <?= profile.name ?></div>
+    <div><strong>Trade:</strong> <?= profile.trade ?></div>
+    <div><strong>ID:</strong> <?= profile.id ?></div>
+    <div><strong>Status:</strong> <span style="color: var(--wd-green); font-weight: bold;"><?= profile.status ?></span></div>
   </div>
   <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-  <p style="font-size: 0.8rem; color: var(--wd-slate);">W-4 Signed: 12/24/2025 | Signature: test 45 54</p>
+  <p style="font-size: 0.8rem; color: var(--wd-slate);">
+    Accountability Level: <strong><?= profile.trust ?></strong>
+  </p>
 </div>
 
-<div class="card" style="border-left: 4px solid var(--wd-green);">
+<? for(var i=0; i < jobs.length; i++) { ?>
+<div class="card" style="border-left: 4px solid var(--wd-green); margin-top: 15px;">
+  <div style="display: flex; justify-content: space-between; align-items: start;">
+    <h3><?= jobs[i].jobName ?></h3>
+    <small style="color: var(--wd-slate);"><?= jobs[i].submittedAt ?></small>
+  </div>
+  
+  <div class="task-list">
+    <? for(var j=0; j < jobs[i].tasks.length; j++) { ?>
+      <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f9f9f9; 
+                  <?= jobs[i].tasks[j].done ? '' : 'color: #d93025; font-weight: bold;' ?>">
+        <span><?= jobs[i].tasks[j].taskName ?></span>
+        <span><?= jobs[i].tasks[j].done ? '✅' : '⚠️ ACTION REQUIRED' ?></span>
+      </div>
+    <? } ?>
+  </div>
+</div>
+<? } ?>
+
+<div class="card" style="background-color: #fcfcfc;">
   <h3>Payroll & Tax Center</h3>
-  <p>Coming Soon: View your weekly paystubs and tax documents.</p>
+  <p style="color: var(--wd-slate);">Secure access to stubs and tax docs will unlock once your trust level reaches Level 2.</p>
   <button disabled style="background: #ccc; border: none; padding: 10px 20px; border-radius: 4px; color: white; cursor: not-allowed;">
     Payroll Portal Locked
   </button>
