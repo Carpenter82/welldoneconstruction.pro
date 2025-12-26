@@ -1,26 +1,111 @@
-<h3 style="margin-top: 30px; color: var(--wd-slate); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Current Job Sites</h3>
-
-<? for(var i=0; i < jobs.length; i++) { ?>
-<div class="card" style="border-top: 5px solid var(--wd-green); margin-top: 15px;">
-  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
-    <div>
-      <h2 style="margin:0; font-size: 1.2rem;"><?= jobs[i].address || "Address TBD" ?></h2>
-      <small style="color: var(--wd-green); font-weight: bold;"><?= jobs[i].jobName ?></small>
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    :root { 
+      --wd-green: #33B26E; 
+      --wd-dark: #343E47; 
+      --wd-slate: #6E797F; 
+      --wd-bg: #F4F7F6; 
+    }
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      background-color: var(--wd-bg); 
+      color: var(--wd-dark); 
+      margin: 0; 
+      padding: 15px; 
+    }
+    .container { max-width: 600px; margin: 0 auto; }
+    .card { 
+      background: white; 
+      padding: 20px; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+      margin-bottom: 20px; 
+    }
+    .header { 
+      background: var(--wd-dark); 
+      color: white; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    .badge { 
+      background: var(--wd-green); 
+      padding: 4px 12px; 
+      border-radius: 20px; 
+      font-size: 0.75rem; 
+      font-weight: bold; 
+    }
+    .btn { 
+      display: block; 
+      width: 100%; 
+      text-align: center; 
+      padding: 14px; 
+      border-radius: 6px; 
+      text-decoration: none; 
+      font-weight: bold; 
+      margin-top: 15px; 
+      border: none; 
+      transition: 0.3s;
+    }
+    .btn-locked { background: #e0e0e0; color: #999; cursor: not-allowed; }
+    .btn-active { background: var(--wd-dark); color: white; cursor: pointer; }
+    .btn-active:hover { background: #000; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <div class="card header">
+      <div>
+        <h2 style="margin:0;"><?= profile.name ?></h2>
+        <small><?= profile.trade ?> | ID: <?= profile.id ?></small>
+      </div>
+      <div class="badge"><?= profile.trust ?></div>
     </div>
-    <small style="color: var(--wd-slate);"><?= jobs[i].submittedAt ?></small>
-  </div>
 
-  <div class="task-list" style="background: #fdfdfd; padding: 10px; border-radius: 8px;">
-    <? for(var j=0; j < jobs[i].tasks.length; j++) { ?>
-      <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; 
-                  <?= jobs[i].tasks[j].done ? '' : 'color: #d93025; font-weight: bold;' ?>">
-        <span style="display: flex; align-items: center;">
-          <?= jobs[i].tasks[j].done ? '✅' : '🔴' ?> 
-          <span style="margin-left: 10px;"><?= jobs[i].tasks[j].taskName ?></span>
-        </span>
-        <span style="font-size: 0.8rem;"><?= jobs[i].tasks[j].done ? 'COMPLETED' : 'REQUIRED' ?></span>
+    <h3 style="margin-top: 30px; color: var(--wd-slate); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">
+      Current Job Sites
+    </h3>
+
+    <? for(var i=0; i < jobs.length; i++) { ?>
+      <div class="card" style="border-top: 5px solid var(--wd-green); margin-top: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+          <div>
+            <h2 style="margin:0; font-size: 1.2rem;"><?= jobs[i].address || "Address TBD" ?></h2>
+            <small style="color: var(--wd-green); font-weight: bold;"><?= jobs[i].jobName ?></small>
+          </div>
+          <small style="color: var(--wd-slate);"><?= jobs[i].submittedAt ?></small>
+        </div>
+
+        <div class="task-list" style="background: #fdfdfd; padding: 10px; border-radius: 8px;">
+          <? for(var j=0; j < jobs[i].tasks.length; j++) { ?>
+            <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; 
+                        <?= jobs[i].tasks[j].done ? '' : 'color: #d93025; font-weight: bold;' ?>">
+              <span style="display: flex; align-items: center;">
+                <?= jobs[i].tasks[j].done ? '✅' : '🔴' ?> 
+                <span style="margin-left: 10px;"><?= jobs[i].tasks[j].taskName ?></span>
+              </span>
+              <span style="font-size: 0.8rem;"><?= jobs[i].tasks[j].done ? 'COMPLETED' : 'REQUIRED' ?></span>
+            </div>
+          <? } ?>
+        </div>
       </div>
     <? } ?>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Payroll & Tax Center</h3>
+      <? if (allTasksComplete) { ?>
+        <p style="color: var(--wd-green); font-weight: bold;">✅ Accountability Met. Your documents are available.</p>
+        <a href="https://welldoneconstruction.link/payroll" class="btn btn-active">Enter Payroll Portal</a>
+      <? } else { ?>
+        <p style="color: var(--wd-slate); font-size: 0.85rem;">🔒 Complete all pending tasks (marked 🔴) at the job sites above to unlock payroll access.</p>
+        <button class="btn btn-locked" disabled>Payroll Portal Locked</button>
+      <? } ?>
+    </div>
+
   </div>
-</div>
-<? } ?>
+</body>
+</html>
