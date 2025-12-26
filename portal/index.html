@@ -18,6 +18,23 @@
     <h3><?= jobs[i].jobName ?></h3>
     <small style="color: var(--wd-slate);"><?= jobs[i].submittedAt ?></small>
   </div>
+
+  <div class="portal-container">
+  <iframe id="staffPortal" 
+          src="YOUR_WEB_APP_URL_HERE?id=New_Worker" 
+          style="width:100%; height:800px; border:none; border-radius:12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+  </iframe>
+</div>
+
+<script>
+  // This little script makes the URL smart.
+  // If they visit /portal/?id=Carpenter82, the iframe will show Carpenter82's data.
+  const urlParams = new URLSearchParams(window.location.search);
+  const workerId = urlParams.get('id');
+  if (workerId) {
+    document.getElementById('staffPortal').src = "YOUR_WEB_APP_URL_HERE?id=" + workerId;
+  }
+</script>
   
   <div class="task-list">
     <? for(var j=0; j < jobs[i].tasks.length; j++) { ?>
