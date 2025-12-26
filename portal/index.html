@@ -1,34 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Portal | Well Done Construction</title>
-    <style>
-        body { margin: 0; padding: 0; background-color: #F4F7F6; font-family: sans-serif; }
-        .wrapper { width: 100%; max-width: 900px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
-        iframe { width: 100%; height: 1000px; border: 2px solid #33B26E; border-radius: 12px; background: white; }
-    </style>
-</head>
-<body>
+<h3 style="margin-top: 30px; color: var(--wd-slate); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Current Job Sites</h3>
 
-<div class="wrapper">
-    <iframe id="staffPortal" 
-            src="https://script.google.com/macros/s/AKfycbx9-7Gn1PEBWa2sJ64jetDFDeOIkA5-KohyKeeYa8BEIaGdUNeT1w4QeIYYBrBpkAhwIg/exec" 
-            allow="camera; geolocation">
-    </iframe>
+<? for(var i=0; i < jobs.length; i++) { ?>
+<div class="card" style="border-top: 5px solid var(--wd-green); margin-top: 15px;">
+  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+    <div>
+      <h2 style="margin:0; font-size: 1.2rem;"><?= jobs[i].address || "Address TBD" ?></h2>
+      <small style="color: var(--wd-green); font-weight: bold;"><?= jobs[i].jobName ?></small>
+    </div>
+    <small style="color: var(--wd-slate);"><?= jobs[i].submittedAt ?></small>
+  </div>
+
+  <div class="task-list" style="background: #fdfdfd; padding: 10px; border-radius: 8px;">
+    <? for(var j=0; j < jobs[i].tasks.length; j++) { ?>
+      <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; 
+                  <?= jobs[i].tasks[j].done ? '' : 'color: #d93025; font-weight: bold;' ?>">
+        <span style="display: flex; align-items: center;">
+          <?= jobs[i].tasks[j].done ? '✅' : '🔴' ?> 
+          <span style="margin-left: 10px;"><?= jobs[i].tasks[j].taskName ?></span>
+        </span>
+        <span style="font-size: 0.8rem;"><?= jobs[i].tasks[j].done ? 'COMPLETED' : 'REQUIRED' ?></span>
+      </div>
+    <? } ?>
+  </div>
 </div>
-
-<script>
-    // This script checks the URL for a worker ID (e.g., ?id=Carpenter82)
-    const urlParams = new URLSearchParams(window.location.search);
-    const workerId = urlParams.get('id');
-    const baseScriptUrl = "https://script.google.com/macros/s/AKfycbx9-7Gn1PEBWa2sJ64jetDFDeOIkA5-KohyKeeYa8BEIaGdUNeT1w4QeIYYBrBpkAhwIg/exec";
-
-    if (workerId) {
-        document.getElementById('staffPortal').src = baseScriptUrl + "?id=" + workerId;
-    }
-</script>
-
-</body>
-</html>
+<? } ?>
