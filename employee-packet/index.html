@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Employee Packet | Well Done Construction LLC</title>
   <style>
-    /* WELL DONE CONSTRUCTION BRAND COLORS */
     :root {
       --wd-green: #33B26E;
       --wd-dark: #343E47;
@@ -22,7 +21,6 @@
       line-height: 1.6;
     }
 
-    /* Header - Professional Charcoal */
     header {
       background: var(--wd-dark);
       padding: 25px;
@@ -43,24 +41,12 @@
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
 
-    h1 { 
-      color: var(--wd-dark); 
-      margin-bottom: 5px; 
-      text-align: center;
-    }
+    h1 { text-align: center; color: var(--wd-dark); margin-bottom: 5px; }
+    .subtitle { text-align: center; color: var(--wd-slate); margin-bottom: 30px; font-style: italic; }
 
-    .subtitle { 
-      color: var(--wd-slate); 
-      text-align: center;
-      margin-bottom: 30px; 
-      font-style: italic; 
-    }
-
-    /* Section Headers */
     h2 { 
       font-size: 1.1rem; 
       text-transform: uppercase; 
-      letter-spacing: 1px; 
       color: var(--wd-green); 
       border-bottom: 2px solid var(--wd-bg);
       padding-bottom: 8px;
@@ -68,34 +54,17 @@
     }
 
     .form-group { margin-bottom: 20px; }
-
-    label { 
-      display: block; 
-      margin-bottom: 8px; 
-      font-weight: 600; 
-      color: var(--wd-dark); 
-    }
+    label { display: block; margin-bottom: 8px; font-weight: 600; }
     
-    input[type="text"], 
-    input[type="email"], 
-    input[type="tel"], 
-    select {
+    input[type="text"], input[type="email"], input[type="tel"], select {
       width: 100%;
       padding: 12px;
       border: 1px solid #ddd;
       border-radius: 4px;
       box-sizing: border-box;
       font-size: 1rem;
-      font-family: inherit;
     }
 
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--wd-green);
-      box-shadow: 0 0 5px rgba(51, 178, 110, 0.2);
-    }
-
-    /* Submit Button - Brand Green */
     .btn-submit {
       background-color: var(--wd-green);
       color: var(--wd-white);
@@ -107,27 +76,12 @@
       cursor: pointer;
       width: 100%;
       margin-top: 30px;
-      transition: background 0.3s;
     }
 
-    .btn-submit:hover {
-      background-color: #2b965c; /* Darker green */
-    }
+    .btn-submit:disabled { background-color: var(--wd-slate); cursor: not-allowed; }
 
-    footer {
-      text-align: center;
-      padding: 40px;
-      color: var(--wd-slate);
-      font-size: 0.85rem;
-    }
-
-    .note {
-      background: #fff8e1;
-      padding: 15px;
-      border-left: 4px solid #ffc107;
-      font-size: 0.9rem;
-      margin-bottom: 20px;
-    }
+    footer { text-align: center; padding: 40px; color: var(--wd-slate); font-size: 0.85rem; }
+    .note { background: #fff8e1; padding: 15px; border-left: 4px solid #ffc107; font-size: 0.9rem; margin-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -138,14 +92,13 @@
 
 <main>
   <h1>Employee Packet</h1>
-  <p class="subtitle">Official Intake & Personal URL Initialization</p>
+  <p class="subtitle">Official Intake & ID Verification</p>
 
- <div class="note">
-    <strong>Note:</strong> Once your intake is processed, your formal On-Call Agreement and tax documents will be sent to your email for digital signature.
+  <div class="note">
+    <strong>Note:</strong> After submission, you will be redirected to your personal portal. Please have your ID ready for the photo upload below.
   </div>
 
-  <form action="#" method="POST">
-    
+  <form id="intakeForm">
     <h2>1. Personal Information</h2>
     <div class="form-group">
       <label>Legal Full Name</label>
@@ -191,7 +144,15 @@
       <input type="text" name="experience" placeholder="e.g. 10 years">
     </div>
 
-    <h2>3. Emergency Contact</h2>
+    <h2>3. Verification & Emergency</h2>
+    <div class="form-group">
+      <label>Photo ID Verification</label>
+      <p style="font-size: 0.8rem; color: var(--wd-slate); margin-top: -5px;">
+        Upload a clear photo of your Driver's License or State ID.
+      </p>
+      <input type="file" id="idPhoto" accept="image/*" capture="camera" required>
+    </div>
+
     <div class="form-group">
       <label>Emergency Contact Name</label>
       <input type="text" name="emergency_name" required>
@@ -200,24 +161,18 @@
       <label>Emergency Contact Phone</label>
       <input type="tel" name="emergency_phone" required>
     </div>
-    <div class="form-group">
-  <label>Photo ID Verification</label>
-  <p style="font-size: 0.8rem; color: var(--wd-slate); margin-top: -5px;">
-    Please upload a clear photo of your Driver's License or State ID.
-  </p>
-  <input type="file" id="idPhoto" accept="image/*" capture="camera" style="border: none; padding: 10px 0;">
-</div>
 
-    <button type="submit" class="btn-submit">Initialize My Personal URL</button>
+    <button type="submit" class="btn-submit" id="submitBtn">Initialize My Personal URL</button>
   </form>
 </main>
 
 <footer>
   &copy; 2025 Well Done Construction LLC | Built on Integrity
 </footer>
+
 <script>
-  // THIS IS WHERE YOU PASTE THE JAVASCRIPT
   const form = document.getElementById('intakeForm');
+  const btn = document.getElementById('submitBtn');
   
   form.addEventListener('submit', function(e) {
     e.preventDefault(); 
@@ -225,22 +180,21 @@
     const fileInput = document.getElementById('idPhoto');
     const file = fileInput.files[0];
 
-    // If there is a file, we convert it to text so the script can read it
     if (file) {
+      btn.disabled = true;
+      btn.innerText = "Processing & Uploading...";
+
       const reader = new FileReader();
       reader.onload = function(event) {
         const base64Data = event.target.result.split(',')[1];
         
-        // This gathers all your form fields
         const formData = new FormData(form);
         const data = {};
         formData.forEach((value, key) => { data[key] = value; });
         
-        // Add the image data
         data.idImage = base64Data;
         data.imageName = file.name;
 
-        // NOW send it to Google
         sendToGoogle(data);
       };
       reader.readAsDataURL(file);
@@ -250,19 +204,24 @@
   });
 
   function sendToGoogle(data) {
-    const scriptURL = "YOUR_DEPLOYED_WEB_APP_URL";
+    // PASTE YOUR ACTUAL DEPLOYED URL BELOW
+    const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec";
+    
     fetch(scriptURL, {
       method: 'POST',
       mode: 'no-cors',
       body: JSON.stringify(data)
     }).then(() => {
-      alert("Application Submitted Successfully!");
-      window.location.href = "https://welldoneconstruction.pro/portal/";
+      const workerId = data.full_name.replace(/\s+/g, '_');
+      alert("Intake Complete! Opening your portal now.");
+      window.location.href = scriptURL + "?id=" + workerId;
+    }).catch(err => {
+      alert("Error submitting packet. Please check your connection.");
+      btn.disabled = false;
+      btn.innerText = "Initialize My Personal URL";
     });
   }
 </script>
 
-</body>
-</html>
 </body>
 </html>
