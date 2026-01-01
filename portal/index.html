@@ -13,17 +13,21 @@
     .btn { display: block; width: 100%; text-align: center; padding: 14px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 15px; border: none; }
     .btn-locked { background: #e0e0e0; color: #999; cursor: not-allowed; }
     .btn-active { background: var(--wd-dark); color: white; cursor: pointer; }
+    #statusMsg { font-size: 0.9rem; margin-top: 10px; text-align: center; }
   </style>
 </head>
 <body>
   <div class="container">
     
     <div class="card header">
-      <div><h2 style="margin:0;"><?= profile.name ?></h2><small><?= profile.trade ?></small></div>
+      <div>
+        <h2 style="margin:0;"><?= profile.name ?></h2>
+        <small><?= profile.trade ?></small>
+      </div>
       <div class="badge"><?= profile.trust ?></div>
     </div>
 
-    <h3 style="color: var(--wd-slate); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Current Job Sites</h3>
+    <h3 style="color: var(--wd-slate); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Current Onboarding Status</h3>
 
     <? for(var i=0; i < jobs.length; i++) { ?>
       <div class="card" style="border-top: 5px solid var(--wd-green);">
@@ -41,16 +45,64 @@
     <? } ?>
 
     <div class="card">
+      <h3>Document Management</h3>
+      <p style="font-size: 0.85rem; color: var(--wd-slate);">
+        If a task is marked <span style="color: #d93025; font-weight: bold;">REQUIRED</span>, upload the missing document below.
+      </p>
+      
+      <div id="uploadArea">
+        <input type="file" id="portalIdUpload" accept="image/*" style="display:none" onchange="handlePortalUpload()">
+        <button onclick="document.getElementById('portalIdUpload').click()" class="btn" style="background: var(--wd-slate); color: white; cursor: pointer;">
+          Upload Photo ID
+        </button>
+      </div>
+      <div id="statusMsg"></div>
+    </div>
+
+    <div class="card">
       <h3>Payroll & Tax Center</h3>
       <? if (allTasksComplete) { ?>
         <p style="color: var(--wd-green);">✅ Requirements Met. Access Unlocked.</p>
-        <a href="YOUR_LINK_HERE" class="btn btn-active">Enter Payroll Portal</a>
+        <a href="https://welldoneconstruction.pro/admin/" class="btn btn-active">Enter Payroll Portal (Gusto)</a>
       <? } else { ?>
-        <p style="color: var(--wd-slate); font-size: 0.85rem;">🔒 Complete all job site tasks to unlock payroll access.</p>
+        <p style="color: var(--wd-slate); font-size: 0.85rem;">🔒 Complete all requirements to unlock payroll access.</p>
         <button class="btn btn-locked" disabled>Payroll Portal Locked</button>
       <? } ?>
     </div>
 
   </div>
+
+  <script>
+    function handlePortalUpload() {
+      const fileInput = document.getElementById('portalIdUpload');
+      const status = document.getElementById('statusMsg');
+      const file = fileInput.files[0];
+      const urlParams = new URLSearchParams(window.location.search);
+      const portalId = urlParams.get('id');
+
+      if (!file) return;
+
+      status.innerText = "Processing upload...";
+      status.style.color = "orange";
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Data = e.target.result.split(',')[1];
+        
+        google.script.run
+          .withSuccessHandler(() => {
+            status.innerText = "Upload Success! Refreshing portal...";
+            status.style.color = "green";
+            setTimeout(() => { location.reload(); }, 1500);
+          })
+          .withFailureHandler((err) => {
+            status.innerText = "Upload Failed: " + err;
+            status.style.color = "red";
+          })
+          .portalFileUpload(base64Data, file.name, portalId);
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
 </body>
 </html>
