@@ -167,7 +167,7 @@
 </main>
 
 <footer>
-  &copy; 2025 Well Done Construction LLC | Built on Integrity
+  &copy; 2026 Well Done Construction LLC | Built on Integrity
 </footer>
 
 <script>
@@ -204,7 +204,7 @@
   });
 
   function sendToGoogle(data) {
-    // PASTE YOUR ACTUAL DEPLOYED URL BELOW
+    // IMPORTANT: REPLACE THIS WITH YOUR NEW DEPLOYMENT URL FROM APPS SCRIPT
     const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec";
     
     fetch(scriptURL, {
@@ -212,67 +212,13 @@
       mode: 'no-cors',
       body: JSON.stringify(data)
     }).then(() => {
-      const workerId = data.full_name.replace(/\s+/g, '_');
-      alert("Intake Complete! Opening your portal now.");
-      window.location.href = scriptURL + "?id=" + workerId;
-    }).catch(err => {
-      alert("Error submitting packet. Please check your connection.");
-      btn.disabled = false;
-      btn.innerText = "Initialize My Personal URL";
-    });
-  }
-<script>
-  const form = document.getElementById('intakeForm');
-  const btn = document.getElementById('submitBtn');
-  
-  form.addEventListener('submit', function(e) {
-    e.preventDefault(); 
-    
-    const fileInput = document.getElementById('idPhoto');
-    const file = fileInput.files[0];
-
-    if (file) {
-      btn.disabled = true;
-      btn.innerText = "Processing & Uploading...";
-
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        // Convert image to Base64 for Google Apps Script
-        const base64Data = event.target.result.split(',')[1];
-        
-        // Collect all form fields
-        const formData = new FormData(form);
-        const data = {};
-        formData.forEach((value, key) => { data[key] = value; });
-        
-        // Add image data
-        data.idImage = base64Data;
-        data.imageName = file.name;
-
-        sendToGoogle(data);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      alert("Please upload your ID photo first.");
-    }
-  });
-
-  function sendToGoogle(data) {
-    // This is your Master Engine URL
-    const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec";
-    
-    fetch(scriptURL, {
-      method: 'POST',
-      mode: 'no-cors', // Essential for Google Apps Script cross-domain
-      body: JSON.stringify(data)
-    }).then(() => {
-      // Create a clean URL-friendly ID from their email
+      // Create the Portal ID from email (matches the renderPortal logic in code.gs)
       const portalId = data.email.toLowerCase().replace(/[^a-z0-9]/g, '_');
       
       alert("Intake Complete! Opening your portal now.");
       
-      // Redirect to the portal on your .pro domain
-      window.location.href = "https://welldoneconstruction.pro/portal/?id=" + portalId;
+      // Redirect directly to the Master Engine's Portal View
+      window.location.href = scriptURL + "?id=" + portalId;
       
     }).catch(err => {
       console.error(err);
