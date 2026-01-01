@@ -81,6 +81,15 @@
     .btn-submit:disabled { background-color: var(--wd-slate); cursor: not-allowed; }
 
     footer { text-align: center; padding: 40px; color: var(--wd-slate); font-size: 0.85rem; }
+    
+    .note { 
+      background: #fff8e1; 
+      padding: 20px; 
+      border-left: 4px solid #ffc107; 
+      font-size: 0.95rem; 
+      margin-bottom: 25px; 
+      color: #5d4037; 
+    }
   </style>
 </head>
 <body>
@@ -92,6 +101,12 @@
 <main>
   <h1>Employee Packet</h1>
   <p class="subtitle">Official Intake & ID Verification</p>
+
+  <div class="note">
+    <strong>Verification Phase:</strong> Thank you for completing the initial steps. Once you submit your ID below, we will personally review your file. 
+    <br><br>
+    Upon verification of your ID and Signed Agreement, you will receive your <strong>Gusto Payroll invitation</strong> and your personal portal link via email. This is a manual review process to ensure the integrity of our team records.
+  </div>
 
   <form id="intakeForm">
     <h2>1. Personal Information</h2>
@@ -206,7 +221,7 @@
       mode: 'no-cors',
       body: JSON.stringify(data)
     }).then(() => {
-      alert("ID Submitted Successfully. We will review your documents and contact you shortly.");
+      alert("ID Received. Your file is now in the 'Verification Phase.' Please allow time for manual review. You will be notified via email regarding your Gusto Payroll setup.");
       window.location.href = "https://welldoneconstruction.pro/"; 
     }).catch(err => {
       console.error(err);
