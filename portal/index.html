@@ -1,108 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <base target="_top">
-  <style>
-    :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-slate: #6E797F; --wd-bg: #F4F7F6; }
-    body { font-family: 'Segoe UI', sans-serif; background-color: var(--wd-bg); color: var(--wd-dark); padding: 15px; margin: 0; }
-    .container { max-width: 600px; margin: 0 auto; }
-    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
-    .header { background: var(--wd-dark); color: white; display: flex; justify-content: space-between; align-items: center; }
-    .badge { background: var(--wd-green); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
-    .task-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
-    .btn { display: block; width: 100%; text-align: center; padding: 14px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 15px; border: none; }
-    .btn-locked { background: #e0e0e0; color: #999; cursor: not-allowed; }
-    .btn-active { background: var(--wd-dark); color: white; cursor: pointer; }
-    #statusMsg { font-size: 0.9rem; margin-top: 10px; text-align: center; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Worker Portal | Well Done Construction LLC</title>
+    <style>
+        :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #F4F7F6; }
+        body { font-family: sans-serif; background: var(--wd-bg); text-align: center; padding: 50px; }
+        .card { background: white; max-width: 500px; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .status-badge { display: inline-block; padding: 10px 20px; border-radius: 20px; font-weight: bold; margin-bottom: 20px; }
+        .verified { background: #e8f5e9; color: var(--wd-green); border: 1px solid var(--wd-green); }
+        .pending { background: #fff3e0; color: #ef6c00; border: 1px solid #ef6c00; }
+        .btn { display: block; background: var(--wd-dark); color: white; text-decoration: none; padding: 15px; margin-top: 10px; border-radius: 4px; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    
-    <div class="card header">
-      <div>
-        <h2 style="margin:0;"><?= profile.name ?></h2>
-        <small><?= profile.trade ?></small>
-      </div>
-      <div class="badge"><?= profile.trust ?></div>
+    <div class="card" id="loginBox">
+        <h2>Employee Portal Login</h2>
+        <input type="email" id="portalEmail" placeholder="Enter your email" style="width:80%; padding:10px; margin-bottom:10px;">
+        <button onclick="checkStatus()" class="btn" style="width:85%; margin:auto; cursor:pointer;">Access My Portal</button>
     </div>
 
-    <h3 style="color: var(--wd-slate); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Current Onboarding Status</h3>
-
-    <? for(var i=0; i < jobs.length; i++) { ?>
-      <div class="card" style="border-top: 5px solid var(--wd-green);">
-        <h2 style="margin:0; font-size: 1.2rem;"><?= jobs[i].address || "Address Pending" ?></h2>
-        <small style="color: var(--wd-green); font-weight: bold;"><?= jobs[i].jobName ?></small>
-        <div style="margin-top:15px;">
-          <? for(var j=0; j < jobs[i].tasks.length; j++) { ?>
-            <div class="task-row" style="<?= jobs[i].tasks[j].done ? '' : 'color: #d93025; font-weight: bold;' ?>">
-              <span><?= jobs[i].tasks[j].done ? '✅' : '🔴' ?> <?= jobs[i].tasks[j].taskName ?></span>
-              <small><?= jobs[i].tasks[j].done ? 'COMPLETED' : 'REQUIRED' ?></small>
-            </div>
-          <? } ?>
-        </div>
-      </div>
-    <? } ?>
-
-    <div class="card">
-      <h3>Document Management</h3>
-      <p style="font-size: 0.85rem; color: var(--wd-slate);">
-        If a task is marked <span style="color: #d93025; font-weight: bold;">REQUIRED</span>, upload the missing document below.
-      </p>
-      
-      <div id="uploadArea">
-        <input type="file" id="portalIdUpload" accept="image/*" style="display:none" onchange="handlePortalUpload()">
-        <button onclick="document.getElementById('portalIdUpload').click()" class="btn" style="background: var(--wd-slate); color: white; cursor: pointer;">
-          Upload Photo ID
-        </button>
-      </div>
-      <div id="statusMsg"></div>
+    <div class="card" id="portalContent" style="display:none;">
+        <div id="statusBadge" class="status-badge">Checking Status...</div>
+        <h2 id="welcomeName">Welcome</h2>
+        <hr>
+        <a href="https://gusto.com/login" class="btn" style="background:var(--wd-green);">Open Gusto Payroll</a>
+        <a href="#" class="btn">View Assignment History</a>
+        <a href="mailto:support@welldoneconstruction.link" class="btn">Contact Support</a>
     </div>
 
-    <div class="card">
-      <h3>Payroll & Tax Center</h3>
-      <? if (allTasksComplete) { ?>
-        <p style="color: var(--wd-green);">✅ Requirements Met. Access Unlocked.</p>
-        <a href="https://welldoneconstruction.pro/admin/" class="btn btn-active">Enter Payroll Portal (Gusto)</a>
-      <? } else { ?>
-        <p style="color: var(--wd-slate); font-size: 0.85rem;">🔒 Complete all requirements to unlock payroll access.</p>
-        <button class="btn btn-locked" disabled>Payroll Portal Locked</button>
-      <? } ?>
-    </div>
+    <script>
+        function checkStatus() {
+            const email = document.getElementById('portalEmail').value;
+            const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec?id=" + email;
 
-  </div>
-
-  <script>
-    function handlePortalUpload() {
-      const fileInput = document.getElementById('portalIdUpload');
-      const status = document.getElementById('statusMsg');
-      const file = fileInput.files[0];
-      const urlParams = new URLSearchParams(window.location.search);
-      const portalId = urlParams.get('id');
-
-      if (!file) return;
-
-      status.innerText = "Processing upload...";
-      status.style.color = "orange";
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const base64Data = e.target.result.split(',')[1];
-        
-        google.script.run
-          .withSuccessHandler(() => {
-            status.innerText = "Upload Success! Refreshing portal...";
-            status.style.color = "green";
-            setTimeout(() => { location.reload(); }, 1500);
-          })
-          .withFailureHandler((err) => {
-            status.innerText = "Upload Failed: " + err;
-            status.style.color = "red";
-          })
-          .portalFileUpload(base64Data, file.name, portalId);
-      };
-      reader.readAsDataURL(file);
-    }
-  </script>
+            fetch(scriptURL)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('loginBox').style.display = 'none';
+                document.getElementById('portalContent').style.display = 'block';
+                document.getElementById('welcomeName').innerText = "Account: " + email;
+                
+                const badge = document.getElementById('statusBadge');
+                if(data.isVerified) {
+                    badge.innerText = "✓ VERIFIED";
+                    badge.className = "status-badge verified";
+                } else {
+                    badge.innerText = "⚠ VERIFICATION PENDING";
+                    badge.className = "status-badge pending";
+                }
+            });
+        }
+    </script>
 </body>
 </html>
