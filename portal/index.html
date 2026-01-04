@@ -14,6 +14,7 @@
         .btn { display: block; background: var(--wd-dark); color: white; text-decoration: none; padding: 15px; margin-top: 10px; border-radius: 4px; font-weight: bold; border: none; width: 100%; cursor: pointer; text-align: center; }
         input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
         hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+        .profile-data { text-align: left; font-size: 0.9rem; line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -27,16 +28,32 @@
 
     <div class="card" id="portalContent" style="display:none;">
         <div id="statusBadge" class="status-badge">Searching Records...</div>
-        <h2 id="welcomeName" style="margin:0;">Welcome</h2>
-        <p style="color:#666; font-size: 0.9rem;">Onboarding & Integrity Record</p>
+        
+        <div class="profile-data" id="dynamicArea">
+            <h2 id="welcomeName" style="margin:0;">Employee Profile</h2>
+            <p><strong>Name:</strong> <span id="displayEmail">...</span><br>
+            <strong>Trade:</strong> TBD</p>
+            
+            <p><strong>ID:</strong> NEW<br>
+            <strong>Status:</strong> Review<br>
+            <strong>Accountability Level:</strong> <span id="accLevel">Level 0</span></p>
+            
+            <p style="font-size: 0.8rem; color: #666;">System Initialization: 1/4/2026</p>
+            <hr>
+            <h3 id="actionStatus">⚠️ ACTION REQUIRED</h3>
+            <p><strong>Payroll & Tax Center</strong><br>
+            Secure access to stubs and tax docs will unlock once your trust level reaches Level 2.</p>
+            <p id="lockStatus" style="font-weight: bold; color: #d32f2f;">Payroll Portal Locked</p>
+        </div>
+
         <hr>
-        <a href="https://gusto.com/login" class="btn" style="background:var(--wd-green);">Open Gusto Payroll</a>
-        <a href="mailto:support@welldoneconstruction.link" class="btn">Contact Support</a>
+        <a href="https://gusto.com/login" id="gustoBtn" class="btn">Open Gusto Payroll</a>
+        <a href="mailto:support@welldoneconstruction.link" class="btn" style="background:#ddd; color:#333;">Contact Support</a>
         <p style="font-size: 0.8rem; color:#999; margin-top:20px;">Well Done Construction LLC</p>
     </div>
 
     <script>
-        // Auto-load if email is in the URL (e.g., from the form redirect)
+        // 1. AUTO-LOAD FROM URL
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const emailParam = urlParams.get('email');
@@ -46,53 +63,48 @@
             }
         };
 
-        function portalCallback(data) {
-    const loginBox = document.getElementById('loginBox');
-    const portalContent = document.getElementById('portalContent');
-    const badge = document.getElementById('statusBadge');
-
-    loginBox.style.display = 'none';
-    portalContent.style.display = 'block';
-
-    if(data.isVerified) {
-        badge.innerText = "✓ VERIFIED";
-        badge.className = "status-badge verified";
-
-        // This part updates the text on your screen
-        let content = portalContent.innerHTML;
-        content = content.replace("Level 0", "Level " + data.level);
-        content = content.replace("⚠️ ACTION REQUIRED", "✅ ACCOUNT ACTIVE");
-        content = content.replace("Payroll Portal Locked", "Payroll Portal Unlocked");
-        portalContent.innerHTML = content;
-        
-        // Optional: Change the Gusto button color to show it's active
-        const gustoBtn = document.querySelector('a[href*="gusto.com"]');
-        if(gustoBtn) gustoBtn.style.background = "#33B26E"; 
-    } else {
-        badge.innerText = "⚠ VERIFICATION PENDING";
-        badge.className = "status-badge pending";
-    }
-}
-
+        // 2. TRIGGER ENGINE CHECK
         function checkStatus() {
             const emailInput = document.getElementById('portalEmail').value.trim().toLowerCase();
             if (!emailInput) { alert("Please enter email"); return; }
 
-            // Visual feedback
-            const btn = document.querySelector('.btn');
-            btn.innerText = "Connecting...";
+            document.getElementById('displayEmail').innerText = emailInput;
+            document.getElementById('statusBadge').innerText = "Connecting to Engine...";
 
             const script = document.createElement('script');
-            // REPLACE THIS URL with your actual Google Apps Script Web App URL
+            // Ensure this URL is your CURRENT Web App URL
             const webAppUrl = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec";
             script.src = webAppUrl + "?id=" + encodeURIComponent(emailInput);
             
             document.body.appendChild(script);
-            script.onload = () => {
-                document.body.removeChild(script);
-                btn.innerText = "Access My Portal";
-            };
-            script.onerror = () => alert("Engine Timeout. Ensure your App Script is deployed to 'Anyone'.");
+            script.onload = () => document.body.removeChild(script);
+        }
+
+        // 3. CALLBACK FROM GOOGLE (The Brains)
+        function portalCallback(data) {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('portalContent').style.display = 'block';
+            const badge = document.getElementById('statusBadge');
+
+            if(data.isVerified) {
+                // UPDATE BADGE
+                badge.innerText = "✓ VERIFIED";
+                badge.className = "status-badge verified";
+
+                // UPDATE DYNAMIC TEXT
+                document.getElementById('accLevel').innerText = "Level " + data.level;
+                document.getElementById('actionStatus').innerText = "✅ ACCOUNT ACTIVE";
+                document.getElementById('actionStatus').style.color = "var(--wd-green)";
+                document.getElementById('lockStatus').innerText = "Payroll Portal Unlocked";
+                document.getElementById('lockStatus').style.color = "var(--wd-green)";
+                
+                // UNLOCK GUSTO BUTTON
+                const gustoBtn = document.getElementById('gustoBtn');
+                gustoBtn.style.background = "var(--wd-green)";
+            } else {
+                badge.innerText = "⚠ VERIFICATION PENDING";
+                badge.className = "status-badge pending";
+            }
         }
     </script>
 </body>
