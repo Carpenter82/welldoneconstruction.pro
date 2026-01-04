@@ -11,7 +11,7 @@
         .status-badge { display: inline-block; padding: 10px 20px; border-radius: 20px; font-weight: bold; margin-bottom: 20px; font-size: 0.9rem; }
         .verified { background: #e8f5e9; color: var(--wd-green); border: 1px solid var(--wd-green); }
         .pending { background: #fff3e0; color: #ef6c00; border: 1px solid #ef6c00; }
-        .btn { display: block; background: var(--wd-dark); color: white; text-decoration: none; padding: 15px; margin-top: 10px; border-radius: 4px; font-weight: bold; border: none; width: 100%; cursor: pointer; }
+        .btn { display: block; background: var(--wd-dark); color: white; text-decoration: none; padding: 15px; margin-top: 10px; border-radius: 4px; font-weight: bold; border: none; width: 100%; cursor: pointer; text-align: center; }
         input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
         hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
     </style>
@@ -36,38 +36,50 @@
     </div>
 
     <script>
-    // 1. This function catches the data when it arrives from Google
-    function portalCallback(data) {
-        const loginBox = document.getElementById('loginBox');
-        const portalContent = document.getElementById('portalContent');
-        const badge = document.getElementById('statusBadge');
+        // Auto-load if email is in the URL (e.g., from the form redirect)
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const emailParam = urlParams.get('email');
+            if (emailParam) {
+                document.getElementById('portalEmail').value = emailParam;
+                checkStatus();
+            }
+        };
 
-        loginBox.style.display = 'none';
-        portalContent.style.display = 'block';
+        function portalCallback(data) {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('portalContent').style.display = 'block';
+            const badge = document.getElementById('statusBadge');
 
-        if(data.isVerified) {
-            badge.innerText = "✓ VERIFIED";
-            badge.className = "status-badge verified";
-        } else {
-            badge.innerText = "⚠ VERIFICATION PENDING";
-            badge.className = "status-badge pending";
+            if(data.isVerified) {
+                badge.innerText = "✓ VERIFIED";
+                badge.className = "status-badge verified";
+            } else {
+                badge.innerText = "⚠ VERIFICATION PENDING";
+                badge.className = "status-badge pending";
+            }
         }
-    }
 
-    // 2. This function triggers the request
-    function checkStatus() {
-        const emailInput = document.getElementById('portalEmail').value.trim().toLowerCase();
-        if (!emailInput) { alert("Please enter email"); return; }
+        function checkStatus() {
+            const emailInput = document.getElementById('portalEmail').value.trim().toLowerCase();
+            if (!emailInput) { alert("Please enter email"); return; }
 
-        document.getElementById('statusBadge').innerText = "Connecting to Engine...";
+            // Visual feedback
+            const btn = document.querySelector('.btn');
+            btn.innerText = "Connecting...";
 
-        // Create a temporary script tag to bypass CORS
-        const script = document.createElement('script');
-        script.src = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec?id=" + encodeURIComponent(emailInput);
-        
-        // Add to page, trigger request, then remove
-        document.body.appendChild(script);
-        script.onload = () => document.body.removeChild(script);
-        script.onerror = () => alert("Engine Timeout. Check your Deployment is set to 'Anyone'.");
-    }
-</script>
+            const script = document.createElement('script');
+            // REPLACE THIS URL with your actual Google Apps Script Web App URL
+            const webAppUrl = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec";
+            script.src = webAppUrl + "?id=" + encodeURIComponent(emailInput);
+            
+            document.body.appendChild(script);
+            script.onload = () => {
+                document.body.removeChild(script);
+                btn.innerText = "Access My Portal";
+            };
+            script.onerror = () => alert("Engine Timeout. Ensure your App Script is deployed to 'Anyone'.");
+        }
+    </script>
+</body>
+</html>
