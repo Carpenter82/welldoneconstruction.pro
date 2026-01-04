@@ -76,3 +76,41 @@
     </script>
 </body>
 </html>
+<script>
+    function checkStatus() {
+        const emailInput = document.getElementById('portalEmail').value.trim().toLowerCase();
+        if (!emailInput) { alert("Please enter an email"); return; }
+
+        const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec?id=" + encodeURIComponent(emailInput);
+
+        const badge = document.getElementById('statusBadge');
+        const loginBox = document.getElementById('loginBox');
+        const portalContent = document.getElementById('portalContent');
+
+        badge.innerText = "Searching Records...";
+
+        // THE FIX: Added redirect: "follow" and mode: "cors" is handled by Google automatically
+        fetch(scriptURL, {
+            method: "GET",
+            redirect: "follow" 
+        })
+        .then(res => res.json())
+        .then(data => {
+            loginBox.style.display = 'none';
+            portalContent.style.display = 'block';
+            document.getElementById('welcomeName').innerText = "Account: " + emailInput;
+            
+            if(data.isVerified) {
+                badge.innerText = "✓ VERIFIED";
+                badge.className = "status-badge verified";
+            } else {
+                badge.innerText = "⚠ VERIFICATION PENDING";
+                badge.className = "status-badge pending";
+            }
+        })
+        .catch(err => {
+            console.error("CORS or Network Error:", err);
+            alert("Security Check: If this is your first time today, please wait 5 seconds and try again. Google is authenticating the redirect.");
+        });
+    }
+</script>
