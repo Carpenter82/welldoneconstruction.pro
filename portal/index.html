@@ -1,18 +1,25 @@
 <script>
     function checkStatus() {
         const emailInput = document.getElementById('portalEmail').value.trim().toLowerCase();
-        
-        // UPDATE THIS URL with your latest Deployment URL
+        if (!emailInput) { alert("Please enter an email"); return; }
+
         const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec?id=" + encodeURIComponent(emailInput);
 
         const badge = document.getElementById('statusBadge');
-        badge.innerText = "Accessing Records...";
+        const loginBox = document.getElementById('loginBox');
+        const portalContent = document.getElementById('portalContent');
+
+        badge.innerText = "Searching Records...";
+        badge.className = "status-badge pending";
 
         fetch(scriptURL)
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error('Network response was not ok');
+            return res.json();
+        })
         .then(data => {
-            document.getElementById('loginBox').style.display = 'none';
-            document.getElementById('portalContent').style.display = 'block';
+            loginBox.style.display = 'none';
+            portalContent.style.display = 'block';
             document.getElementById('welcomeName').innerText = "Account: " + emailInput;
             
             if(data.isVerified) {
@@ -24,8 +31,9 @@
             }
         })
         .catch(err => {
-            console.error(err);
-            alert("Connection Error. Is the Master Engine Deployed to 'Anyone'?");
+            console.error("Error Detail:", err);
+            badge.innerText = "Connection Error";
+            alert("Could not connect to Master Engine. Check Console (F12) for details.");
         });
     }
 </script>
