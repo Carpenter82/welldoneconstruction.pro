@@ -1,56 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Worker Portal | Well Done Construction LLC</title>
-    <style>
-        :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #F4F7F6; }
-        body { font-family: sans-serif; background: var(--wd-bg); text-align: center; padding: 50px; }
-        .card { background: white; max-width: 500px; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .status-badge { display: inline-block; padding: 10px 20px; border-radius: 20px; font-weight: bold; margin-bottom: 20px; }
-        .verified { background: #e8f5e9; color: var(--wd-green); border: 1px solid var(--wd-green); }
-        .pending { background: #fff3e0; color: #ef6c00; border: 1px solid #ef6c00; }
-        .btn { display: block; background: var(--wd-dark); color: white; text-decoration: none; padding: 15px; margin-top: 10px; border-radius: 4px; }
-    </style>
-</head>
-<body>
-    <div class="card" id="loginBox">
-        <h2>Employee Portal Login</h2>
-        <input type="email" id="portalEmail" placeholder="Enter your email" style="width:80%; padding:10px; margin-bottom:10px;">
-        <button onclick="checkStatus()" class="btn" style="width:85%; margin:auto; cursor:pointer;">Access My Portal</button>
-    </div>
+<script>
+    function checkStatus() {
+        const emailInput = document.getElementById('portalEmail').value.trim().toLowerCase();
+        
+        // UPDATE THIS URL with your latest Deployment URL
+        const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec?id=" + encodeURIComponent(emailInput);
 
-    <div class="card" id="portalContent" style="display:none;">
-        <div id="statusBadge" class="status-badge">Checking Status...</div>
-        <h2 id="welcomeName">Welcome</h2>
-        <hr>
-        <a href="https://gusto.com/login" class="btn" style="background:var(--wd-green);">Open Gusto Payroll</a>
-        <a href="#" class="btn">View Assignment History</a>
-        <a href="mailto:support@welldoneconstruction.link" class="btn">Contact Support</a>
-    </div>
+        const badge = document.getElementById('statusBadge');
+        badge.innerText = "Accessing Records...";
 
-    <script>
-        function checkStatus() {
-            const email = document.getElementById('portalEmail').value;
-            const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec?id=" + email;
-
-            fetch(scriptURL)
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('loginBox').style.display = 'none';
-                document.getElementById('portalContent').style.display = 'block';
-                document.getElementById('welcomeName').innerText = "Account: " + email;
-                
-                const badge = document.getElementById('statusBadge');
-                if(data.isVerified) {
-                    badge.innerText = "✓ VERIFIED";
-                    badge.className = "status-badge verified";
-                } else {
-                    badge.innerText = "⚠ VERIFICATION PENDING";
-                    badge.className = "status-badge pending";
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+        fetch(scriptURL)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('portalContent').style.display = 'block';
+            document.getElementById('welcomeName').innerText = "Account: " + emailInput;
+            
+            if(data.isVerified) {
+                badge.innerText = "✓ VERIFIED";
+                badge.className = "status-badge verified";
+            } else {
+                badge.innerText = "⚠ VERIFICATION PENDING";
+                badge.className = "status-badge pending";
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Connection Error. Is the Master Engine Deployed to 'Anyone'?");
+        });
+    }
+</script>
