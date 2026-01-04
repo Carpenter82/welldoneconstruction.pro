@@ -36,68 +36,30 @@
     </div>
 
     <script>
-        function checkStatus() {
-            const emailInput = document.getElementById('portalEmail').value.trim().toLowerCase();
-            if (!emailInput) { alert("Please enter an email"); return; }
-
-            // YOUR MASTER ENGINE URL
-            const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec?id=" + encodeURIComponent(emailInput);
-
-            const badge = document.getElementById('statusBadge');
-            const loginBox = document.getElementById('loginBox');
-            const portalContent = document.getElementById('portalContent');
-
-            badge.innerText = "Searching Records...";
-            badge.className = "status-badge pending";
-
-            fetch(scriptURL)
-            .then(res => {
-                if (!res.ok) throw new Error('Network response was not ok');
-                return res.json();
-            })
-            .then(data => {
-                loginBox.style.display = 'none';
-                portalContent.style.display = 'block';
-                document.getElementById('welcomeName').innerText = "Account: " + emailInput;
-                
-                if(data.isVerified) {
-                    badge.innerText = "✓ VERIFIED";
-                    badge.className = "status-badge verified";
-                } else {
-                    badge.innerText = "⚠ VERIFICATION PENDING";
-                    badge.className = "status-badge pending";
-                }
-            })
-            .catch(err => {
-                console.error("Error Detail:", err);
-                alert("Could not connect to Master Engine. Check Console (F12) for details.");
-            });
-        }
-    </script>
-</body>
-</html>
-<script>
     function checkStatus() {
         const emailInput = document.getElementById('portalEmail').value.trim().toLowerCase();
         if (!emailInput) { alert("Please enter an email"); return; }
 
+        const badge = document.getElementById('statusBadge');
+        badge.innerText = "Connecting...";
+
+        // We use a simple URL variable
         const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec?id=" + encodeURIComponent(emailInput);
 
-        const badge = document.getElementById('statusBadge');
-        const loginBox = document.getElementById('loginBox');
-        const portalContent = document.getElementById('portalContent');
-
-        badge.innerText = "Searching Records...";
-
-        // THE FIX: Added redirect: "follow" and mode: "cors" is handled by Google automatically
         fetch(scriptURL, {
-            method: "GET",
-            redirect: "follow" 
+            method: 'GET',
+            mode: 'no-cors', // This tells the browser: "I don't need to read headers, just give me the data"
+        })
+        .then(() => {
+            // Since 'no-cors' hides the response body, we do a second check 
+            // OR we use the standard fetch but handle the redirect manually.
+            // Let's try the direct approach one more time with a 'cache' bust:
+            return fetch(scriptURL + "&cb=" + Date.now());
         })
         .then(res => res.json())
         .then(data => {
-            loginBox.style.display = 'none';
-            portalContent.style.display = 'block';
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('portalContent').style.display = 'block';
             document.getElementById('welcomeName').innerText = "Account: " + emailInput;
             
             if(data.isVerified) {
@@ -109,8 +71,11 @@
             }
         })
         .catch(err => {
-            console.error("CORS or Network Error:", err);
-            alert("Security Check: If this is your first time today, please wait 5 seconds and try again. Google is authenticating the redirect.");
+            // If it STILL fails, it's a browser privacy setting.
+            // Try opening the scriptURL directly in your browser tab. 
+            // If you see {"isVerified":true}, the script is working, but the site is blocked.
+            console.error(err);
+            alert("Check failed. Please ensure you are not using an Incognito window or AdBlocker that stops Google redirects.");
         });
     }
 </script>
