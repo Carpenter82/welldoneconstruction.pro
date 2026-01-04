@@ -36,46 +36,38 @@
     </div>
 
     <script>
+    // 1. This function catches the data when it arrives from Google
+    function portalCallback(data) {
+        const loginBox = document.getElementById('loginBox');
+        const portalContent = document.getElementById('portalContent');
+        const badge = document.getElementById('statusBadge');
+
+        loginBox.style.display = 'none';
+        portalContent.style.display = 'block';
+
+        if(data.isVerified) {
+            badge.innerText = "✓ VERIFIED";
+            badge.className = "status-badge verified";
+        } else {
+            badge.innerText = "⚠ VERIFICATION PENDING";
+            badge.className = "status-badge pending";
+        }
+    }
+
+    // 2. This function triggers the request
     function checkStatus() {
         const emailInput = document.getElementById('portalEmail').value.trim().toLowerCase();
-        if (!emailInput) { alert("Please enter an email"); return; }
+        if (!emailInput) { alert("Please enter email"); return; }
 
-        const badge = document.getElementById('statusBadge');
-        badge.innerText = "Connecting...";
+        document.getElementById('statusBadge').innerText = "Connecting to Engine...";
 
-        // We use a simple URL variable
-        const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec?id=" + encodeURIComponent(emailInput);
-
-        fetch(scriptURL, {
-            method: 'GET',
-            mode: 'no-cors', // This tells the browser: "I don't need to read headers, just give me the data"
-        })
-        .then(() => {
-            // Since 'no-cors' hides the response body, we do a second check 
-            // OR we use the standard fetch but handle the redirect manually.
-            // Let's try the direct approach one more time with a 'cache' bust:
-            return fetch(scriptURL + "&cb=" + Date.now());
-        })
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById('loginBox').style.display = 'none';
-            document.getElementById('portalContent').style.display = 'block';
-            document.getElementById('welcomeName').innerText = "Account: " + emailInput;
-            
-            if(data.isVerified) {
-                badge.innerText = "✓ VERIFIED";
-                badge.className = "status-badge verified";
-            } else {
-                badge.innerText = "⚠ VERIFICATION PENDING";
-                badge.className = "status-badge pending";
-            }
-        })
-        .catch(err => {
-            // If it STILL fails, it's a browser privacy setting.
-            // Try opening the scriptURL directly in your browser tab. 
-            // If you see {"isVerified":true}, the script is working, but the site is blocked.
-            console.error(err);
-            alert("Check failed. Please ensure you are not using an Incognito window or AdBlocker that stops Google redirects.");
-        });
+        // Create a temporary script tag to bypass CORS
+        const script = document.createElement('script');
+        script.src = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec?id=" + encodeURIComponent(emailInput);
+        
+        // Add to page, trigger request, then remove
+        document.body.appendChild(script);
+        script.onload = () => document.body.removeChild(script);
+        script.onerror = () => alert("Engine Timeout. Check your Deployment is set to 'Anyone'.");
     }
 </script>
