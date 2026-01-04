@@ -47,18 +47,32 @@
         };
 
         function portalCallback(data) {
-            document.getElementById('loginBox').style.display = 'none';
-            document.getElementById('portalContent').style.display = 'block';
-            const badge = document.getElementById('statusBadge');
+    const loginBox = document.getElementById('loginBox');
+    const portalContent = document.getElementById('portalContent');
+    const badge = document.getElementById('statusBadge');
 
-            if(data.isVerified) {
-                badge.innerText = "✓ VERIFIED";
-                badge.className = "status-badge verified";
-            } else {
-                badge.innerText = "⚠ VERIFICATION PENDING";
-                badge.className = "status-badge pending";
-            }
-        }
+    loginBox.style.display = 'none';
+    portalContent.style.display = 'block';
+
+    if(data.isVerified) {
+        badge.innerText = "✓ VERIFIED";
+        badge.className = "status-badge verified";
+
+        // This part updates the text on your screen
+        let content = portalContent.innerHTML;
+        content = content.replace("Level 0", "Level " + data.level);
+        content = content.replace("⚠️ ACTION REQUIRED", "✅ ACCOUNT ACTIVE");
+        content = content.replace("Payroll Portal Locked", "Payroll Portal Unlocked");
+        portalContent.innerHTML = content;
+        
+        // Optional: Change the Gusto button color to show it's active
+        const gustoBtn = document.querySelector('a[href*="gusto.com"]');
+        if(gustoBtn) gustoBtn.style.background = "#33B26E"; 
+    } else {
+        badge.innerText = "⚠ VERIFICATION PENDING";
+        badge.className = "status-badge pending";
+    }
+}
 
         function checkStatus() {
             const emailInput = document.getElementById('portalEmail').value.trim().toLowerCase();
