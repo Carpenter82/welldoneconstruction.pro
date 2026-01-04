@@ -1,87 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worker Portal | Well Done Construction LLC</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Portal</title>
     <style>
         :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #F4F7F6; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--wd-bg); text-align: center; padding: 50px; color: var(--wd-dark); }
-        .card { background: white; max-width: 500px; margin: auto; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .status-badge { display: inline-block; padding: 10px 20px; border-radius: 20px; font-weight: bold; margin-bottom: 20px; font-size: 0.9rem; }
+        body { font-family: sans-serif; background: var(--wd-bg); text-align: center; padding: 20px; color: var(--wd-dark); }
+        .card { background: white; max-width: 450px; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .status-badge { display: inline-block; padding: 8px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 15px; }
         .verified { background: #e8f5e9; color: var(--wd-green); border: 1px solid var(--wd-green); }
         .pending { background: #fff3e0; color: #ef6c00; border: 1px solid #ef6c00; }
-        .btn { display: block; background: var(--wd-dark); color: white; text-decoration: none; padding: 15px; margin-top: 10px; border-radius: 4px; font-weight: bold; border: none; width: 100%; cursor: pointer; text-align: center; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
-        .profile-data { text-align: left; font-size: 0.9rem; line-height: 1.6; }
+        .btn { display: block; background: var(--wd-dark); color: white; text-decoration: none; padding: 12px; margin-top: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; border:none; width: 100%; }
+        input[type="file"] { margin: 15px 0; }
     </style>
 </head>
 <body>
-
     <div class="card" id="loginBox">
-        <h2 style="margin-top:0;">Employee Portal</h2>
-        <input type="email" id="portalEmail" placeholder="email@address.com">
-        <button onclick="checkStatus()" class="btn">Access My Portal</button>
+        <h2>Employee Portal</h2>
+        <input type="email" id="portalEmail" placeholder="email@address.com" style="width:90%; padding:10px; margin-bottom:10px;">
+        <button onclick="checkStatus()" class="btn">Access Portal</button>
     </div>
 
     <div class="card" id="portalContent" style="display:none;">
         <div id="statusBadge" class="status-badge">Connecting...</div>
-        <div class="profile-data" id="dynamicArea">
-            <h2 style="margin:0;">Employee Profile</h2>
-            <p><strong>Name:</strong> <span id="displayEmail">...</span></p>
+        <div id="profileArea" style="text-align:left;">
+            <p><strong>Name:</strong> <span id="displayEmail"></span></p>
             <p><strong>Accountability:</strong> <span id="accLevel">Level 0</span></p>
             <hr>
+            <div id="uploadSection">
+                <h3>Step 1: Upload ID</h3>
+                <input type="file" id="idFile" accept="image/*">
+                <button onclick="uploadID()" class="btn" style="background:orange;">Upload ID Photo</button>
+            </div>
+            <hr>
             <h3 id="actionStatus">⚠️ ACTION REQUIRED</h3>
-            <p id="lockStatus" style="font-weight: bold; color: #d32f2f;">Payroll Portal Locked</p>
+            <p id="lockStatus">Payroll Portal Locked</p>
+            <a href="https://gusto.com/login" id="gustoBtn" class="btn" style="opacity:0.5; pointer-events:none;">Open Gusto</a>
         </div>
-        <hr>
-        <a href="https://gusto.com/login" id="gustoBtn" class="btn">Open Gusto Payroll</a>
     </div>
 
     <script>
-        // 1. Auto-Check if Email is in URL
-        window.onload = function() {
-            const params = new URLSearchParams(window.location.search);
-            const email = params.get('email');
-            if (email) {
-                document.getElementById('portalEmail').value = email;
-                checkStatus();
-            }
-        };
+        const webAppUrl = "YOUR_NEW_DEPLOYMENT_URL_HERE"; // PASTE NEW URL HERE
 
-        // 2. The Engine Request
         function checkStatus() {
-            const emailInput = document.getElementById('portalEmail').value.trim().toLowerCase();
-            if (!emailInput) return;
-
-            document.getElementById('displayEmail').innerText = emailInput;
+            const email = document.getElementById('portalEmail').value.trim().toLowerCase();
+            document.getElementById('displayEmail').innerText = email;
             document.getElementById('loginBox').style.display = 'none';
             document.getElementById('portalContent').style.display = 'block';
-
             const script = document.createElement('script');
-            // PASTE YOUR NEW WEB APP URL HERE
-            const webAppUrl = "PASTE_YOUR_EXEC_URL_HERE"; 
-            script.src = webAppUrl + "?id=" + encodeURIComponent(emailInput);
+            script.src = webAppUrl + "?id=" + encodeURIComponent(email);
             document.body.appendChild(script);
         }
 
-        // 3. The Callback (Catching the data)
         function portalCallback(data) {
             const badge = document.getElementById('statusBadge');
             if(data.isVerified) {
-                badge.innerText = "✓ VERIFIED";
-                badge.className = "status-badge verified";
-                document.getElementById('accLevel').innerText = "Level " + data.level;
+                badge.innerText = "✓ VERIFIED"; badge.className = "status-badge verified";
+                document.getElementById('accLevel').innerText = "Level 2";
                 document.getElementById('actionStatus').innerText = "✅ ACCOUNT ACTIVE";
-                document.getElementById('actionStatus').style.color = "var(--wd-green)";
                 document.getElementById('lockStatus').innerText = "Payroll Portal Unlocked";
-                document.getElementById('lockStatus').style.color = "var(--wd-green)";
+                document.getElementById('gustoBtn').style.opacity = "1";
+                document.getElementById('gustoBtn').style.pointerEvents = "auto";
                 document.getElementById('gustoBtn').style.background = "var(--wd-green)";
+                document.getElementById('uploadSection').style.display = "none";
             } else {
-                badge.innerText = "⚠ VERIFICATION PENDING";
-                badge.className = "status-badge pending";
+                badge.innerText = "⚠ PENDING VERIFICATION"; badge.className = "status-badge pending";
             }
+        }
+
+        function uploadID() {
+            const file = document.getElementById('idFile').files[0];
+            const email = document.getElementById('displayEmail').innerText;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result.split(',')[1];
+                fetch(webAppUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ email: email, idImage: base64 })
+                }).then(() => alert("Photo Uploaded! Now wait for admin verification."));
+            };
+            reader.readAsDataURL(file);
         }
     </script>
 </body>
