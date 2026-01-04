@@ -1,39 +1,78 @@
-<script>
-    function checkStatus() {
-        const emailInput = document.getElementById('portalEmail').value.trim().toLowerCase();
-        if (!emailInput) { alert("Please enter an email"); return; }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Portal | Well Done Construction LLC</title>
+    <style>
+        :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #F4F7F6; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--wd-bg); text-align: center; padding: 50px; color: var(--wd-dark); }
+        .card { background: white; max-width: 500px; margin: auto; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .status-badge { display: inline-block; padding: 10px 20px; border-radius: 20px; font-weight: bold; margin-bottom: 20px; font-size: 0.9rem; }
+        .verified { background: #e8f5e9; color: var(--wd-green); border: 1px solid var(--wd-green); }
+        .pending { background: #fff3e0; color: #ef6c00; border: 1px solid #ef6c00; }
+        .btn { display: block; background: var(--wd-dark); color: white; text-decoration: none; padding: 15px; margin-top: 10px; border-radius: 4px; font-weight: bold; border: none; width: 100%; cursor: pointer; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+    </style>
+</head>
+<body>
 
-        const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec?id=" + encodeURIComponent(emailInput);
+    <div class="card" id="loginBox">
+        <h2 style="margin-top:0;">Employee Portal</h2>
+        <p style="color:#666;">Enter your email to view your onboarding status.</p>
+        <input type="email" id="portalEmail" placeholder="email@address.com">
+        <button onclick="checkStatus()" class="btn">Access My Portal</button>
+    </div>
 
-        const badge = document.getElementById('statusBadge');
-        const loginBox = document.getElementById('loginBox');
-        const portalContent = document.getElementById('portalContent');
+    <div class="card" id="portalContent" style="display:none;">
+        <div id="statusBadge" class="status-badge">Searching Records...</div>
+        <h2 id="welcomeName" style="margin:0;">Welcome</h2>
+        <p style="color:#666; font-size: 0.9rem;">Onboarding & Integrity Record</p>
+        <hr>
+        <a href="https://gusto.com/login" class="btn" style="background:var(--wd-green);">Open Gusto Payroll</a>
+        <a href="mailto:support@welldoneconstruction.link" class="btn">Contact Support</a>
+        <p style="font-size: 0.8rem; color:#999; margin-top:20px;">Well Done Construction LLC</p>
+    </div>
 
-        badge.innerText = "Searching Records...";
-        badge.className = "status-badge pending";
+    <script>
+        function checkStatus() {
+            const emailInput = document.getElementById('portalEmail').value.trim().toLowerCase();
+            if (!emailInput) { alert("Please enter an email"); return; }
 
-        fetch(scriptURL)
-        .then(res => {
-            if (!res.ok) throw new Error('Network response was not ok');
-            return res.json();
-        })
-        .then(data => {
-            loginBox.style.display = 'none';
-            portalContent.style.display = 'block';
-            document.getElementById('welcomeName').innerText = "Account: " + emailInput;
-            
-            if(data.isVerified) {
-                badge.innerText = "✓ VERIFIED";
-                badge.className = "status-badge verified";
-            } else {
-                badge.innerText = "⚠ VERIFICATION PENDING";
-                badge.className = "status-badge pending";
-            }
-        })
-        .catch(err => {
-            console.error("Error Detail:", err);
-            badge.innerText = "Connection Error";
-            alert("Could not connect to Master Engine. Check Console (F12) for details.");
-        });
-    }
-</script>
+            // YOUR MASTER ENGINE URL
+            const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec?id=" + encodeURIComponent(emailInput);
+
+            const badge = document.getElementById('statusBadge');
+            const loginBox = document.getElementById('loginBox');
+            const portalContent = document.getElementById('portalContent');
+
+            badge.innerText = "Searching Records...";
+            badge.className = "status-badge pending";
+
+            fetch(scriptURL)
+            .then(res => {
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
+            .then(data => {
+                loginBox.style.display = 'none';
+                portalContent.style.display = 'block';
+                document.getElementById('welcomeName').innerText = "Account: " + emailInput;
+                
+                if(data.isVerified) {
+                    badge.innerText = "✓ VERIFIED";
+                    badge.className = "status-badge verified";
+                } else {
+                    badge.innerText = "⚠ VERIFICATION PENDING";
+                    badge.className = "status-badge pending";
+                }
+            })
+            .catch(err => {
+                console.error("Error Detail:", err);
+                alert("Could not connect to Master Engine. Check Console (F12) for details.");
+            });
+        }
+    </script>
+</body>
+</html>
