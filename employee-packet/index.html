@@ -216,5 +216,82 @@
     }
   };
 </script>
+  <footer>
+    &copy; 2026 Well Done Construction LLC | Built on Integrity
+  </footer>
+
+  <script>
+    const form = document.getElementById('intakeForm');
+    const btn = document.getElementById('submitBtn');
+
+    // 1. CATCH EMAIL FROM LINK
+    window.onload = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const emailFromLink = urlParams.get('email');
+      if (emailFromLink) {
+        const emailInput = document.getElementById('email');
+        if (emailInput) {
+          emailInput.value = emailFromLink;
+          emailInput.style.backgroundColor = "#e8f5e9";
+          emailInput.style.border = "2px solid var(--wd-green)";
+          emailInput.readOnly = true; 
+        }
+      }
+    };
+
+    // 2. PREPARE & SUBMIT DATA
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('idPhoto');
+      const file = fileInput.files[0];
+
+      if (file) {
+        btn.disabled = true;
+        btn.innerText = "Processing & Uploading...";
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const base64Data = event.target.result.split(',')[1];
+          
+          const data = {
+            email: document.getElementById('email').value,
+            full_name: document.getElementById('full_name').value,
+            phone: document.getElementsByName('phone')[0].value,
+            emergency_name: document.getElementsByName('emergency_name')[0].value,
+            emergency_phone: document.getElementsByName('emergency_phone')[0].value,
+            idImage: base64Data,
+            imageName: file.name
+          };
+
+          sendToGoogle(data);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // 3. SEND TO APPS SCRIPT ENGINE
+    function sendToGoogle(data) {
+      const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec";
+      
+      fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors', 
+        cache: 'no-cache',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(() => {
+        window.location.href = "https://welldoneconstruction.pro/"; 
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Error submitting packet. Please try again.");
+        btn.disabled = false;
+        btn.innerText = "Complete My Employee Packet";
+      });
+    }
+  </script>
+  </body>
+</html>
 </body>
 </html>
