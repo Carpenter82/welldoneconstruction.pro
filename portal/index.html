@@ -1,84 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worker Portal</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Portal | Well Done Construction LLC</title>
     <style>
         :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #F4F7F6; }
-        body { font-family: sans-serif; background: var(--wd-bg); text-align: center; padding: 20px; color: var(--wd-dark); }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--wd-bg); text-align: center; padding: 20px; color: var(--wd-dark); }
         .card { background: white; max-width: 450px; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .status-badge { display: inline-block; padding: 8px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 15px; }
         .verified { background: #e8f5e9; color: var(--wd-green); border: 1px solid var(--wd-green); }
         .pending { background: #fff3e0; color: #ef6c00; border: 1px solid #ef6c00; }
-        .btn { display: block; background: var(--wd-dark); color: white; text-decoration: none; padding: 12px; margin-top: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; border:none; width: 100%; }
+        .btn { display: block; background: var(--wd-dark); color: white; text-decoration: none; padding: 12px; margin-top: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; border:none; width: 100%; transition: 0.3s; }
+        .btn:hover { opacity: 0.8; }
+        input[type="email"] { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
         input[type="file"] { margin: 15px 0; }
+        hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
     </style>
 </head>
 <body>
+
     <div class="card" id="loginBox">
-        <h2>Employee Portal</h2>
-        <input type="email" id="portalEmail" placeholder="email@address.com" style="width:90%; padding:10px; margin-bottom:10px;">
+        <h2 style="margin-top:0;">Employee Portal</h2>
+        <p>Enter your email to access your records.</p>
+        <input type="email" id="portalEmail" placeholder="email@address.com">
         <button onclick="checkStatus()" class="btn">Access Portal</button>
     </div>
 
     <div class="card" id="portalContent" style="display:none;">
         <div id="statusBadge" class="status-badge">Connecting...</div>
+        
         <div id="profileArea" style="text-align:left;">
-            <p><strong>Name:</strong> <span id="displayEmail"></span></p>
+            <p><strong>Name:</strong> <span id="displayEmail">...</span></p>
             <p><strong>Accountability:</strong> <span id="accLevel">Level 0</span></p>
             <hr>
+            
             <div id="uploadSection">
-                <h3>Step 1: Upload ID</h3>
+                <h3 style="margin-top:0;">Step 1: Identity Verification</h3>
+                <p style="font-size: 0.85rem; color: #666;">Upload a clear photo of your ID.</p>
                 <input type="file" id="idFile" accept="image/*">
                 <button onclick="uploadID()" class="btn" style="background:orange;">Upload ID Photo</button>
             </div>
-            <hr>
+            
+            <hr id="divider" style="display:none;">
+            
             <h3 id="actionStatus">⚠️ ACTION REQUIRED</h3>
-            <p id="lockStatus">Payroll Portal Locked</p>
-            <a href="https://gusto.com/login" id="gustoBtn" class="btn" style="opacity:0.5; pointer-events:none;">Open Gusto</a>
+            <p id="lockStatus" style="font-weight:bold; color:#d32f2f;">Payroll Portal Locked</p>
+            <a href="https://gusto.com/login" id="gustoBtn" class="btn" style="opacity:0.5; pointer-events:none;">Open Gusto Payroll</a>
         </div>
     </div>
 
     <script>
-        const webAppUrl = "// Replace the old URL with this one
-const webAppUrl = "https://script.google.com/macros/s/AKfycbyf_wTRE5asyvGZbDrz209grmfDZWrkyuSeJXNmuHQMqxiIbsd08xeC91EUe_Bbpuxy8Q/exec";"; // PASTE NEW URL HERE
+        // THE MASTER ENGINE LINK
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbyf_wTRE5asyvGZbDrz209grmfDZWrkyuSeJXNmuHQMqxiIbsd08xeC91EUe_Bbpuxy8Q/exec";
+
+        // AUTO-LOAD IF EMAIL IN URL
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const email = params.get('email');
+            if (email) {
+                document.getElementById('portalEmail').value = email;
+                checkStatus();
+            }
+        };
 
         function checkStatus() {
             const email = document.getElementById('portalEmail').value.trim().toLowerCase();
+            if (!email) { alert("Please enter your email"); return; }
+
             document.getElementById('displayEmail').innerText = email;
             document.getElementById('loginBox').style.display = 'none';
             document.getElementById('portalContent').style.display = 'block';
+
+            // JSONP Handshake
             const script = document.createElement('script');
             script.src = webAppUrl + "?id=" + encodeURIComponent(email);
             document.body.appendChild(script);
         }
 
+        // CALLBACK FROM GOOGLE ENGINE
         function portalCallback(data) {
             const badge = document.getElementById('statusBadge');
-            if(data.isVerified) {
-                badge.innerText = "✓ VERIFIED"; badge.className = "status-badge verified";
+            
+            if (data.isVerified) {
+                // FLIP TO GREEN
+                badge.innerText = "✓ VERIFIED";
+                badge.className = "status-badge verified";
                 document.getElementById('accLevel').innerText = "Level 2";
                 document.getElementById('actionStatus').innerText = "✅ ACCOUNT ACTIVE";
+                document.getElementById('actionStatus').style.color = "#33B26E";
                 document.getElementById('lockStatus').innerText = "Payroll Portal Unlocked";
-                document.getElementById('gustoBtn').style.opacity = "1";
-                document.getElementById('gustoBtn').style.pointerEvents = "auto";
-                document.getElementById('gustoBtn').style.background = "var(--wd-green)";
+                document.getElementById('lockStatus').style.color = "#33B26E";
+                
+                // UNLOCK GUSTO BUTTON
+                const gBtn = document.getElementById('gustoBtn');
+                gBtn.style.opacity = "1";
+                gBtn.style.pointerEvents = "auto";
+                gBtn.style.background = "#33B26E";
+                
+                // HIDE UPLOAD SECTION
                 document.getElementById('uploadSection').style.display = "none";
             } else {
-                badge.innerText = "⚠ PENDING VERIFICATION"; badge.className = "status-badge pending";
+                // REMAIN PENDING
+                badge.innerText = "⚠ PENDING VERIFICATION";
+                badge.className = "status-badge pending";
             }
         }
 
         function uploadID() {
-            const file = document.getElementById('idFile').files[0];
+            const fileInput = document.getElementById('idFile');
+            const file = fileInput.files[0];
             const email = document.getElementById('displayEmail').innerText;
+
+            if (!file) { alert("Please select a file first"); return; }
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 const base64 = e.target.result.split(',')[1];
+                
+                // Show uploading status
+                const upBtn = document.querySelector("#uploadSection .btn");
+                upBtn.innerText = "Uploading...";
+                upBtn.disabled = true;
+
                 fetch(webAppUrl, {
                     method: 'POST',
+                    mode: 'no-cors', // Essential for Google Apps Script POST
                     body: JSON.stringify({ email: email, idImage: base64 })
-                }).then(() => alert("Photo Uploaded! Now wait for admin verification."));
+                }).then(() => {
+                    alert("Photo Uploaded Successfully! Admin review required for verification.");
+                    upBtn.innerText = "Upload ID Photo";
+                    upBtn.disabled = false;
+                }).catch(err => {
+                    alert("Upload failed. Try a smaller image.");
+                });
             };
             reader.readAsDataURL(file);
         }
