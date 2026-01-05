@@ -33,17 +33,19 @@
 
 <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get('employee') || "Worker";
-    document.getElementById('empName').innerText = "Employee: " + name;
+    // 1. Get the email/ID from the URL (e.g., ?email=tee35081@gmail.com)
+    const workerEmail = urlParams.get('email') || urlParams.get('employee') || "Unknown_Worker";
+    document.getElementById('empName').innerText = "Account: " + workerEmail;
 
     async function sendData() {
         const btn = document.getElementById('submitBtn');
         const status = document.getElementById('status');
         btn.disabled = true;
-        status.innerText = "Processing...";
+        status.innerText = "Filing to Records...";
 
         const checklistData = {
-            employee: name,
+            email: workerEmail, // CHANGED FROM 'employee' TO 'email' TO MATCH ENGINE
+            type: "Checklist",
             submittedAt: new Date().toLocaleString(),
             tasks: Array.from(document.querySelectorAll('.task')).map(t => ({
                 taskName: t.innerText.trim(),
@@ -51,7 +53,6 @@
             }))
         };
 
-        // UPDATED WITH YOUR NEW URL:
         const scriptURL = "https://script.google.com/macros/s/AKfycbwImj4FnPHWpg1jWIo_Oh5dY0EiYVsficDcnWjmdz7t36e0ihIQnvXLrNk3lrG_JC8i/exec";
 
         try {
@@ -61,7 +62,7 @@
                 headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify(checklistData)
             });
-            status.innerText = "✅ Submission Saved!";
+            status.innerText = "✅ Checklist Saved to Your Folder!";
             status.style.color = "green";
         } catch (e) {
             status.innerText = "❌ Connection Error.";
