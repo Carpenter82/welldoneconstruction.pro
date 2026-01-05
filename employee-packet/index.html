@@ -199,6 +199,22 @@
     });
   }
 </script>
-
+<script>
+  // This runs as soon as the worker clicks your link
+  window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const emailFromLink = urlParams.get('email');
+    
+    if (emailFromLink) {
+      const emailInput = document.getElementById('email');
+      if (emailInput) {
+        emailInput.value = emailFromLink;
+        // Visual feedback so they know it's official
+        emailInput.style.backgroundColor = "#e8f5e9";
+        emailInput.style.border = "2px solid #33B26E";
+      }
+    }
+  };
+</script>
 </body>
 </html>
