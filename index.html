@@ -11,6 +11,7 @@
       --wd-dark: #343E47;
       --wd-slate: #6E797F;
       --wd-white: #FFFFFF;
+      --wd-light: #F8F9FA;
     }
 
     body {
@@ -44,7 +45,7 @@
     .hero h1 {
       font-size: 2.5rem;
       color: var(--wd-dark);
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       font-weight: 700;
     }
 
@@ -54,7 +55,7 @@
       margin-bottom: 40px;
     }
 
-    /* The Primary Action Button */
+    /* Primary Action Button */
     .btn-apply {
       display: inline-block;
       background-color: var(--wd-green);
@@ -64,42 +65,79 @@
       font-weight: bold;
       text-decoration: none;
       border-radius: 5px;
-      transition: transform 0.2s, background-color 0.2s;
+      transition: all 0.2s ease-in-out;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
     .btn-apply:hover {
       background-color: #2b965c;
       transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
     }
 
-    /* Features/Info Section */
+    /* Features Section */
     .info-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 30px;
       padding: 40px 20px;
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
     }
 
     .info-item {
       text-align: center;
-      padding: 20px;
+      padding: 30px;
+      background: var(--wd-light);
+      border-radius: 8px;
     }
 
     .info-item h3 {
       color: var(--wd-green);
-      margin-bottom: 10px;
+      margin-top: 0;
+      font-size: 1.4rem;
     }
 
     footer {
-      margin-top: 80px;
-      padding: 40px 20px;
+      margin-top: 60px;
+      padding: 40px 20px 100px 20px; /* Extra bottom padding for the nav dock */
       border-top: 1px solid #eee;
       text-align: center;
       color: var(--wd-slate);
       font-size: 0.9rem;
+    }
+
+    /* System Navigation Dock */
+    .nav-dock {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--wd-dark);
+      padding: 12px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      z-index: 1000;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+    }
+
+    .nav-dock a {
+      color: #adb5bd;
+      text-decoration: none;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: bold;
+    }
+
+    .nav-dock a:hover {
+      color: var(--wd-green);
+    }
+
+    .nav-dock a.active {
+      color: var(--wd-white);
+      border-bottom: 2px solid var(--wd-green);
     }
   </style>
 </head>
@@ -134,15 +172,15 @@
   </section>
 
   <footer>
-    <p>&copy; 2025 Well Done Construction LLC. All rights reserved.</p>
+    <p>&copy; 2026 Well Done Construction LLC. All rights reserved.</p>
   </footer>
+
+  <nav class="nav-dock">
+    <a href="/" class="active">P1: Home</a>
+    <a href="/employee-packet/">P2: Intake</a>
+    <a href="/portal/">P3: Portal</a>
+    <a href="/admin/">P4: Admin</a>
+  </nav>
 
 </body>
 </html>
-
-<div style="position: fixed; bottom: 0; left: 0; background: #343E47; padding: 10px; font-size: 10px;">
-  <a href="/" style="color: white; margin-right: 10px;">P1: Home</a>
-  <a href="/employee-packet/" style="color: white; margin-right: 10px;">P2: Intake</a>
-  <a href="/portal/" style="color: white; margin-right: 10px;">P3: Portal</a>
-  <a href="/admin/" style="color: white;">P4: Admin</a>
-</div>
