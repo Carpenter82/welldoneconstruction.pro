@@ -1,70 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apply | Well Done Construction LLC</title>
-    <style>
-        :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #F4F7F6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--wd-bg); padding: 20px; color: var(--wd-dark); }
-        .form-card { max-width: 700px; margin: auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { border-bottom: 2px solid var(--wd-green); padding-bottom: 10px; margin-top: 30px; }
-        label { display: block; margin-top: 15px; font-weight: bold; }
-        input[type="text"], input[type="email"], input[type="tel"], input[type="date"] { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        .btn-apply { background: var(--wd-green); color: white; border: none; padding: 18px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 30px; cursor: pointer; font-size: 1.1rem; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Intake | Well Done Construction</title>
+<style>
+  :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #F4F7F6; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--wd-bg); color: var(--wd-dark); margin: 0; padding: 20px; }
+  .form-container { max-width: 600px; margin: 40px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 5px solid var(--wd-green); }
+  h1 { text-align: center; color: var(--wd-dark); }
+  label { display: block; margin-top: 15px; font-weight: bold; }
+  input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+  .submit-btn { background: var(--wd-green); color: white; border: none; padding: 15px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 25px; cursor: pointer; font-size: 1.1rem; }
+  .submit-btn:disabled { background: #ccc; }
+</style>
 </head>
 <body>
-<div class="form-card">
-    <h1>Employment Application</h1>
-    <form id="wdcApplication">
-        <h2>1. Personal Information</h2>
-        <label>Full Name *</label>
-        <input type="text" id="fullName" required>
-        <label>Email Address *</label>
-        <input type="email" id="email" required>
-        <label>Phone *</label>
-        <input type="tel" id="phone" required>
-        
-        <h2>2. Resume / ID Upload</h2>
-        <label>Choose File (PDF or Image)</label>
-        <input type="file" id="resumeFile" accept=".pdf,image/*">
 
-        <button type="submit" class="btn-apply" id="submitBtn">Apply Now</button>
-    </form>
+<div class="form-container">
+  <h1>Worker Intake Form</h1>
+  <form id="intakeForm">
+    <label>First Name</label>
+    <input type="text" id="firstName" name="firstName" required>
+    
+    <label>Last Name</label>
+    <input type="text" id="lastName" name="lastName" required>
+    
+    <label>Email Address</label>
+    <input type="email" id="email" name="email" required>
+    
+    <label>Phone Number</label>
+    <input type="tel" id="phone" name="phone" required>
+    
+    <label>Upload ID / License (Photo or PDF)</label>
+    <input type="file" id="idFile" name="idFile" accept="image/*,.pdf" required>
+    
+    <button type="submit" id="submitBtn" class="submit-btn">Complete My Employee Packet</button>
+  </form>
 </div>
 
 <script>
-    const scriptURL = "PASTE_YOUR_JOBFOLDERAUTOCREATE_URL_HERE";
+  // THE ENGINE LINK
+  const scriptURL = "https://script.google.com/macros/s/AKfycbx_YOUR_ENGINE_ID/exec"; 
 
-    document.getElementById('wdcApplication').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const btn = document.getElementById('submitBtn');
-        btn.disabled = true;
-        btn.innerText = "Submitting...";
+  const form = document.getElementById('intakeForm');
+  const btn = document.getElementById('submitBtn');
 
-        const fileInput = document.getElementById('resumeFile');
-        const file = fileInput.files[0];
-        const reader = new FileReader();
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    btn.disabled = true;
+    btn.innerText = "Processing...";
 
-        reader.onload = function(event) {
-            const base64Data = file ? event.target.result.split(',')[1] : null;
-            const payload = {
-                full_name: document.getElementById('fullName').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                resumeData: base64Data,
-                resumeName: file ? file.name : ""
-            };
+    const fileInput = document.getElementById('idFile');
+    const file = fileInput.files[0];
+    const reader = new FileReader();
 
-            fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
-            .then(() => { window.location.href = "https://welldoneconstruction.pro/thank-you.html"; })
-            .catch(() => { alert("Error"); btn.disabled = false; });
-        };
+    reader.onload = function(event) {
+      const base64 = event.target.result.split(',')[1];
+      
+      const payload = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        idImage: base64,
+        fileName: file.name
+      };
 
-        if (file) { reader.readAsDataURL(file); } 
-        else { reader.onload({ target: { result: "," } }); }
-    });
+      fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(payload)
+      })
+      .then(response => {
+        // ONCE SUBMITTED, MOVE TO THE SUCCESS PAGE
+        window.location.href = "https://welldoneconstruction.pro/application-received/";
+      })
+      .catch(error => {
+        alert("Submission Error. Please try again.");
+        btn.disabled = false;
+        btn.innerText = "Complete My Employee Packet";
+      });
+    };
+
+    reader.readAsDataURL(file);
+  });
 </script>
+
 </body>
 </html>
