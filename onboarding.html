@@ -1,146 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Well Done Construction - Onboarding Portal</title>
-<style>
-  :root {
-    --wd-green: #33B26E;
-    --wd-dark: #343E47;
-    --wd-slate: #6E797F;
-    --wd-white: #FFFFFF;
-    --wd-bg: #F4F7F6;
-  }
-
-  body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    margin: 0;
-    background-color: var(--wd-bg);
-    color: var(--wd-dark);
-    line-height: 1.6;
-  }
-
-  header {
-    background: var(--wd-dark);
-    padding: 25px;
-    text-align: center;
-    border-bottom: 4px solid var(--wd-green);
-  }
-
-  header img {
-    max-width: 250px;
-    height: auto;
-  }
-
-  main {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 35px;
-    background: var(--wd-white);
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    text-align: left;
-  }
-
-  h1 { text-align: center; color: var(--wd-green); margin-bottom: 30px; }
-  h2 { color: var(--wd-dark); border-bottom: 2px solid #EAECEB; padding-bottom: 10px; margin-top: 30px; }
-  p { margin-bottom: 15px; }
-  ul { margin-left: 0; list-style-type: none; padding: 0; }
-  li { 
-    margin-bottom: 12px; 
-    padding: 15px;
-    background: #fcfcfc;
-    border-left: 4px solid var(--wd-slate);
-    border-radius: 0 4px 4px 0;
-  }
-  li strong { color: var(--wd-green); }
-
-  .button-container { text-align: center; margin-top: 40px; }
-  
-  .step-box {
-    background: #f9f9f9;
-    padding: 25px;
-    border-radius: 8px;
-    border: 1px dashed #ddd;
-    margin-bottom: 20px;
-  }
-
-  a.button {
-    display: inline-block;
-    background: var(--wd-green);
-    color: #fff;
-    padding: 18px 36px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-
-  a.button:hover { background: #288e58; transform: translateY(-1px); }
-  
-  footer {
-    padding: 40px 20px 100px 20px;
-    text-align: center;
-    color: var(--wd-slate);
-    font-size: 0.85rem;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding | Well Done Construction</title>
+    <style>
+        :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #F4F7F6; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; background-color: var(--wd-bg); color: var(--wd-dark); padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 10px solid var(--wd-green); }
+        .role-box { background: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-radius: 5px; margin: 20px 0; }
+        .btn { display: inline-block; background: var(--wd-green); color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 20px; cursor: pointer; border: none; font-size: 1.1rem; width: 100%; }
+        input[type="file"] { margin: 15px 0; width: 100%; padding: 10px; border: 1px dashed #ccc; }
+    </style>
 </head>
 <body>
 
-<header>
-  <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction Logo">
-</header>
+<div class="container">
+    <h1>Official Intake & ID Verification</h1>
+    <p><strong>Well Done Construction LLC</strong></p>
 
-<main>
-  <h1>Welcome to the Team!</h1>
-
-  <section>
-    <h2>Our Mission</h2>
-    <p>We’re glad to have you join us! Our mission is to deliver top-quality remodeling and maintenance with unparalleled convenience. Dedicated professionals like you are the foundation of <strong>Well Done Construction</strong>.</p>
-  </section>
-
-  <section>
-    <h2>What to Expect</h2>
-    <p>When project opportunities arise, you will receive a notification in your portal including:</p>
-    <ul>
-      <li><strong>Project Overview:</strong> Clear scope and requirements.</li>
-      <li><strong>Timeline:</strong> Fixed start and estimated completion dates.</li>
-      <li><strong>Compensation:</strong> Transparent, flat-rate or hourly pay.</li>
-      <li><strong>Client Info:</strong> Secure access to site location and contacts.</li>
-    </ul>
-  </section>
-
-  <section class="button-container">
-    <h2>Onboarding Steps</h2>
-    
-    <div class="step-box">
-      <h3>Official Intake & ID Verification</h3>
-      <p>This final step initializes your personal worker portal and prepares your profile for payroll.</p>
-      <p><small><strong>Note:</strong> Have your Driver's License or State ID ready for upload.</small></p>
-      <br>
-      <a class="button" id="intakeBtn" href="https://welldoneconstruction.pro/application/">Complete My Employee Packet</a>
+    <div class="role-box">
+        <p>This role is a W-2, at-will, on-call position. Starting at <strong>$20/hr</strong>. Continued work is based on availability, performance, and company needs.</p>
+        <p><strong>Expectations:</strong> Report on time, use proper PPE, and maintain professional conduct on all job sites.</p>
     </div>
-  </section>
-</main>
 
-<footer>
-  &copy; 2026 Well Done Construction | Washoe County, NV
-</footer>
+    <div class="id-section">
+        <h3>Identity Verification</h3>
+        <p>Please upload a clear photo of your Driver’s License or State ID. This is required to initialize your worker portal and payroll.</p>
+        
+        <form id="onboardingForm">
+            <input type="file" id="idUpload" accept="image/*" required>
+            <button type="submit" id="submitBtn" class="btn">Submit ID & Complete Onboarding</button>
+        </form>
+    </div>
+</div>
 
 <script>
-  // THE HANDSHAKE: Catch email from URL and pass to the next page
-  const urlParams = new URLSearchParams(window.location.search);
-  const email = urlParams.get('email');
-  
-  if (email) {
-    const intakeBtn = document.getElementById('intakeBtn');
-    // UPDATED: Appends the email to the new /application/ path
-    intakeBtn.href = "https://welldoneconstruction.pro/application/?email=" + encodeURIComponent(email);
-  }
-</script>
+    const scriptURL = 'YOUR_APPS_SCRIPT_URL'; // Points to JobFolderAutoCreate_Email
+    const form = document.getElementById('onboardingForm');
+    const btn = document.getElementById('submitBtn');
 
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        const file = document.getElementById('idUpload').files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+            const base64 = event.target.result.split(',')[1];
+            
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    idImage: base64,
+                    fileName: file.name,
+                    action: 'onboarding'
+                })
+            })
+            .then(() => {
+                // REDIRECT TO THANK YOU PAGE
+                window.location.href = "https://welldoneconstruction.pro/thank-you.html";
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+</script>
 </body>
 </html>
