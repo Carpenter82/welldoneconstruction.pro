@@ -1,297 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Employee Packet | Well Done Construction LLC</title>
-  <style>
-    :root {
-      --wd-green: #33B26E;
-      --wd-dark: #343E47;
-      --wd-slate: #6E797F;
-      --wd-bg: #F4F7F6;
-      --wd-white: #FFFFFF;
-    }
-
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      margin: 0;
-      background-color: var(--wd-bg);
-      color: var(--wd-dark);
-      line-height: 1.6;
-    }
-
-    header {
-      background: var(--wd-dark);
-      padding: 25px;
-      text-align: center;
-      border-bottom: 4px solid var(--wd-green);
-    }
-    header img {
-      max-width: 240px;
-      height: auto;
-    }
-
-    main {
-      max-width: 750px;
-      margin: 40px auto;
-      background: var(--wd-white);
-      padding: 40px;
-      border-radius: 8px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-
-    h1 { text-align: center; color: var(--wd-dark); margin-bottom: 5px; }
-    .subtitle { text-align: center; color: var(--wd-slate); margin-bottom: 30px; font-style: italic; }
-
-    h2 { 
-      font-size: 1.1rem; 
-      text-transform: uppercase; 
-      color: var(--wd-green); 
-      border-bottom: 2px solid var(--wd-bg);
-      padding-bottom: 8px;
-      margin-top: 35px;
-    }
-
-    .form-group { margin-bottom: 20px; }
-    label { display: block; margin-bottom: 8px; font-weight: 600; }
-    
-    input[type="text"], input[type="email"], input[type="tel"], select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      box-sizing: border-box;
-      font-size: 1rem;
-    }
-
-    .btn-submit {
-      background-color: var(--wd-green);
-      color: var(--wd-white);
-      padding: 18px 32px;
-      border: none;
-      border-radius: 4px;
-      font-size: 1.1rem;
-      font-weight: bold;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 30px;
-    }
-
-    .btn-submit:disabled { background-color: var(--wd-slate); cursor: not-allowed; }
-
-    footer { text-align: center; padding: 40px; color: var(--wd-slate); font-size: 0.85rem; }
-    
-    .note { 
-      background: #e8f5e9; 
-      padding: 20px; 
-      border-left: 4px solid var(--wd-green); 
-      font-size: 1rem; 
-      margin-bottom: 25px; 
-      color: var(--wd-dark); 
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Packet | Well Done Construction LLC</title>
+    <style>
+        :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #F4F7F6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--wd-bg); margin: 0; padding: 20px; color: var(--wd-dark); }
+        .container { max-width: 600px; margin: auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { margin-bottom: 5px; color: var(--wd-dark); }
+        .subtitle { color: #666; font-style: italic; margin-bottom: 25px; text-align: center; }
+        .form-section { border-top: 2px solid #eee; padding-top: 20px; margin-top: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn-submit { background: var(--wd-green); color: white; padding: 15px; border: none; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
+        .btn-submit:disabled { background: #ccc; }
+        .note { background: #e8f5e9; padding: 15px; border-left: 4px solid var(--wd-green); margin-bottom: 25px; font-size: 0.9rem; }
+    </style>
 </head>
 <body>
 
-<header>
-  <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction LLC">
-</header>
+<div class="container">
+    <header>
+        <h1>Employee Packet</h1>
+        <p class="subtitle">Official Intake & ID Verification</p>
+    </header>
 
-<main>
-  <h1>Employee Packet</h1>
-  <p class="subtitle">Official Intake & ID Verification</p>
-
-  <div class="note">
-    Upload your ID below. Once your ID and signed agreement are verified, your portal link will be emailed to you.
-  </div>
-
-  <form id="intakeForm">
-    <h2>1. Personal Information</h2>
-    <div class="form-group">
-      <label>Legal Full Name</label>
-      <input type="text" name="full_name" id="full_name" required placeholder="As it appears on your ID">
-    </div>
-    
-    <div class="form-group">
-      <label>Email Address</label>
-      <input type="email" name="email" id="email" required placeholder="email@address.com">
+    <div class="note">
+        <strong>Important:</strong> Please ensure your Legal Name matches your ID exactly. This information is used for payroll and verification.
     </div>
 
-    <div class="form-group">
-      <label>Phone Number</label>
-      <input type="tel" name="phone" required placeholder="775-xxx-xxxx">
-    </div>
+    <form id="intakeForm">
+        <label>Legal Full Name</label>
+        <input type="text" id="full_name" required placeholder="John Doe">
 
-    <h2>2. Verification & Emergency</h2>
-    <div class="form-group">
-      <label>Photo ID Verification</label>
-      <p style="font-size: 0.8rem; color: var(--wd-slate); margin-top: -5px;">
-        Upload a clear photo of your Driver's License or State ID.
-      </p>
-      <input type="file" id="idPhoto" accept="image/*" capture="camera" required>
-    </div>
+        <label>Email Address</label>
+        <input type="email" id="email" required placeholder="john@example.com">
 
-    <div class="form-group">
-      <label>Emergency Contact Name</label>
-      <input type="text" name="emergency_name" required>
-    </div>
-    <div class="form-group">
-      <label>Emergency Contact Phone</label>
-      <input type="tel" name="emergency_phone" required>
-    </div>
+        <label>Phone Number</label>
+        <input type="tel" id="phone" required placeholder="775-000-0000">
 
-    <button type="submit" class="btn-submit" id="submitBtn">Complete My Employee Packet</button>
-  </form>
-</main>
+        <div class="form-section">
+            <label>Emergency Contact Name</label>
+            <input type="text" id="emergency_name" required>
 
-<footer>
-  &copy; 2026 Well Done Construction LLC | Built on Integrity
-</footer>
+            <label>Emergency Contact Phone</label>
+            <input type="tel" id="emergency_phone" required>
+        </div>
+
+        <div class="form-section">
+            <label>Photo ID Verification</label>
+            <p style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">Upload a clear photo of your Driver's License or State ID.</p>
+            <input type="file" id="idPhoto" accept="image/*" capture="camera" required>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn-submit">Complete My Employee Packet</button>
+    </form>
+</div>
 
 <script>
-  const form = document.getElementById('intakeForm');
-  const btn = document.getElementById('submitBtn');
-  
-  form.addEventListener('submit', function(e) {
-    e.preventDefault(); 
-    
-    const fileInput = document.getElementById('idPhoto');
-    const file = fileInput.files[0];
+    // 1. UPDATE THIS URL WITH YOUR DEPLOYMENT URL
+    const scriptURL = "PASTE_YOUR_APPS_SCRIPT_URL_HERE";
 
-    if (file) {
-      btn.disabled = true;
-      btn.innerText = "Processing & Uploading...";
-
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const base64Data = event.target.result.split(',')[1];
-        
-        const data = {
-          email: document.getElementById('email').value,
-          full_name: document.getElementById('full_name').value,
-          idImage: base64Data,
-          imageName: file.name
-        };
-
-        sendToGoogle(data);
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-
-  function sendToGoogle(data) {
-    const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec";
-    
-    fetch(scriptURL, {
-      method: 'POST',
-      body: JSON.stringify(data)
-    })
-    .then(() => {
-      // Direct redirect to the main page or a pending page
-      window.location.href = "https://welldoneconstruction.pro/"; 
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Error submitting packet. Please try again.");
-      btn.disabled = false;
-      btn.innerText = "Complete My Employee Packet";
-    });
-  }
-</script>
-<script>
-  // This runs as soon as the worker clicks your link
-  window.onload = function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const emailFromLink = urlParams.get('email');
-    
-    if (emailFromLink) {
-      const emailInput = document.getElementById('email');
-      if (emailInput) {
-        emailInput.value = emailFromLink;
-        // Visual feedback so they know it's official
-        emailInput.style.backgroundColor = "#e8f5e9";
-        emailInput.style.border = "2px solid #33B26E";
-      }
-    }
-  };
-</script>
-  <footer>
-    &copy; 2026 Well Done Construction LLC | Built on Integrity
-  </footer>
-
-  <script>
-    const form = document.getElementById('intakeForm');
-    const btn = document.getElementById('submitBtn');
-
-    // 1. CATCH EMAIL FROM LINK
+    // Auto-fill email from the URL (from your Gmail link)
     window.onload = function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const emailFromLink = urlParams.get('email');
-      if (emailFromLink) {
-        const emailInput = document.getElementById('email');
-        if (emailInput) {
-          emailInput.value = emailFromLink;
-          emailInput.style.backgroundColor = "#e8f5e9";
-          emailInput.style.border = "2px solid var(--wd-green)";
-          emailInput.readOnly = true; 
+        const params = new URLSearchParams(window.location.search);
+        const email = params.get('email');
+        if (email) {
+            document.getElementById('email').value = email;
+            document.getElementById('email').readOnly = true;
+            document.getElementById('email').style.background = "#f9f9f9";
         }
-      }
     };
 
-    // 2. PREPARE & SUBMIT DATA
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const fileInput = document.getElementById('idPhoto');
-      const file = fileInput.files[0];
+    document.getElementById('intakeForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const file = document.getElementById('idPhoto').files[0];
 
-      if (file) {
         btn.disabled = true;
         btn.innerText = "Processing & Uploading...";
 
         const reader = new FileReader();
         reader.onload = function(event) {
-          const base64Data = event.target.result.split(',')[1];
-          
-          const data = {
-            email: document.getElementById('email').value,
-            full_name: document.getElementById('full_name').value,
-            phone: document.getElementsByName('phone')[0].value,
-            emergency_name: document.getElementsByName('emergency_name')[0].value,
-            emergency_phone: document.getElementsByName('emergency_phone')[0].value,
-            idImage: base64Data,
-            imageName: file.name
-          };
+            const base64Data = event.target.result.split(',')[1];
+            
+            const payload = {
+                full_name: document.getElementById('full_name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                emergency_name: document.getElementById('emergency_name').value,
+                emergency_phone: document.getElementById('emergency_phone').value,
+                idImage: base64Data
+            };
 
-          sendToGoogle(data);
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                // Success redirect to homepage
+                window.location.href = "https://welldoneconstruction.pro/";
+            })
+            .catch(err => {
+                alert("Submission failed. Please check your connection.");
+                btn.disabled = false;
+                btn.innerText = "Complete My Employee Packet";
+            });
         };
         reader.readAsDataURL(file);
-      }
     });
+</script>
 
-    // 3. SEND TO APPS SCRIPT ENGINE
-    function sendToGoogle(data) {
-      const scriptURL = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec";
-      
-      fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors', 
-        cache: 'no-cache',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-      .then(() => {
-        window.location.href = "https://welldoneconstruction.pro/"; 
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Error submitting packet. Please try again.");
-        btn.disabled = false;
-        btn.innerText = "Complete My Employee Packet";
-      });
-    }
-  </script>
-  </body>
-</html>
 </body>
 </html>
