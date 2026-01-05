@@ -7,51 +7,47 @@
     <style>
         :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #F4F7F6; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--wd-bg); color: var(--wd-dark); margin: 0; padding: 20px; }
-        .form-container { max-width: 700px; margin: 20px auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 8px solid var(--wd-green); }
+        .form-container { max-width: 600px; margin: 20px auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 8px solid var(--wd-green); }
         h1 { font-size: 1.6rem; color: var(--wd-dark); margin-bottom: 15px; }
-        .status-header { background: #E8F5E9; color: #2E7D32; padding: 10px 15px; border-radius: 4px; font-weight: bold; margin-bottom: 25px; display: inline-block; }
         .instruction-box { line-height: 1.6; color: #444; margin-bottom: 30px; }
-        .section-title { font-weight: bold; text-transform: uppercase; font-size: 0.85rem; color: #666; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         label { display: block; margin-top: 20px; font-weight: bold; }
-        input[type="file"] { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; background: #fafafa; }
+        input { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         .submit-btn { background: var(--wd-green); color: white; border: none; padding: 18px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 30px; cursor: pointer; font-size: 1.1rem; }
+        .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
 <div class="form-container">
-    <div class="status-header">Agreement Received</div>
-    <h1>Candidate ID Verification</h1>
-    
+    <h1>Step 4: ID Verification</h1>
     <div class="instruction-box">
-        <p>Your signed On-Call Employee Agreement has been received. To complete your candidate file for final administrative review, we require a clear copy of your government-issued identification.</p>
-        
-        <p><strong>The Process:</strong> Once your ID is submitted, your full file (Admission, Agreement, and Identification) will be reviewed. If you are elected for the On-Call roster, you will receive a <strong>Welcome/Payroll</strong> notification with further instructions.</p>
+        <p>Please upload a clear copy of your government-issued ID to complete your candidate file.</p>
     </div>
     
     <form id="onboardingForm">
-        <div class="section-title">Required Identification</div>
+        <label>Full Name</label>
+        <input type="text" id="lastName" placeholder="Last Name" required>
         
-        <label>Upload Driver's License or State ID</label>
-        <input type="file" id="idFile" accept="image/*" required>
+        <label>Phone Number (Used on Application)</label>
+        <input type="tel" id="phone" placeholder="702-555-0123" required>
 
-        <p style="font-size: 0.85rem; color: #777; margin-top: 20px;">
-            <em>Your information is kept secure and used strictly for identity verification and potential payroll enrollment.</em>
-        </p>
+        <label>Upload ID (Photo or Scan)</label>
+        <input type="file" id="idFile" accept="image/*" required>
 
         <button type="submit" id="submitBtn" class="submit-btn">Submit for Review</button>
     </form>
 </div>
 
 <script>
-    const scriptURL = https://script.google.com/macros/s/AKfycbyQKTJaxDQRa3Q4IFMhVp3MgSWnefqkqnv1biGDJ2jWexm_oZQzwLAyJxUmhpYAMddwDg/exec
+    // WIRE TO DEPLOY 1
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyQKTJaxDQRa3Q4IFMhVp3MgSWnefqkqnv1biGDJ2jWexm_oZQzwLAyJxUmhpYAMddwDg/exec";
     const form = document.getElementById('onboardingForm');
     const btn = document.getElementById('submitBtn');
 
     form.addEventListener('submit', e => {
         e.preventDefault();
         btn.disabled = true;
-        btn.innerText = "Submitting File...";
+        btn.innerText = "Processing File...";
 
         const fileInput = document.getElementById('idFile');
         const file = fileInput.files[0];
@@ -59,12 +55,19 @@
 
         reader.onload = function(event) {
             const base64 = event.target.result.split(',')[1];
-            const payload = { idImage: base64, fileName: file.name, type: "ONBOARDING_ID" };
+            const payload = { 
+                type: "ONBOARDING_ID",
+                idImage: base64, 
+                lastName: document.getElementById('lastName').value,
+                phone: document.getElementById('phone').value 
+            };
 
             fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
-            .then(() => { window.location.href = "https://welldoneconstruction.pro/thank-you.html"; })
+            .then(() => { 
+                window.location.href = "https://welldoneconstruction.pro/thank-you.html"; 
+            })
             .catch(error => {
-                alert("Submission error. Please try again.");
+                alert("Error connecting to server. Please try again.");
                 btn.disabled = false;
                 btn.innerText = "Submit for Review";
             });
@@ -72,6 +75,5 @@
         reader.readAsDataURL(file);
     });
 </script>
-
 </body>
 </html>
