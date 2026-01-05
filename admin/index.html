@@ -1,121 +1,72 @@
-<script>
-  // Simple Password Gate for Well Done Construction
-  var password = prompt("Authorized Access Only: Please enter your password");
-  
-  // Set your desired password here
-  if (password !== "WellDone2025") {
-    alert("Incorrect password. Access Denied.");
-    window.location.href = "https://welldoneconstruction.pro/"; 
-  }
-</script>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Control | Well Done Construction LLC</title>
-  <style>
-    :root {
-      --wd-green: #33B26E;
-      --wd-dark: #343E47;
-      --wd-slate: #6E797F;
-      --wd-bg: #EAECEB;
-    }
-
-    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; display: flex; height: 100vh; background-color: var(--wd-bg); }
-
-    /* Admin Sidebar - Dark Charcoal */
-    nav {
-      width: 260px;
-      background-color: var(--wd-dark);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-    }
-
-    .nav-header { font-weight: bold; font-size: 1.2rem; color: var(--wd-green); margin-bottom: 30px; text-align: center; border-bottom: 1px solid var(--wd-slate); padding-bottom: 15px; }
-
-    .nav-link { color: white; text-decoration: none; padding: 12px; margin-bottom: 5px; border-radius: 4px; display: block; }
-    .nav-link:hover, .nav-link.active { background: var(--wd-slate); }
-
-    /* Main Admin Area */
-    main { flex-grow: 1; padding: 30px; overflow-y: auto; }
-    
-    .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
-    .stat-card { background: white; padding: 20px; border-radius: 8px; border-left: 5px solid var(--wd-green); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    .stat-card small { color: var(--wd-slate); text-transform: uppercase; font-size: 0.75rem; }
-    .stat-card div { font-size: 1.5rem; font-weight: bold; color: var(--wd-dark); }
-
-    /* Employee Table */
-    .table-container { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    table { width: 100%; border-collapse: collapse; text-align: left; }
-    th { border-bottom: 2px solid var(--wd-bg); padding: 12px; color: var(--wd-slate); font-size: 0.85rem; }
-    td { padding: 12px; border-bottom: 1px solid var(--wd-bg); font-size: 0.95rem; }
-
-    .trade-badge { background: #f0fdf4; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; border: 1px solid #bbf7d0; }
-    .action-btn { color: var(--wd-green); text-decoration: none; font-weight: bold; font-size: 0.85rem; }
-  </style>
+    <title>Admin Control | Well Done Construction</title>
+    <style>
+        body { font-family: sans-serif; background: #F4F7F6; padding: 40px; color: #343E47; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; }
+        .btn-verify { background: #33B26E; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+        .status-v { color: #33B26E; font-weight: bold; }
+    </style>
 </head>
 <body>
-
-  <nav>
-    <div class="nav-header">Admin Control</div>
-    <a href="#" class="nav-link active">Applicants (Stage 1)</a>
-    <a href="#" class="nav-link">Onboarded (Stage 2)</a>
-    <a href="#" class="nav-link">Active Projects</a>
-    <a href="https://welldoneconstruction.pro/" class="nav-link" style="margin-top: auto;">Sign Out</a>
-  </nav>
-
-  <main>
-    <h1>Management Dashboard</h1>
-    
-    <div class="stats-bar">
-      <div class="stat-card">
-        <small>New Resumes</small>
-        <div>12</div>
-      </div>
-      <div class="stat-card">
-        <small>Pending Signatures</small>
-        <div>4</div>
-      </div>
-      <div class="stat-card" style="border-left-color: var(--wd-dark);">
-        <small>Active Crew</small>
-        <div>8</div>
-      </div>
+    <div class="container">
+        <h2>WDC Applicant Review</h2>
+        <button onclick="loadApplicants()" style="padding: 10px;">Refresh List</button>
+        <table id="applicantTable">
+            <thead>
+                <tr>
+                    <th>Email / Folder</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="listBody">
+                <tr><td colspan="3">Click Refresh to load applicants...</td></tr>
+            </tbody>
+        </table>
     </div>
 
-    <div class="table-container">
-      <h3>Recent Applicants</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Primary Trade</th>
-            <th>Experience</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>John Miller</td>
-            <td><span class="trade-badge">Welding</span></td>
-            <td>12 Years</td>
-            <td>Resume Reviewed</td>
-            <td><a href="#" class="action-btn">Send Packet</a></td>
-          </tr>
-          <tr>
-            <td>Steve Davis</td>
-            <td><span class="trade-badge">Electrical</span></td>
-            <td>8 Years</td>
-            <td>Intake Complete</td>
-            <td><a href="#" class="action-btn">Build Portal</a></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </main>
+    <script>
+        const adminUrl = "YOUR_APPS_SCRIPT_URL_HERE";
 
+        function loadApplicants() {
+            const body = document.getElementById('listBody');
+            body.innerHTML = "Loading...";
+            
+            const script = document.createElement('script');
+            script.src = adminUrl + "?adminAction=list";
+            document.body.appendChild(script);
+        }
+
+        function adminCallback(data) {
+            const body = document.getElementById('listBody');
+            body.innerHTML = "";
+            data.forEach(person => {
+                const row = `<tr>
+                    <td>${person.name}</td>
+                    <td class="${person.verified ? 'status-v' : ''}">${person.verified ? 'Verified' : 'Pending'}</td>
+                    <td>
+                        ${person.verified ? '' : `<button class="btn-verify" onclick="verifyUser('${person.id}')">Approve & Verify</button>`}
+                    </td>
+                </tr>`;
+                body.innerHTML += row;
+            });
+        }
+
+        function verifyUser(folderId) {
+            if(!confirm("Approve this employee? This unlocks their portal.")) return;
+            const script = document.createElement('script');
+            script.src = adminUrl + "?adminAction=verify&folderId=" + folderId;
+            document.body.appendChild(script);
+        }
+
+        function verifyDone() {
+            alert("Employee Verified!");
+            loadApplicants();
+        }
+    </script>
 </body>
 </html>
