@@ -121,7 +121,7 @@
       <p>This final step initializes your personal worker portal and prepares your profile for payroll.</p>
       <p><small><strong>Note:</strong> Have your Driver's License or State ID ready for upload.</small></p>
       <br>
-      <a class="button" id="intakeBtn" href="https://welldoneconstruction.pro/employee-packet/">Complete My Employee Packet</a>
+      <a class="button" id="intakeBtn" href="https://welldoneconstruction.pro/application/">Complete My Employee Packet</a>
     </div>
   </section>
 </main>
@@ -137,8 +137,8 @@
   
   if (email) {
     const intakeBtn = document.getElementById('intakeBtn');
-    // Appends the email to the link: .../employee-packet/?email=worker@email.com
-    intakeBtn.href = "https://welldoneconstruction.pro/employee-packet/?email=" + encodeURIComponent(email);
+    // UPDATED: Appends the email to the new /application/ path
+    intakeBtn.href = "https://welldoneconstruction.pro/application/?email=" + encodeURIComponent(email);
   }
 </script>
 
