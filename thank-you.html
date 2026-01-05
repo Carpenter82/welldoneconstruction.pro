@@ -5,56 +5,124 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Submission Successful | Well Done Construction</title>
 <style>
+  :root {
+    --wd-green: #33B26E;
+    --wd-dark: #343E47;
+    --wd-slate: #6E797F;
+    --wd-white: #FFFFFF;
+    --wd-bg: #F4F7F6;
+  }
+
   body { 
-    font-family: 'Segoe UI', Arial, sans-serif; 
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif; 
     text-align: center; 
     margin: 0; 
-    padding: 50px 20px;
-    background-color: #F4F7F6; /* Brand Light Gray */
-    color: #343E47; /* Brand Charcoal */
+    padding: 60px 20px;
+    background-color: var(--wd-bg); 
+    color: var(--wd-dark);
   }
+
   .container { 
-    background: #fff; 
-    padding: 50px; 
-    border-radius: 8px; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    background: var(--wd-white); 
+    padding: 50px 40px; 
+    border-radius: 12px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
     display: inline-block; 
-    max-width: 500px;
-    border-top: 5px solid #33B26E; /* Brand Green Top Border */
+    max-width: 550px;
+    width: 100%;
+    box-sizing: border-box;
+    border-top: 6px solid var(--wd-green); 
   }
-  h1 { color: #33B26E; margin-bottom: 20px; } /* Brand Green */
-  p { font-size: 1.1rem; line-height: 1.6; }
+
+  .check-icon {
+    width: 80px;
+    height: 80px;
+    background: #eaf7ef;
+    color: var(--wd-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin: 0 auto 25px auto;
+    font-weight: bold;
+  }
+
+  h1 { 
+    color: var(--wd-dark); 
+    margin-bottom: 15px; 
+    font-size: 1.8rem;
+  }
+
+  .sub-text {
+    font-size: 1.1rem;
+    color: var(--wd-slate);
+    margin-bottom: 35px;
+  }
+
   .next-steps {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #EAECEB;
+    background: #fcfcfc;
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #eee;
     text-align: left;
   }
-  .check-icon {
-    font-size: 50px;
-    color: #33B26E;
+
+  .next-steps p {
+    margin-top: 0;
+    color: var(--wd-dark);
+    font-weight: bold;
+  }
+
+  ul {
+    padding-left: 20px;
+    margin-bottom: 0;
+    color: var(--wd-slate);
+  }
+
+  li {
     margin-bottom: 10px;
+    font-size: 0.95rem;
+  }
+
+  .home-link {
+    display: inline-block;
+    margin-top: 40px;
+    color: var(--wd-green);
+    text-decoration: none;
+    font-weight: bold;
+    transition: opacity 0.2s;
+  }
+
+  .home-link:hover {
+    opacity: 0.8;
+  }
+
+  @media (max-width: 480px) {
+    .container { padding: 30px 20px; }
   }
 </style>
 </head>
 <body>
+
   <div class="container">
     <div class="check-icon">✓</div>
     <h1>Application Received</h1>
-    <p>Your On-Call Employee Packet has been submitted successfully.</p>
+    <p class="sub-text">Your On-Call Employee Packet has been submitted successfully to our master records.</p>
     
     <div class="next-steps">
-      <p><strong>What happens next?</strong></p>
-      <ul style="padding-left: 20px; color: #6E797F;">
-        <li>Your employee folder is being initialized.</li>
-        <li>Our team will review your qualifications.</li>
-        <li>Keep an eye on your inbox for your <strong>Personal Portal</strong> access link.</li>
+      <p>What happens next?</p>
+      <ul>
+        <li><strong>Folder Initialization:</strong> Your internal record folder is being created in Reno/Sparks HQ.</li>
+        <li><strong>Document Review:</strong> Our administrative team is verifying your provided ID and agreement.</li>
+        <li><strong>Portal Access:</strong> Once verified, you will receive an email to unlock your <strong>Personal Staff Portal</strong>.</li>
       </ul>
     </div>
 
-    <p style="margin-top: 30px;">
-      <a href="https://welldoneconstruction.link" style="color: #33B26E; text-decoration: none; font-weight: bold;">← Return to Homepage</a>
-    </p>
+    <a href="https://welldoneconstruction.link" class="home-link">
+      ← Return to Homepage
+    </a>
   </div>
+
 </body>
 </html>
