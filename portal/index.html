@@ -1,84 +1,77 @@
-<script>
-  // 1. CONFIGURATION
-  const webAppUrl = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Portal | Well Done Construction</title>
+    <style>
+        :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #F4F7F6; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--wd-bg); color: var(--wd-dark); margin: 0; padding: 0; }
+        
+        /* Layout */
+        .header { background: var(--wd-dark); color: white; padding: 20px; text-align: center; border-bottom: 5px solid var(--wd-green); }
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; }
+        
+        /* Profile Card */
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .status-pill { display: inline-block; background: var(--wd-green); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+        
+        /* Grid */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .grid-item { background: #fff; border: 1px solid #ddd; padding: 20px; border-radius: 6px; text-align: center; transition: 0.3s; cursor: pointer; text-decoration: none; color: inherit; }
+        .grid-item:hover { border-color: var(--wd-green); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .grid-item h3 { margin: 0 0 10px 0; color: var(--wd-dark); }
+        
+        .payroll-notice { background: #fff3cd; color: #856404; padding: 15px; border-radius: 6px; border: 1px solid #ffeeba; margin-top: 20px; font-size: 0.9rem; }
+        
+        .footer { text-align: center; padding: 40px; color: #888; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
 
-  // 2. AUTO-LOAD ON START
-  window.onload = function() {
-    const params = new URLSearchParams(window.location.search);
-    const email = params.get('email');
-    if (email) {
-      document.getElementById('portalEmail').value = email;
-      checkStatus();
-    }
-  };
+<div class="header">
+    <h1>Well Done Construction</h1>
+    <p>Official Worker Portal</p>
+</div>
 
-  // 3. STATUS CHECK (JSONP Handshake)
-  function checkStatus() {
-    const email = document.getElementById('portalEmail').value.trim().toLowerCase();
-    if (!email) { alert("Please enter your email"); return; }
+<div class="container">
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h2 style="margin: 0;">Worker Profile</h2>
+                <p id="workerName" style="font-size: 1.2rem; margin: 10px 0;">Loading profile...</p>
+            </div>
+            <div class="status-pill">Active / Elected</div>
+        </div>
+        
+        <div class="payroll-notice">
+            <strong>Payroll Accountability:</strong> Please ensure all on-site tasks are checked off in your daily log to prevent processing delays.
+        </div>
+    </div>
 
-    document.getElementById('displayEmail').innerText = email;
-    document.getElementById('loginBox').style.display = 'none';
-    document.getElementById('portalContent').style.display = 'block';
+    <div class="grid">
+        <a href="https://welldoneconstruction.pro/portal/tasks" class="grid-item">
+            <h3>Active Tasks</h3>
+            <p>View your current job assignments and project goals.</p>
+        </a>
+        <a href="https://welldoneconstruction.pro/portal/payroll" class="grid-item">
+            <h3>Payroll & Time</h3>
+            <p>Review submitted hours and payment history.</p>
+        </a>
+        <a href="https://welldoneconstruction.pro/portal/resources" class="grid-item">
+            <h3>Resources</h3>
+            <p>Access safety manuals, trade guides, and W-2 forms.</p>
+        </a>
+        <a href="https://welldoneconstruction.pro/portal/profile" class="grid-item">
+            <h3>Settings</h3>
+            <p>Update your contact info or notification preferences.</p>
+        </a>
+    </div>
+</div>
 
-    const script = document.createElement('script');
-    script.src = webAppUrl + "?id=" + encodeURIComponent(email);
-    document.body.appendChild(script);
-  }
+<div class="footer">
+    &copy; 2026 Well Done Construction LLC | Integrity in Every Build
+</div>
 
-  // 4. THE CALLBACK (Triggered by Google Script)
-  function portalCallback(data) {
-    const badge = document.getElementById('statusBadge');
-    const actionStatus = document.getElementById('actionStatus');
-    const lockStatus = document.getElementById('lockStatus');
-    const gBtn = document.getElementById('gustoBtn');
-    const uploadSection = document.getElementById('uploadSection');
-    
-    if (data.isVerified) {
-      badge.innerText = "✓ VERIFIED";
-      badge.className = "status-badge verified";
-      document.getElementById('accLevel').innerText = "Level 2";
-      actionStatus.innerText = "✅ ACCOUNT ACTIVE";
-      actionStatus.style.color = "green";
-      lockStatus.innerText = "Payroll Portal Unlocked";
-      lockStatus.style.color = "green";
-      gBtn.style.opacity = "1";
-      gBtn.style.pointerEvents = "auto";
-      if(uploadSection) uploadSection.style.display = "none";
-    } else {
-      badge.innerText = "⚠ PENDING VERIFICATION";
-      badge.className = "status-badge pending";
-      actionStatus.innerText = "⚠️ ACTION REQUIRED";
-      lockStatus.innerText = "ID Verification Under Review";
-    }
-  }
-
-  // 5. ID UPLOAD HANDLER
-  function uploadID() {
-    const fileInput = document.getElementById('idFile');
-    const file = fileInput.files[0];
-    const email = document.getElementById('displayEmail').innerText;
-
-    if (!file) { alert("Please select a file first"); return; }
-
-    const upBtn = document.querySelector("#uploadSection .btn");
-    upBtn.innerText = "Uploading...";
-    upBtn.disabled = true;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const base64 = e.target.result.split(',')[1];
-      fetch(webAppUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify({ email: email, idImage: base64 })
-      }).then(() => {
-        alert("Upload Successful!");
-        upBtn.innerText = "Upload ID Photo";
-        upBtn.disabled = false;
-        checkStatus();
-      });
-    };
-    reader.readAsDataURL(file);
-  }
-</script>
+</body>
+</html>
