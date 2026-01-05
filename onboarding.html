@@ -1,40 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Well Done Construction - Onboarding Portal</title>
+<style>
+  :root {
+    --wd-green: #33B26E;
+    --wd-dark: #343E47;
+    --wd-slate: #6E797F;
+    --wd-white: #FFFFFF;
+    --wd-bg: #F4F7F6;
+  }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    background-color: var(--wd-bg);
+    color: var(--wd-dark);
+    line-height: 1.6;
+  }
+
+  header {
+    background: var(--wd-dark);
+    padding: 25px;
+    text-align: center;
+    border-bottom: 4px solid var(--wd-green);
+  }
+
+  header img {
+    max-width: 250px;
+    height: auto;
+  }
+
+  main {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 35px;
+    background: var(--wd-white);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: left;
+  }
+
+  h1 { 
+    text-align: center; 
+    color: var(--wd-green);
+    margin-bottom: 30px;
+  }
+
+  h2 {
+    color: var(--wd-dark);
+    border-bottom: 2px solid #EAECEB;
+    padding-bottom: 10px;
+    margin-top: 30px;
+  }
+
+  p { margin-bottom: 15px; }
+
+  ul { margin-left: 0; list-style-type: none; padding: 0; }
+
+  li { 
+    margin-bottom: 12px; 
+    padding: 15px;
+    background: #fcfcfc;
+    border-left: 4px solid var(--wd-slate);
+    border-radius: 0 4px 4px 0;
+  }
+
+  li strong { color: var(--wd-green); }
+
+  /* Action Buttons */
+  .button-container { text-align: center; margin-top: 40px; }
+  
+  .step-box {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px dashed #ddd;
+    margin-bottom: 20px;
+  }
+
+  a.button {
+    display: inline-block;
+    background: var(--wd-green);
+    color: #fff;
+    padding: 16px 32px;
+    border-radius: 4px;
+    text-decoration: none;
+    margin: 10px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  a.button:hover {
+    background: #288e58;
+    transform: translateY(-1px);
+  }
+  
+  a.button-secondary {
+    background: var(--wd-dark);
+  }
+
+  a.button-secondary:hover {
+    background: var(--wd-slate);
+  }
+
+  footer {
+    padding: 40px 20px 100px 20px;
+    text-align: center;
+    color: var(--wd-slate);
+    font-size: 0.85rem;
+  }
+
+  /* Nav Dock (Consistent across all pages) */
+  .nav-dock {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--wd-dark);
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    z-index: 1000;
+  }
+
+  .nav-dock a {
+    color: #adb5bd;
+    text-decoration: none;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+
+  .nav-dock a.active { color: var(--wd-white); border-bottom: 2px solid var(--wd-green); }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction Logo">
+</header>
+
 <main>
   <h1>Welcome to the Team!</h1>
-  
+
+  <section>
+    <h2>Our Mission</h2>
+    <p>We’re glad to have you join us! Our mission is to deliver top-quality remodeling and maintenance with unparalleled convenience. Dedicated professionals like you are the foundation of <strong>Well Done Construction</strong>.</p>
+  </section>
+
+  <section>
+    <h2>What to Expect</h2>
+    <p>When project opportunities arise, you will receive a notification in your portal including:</p>
+    <ul>
+      <li><strong>Project Overview:</strong> Clear scope and requirements.</li>
+      <li><strong>Timeline:</strong> Fixed start and estimated completion dates.</li>
+      <li><strong>Compensation:</strong> Transparent, flat-rate or hourly pay.</li>
+      <li><strong>Client Info:</strong> Secure access to site location and contacts.</li>
+    </ul>
+  </section>
+
   <section class="button-container">
     <h2>Onboarding Steps</h2>
     
     <div class="step-box">
       <p><strong>Step 1: Legal Documentation</strong></p>
       <a class="button" href="https://dochub.com/m/shared-document/tee-construction/EB5r38Awlmd8oMvRXzZ1kD/on-call-employee-agreement-pdf?dt=Ld8g8Eod_amagDQuWys3" target="_blank">Sign On-Call Agreement</a>
-      <p><small>(Return here once DocHub is signed)</small></p>
     </div>
 
     <div class="step-box">
       <p><strong>Step 2: Personnel Records</strong></p>
-      <a class="button" id="packetLink" href="https://welldoneconstruction.pro/employee-packet/">Submit Employee Packet</a>
+      <a class="button" href="https://welldoneconstruction.pro/employee-packet/">Submit Employee Packet</a>
       <p><small>(You will need a photo of your ID for this step)</small></p>
     </div>
     
     <hr style="margin: 40px 0; border: 0; border-top: 1px solid #eee;">
     
     <p>Existing members:</p>
-    <a class="button button-secondary" id="portalLink" href="https://welldoneconstruction.pro/portal/">Access Worker Portal</a>
+    <a class="button button-secondary" href="https://welldoneconstruction.pro/portal/">Access Worker Portal</a>
   </section>
 </main>
 
-<script>
-  // SMART REDIRECT LOGIC
-  // If the worker comes from an email with ?email=test@test.com
-  // This script attaches that email to the buttons so the Engine stays synced.
-  const params = new URLSearchParams(window.location.search);
-  const email = params.get('email');
-  
-  if (email) {
-    const packetUrl = "https://welldoneconstruction.pro/employee-packet/?email=" + encodeURIComponent(email);
-    const portalUrl = "https://welldoneconstruction.pro/portal/?id=" + encodeURIComponent(email);
-    
-    document.getElementById('packetLink').href = packetUrl;
-    document.getElementById('portalLink').href = portalUrl;
-  }
-</script>
+<footer>
+  &copy; 2026 Well Done Construction | Washoe County, NV
+</footer>
+
+<nav class="nav-dock">
+  <a href="/">P1: Home</a>
+  <a href="/employee-packet/" class="active">P2: Intake</a>
+  <a href="/portal/">P3: Portal</a>
+  <a href="/admin/">P4: Admin</a>
+</nav>
+
+</body>
+</html>
