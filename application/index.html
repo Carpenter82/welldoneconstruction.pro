@@ -1,90 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Employee Intake | Well Done Construction</title>
-<style>
-  :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #F4F7F6; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--wd-bg); color: var(--wd-dark); margin: 0; padding: 20px; }
-  .form-container { max-width: 600px; margin: 40px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 5px solid var(--wd-green); }
-  h1 { text-align: center; color: var(--wd-dark); }
-  label { display: block; margin-top: 15px; font-weight: bold; }
-  input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-  .submit-btn { background: var(--wd-green); color: white; border: none; padding: 15px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 25px; cursor: pointer; font-size: 1.1rem; }
-  .submit-btn:disabled { background: #ccc; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Application | Well Done Construction</title>
+    <style>
+        :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #F4F7F6; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--wd-bg); color: var(--wd-dark); margin: 0; padding: 20px; }
+        .form-container { max-width: 700px; margin: 20px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 8px solid var(--wd-green); }
+        h1 { text-align: center; margin-bottom: 5px; }
+        p.subtitle { text-align: center; color: #666; margin-bottom: 25px; }
+        .section-title { background: #eee; padding: 10px; margin-top: 20px; font-weight: bold; border-left: 4px solid var(--wd-green); }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 1rem; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .submit-btn { background: var(--wd-green); color: white; border: none; padding: 20px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 30px; cursor: pointer; font-size: 1.2rem; transition: background 0.3s; }
+        .submit-btn:hover { background: #288c56; }
+        .submit-btn:disabled { background: #ccc; }
+    </style>
 </head>
 <body>
 
 <div class="form-container">
-  <h1>Worker Intake Form</h1>
-  <form id="intakeForm">
-    <label>First Name</label>
-    <input type="text" id="firstName" name="firstName" required>
+    <h1>Worker Intake Form</h1>
+    <p class="subtitle">Well Done Construction - Reno/Sparks, NV</p>
     
-    <label>Last Name</label>
-    <input type="text" id="lastName" name="lastName" required>
-    
-    <label>Email Address</label>
-    <input type="email" id="email" name="email" required>
-    
-    <label>Phone Number</label>
-    <input type="tel" id="phone" name="phone" required>
-    
-    <label>Upload ID / License (Photo or PDF)</label>
-    <input type="file" id="idFile" name="idFile" accept="image/*,.pdf" required>
-    
-    <button type="submit" id="submitBtn" class="submit-btn">Complete My Employee Packet</button>
-  </form>
+    <form id="intakeForm">
+        <div class="section-title">Personal Information</div>
+        <div class="grid">
+            <div>
+                <label>First Name</label>
+                <input type="text" id="firstName" required>
+            </div>
+            <div>
+                <label>Last Name</label>
+                <input type="text" id="lastName" required>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div>
+                <label>Phone Number</label>
+                <input type="tel" id="phone" placeholder="775-xxx-xxxx" required>
+            </div>
+            <div>
+                <label>Email Address</label>
+                <input type="email" id="email" required>
+            </div>
+        </div>
+
+        <div class="section-title">Trade & Experience</div>
+        <label>Primary Trade (e.g., Carpenter, Laborer, Painter)</label>
+        <input type="text" id="trade" placeholder="What is your main skill?" required>
+
+        <div class="grid">
+            <div>
+                <label>Years of Experience</label>
+                <input type="number" id="yearsExp" min="0">
+            </div>
+            <div>
+                <label>Desired Hourly Rate ($)</label>
+                <input type="number" id="payExpectation" placeholder="0.00">
+            </div>
+        </div>
+
+        <label>Do you have your own tools / transportation?</label>
+        <select id="toolsTransport">
+            <option value="Both">I have tools and a truck/car</option>
+            <option value="Tools Only">Tools only</option>
+            <option value="Transport Only">Transportation only</option>
+            <option value="Neither">Neither</option>
+        </select>
+
+        <label>List any certifications (OSHA-10, Forklift, etc.)</label>
+        <textarea id="certs" rows="2"></textarea>
+
+        <div class="section-title">Compliance Upload</div>
+        <label>Upload ID / Driver's License (Photo or PDF)</label>
+        <input type="file" id="idFile" accept="image/*,.pdf" required>
+
+        <button type="submit" id="submitBtn" class="submit-btn">Submit My Application</button>
+    </form>
 </div>
 
 <script>
-  // THE ENGINE LINK
-  const scriptURL = "https://script.google.com/macros/s/AKfycbx_YOUR_ENGINE_ID/exec"; 
+    // Update this to your active Engine URL
+    const scriptURL = "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_URL/exec"; 
 
-  const form = document.getElementById('intakeForm');
-  const btn = document.getElementById('submitBtn');
+    const form = document.getElementById('intakeForm');
+    const btn = document.getElementById('submitBtn');
 
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    btn.disabled = true;
-    btn.innerText = "Processing...";
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        btn.disabled = true;
+        btn.innerText = "Sending to HQ...";
 
-    const fileInput = document.getElementById('idFile');
-    const file = fileInput.files[0];
-    const reader = new FileReader();
+        const fileInput = document.getElementById('idFile');
+        const file = fileInput.files[0];
+        const reader = new FileReader();
 
-    reader.onload = function(event) {
-      const base64 = event.target.result.split(',')[1];
-      
-      const payload = {
-        firstName: document.getElementById('firstName').value,
-        lastName: document.getElementById('lastName').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
-        idImage: base64,
-        fileName: file.name
-      };
+        reader.onload = function(event) {
+            const base64 = event.target.result.split(',')[1];
+            
+            const payload = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                trade: document.getElementById('trade').value,
+                yearsExp: document.getElementById('yearsExp').value,
+                pay: document.getElementById('payExpectation').value,
+                tools: document.getElementById('toolsTransport').value,
+                certs: document.getElementById('certs').value,
+                idImage: base64,
+                fileName: file.name
+            };
 
-      fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify(payload)
-      })
-      .then(response => {
-        // ONCE SUBMITTED, MOVE TO THE SUCCESS PAGE
-        window.location.href = "https://welldoneconstruction.pro/application-received/";
-      })
-      .catch(error => {
-        alert("Submission Error. Please try again.");
-        btn.disabled = false;
-        btn.innerText = "Complete My Employee Packet";
-      });
-    };
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                // MOVE TO THE HARD STOP
+                window.location.href = "https://welldoneconstruction.pro/application-received/";
+            })
+            .catch(error => {
+                alert("Error submitting. Check your connection.");
+                btn.disabled = false;
+                btn.innerText = "Submit My Application";
+            });
+        };
 
-    reader.readAsDataURL(file);
-  });
+        reader.readAsDataURL(file);
+    });
 </script>
 
 </body>
