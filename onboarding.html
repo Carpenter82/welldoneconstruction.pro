@@ -5,82 +5,138 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Well Done Construction - Onboarding Portal</title>
 <style>
+  :root {
+    --wd-green: #33B26E;
+    --wd-dark: #343E47;
+    --wd-slate: #6E797F;
+    --wd-white: #FFFFFF;
+    --wd-bg: #F4F7F6;
+  }
+
   body {
     font-family: 'Segoe UI', Arial, sans-serif;
     margin: 0;
-    background-color: #F4F7F6; /* Light gray background */
-    color: #343E47; /* Brand Charcoal */
+    background-color: var(--wd-bg);
+    color: var(--wd-dark);
     line-height: 1.6;
-    text-align: center;
   }
+
   header {
-    background: #343E47; /* Brand Charcoal Header */
+    background: var(--wd-dark);
     padding: 25px;
     text-align: center;
-    border-bottom: 4px solid #33B26E; /* Brand Green Accent */
+    border-bottom: 4px solid var(--wd-green);
   }
+
   header img {
     max-width: 250px;
+    height: auto;
   }
+
   main {
     max-width: 800px;
     margin: 40px auto;
     padding: 35px;
-    background: #fff;
+    background: var(--wd-white);
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     text-align: left;
   }
-  h1, h2 {
-    color: #343E47;
-    text-align: left;
-    border-bottom: 2px solid #EAECEB;
-    padding-bottom: 10px;
-  }
+
   h1 { 
     text-align: center; 
-    border-bottom: none;
-    color: #33B26E; /* Brand Green for Welcome */
+    color: var(--wd-green);
+    margin-bottom: 30px;
   }
+
+  h2 {
+    color: var(--wd-dark);
+    border-bottom: 2px solid #EAECEB;
+    padding-bottom: 10px;
+    margin-top: 30px;
+  }
+
   p { margin-bottom: 15px; }
-  ul { margin-left: 20px; list-style-type: none; padding: 0; }
+
+  ul { margin-left: 0; list-style-type: none; padding: 0; }
+
   li { 
     margin-bottom: 12px; 
-    padding-left: 10px;
-    border-left: 3px solid #6E797F; /* Slate accent on list items */
+    padding: 15px;
+    background: #fcfcfc;
+    border-left: 4px solid var(--wd-slate);
+    border-radius: 0 4px 4px 0;
   }
+
+  li strong { color: var(--wd-green); }
+
+  /* Action Buttons */
+  .button-container { text-align: center; margin-top: 40px; }
   
-  /* Primary Action Buttons */
-  .button-container { text-align: center; margin-top: 30px; }
-  
+  .step-box {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px dashed #ddd;
+    margin-bottom: 20px;
+  }
+
   a.button {
     display: inline-block;
-    background: #33B26E; /* Brand Green */
+    background: var(--wd-green);
     color: #fff;
-    padding: 14px 28px;
+    padding: 16px 32px;
     border-radius: 4px;
     text-decoration: none;
     margin: 10px;
     font-weight: bold;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
+
   a.button:hover {
-    background: #288e58; /* Darker Green */
+    background: #288e58;
+    transform: translateY(-1px);
   }
   
-  /* Secondary/Utility Buttons */
   a.button-secondary {
-    background: #343E47; /* Brand Charcoal */
+    background: var(--wd-dark);
   }
+
   a.button-secondary:hover {
-    background: #6E797F; /* Slate on hover */
+    background: var(--wd-slate);
   }
 
   footer {
-    padding: 20px;
-    color: #6E797F;
+    padding: 40px 20px 100px 20px;
+    text-align: center;
+    color: var(--wd-slate);
     font-size: 0.85rem;
   }
+
+  /* Nav Dock (Consistent across all pages) */
+  .nav-dock {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--wd-dark);
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    z-index: 1000;
+  }
+
+  .nav-dock a {
+    color: #adb5bd;
+    text-decoration: none;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+
+  .nav-dock a.active { color: var(--wd-white); border-bottom: 2px solid var(--wd-green); }
 </style>
 </head>
 <body>
@@ -90,41 +146,55 @@
 </header>
 
 <main>
-<h1>Welcome to the Team!</h1>
+  <h1>Welcome to the Team!</h1>
 
-<section>
-<h2>Our Mission</h2>
-<p>We’re glad to have you join us! Our mission is to deliver top-quality remodeling and maintenance with unparalleled convenience. Dedicated professionals like you are the foundation of <strong>Well Done Construction</strong>.</p>
-</section>
+  <section>
+    <h2>Our Mission</h2>
+    <p>We’re glad to have you join us! Our mission is to deliver top-quality remodeling and maintenance with unparalleled convenience. Dedicated professionals like you are the foundation of <strong>Well Done Construction</strong>.</p>
+  </section>
 
-<section>
-<h2>Expectations</h2>
-<p>When your services are requested via your personal portal, you will receive an email containing:</p>
-<ul>
-  <li><strong>Project Overview:</strong> Clear scope of work.</li>
-  <li><strong>Timeline:</strong> Estimated completion date.</li>
-  <li><strong>Compensation:</strong> Transparent pay for the project.</li>
-  <li><strong>Client Info:</strong> Location and contact details.</li>
-</ul>
-</section>
+  <section>
+    <h2>What to Expect</h2>
+    <p>When project opportunities arise, you will receive a notification in your portal including:</p>
+    <ul>
+      <li><strong>Project Overview:</strong> Clear scope and requirements.</li>
+      <li><strong>Timeline:</strong> Fixed start and estimated completion dates.</li>
+      <li><strong>Compensation:</strong> Transparent, flat-rate or hourly pay.</li>
+      <li><strong>Client Info:</strong> Secure access to site location and contacts.</li>
+    </ul>
+  </section>
 
-<section class="button-container">
-  <h2>Action Required</h2>
-  <a class="button" href="https://welldoneconstruction.pro/employee-packet/">1. Submit Employee Packet</a>
-  
-  <a class="button" href="https://dochub.com/m/shared-document/tee-construction/EB5r38Awlmd8oMvRXzZ1kD/on-call-employee-agreement-pdf?dt=Ld8g8Eod_amagDQuWys3" target="_blank">2. Sign On-Call Agreement</a>
-  
-  <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
-  
-  <p><small>Already onboarded?</small></p>
-  <a class="button button-secondary" href="https://welldoneconstruction.pro/portal/">Access Personal Portal</a>
-</section>
+  <section class="button-container">
+    <h2>Onboarding Steps</h2>
+    
+    <div class="step-box">
+      <p><strong>Step 1: Legal Documentation</strong></p>
+      <a class="button" href="https://dochub.com/m/shared-document/tee-construction/EB5r38Awlmd8oMvRXzZ1kD/on-call-employee-agreement-pdf?dt=Ld8g8Eod_amagDQuWys3" target="_blank">Sign On-Call Agreement</a>
+    </div>
 
+    <div class="step-box">
+      <p><strong>Step 2: Personnel Records</strong></p>
+      <a class="button" href="https://welldoneconstruction.pro/employee-packet/">Submit Employee Packet</a>
+      <p><small>(You will need a photo of your ID for this step)</small></p>
+    </div>
+    
+    <hr style="margin: 40px 0; border: 0; border-top: 1px solid #eee;">
+    
+    <p>Existing members:</p>
+    <a class="button button-secondary" href="https://welldoneconstruction.pro/portal/">Access Worker Portal</a>
+  </section>
 </main>
 
 <footer>
-  &copy; 2025 Well Done Construction | Washoe County, NV
+  &copy; 2026 Well Done Construction | Washoe County, NV
 </footer>
+
+<nav class="nav-dock">
+  <a href="/">P1: Home</a>
+  <a href="/employee-packet/" class="active">P2: Intake</a>
+  <a href="/portal/">P3: Portal</a>
+  <a href="/admin/">P4: Admin</a>
+</nav>
 
 </body>
 </html>
