@@ -1,94 +1,84 @@
 <script>
-    // 1. UPDATE THIS URL to match your latest "Master Engine" Deployment
-    const webAppUrl = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec";
+  // 1. CONFIGURATION
+  const webAppUrl = "https://script.google.com/macros/s/AKfycbx6xrCNODgRVfAsrA-i5PWqjqZm1klel8RhM_Zh_DbID8nQHkMNd-Rhwp14ya5js7WZ2w/exec";
 
-    // 2. AUTO-LOAD & CHECK FOR NEW SUBMISSIONS
-    window.onload = function() {
-        const params = new URLSearchParams(window.location.search);
-        const email = params.get('email');
-        
-        if (email) {
-            document.getElementById('portalEmail').value = email;
-            checkStatus();
-        }
+  // 2. AUTO-LOAD ON START
+  window.onload = function() {
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get('email');
+    if (email) {
+      document.getElementById('portalEmail').value = email;
+      checkStatus();
+    }
+  };
+
+  // 3. STATUS CHECK (JSONP Handshake)
+  function checkStatus() {
+    const email = document.getElementById('portalEmail').value.trim().toLowerCase();
+    if (!email) { alert("Please enter your email"); return; }
+
+    document.getElementById('displayEmail').innerText = email;
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('portalContent').style.display = 'block';
+
+    const script = document.createElement('script');
+    script.src = webAppUrl + "?id=" + encodeURIComponent(email);
+    document.body.appendChild(script);
+  }
+
+  // 4. THE CALLBACK (Triggered by Google Script)
+  function portalCallback(data) {
+    const badge = document.getElementById('statusBadge');
+    const actionStatus = document.getElementById('actionStatus');
+    const lockStatus = document.getElementById('lockStatus');
+    const gBtn = document.getElementById('gustoBtn');
+    const uploadSection = document.getElementById('uploadSection');
+    
+    if (data.isVerified) {
+      badge.innerText = "✓ VERIFIED";
+      badge.className = "status-badge verified";
+      document.getElementById('accLevel').innerText = "Level 2";
+      actionStatus.innerText = "✅ ACCOUNT ACTIVE";
+      actionStatus.style.color = "green";
+      lockStatus.innerText = "Payroll Portal Unlocked";
+      lockStatus.style.color = "green";
+      gBtn.style.opacity = "1";
+      gBtn.style.pointerEvents = "auto";
+      if(uploadSection) uploadSection.style.display = "none";
+    } else {
+      badge.innerText = "⚠ PENDING VERIFICATION";
+      badge.className = "status-badge pending";
+      actionStatus.innerText = "⚠️ ACTION REQUIRED";
+      lockStatus.innerText = "ID Verification Under Review";
+    }
+  }
+
+  // 5. ID UPLOAD HANDLER
+  function uploadID() {
+    const fileInput = document.getElementById('idFile');
+    const file = fileInput.files[0];
+    const email = document.getElementById('displayEmail').innerText;
+
+    if (!file) { alert("Please select a file first"); return; }
+
+    const upBtn = document.querySelector("#uploadSection .btn");
+    upBtn.innerText = "Uploading...";
+    upBtn.disabled = true;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const base64 = e.target.result.split(',')[1];
+      fetch(webAppUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({ email: email, idImage: base64 })
+      }).then(() => {
+        alert("Upload Successful!");
+        upBtn.innerText = "Upload ID Photo";
+        upBtn.disabled = false;
+        checkStatus();
+      });
     };
-
-    function checkStatus() {
-        const email = document.getElementById('portalEmail').value.trim().toLowerCase();
-        if (!email) { alert("Please enter your email"); return; }
-
-        document.getElementById('displayEmail').innerText = email;
-        document.getElementById('loginBox').style.display = 'none';
-        document.getElementById('portalContent').style.display = 'block';
-
-        // JSONP Handshake to check verification status
-        const script = document.createElement('script');
-        script.src = webAppUrl + "?id=" + encodeURIComponent(email);
-        document.body.appendChild(script);
-    }
-
-    // 3. CALLBACK HANDLER
-    function portalCallback(data) {
-        const badge = document.getElementById('statusBadge');
-        const actionStatus = document.getElementById('actionStatus');
-        const lockStatus = document.getElementById('lockStatus');
-        const gBtn = document.getElementById('gustoBtn');
-        const uploadSection = document.getElementById('uploadSection');
-        
-        if (data.isVerified) {
-            badge.innerText = "✓ VERIFIED";
-            badge.className = "status-badge verified";
-            document.getElementById('accLevel').innerText = "Level 2";
-            
-            actionStatus.innerText = "✅ ACCOUNT ACTIVE";
-            actionStatus.style.color = "var(--wd-green)";
-            
-            lockStatus.innerText = "Payroll Portal Unlocked";
-            lockStatus.style.color = "var(--wd-green)";
-            
-            gBtn.style.opacity = "1";
-            gBtn.style.pointerEvents = "auto";
-            gBtn.style.background = "var(--wd-green)";
-            
-            if(uploadSection) uploadSection.style.display = "none";
-        } else {
-            badge.innerText = "⚠ PENDING VERIFICATION";
-            badge.className = "status-badge pending";
-            actionStatus.innerText = "⚠️ ACTION REQUIRED";
-            lockStatus.innerText = "ID Verification Under Review";
-        }
-    }
-
-    // 4. ID UPLOAD HANDLER
-    function uploadID() {
-        const fileInput = document.getElementById('idFile');
-        const file = fileInput.files[0];
-        const email = document.getElementById('displayEmail').innerText;
-
-        if (!file) { alert("Please select a file first"); return; }
-
-        const upBtn = document.querySelector("#uploadSection .btn");
-        upBtn.innerText = "Uploading...";
-        upBtn.disabled = true;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result.split(',')[1];
-            
-            fetch(webAppUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ email: email, idImage: base64 })
-            }).then(() => {
-                alert("Upload Successful! Your status will update once an admin reviews your ID.");
-                upBtn.innerText = "Upload ID Photo";
-                upBtn.disabled = false;
-                checkStatus(); // Refresh status badge
-            }).catch(err => {
-                alert("Upload failed. Please check your connection.");
-                upBtn.disabled = false;
-            });
-        };
-        reader.readAsDataURL(file);
-    }
+    reader.readAsDataURL(file);
+  }
 </script>
