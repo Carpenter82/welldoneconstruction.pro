@@ -43,23 +43,10 @@
     text-align: left;
   }
 
-  h1 { 
-    text-align: center; 
-    color: var(--wd-green);
-    margin-bottom: 30px;
-  }
-
-  h2 {
-    color: var(--wd-dark);
-    border-bottom: 2px solid #EAECEB;
-    padding-bottom: 10px;
-    margin-top: 30px;
-  }
-
+  h1 { text-align: center; color: var(--wd-green); margin-bottom: 30px; }
+  h2 { color: var(--wd-dark); border-bottom: 2px solid #EAECEB; padding-bottom: 10px; margin-top: 30px; }
   p { margin-bottom: 15px; }
-
   ul { margin-left: 0; list-style-type: none; padding: 0; }
-
   li { 
     margin-bottom: 12px; 
     padding: 15px;
@@ -67,15 +54,13 @@
     border-left: 4px solid var(--wd-slate);
     border-radius: 0 4px 4px 0;
   }
-
   li strong { color: var(--wd-green); }
 
-  /* Action Buttons */
   .button-container { text-align: center; margin-top: 40px; }
   
   .step-box {
     background: #f9f9f9;
-    padding: 20px;
+    padding: 25px;
     border-radius: 8px;
     border: 1px dashed #ddd;
     margin-bottom: 20px;
@@ -85,58 +70,22 @@
     display: inline-block;
     background: var(--wd-green);
     color: #fff;
-    padding: 16px 32px;
+    padding: 18px 36px;
     border-radius: 4px;
     text-decoration: none;
-    margin: 10px;
     font-weight: bold;
     transition: all 0.3s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
 
-  a.button:hover {
-    background: #288e58;
-    transform: translateY(-1px);
-  }
+  a.button:hover { background: #288e58; transform: translateY(-1px); }
   
-  a.button-secondary {
-    background: var(--wd-dark);
-  }
-
-  a.button-secondary:hover {
-    background: var(--wd-slate);
-  }
-
   footer {
     padding: 40px 20px 100px 20px;
     text-align: center;
     color: var(--wd-slate);
     font-size: 0.85rem;
   }
-
-  /* Nav Dock (Consistent across all pages) */
-  .nav-dock {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--wd-dark);
-    padding: 12px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    z-index: 1000;
-  }
-
-  .nav-dock a {
-    color: #adb5bd;
-    text-decoration: none;
-    font-size: 11px;
-    text-transform: uppercase;
-    font-weight: bold;
-  }
-
-  .nav-dock a.active { color: var(--wd-white); border-bottom: 2px solid var(--wd-green); }
 </style>
 </head>
 <body>
@@ -168,20 +117,12 @@
     <h2>Onboarding Steps</h2>
     
     <div class="step-box">
-      <p><strong>Step 1: Legal Documentation</strong></p>
-      <a class="button" href="https://dochub.com/m/shared-document/tee-construction/EB5r38Awlmd8oMvRXzZ1kD/on-call-employee-agreement-pdf?dt=Ld8g8Eod_amagDQuWys3" target="_blank">Sign On-Call Agreement</a>
+      <h3>Official Intake & ID Verification</h3>
+      <p>This final step initializes your personal worker portal and prepares your profile for payroll.</p>
+      <p><small><strong>Note:</strong> Have your Driver's License or State ID ready for upload.</small></p>
+      <br>
+      <a class="button" id="intakeBtn" href="https://welldoneconstruction.pro/employee-packet/">Complete My Employee Packet</a>
     </div>
-
-    <div class="step-box">
-      <p><strong>Step 2: Personnel Records</strong></p>
-      <a class="button" href="https://welldoneconstruction.pro/employee-packet/">Submit Employee Packet</a>
-      <p><small>(You will need a photo of your ID for this step)</small></p>
-    </div>
-    
-    <hr style="margin: 40px 0; border: 0; border-top: 1px solid #eee;">
-    
-    <p>Existing members:</p>
-    <a class="button button-secondary" href="https://welldoneconstruction.pro/portal/">Access Worker Portal</a>
   </section>
 </main>
 
@@ -189,12 +130,17 @@
   &copy; 2026 Well Done Construction | Washoe County, NV
 </footer>
 
-<nav class="nav-dock">
-  <a href="/">P1: Home</a>
-  <a href="/employee-packet/" class="active">P2: Intake</a>
-  <a href="/portal/">P3: Portal</a>
-  <a href="/admin/">P4: Admin</a>
-</nav>
+<script>
+  // THE HANDSHAKE: Catch email from URL and pass to the next page
+  const urlParams = new URLSearchParams(window.location.search);
+  const email = urlParams.get('email');
+  
+  if (email) {
+    const intakeBtn = document.getElementById('intakeBtn');
+    // Appends the email to the link: .../employee-packet/?email=worker@email.com
+    intakeBtn.href = "https://welldoneconstruction.pro/employee-packet/?email=" + encodeURIComponent(email);
+  }
+</script>
 
 </body>
 </html>
