@@ -1,100 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WELL DONE | Admin Control</title>
+    <title>WD | Admin</title>
     <style>
-        :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #e9ecef; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--wd-bg); padding: 40px; margin: 0; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-top: 5px solid var(--wd-dark); }
-        .header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; padding-bottom: 20px; }
-        h1 { margin: 0; color: var(--wd-dark); font-size: 1.8rem; }
+        body { font-family: sans-serif; background: #1a1d20; color: white; padding: 20px; }
+        .box { background: #2b3035; padding: 20px; border-radius: 8px; border-top: 4px solid #33B26E; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { text-align: left; background: #f8f9fa; padding: 15px; border-bottom: 2px solid #dee2e6; color: #666; text-transform: uppercase; font-size: 0.85rem; }
-        td { padding: 15px; border-bottom: 1px solid #dee2e6; color: #333; }
-        .badge { background: var(--wd-green); color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
-        .refresh-btn { background: var(--wd-dark); color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
-        .refresh-btn:hover { opacity: 0.9; }
-        #status-msg { margin-top: 10px; font-style: italic; color: #666; }
+        th { text-align: left; border-bottom: 2px solid #444; padding: 10px; color: #aaa; }
+        td { padding: 10px; border-bottom: 1px solid #444; }
+        .status-badge { background: #33B26E; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+        .loading { color: #ffca28; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="header-flex">
-            <h1>Onboarding Queue</h1>
-            <button class="refresh-btn" onclick="loadData()">Refresh Roster</button>
-        </div>
+    <div class="box">
+        <h2>Onboarding Roster</h2>
+        <div id="msg">System: <span class="loading">Connecting to Google SSOT...</span></div>
         
-        <div id="status-msg">System Ready.</div>
-
-        <table id="rosterTable">
+        <table>
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>Candidate</th>
                     <th>Phone</th>
                     <th>Trade</th>
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-                <tr><td colspan="4">Initializing...</td></tr>
-            </tbody>
+            <tbody id="rows">
+                </tbody>
         </table>
     </div>
 
     <script>
-        // YOUR UNIQUE DEPLOYMENT 2 URL
+        // YOUR SSOT DEPLOYMENT URL
         const ssotURL = "https://script.google.com/macros/s/AKfycbyHFv2lI2whyM63Y3Up_yqeI006GVOpVCgzQUDD8DvWXjdGVvqSkfCvL8wb8Ud8RIaG/exec";
 
-        function loadData() {
-            const tbody = document.getElementById('tableBody');
-            const status = document.getElementById('status-msg');
-            
-            status.innerText = "Requesting data from SSOT...";
-            tbody.innerHTML = '<tr><td colspan="4">Loading data from Google Sheets...</td></tr>';
-
-            // REMOVE OLD SCRIPTS TO PREVENT MEMORY CLOG
-            const oldScript = document.getElementById('jsonp-script');
-            if (oldScript) oldScript.remove();
-
-            // JSONP TRICK FOR CROSS-DOMAIN LOADING
-            const script = document.createElement('script');
-            script.id = 'jsonp-script';
-            script.src = ssotURL + "?callback=renderTable";
-            document.body.appendChild(script);
-        }
-
-        // CALLBACK FUNCTION: This runs when Google sends the data back
+        // 1. The function that handles the data
         function renderTable(data) {
-            const tbody = document.getElementById('tableBody');
-            const status = document.getElementById('status-msg');
+            const tbody = document.getElementById('rows');
+            const msg = document.getElementById('msg');
             
-            tbody.innerHTML = '';
-            status.innerText = "Data Updated: " + new Date().toLocaleTimeString();
-
             if (!data || data.length < 2) {
-                tbody.innerHTML = '<tr><td colspan="4">No candidates found in the tracker.</td></tr>';
+                msg.innerHTML = "System: <span style='color:red'>Connected, but no data found.</span>";
                 return;
             }
 
-            // Loop through data (starting at index 1 to skip headers)
+            msg.innerHTML = "System: <span style='color:#33B26E'>Live (Data Updated)</span>";
+            tbody.innerHTML = ""; // Clear the loading row
+
             for (let i = 1; i < data.length; i++) {
                 const row = data[i];
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><strong>${row[1] || 'Unknown'}</strong></td>
-                    <td>${row[2] || 'N/A'}</td>
-                    <td>${row[3] || 'General'}</td>
-                    <td><span class="badge">${row[5] || 'PENDING'}</span></td>
+                    <td>${row[1] || '---'}</td>
+                    <td>${row[2] || '---'}</td>
+                    <td>${row[3] || '---'}</td>
+                    <td><span class="status-badge">${row[5] || 'PENDING'}</span></td>
                 `;
                 tbody.appendChild(tr);
             }
         }
 
-        // Start loading as soon as page is ready
-        window.onload = loadData;
+        // 2. The trigger that fetches the data
+        const loader = document.createElement('script');
+        loader.src = ssotURL + "?callback=renderTable";
+        document.body.appendChild(loader);
     </script>
 </body>
 </html>
