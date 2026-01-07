@@ -5,25 +5,30 @@
     <title>WD | Admin</title>
     <style>
         body { font-family: sans-serif; background: #1a1d20; color: white; padding: 20px; }
-        .box { background: #2b3035; padding: 20px; border-radius: 8px; border-top: 4px solid #33B26E; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { text-align: left; border-bottom: 2px solid #444; padding: 10px; color: #aaa; }
-        td { padding: 10px; border-bottom: 1px solid #444; }
-        .status-badge { background: #33B26E; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
-        .elect-btn { background: #ffca28; color: black; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .elect-btn:hover { background: #ffd54f; }
+        .box { max-width: 900px; margin: 0 auto; background: #2b3035; padding: 20px; border-radius: 8px; border-top: 4px solid #33B26E; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        h2 { margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #212529; }
+        th { text-align: left; border-bottom: 2px solid #444; padding: 12px; color: #33B26E; text-transform: uppercase; font-size: 12px; }
+        td { padding: 12px; border-bottom: 1px solid #333; font-size: 14px; }
+        .status-badge { background: #33B26E; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .elect-btn { background: #ffca28; color: black; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .elect-btn:hover { background: #ffd54f; transform: scale(1.05); }
         .loading { color: #ffca28; font-weight: bold; }
+        .refresh-btn { float: right; background: transparent; border: 1px solid #444; color: #aaa; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .refresh-btn:hover { color: white; border-color: white; }
     </style>
 </head>
 <body>
 
     <div class="box">
+        <button class="refresh-btn" onclick="location.reload()">REFRESH SYSTEM</button>
         <h2>Onboarding Roster</h2>
         <div id="msg">System: <span class="loading">Connecting to Google SSOT...</span></div>
         
         <table>
             <thead>
                 <tr>
+                    <th>Timestamp</th>
                     <th>Candidate</th>
                     <th>Trade</th>
                     <th>Status</th>
@@ -35,9 +40,10 @@
     </div>
 
     <script>
-        // UPDATED SSOT URL
+        // YOUR MASTER ENGINE URL
         const ssotURL = "https://script.google.com/macros/s/AKfycbyqdgARBMulJ1ZsPQz9uQaFiCURJ5fzheRm7UxOk9ets8YfoIzfLHR7fRPvbBPL0xdd/exec";
 
+        // 1. THIS READS THE DATA FROM THE SHEET
         function renderTable(data) {
             const tbody = document.getElementById('rows');
             const msg = document.getElementById('msg');
@@ -50,41 +56,52 @@
             msg.innerHTML = "System: <span style='color:#33B26E'>Live (Data Updated)</span>";
             tbody.innerHTML = ""; 
 
+            // Start at 1 to skip the Green Header row
             for (let i = 1; i < data.length; i++) {
-                const row = data[i]; // row[1]=First, row[2]=Last, row[5]=Trade, row[6]=Status, row[7]=FolderID
+                const row = data[i]; 
+                // Mapping: 0=Time, 1=First, 2=Last, 5=Trade, 6=Status, 7=FolderID
+                const timestamp = new Date(row[0]).toLocaleDateString();
+                const fullName = row[1] + " " + row[2];
+                const trade = row[5] || "N/A";
+                const status = row[6] || "Pending";
+                const folderId = row[7];
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${row[1]} ${row[2]}</td>
-                    <td>${row[5]}</td>
-                    <td><span class="status-badge">${row[6]}</span></td>
+                    <td style="color:#666; font-size:12px;">${timestamp}</td>
+                    <td><strong>${fullName}</strong></td>
+                    <td>${trade}</td>
+                    <td><span class="status-badge">${status}</span></td>
                     <td>
-                        ${row[6] === 'Pending' ? `<button class="elect-btn" onclick="electWorker('${row[7]}', '${row[1]}', '${i+1}')">ELECT</button>` : '✅'}
+                        ${status === 'Pending' ? `<button class="elect-btn" onclick="electWorker('${folderId}', '${fullName}', '${i+1}')">ELECT</button>` : '✅ ACTIVE'}
                     </td>
                 `;
                 tbody.appendChild(tr);
             }
         }
 
+        // 2. THIS UPDATES THE SHEET WHEN YOU CLICK 'ELECT'
         function electWorker(fId, name, rowNum) {
             if(!confirm("Elect " + name + " and move to Active Jobs?")) return;
             
             fetch(ssotURL, {
                 method: 'POST',
                 mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({
-                    action: 'elect',
+                    type: 'ELECT', // Tells the script what to do
                     folderId: fId,
                     row: rowNum
                 })
             }).then(() => {
-                alert("Election command sent for " + name + ". Refreshing...");
-                location.reload();
+                alert("Election command sent for " + name + ". Refreshing spreadsheet...");
+                setTimeout(() => { location.reload(); }, 1000);
             });
         }
 
-        // Fetch Data
+        // 3. BOOT THE SYSTEM (Fetch the Spreadsheet)
         const loader = document.createElement('script');
-        loader.src = ssotURL + "?callback=renderTable";
+        loader.src = ssotURL + "?type=READ&callback=renderTable"; // Added 'type=READ'
         document.body.appendChild(loader);
     </script>
 </body>
