@@ -93,7 +93,7 @@
 </div>
 
 <script>
-    // UPDATED URL
+    // THE ADDRESS TO YOUR GOOGLE SCRIPT
     const scriptURL = "https://script.google.com/macros/s/AKfycbyqdgARBMulJ1ZsPQz9uQaFiCURJ5fzheRm7UxOk9ets8YfoIzfLHR7fRPvbBPL0xdd/exec"; 
     
     const form = document.getElementById('intakeForm');
@@ -104,6 +104,7 @@
         btn.disabled = true;
         btn.innerText = "Submitting...";
 
+        // Pack the data
         const payload = {
             firstName: document.getElementById('firstName').value,
             lastName: document.getElementById('lastName').value,
@@ -116,18 +117,24 @@
             certs: document.getElementById('certs').value
         };
 
+        // Send the data as a plain-text string to bypass security blocks
         fetch(scriptURL, {
             method: 'POST',
             mode: 'no-cors', 
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8'
+            },
             body: JSON.stringify(payload)
         })
         .then(() => {
+            // Show success message
             document.getElementById('formFields').style.display = 'none';
             document.getElementById('successMessage').style.display = 'block';
             window.scrollTo(0, 0);
         })
         .catch(error => {
             console.error('Error!', error.message);
+            alert("Something went wrong. Please try again.");
             btn.disabled = false;
             btn.innerText = "Submit My Application";
         });
