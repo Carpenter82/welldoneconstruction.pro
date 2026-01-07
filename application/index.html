@@ -92,11 +92,11 @@
         </div>
     </div>
 </div>
-// REPLACE THIS LINE IN YOUR HTML FILE
-const scriptURL = "https://script.google.com/macros/s/AKfycbyqdgARBMulJ1ZsPQz9uQaFiCURJ5fzheRm7UxOk9ets8YfoIzfLHR7fRPvbBPL0xdd/exec";
+
 <script>
-    // LINKED TO YOUR SSOT APPS SCRIPT
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyHFv2lI2whyM63Y3Up_yqeI006GVOpVCgzQUDD8DvWXjdGVvqSkfCvL8wb8Ud8RIaG/exec"; 
+    // UPDATED SCRIPT URL FOR ACCOUNTABILITY ENGINE
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyqdgARBMulJ1ZsPQz9uQaFiCURJ5fzheRm7UxOk9ets8YfoIzfLHR7fRPvbBPL0xdd/exec"; 
+    
     const form = document.getElementById('intakeForm');
     const formWrapper = document.getElementById('formFields');
     const successMsg = document.getElementById('successMessage');
@@ -107,6 +107,7 @@ const scriptURL = "https://script.google.com/macros/s/AKfycbyqdgARBMulJ1ZsPQz9uQ
         btn.disabled = true;
         btn.innerText = "Submitting...";
 
+        // JSON Payload matching your Spreadsheet Headers
         const payload = {
             firstName: document.getElementById('firstName').value,
             lastName: document.getElementById('lastName').value,
@@ -116,67 +117,27 @@ const scriptURL = "https://script.google.com/macros/s/AKfycbyqdgARBMulJ1ZsPQz9uQ
             yearsExp: document.getElementById('yearsExp').value,
             pay: document.getElementById('payExpectation').value,
             tools: document.getElementById('toolsTransport').value,
-            certs: document.getElementById('certs').value,
-            type: "ADMISSION"
+            certs: document.getElementById('certs').value
         };
 
         fetch(scriptURL, {
             method: 'POST',
-            mode: 'no-cors',
             body: JSON.stringify(payload)
         })
-        .then(() => {
+        .then(response => {
+            console.log('Success!', response);
             formWrapper.style.display = 'none';
             successMsg.style.display = 'block';
             window.scrollTo(0, 0);
         })
         .catch(error => {
             console.error('Error!', error.message);
-            alert("Submission error. Please check connection.");
+            alert("Submission error. Please check your connection.");
             btn.disabled = false;
             btn.innerText = "Submit My Application";
         });
     });
 </script>
-function doPost(e) {
-  try {
-    const SS_ID = "1TVnkUDhrvu32AB6KUBIIoTofXUsZr65_hteG6OL7f2Q";
-    const SHEET_NAME = "Application";
-    const MASTER_FOLDER_ID = "1q8cr_nzaUeB2sHi3l3EWl6gH1-xNWU2k";
-    
-    const ss = SpreadsheetApp.openById(SS_ID);
-    const sheet = ss.getSheetByName(SHEET_NAME);
-    const data = JSON.parse(e.postData.contents);
-    
-    // 1. Create Folder: Trade - Name - Phone
-    const folderName = `${data.trade} - ${data.firstName} ${data.lastName} - ${data.phone}`;
-    const parentFolder = DriveApp.getFolderById(MASTER_FOLDER_ID);
-    const newFolder = parentFolder.createFolder(folderName);
-    const folderId = newFolder.getId();
 
-    // 2. Map to Sheet Headers: 
-    // [Timestamp, First Name, Last Name, Phone, Email, Trade, Status, FolderID, Exp, Pay, Tools, Certs]
-    const rowData = [
-      new Date(), 
-      data.firstName, 
-      data.lastName, 
-      data.phone, 
-      data.email, 
-      data.trade, 
-      "Pending", 
-      folderId,
-      data.yearsExp,
-      data.pay,
-      data.tools,
-      data.certs
-    ];
-
-    sheet.appendRow(rowData);
-    return ContentService.createTextOutput("Success").setMimeType(ContentService.MimeType.TEXT);
-
-  } catch (err) {
-    return ContentService.createTextOutput("Error: " + err.message).setMimeType(ContentService.MimeType.TEXT);
-  }
-}
 </body>
 </html>
