@@ -94,7 +94,7 @@
 </div>
 
 <script>
-    // UPDATED SCRIPT URL FOR ACCOUNTABILITY ENGINE
+    // SSOT ENGINE URL
     const scriptURL = "https://script.google.com/macros/s/AKfycbyqdgARBMulJ1ZsPQz9uQaFiCURJ5fzheRm7UxOk9ets8YfoIzfLHR7fRPvbBPL0xdd/exec"; 
     
     const form = document.getElementById('intakeForm');
@@ -107,7 +107,7 @@
         btn.disabled = true;
         btn.innerText = "Submitting...";
 
-        // JSON Payload matching your Spreadsheet Headers
+        // DATA LABELS MUST MATCH THE DOPOST SCRIPT EXACTLY
         const payload = {
             firstName: document.getElementById('firstName').value,
             lastName: document.getElementById('lastName').value,
@@ -115,24 +115,27 @@
             phone: document.getElementById('phone').value,
             trade: document.getElementById('trade').value,
             yearsExp: document.getElementById('yearsExp').value,
-            pay: document.getElementById('payExpectation').value,
-            tools: document.getElementById('toolsTransport').value,
+            pay: document.getElementById('payExpectation').value, // This is the 'Pay' field
+            tools: document.getElementById('toolsTransport').value, // This is the 'Tools' field
             certs: document.getElementById('certs').value
         };
 
         fetch(scriptURL, {
             method: 'POST',
+            mode: 'no-cors', // IMPORTANT: Use no-cors for Google Apps Script redirects
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         })
-        .then(response => {
-            console.log('Success!', response);
+        .then(() => {
+            // Because of no-cors, we assume success if the request sends
             formWrapper.style.display = 'none';
             successMsg.style.display = 'block';
             window.scrollTo(0, 0);
         })
         .catch(error => {
             console.error('Error!', error.message);
-            alert("Submission error. Please check your connection.");
+            alert("Check your internet connection and try again.");
             btn.disabled = false;
             btn.innerText = "Submit My Application";
         });
