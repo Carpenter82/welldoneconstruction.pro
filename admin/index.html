@@ -8,14 +8,13 @@
         .box { max-width: 900px; margin: 0 auto; background: #2b3035; padding: 20px; border-radius: 8px; border-top: 4px solid #33B26E; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         h2 { margin-top: 0; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #212529; }
-        th { text-align: left; border-bottom: 2px solid #444; padding: 12px; color: #33B26E; text-transform: uppercase; font-size: 12px; }
+        th { text-align: left; border-bottom: 2px solid #444; padding: 12px; color: #33B26E; text-transform: uppercase; font-size: 11px; }
         td { padding: 12px; border-bottom: 1px solid #333; font-size: 14px; }
         .status-badge { background: #33B26E; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
-        .elect-btn { background: #ffca28; color: black; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .elect-btn:hover { background: #ffd54f; transform: scale(1.05); }
+        .elect-btn { background: #ffca28; color: black; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .elect-btn:hover { background: #ffd54f; }
         .loading { color: #ffca28; font-weight: bold; }
         .refresh-btn { float: right; background: transparent; border: 1px solid #444; color: #aaa; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .refresh-btn:hover { color: white; border-color: white; }
     </style>
 </head>
 <body>
@@ -23,12 +22,11 @@
     <div class="box">
         <button class="refresh-btn" onclick="location.reload()">REFRESH SYSTEM</button>
         <h2>Onboarding Roster</h2>
-        <div id="msg">System: <span class="loading">Connecting to Google SSOT...</span></div>
+        <div id="msg">System: <span class="loading">Fetching Roster...</span></div>
         
         <table>
             <thead>
                 <tr>
-                    <th>Timestamp</th>
                     <th>Candidate</th>
                     <th>Trade</th>
                     <th>Status</th>
@@ -40,47 +38,42 @@
     </div>
 
     <script>
-        // YOUR MASTER ENGINE URL
+        // MASTER ENGINE URL
         const ssotURL = "https://script.google.com/macros/s/AKfycbyqdgARBMulJ1ZsPQz9uQaFiCURJ5fzheRm7UxOk9ets8YfoIzfLHR7fRPvbBPL0xdd/exec";
 
-        // 1. THIS READS THE DATA FROM THE SHEET
+        // 1. DATA RENDERER (Triggered by JSONP)
         function renderTable(data) {
             const tbody = document.getElementById('rows');
             const msg = document.getElementById('msg');
             
             if (!data || data.length < 2) {
-                msg.innerHTML = "System: <span style='color:red'>Connected, but no applicants found.</span>";
+                msg.innerHTML = "System: <span style='color:red'>Connected, but no candidates found.</span>";
                 return;
             }
 
-            msg.innerHTML = "System: <span style='color:#33B26E'>Live (Data Updated)</span>";
+            msg.innerHTML = "System: <span style='color:#33B26E'>Connected to SSOT</span>";
             tbody.innerHTML = ""; 
 
-            // Start at 1 to skip the Green Header row
+            // Skip the header row (i=0)
             for (let i = 1; i < data.length; i++) {
                 const row = data[i]; 
-                // Mapping: 0=Time, 1=First, 2=Last, 5=Trade, 6=Status, 7=FolderID
-                const timestamp = new Date(row[0]).toLocaleDateString();
-                const fullName = row[1] + " " + row[2];
-                const trade = row[5] || "N/A";
-                const status = row[6] || "Pending";
-                const folderId = row[7];
+                // Skip rows that are empty or errors
+                if (!row[1]) continue; 
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td style="color:#666; font-size:12px;">${timestamp}</td>
-                    <td><strong>${fullName}</strong></td>
-                    <td>${trade}</td>
-                    <td><span class="status-badge">${status}</span></td>
+                    <td><strong>${row[1]} ${row[2]}</strong></td>
+                    <td>${row[5] || 'N/A'}</td>
+                    <td><span class="status-badge">${row[6]}</span></td>
                     <td>
-                        ${status === 'Pending' ? `<button class="elect-btn" onclick="electWorker('${folderId}', '${fullName}', '${i+1}')">ELECT</button>` : '✅ ACTIVE'}
+                        ${row[6] === 'Pending' ? `<button class="elect-btn" onclick="electWorker('${row[7]}', '${row[1]}', '${i+1}')">ELECT</button>` : '✅'}
                     </td>
                 `;
                 tbody.appendChild(tr);
             }
         }
 
-        // 2. THIS UPDATES THE SHEET WHEN YOU CLICK 'ELECT'
+        // 2. ELECT FUNCTION (Only fires on button click)
         function electWorker(fId, name, rowNum) {
             if(!confirm("Elect " + name + " and move to Active Jobs?")) return;
             
@@ -89,19 +82,20 @@
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({
-                    type: 'ELECT', // Tells the script what to do
+                    type: 'ELECT',
                     folderId: fId,
                     row: rowNum
                 })
             }).then(() => {
-                alert("Election command sent for " + name + ". Refreshing spreadsheet...");
+                alert("Worker Elected! Refreshing...");
                 setTimeout(() => { location.reload(); }, 1000);
             });
         }
 
-        // 3. BOOT THE SYSTEM (Fetch the Spreadsheet)
+        // 3. INITIAL FETCH (READ ONLY)
+        // This creates a script tag that asks Google for data without sending a POST
         const loader = document.createElement('script');
-        loader.src = ssotURL + "?type=READ&callback=renderTable"; // Added 'type=READ'
+        loader.src = ssotURL + "?callback=renderTable";
         document.body.appendChild(loader);
     </script>
 </body>
