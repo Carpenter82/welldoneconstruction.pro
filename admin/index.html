@@ -5,25 +5,20 @@
     <title>WD | Admin</title>
     <style>
         body { font-family: sans-serif; background: #1a1d20; color: white; padding: 20px; }
-        .box { max-width: 900px; margin: 0 auto; background: #2b3035; padding: 20px; border-radius: 8px; border-top: 4px solid #33B26E; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        h2 { margin-top: 0; }
+        .box { max-width: 900px; margin: 0 auto; background: #2b3035; padding: 20px; border-radius: 8px; border-top: 4px solid #33B26E; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #212529; }
-        th { text-align: left; border-bottom: 2px solid #444; padding: 12px; color: #33B26E; text-transform: uppercase; font-size: 11px; }
+        th { text-align: left; border-bottom: 2px solid #444; padding: 12px; color: #33B26E; font-size: 11px; }
         td { padding: 12px; border-bottom: 1px solid #333; font-size: 14px; }
-        .status-badge { background: #33B26E; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .status-badge { background: #33B26E; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; }
         .elect-btn { background: #ffca28; color: black; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .elect-btn:hover { background: #ffd54f; }
         .loading { color: #ffca28; font-weight: bold; }
-        .refresh-btn { float: right; background: transparent; border: 1px solid #444; color: #aaa; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
     </style>
 </head>
 <body>
 
     <div class="box">
-        <button class="refresh-btn" onclick="location.reload()">REFRESH SYSTEM</button>
         <h2>Onboarding Roster</h2>
-        <div id="msg">System: <span class="loading">Fetching Roster...</span></div>
-        
+        <div id="msg">System: <span class="loading">Connecting...</span></div>
         <table>
             <thead>
                 <tr>
@@ -38,32 +33,29 @@
     </div>
 
     <script>
-        // MASTER ENGINE URL
+        // Use your existing Script URL
         const ssotURL = "https://script.google.com/macros/s/AKfycbyqdgARBMulJ1ZsPQz9uQaFiCURJ5fzheRm7UxOk9ets8YfoIzfLHR7fRPvbBPL0xdd/exec";
 
-        // 1. DATA RENDERER (Triggered by JSONP)
         function renderTable(data) {
             const tbody = document.getElementById('rows');
             const msg = document.getElementById('msg');
             
             if (!data || data.length < 2) {
-                msg.innerHTML = "System: <span style='color:red'>Connected, but no candidates found.</span>";
+                msg.innerHTML = "System: <span style='color:red'>No candidates found.</span>";
                 return;
             }
 
-            msg.innerHTML = "System: <span style='color:#33B26E'>Connected to SSOT</span>";
+            msg.innerHTML = "System: <span style='color:#33B26E'>Live</span>";
             tbody.innerHTML = ""; 
 
-            // Skip the header row (i=0)
             for (let i = 1; i < data.length; i++) {
                 const row = data[i]; 
-                // Skip rows that are empty or errors
-                if (!row[1]) continue; 
+                if (!row[1] || row[1] === "First Name") continue; // Skip empty/header rows
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><strong>${row[1]} ${row[2]}</strong></td>
-                    <td>${row[5] || 'N/A'}</td>
+                    <td>${row[5] || ''}</td>
                     <td><span class="status-badge">${row[6]}</span></td>
                     <td>
                         ${row[6] === 'Pending' ? `<button class="elect-btn" onclick="electWorker('${row[7]}', '${row[1]}', '${i+1}')">ELECT</button>` : '✅'}
@@ -73,27 +65,16 @@
             }
         }
 
-        // 2. ELECT FUNCTION (Only fires on button click)
         function electWorker(fId, name, rowNum) {
-            if(!confirm("Elect " + name + " and move to Active Jobs?")) return;
-            
+            if(!confirm("Elect " + name + "?")) return;
             fetch(ssotURL, {
                 method: 'POST',
                 mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    type: 'ELECT',
-                    folderId: fId,
-                    row: rowNum
-                })
-            }).then(() => {
-                alert("Worker Elected! Refreshing...");
-                setTimeout(() => { location.reload(); }, 1000);
-            });
+                body: JSON.stringify({ type: 'ELECT', row: rowNum })
+            }).then(() => { location.reload(); });
         }
 
-        // 3. INITIAL FETCH (READ ONLY)
-        // This creates a script tag that asks Google for data without sending a POST
+        // This is the "Safe Read" part
         const loader = document.createElement('script');
         loader.src = ssotURL + "?callback=renderTable";
         document.body.appendChild(loader);
