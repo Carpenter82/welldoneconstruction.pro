@@ -10,6 +10,8 @@
         th { text-align: left; border-bottom: 2px solid #444; padding: 10px; color: #aaa; }
         td { padding: 10px; border-bottom: 1px solid #444; }
         .status-badge { background: #33B26E; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+        .elect-btn { background: #ffca28; color: black; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .elect-btn:hover { background: #ffd54f; }
         .loading { color: #ffca28; font-weight: bold; }
     </style>
 </head>
@@ -23,64 +25,67 @@
             <thead>
                 <tr>
                     <th>Candidate</th>
-                    <th>Phone</th>
                     <th>Trade</th>
                     <th>Status</th>
+                    <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="rows">
-                </tbody>
+            <tbody id="rows"></tbody>
         </table>
     </div>
 
     <script>
-        // YOUR SSOT DEPLOYMENT URL
-        const ssotURL = "https://script.google.com/macros/s/AKfycbyHFv2lI2whyM63Y3Up_yqeI006GVOpVCgzQUDD8DvWXjdGVvqSkfCvL8wb8Ud8RIaG/exec";
+        // UPDATED SSOT URL
+        const ssotURL = "https://script.google.com/macros/s/AKfycbyqdgARBMulJ1ZsPQz9uQaFiCURJ5fzheRm7UxOk9ets8YfoIzfLHR7fRPvbBPL0xdd/exec";
 
-        // 1. The function that handles the data
         function renderTable(data) {
             const tbody = document.getElementById('rows');
             const msg = document.getElementById('msg');
             
             if (!data || data.length < 2) {
-                msg.innerHTML = "System: <span style='color:red'>Connected, but no data found.</span>";
+                msg.innerHTML = "System: <span style='color:red'>Connected, but no applicants found.</span>";
                 return;
             }
 
             msg.innerHTML = "System: <span style='color:#33B26E'>Live (Data Updated)</span>";
-            tbody.innerHTML = ""; // Clear the loading row
+            tbody.innerHTML = ""; 
 
             for (let i = 1; i < data.length; i++) {
-                const row = data[i];
+                const row = data[i]; // row[1]=First, row[2]=Last, row[5]=Trade, row[6]=Status, row[7]=FolderID
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${row[1] || '---'}</td>
-                    <td>${row[2] || '---'}</td>
-                    <td>${row[3] || '---'}</td>
-                    <td><span class="status-badge">${row[5] || 'PENDING'}</span></td>
+                    <td>${row[1]} ${row[2]}</td>
+                    <td>${row[5]}</td>
+                    <td><span class="status-badge">${row[6]}</span></td>
+                    <td>
+                        ${row[6] === 'Pending' ? `<button class="elect-btn" onclick="electWorker('${row[7]}', '${row[1]}', '${i+1}')">ELECT</button>` : '✅'}
+                    </td>
                 `;
                 tbody.appendChild(tr);
             }
         }
 
-        // 2. The trigger that fetches the data
+        function electWorker(fId, name, rowNum) {
+            if(!confirm("Elect " + name + " and move to Active Jobs?")) return;
+            
+            fetch(ssotURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    action: 'elect',
+                    folderId: fId,
+                    row: rowNum
+                })
+            }).then(() => {
+                alert("Election command sent for " + name + ". Refreshing...");
+                location.reload();
+            });
+        }
+
+        // Fetch Data
         const loader = document.createElement('script');
         loader.src = ssotURL + "?callback=renderTable";
         document.body.appendChild(loader);
     </script>
-    // Example function to call your script from the Admin Portal
-function electWorker(workerData) {
-  fetch('YOUR_SCRIPT_URL', {
-    method: 'POST',
-    body: JSON.stringify({
-      action: 'elect',
-      folderId: workerData.folderId,
-      email: workerData.email,
-      name: workerData.name
-    })
-  })
-  .then(res => res.json())
-  .then(data => alert("Worker folder moved and Email Sent!"));
-}
 </body>
 </html>
