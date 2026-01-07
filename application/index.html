@@ -138,6 +138,45 @@ const scriptURL = "https://script.google.com/macros/s/AKfycbyqdgARBMulJ1ZsPQz9uQ
         });
     });
 </script>
+function doPost(e) {
+  try {
+    const SS_ID = "1TVnkUDhrvu32AB6KUBIIoTofXUsZr65_hteG6OL7f2Q";
+    const SHEET_NAME = "Application";
+    const MASTER_FOLDER_ID = "1q8cr_nzaUeB2sHi3l3EWl6gH1-xNWU2k";
+    
+    const ss = SpreadsheetApp.openById(SS_ID);
+    const sheet = ss.getSheetByName(SHEET_NAME);
+    const data = JSON.parse(e.postData.contents);
+    
+    // 1. Create Folder: Trade - Name - Phone
+    const folderName = `${data.trade} - ${data.firstName} ${data.lastName} - ${data.phone}`;
+    const parentFolder = DriveApp.getFolderById(MASTER_FOLDER_ID);
+    const newFolder = parentFolder.createFolder(folderName);
+    const folderId = newFolder.getId();
 
+    // 2. Map to Sheet Headers: 
+    // [Timestamp, First Name, Last Name, Phone, Email, Trade, Status, FolderID, Exp, Pay, Tools, Certs]
+    const rowData = [
+      new Date(), 
+      data.firstName, 
+      data.lastName, 
+      data.phone, 
+      data.email, 
+      data.trade, 
+      "Pending", 
+      folderId,
+      data.yearsExp,
+      data.pay,
+      data.tools,
+      data.certs
+    ];
+
+    sheet.appendRow(rowData);
+    return ContentService.createTextOutput("Success").setMimeType(ContentService.MimeType.TEXT);
+
+  } catch (err) {
+    return ContentService.createTextOutput("Error: " + err.message).setMimeType(ContentService.MimeType.TEXT);
+  }
+}
 </body>
 </html>
