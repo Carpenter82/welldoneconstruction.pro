@@ -74,6 +74,7 @@
 </div>
 
 <script>
+    // Points to your SSOT project
     const ssotURL = "https://script.google.com/macros/s/AKfycbyQKTJaxDQRa3Q4IFMhVp3MgSWnefqkqnv1biGDJ2jWexm_oZQzwLAyJxUmhpYAMddwDg/exec";
 
     function loadWorkerProfile() {
@@ -85,14 +86,18 @@
             return;
         }
 
+        // Logic: Dynamically loads the SSOT data via JSONP
         const script = document.createElement('script');
-        script.src = `${ssotURL}?callback=handleProfile&email=${workerEmail}`;
+        script.src = `${ssotURL}?callback=handleProfile`;
         document.body.appendChild(script);
     }
 
     function handleProfile(data) {
-        const emailToFind = new URLSearchParams(window.location.search).get('email');
-        // Column 2 is Email (index 2), Column 1 is Name (index 1)
+        const urlParams = new URLSearchParams(window.location.search);
+        const emailToFind = urlParams.get('email');
+
+        // Logic: Find the worker in the SSOT array. 
+        // Column Index 2 is Email, Column Index 1 is Full Name.
         const worker = data.find(row => row[2] === emailToFind);
 
         if (worker) {
