@@ -1,59 +1,16 @@
-<form id="onboardingForm">
-    <label>Last Name</label>
-    <input type="text" id="lastName" placeholder="Last Name" required>
-    
-    <label>Email Address (Must match your application)</label>
-    <input type="email" id="email" placeholder="email@example.com" required>
-
-    <label>Phone Number</label>
-    <input type="tel" id="phone" placeholder="702-555-0123" required>
-
-    <label>Upload ID (Photo or Scan)</label>
-    <input type="file" id="idFile" accept="image/*" required>
-
-    <button type="submit" id="submitBtn" class="submit-btn">Submit for Review</button>
-</form>
-
+<h2>Upload ID</h2>
+<input type="file" id="i">
+<button onclick="up()">Upload</button>
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyQKTJaxDQRa3Q4IFMhVp3MgSWnefqkqnv1biGDJ2jWexm_oZQzwLAyJxUmhpYAMddwDg/exec";
-    const form = document.getElementById('onboardingForm');
-    const btn = document.getElementById('submitBtn');
-
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        btn.disabled = true;
-        btn.innerText = "Processing File...";
-
-        const fileInput = document.getElementById('idFile');
-        const file = fileInput.files[0];
-        const reader = new FileReader();
-
-        reader.onload = function(event) {
-            const base64 = event.target.result.split(',')[1];
-            const payload = { 
-                type: "ONBOARDING_ID",
-                idImage: base64, 
-                lastName: document.getElementById('lastName').value,
-                email: document.getElementById('email').value, // CRITICAL: Used to find folder
-                phone: document.getElementById('phone').value 
-            };
-
-            // Sends to the WellDone_Accountability_Engine
-            fetch(scriptURL, { 
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: JSON.stringify(payload) 
-            })
-            .then(() => { 
-                window.location.href = "https://welldoneconstruction.pro/thank-you.html"; 
-            })
-            .catch(error => {
-                console.error('Upload error!', error);
-                alert("Error connecting to server. Please try again.");
-                btn.disabled = false;
-                btn.innerText = "Submit for Review";
-            });
-        };
-        reader.readAsDataURL(file);
-    });
+  async function up() {
+    const email = new URLSearchParams(window.location.search).get('email');
+    const file = document.getElementById('i').files[0];
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = reader.result.split(',')[1];
+      await fetch('API_URL', {method:'POST', body: JSON.stringify({action:'upload', email:email, base64:base64, filename:file.name, type:file.type})});
+      alert('ID Uploaded');
+    };
+    reader.readAsDataURL(file);
+  }
 </script>
