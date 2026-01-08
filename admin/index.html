@@ -1,96 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>WD | Admin Roster</title>
-    <style>
-        body { font-family: sans-serif; background: #1a1d20; color: white; padding: 20px; }
-        .box { max-width: 900px; margin: 0 auto; background: #2b3035; padding: 20px; border-radius: 8px; border-top: 4px solid #33B26E; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #212529; }
-        th { text-align: left; border-bottom: 2px solid #444; padding: 12px; color: #33B26E; font-size: 11px; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #333; font-size: 14px; }
-        .status-badge { background: #33B26E; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; }
-        .elect-btn { background: #ffca28; color: black; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .elect-btn:hover { background: #ffd54f; transform: scale(1.05); }
-        .loading { color: #ffca28; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-    <div class="box">
-        <h2>Onboarding Roster</h2>
-        <div id="msg">System: <span class="loading">Connecting...</span></div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Candidate</th>
-                    <th>Trade/Email</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="rows"></tbody>
-        </table>
-    </div>
-
-    <script>
-        /**
-         * SSOT_URL: Points to your WellDone_Accountability_Engine
-         * Ensure this matches your latest Web App deployment URL.
-         */
-        const ssotURL = "https://script.google.com/macros/s/AKfycbyqdgARBMulJ1ZsPQz9uQaFiCURJ5fzheRm7UxOk9ets8YfoIzfLHR7fRPvbBPL0xdd/exec";
-
-        function renderTable(data) {
-            const tbody = document.getElementById('rows');
-            const msg = document.getElementById('msg');
-            
-            if (!data || data.length < 2) {
-                msg.innerHTML = "System: <span style='color:red'>No candidates found.</span>";
-                return;
-            }
-
-            msg.innerHTML = "System: <span style='color:#33B26E'>Live Connection</span>";
-            tbody.innerHTML = ""; 
-
-            // Starts at index 1 to skip the Spreadsheet header row
-            for (let i = 1; i < data.length; i++) {
-                const row = data[i]; 
-                // Skip row if First Name (Column B / Index 1) is empty
-                if (!row[1] || row[1] === "First Name") continue; 
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${row[1]} ${row[2]}</strong></td> 
-                    <td>${row[4] || ''}</td>      
-                    <td><span class="status-badge">${row[6] || 'Pending'}</span></td> 
-                    <td>
-                        ${row[6] !== 'ACTIVE / ELECTED' ? 
-                          `<button class="elect-btn" onclick="electWorker('${row[1]}', '${i+1}')">ELECT</button>` : 
-                          '<span>✅ Active</span>'}
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            }
-        }
-
-        function electWorker(name, rowNum) {
-            if(!confirm("Are you sure you want to ELECT " + name + " to the Active Roster?")) return;
-            
-            // Sends the ELECT signal back to the Engine to update Column G (Index 6)
-            fetch(ssotURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ type: 'ELECT', row: rowNum })
-            }).then(() => { 
-                alert(name + " has been successfully Elected.");
-                location.reload(); 
-            });
-        }
-
-        // JSONP Logic: Loads data across domains from Google Sheets
-        const loader = document.createElement('script');
-        loader.src = ssotURL + "?callback=renderTable";
-        document.body.appendChild(loader);
-    </script>
-</body>
-</html>
+<h1>Admin Panel</h1>
+<table id="adminTable">
+  <tr><th>Worker</th><th>Action</th></tr>
+  </table>
+<script>
+  async function electWorker(email) {
+    await fetch('YOUR_WEB_APP_URL', {method:'POST', body: JSON.stringify({action:'elect', email:email})});
+    alert('User status changed to ACTIVE / ELECTED');
+  }
+</script>
