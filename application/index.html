@@ -1,18 +1,19 @@
-<form id="appForm">
-  <input type="text" id="fname" placeholder="First Name" required>
-  <input type="email" id="email" placeholder="Email" required>
+<form id="app">
+  <input type="text" id="fn" placeholder="First Name" required>
+  <input type="text" id="ln" placeholder="Last Name" required>
+  <input type="email" id="em" placeholder="Email" required>
   <button type="submit">Submit</button>
 </form>
 <script>
-  document.getElementById('appForm').onsubmit = async (e) => {
+  document.getElementById('app').onsubmit = async (e) => {
     e.preventDefault();
-    const payload = {
+    const d = {
       action: 'intake',
-      firstName: document.getElementById('fname').value,
-      email: document.getElementById('email').value
+      firstName: document.getElementById('fn').value,
+      lastName: document.getElementById('ln').value,
+      email: document.getElementById('em').value
     };
-    await fetch('YOUR_WEB_APP_URL', {method:'POST', body: JSON.stringify(payload)});
-    window.location.href = '../onboarding.html?email=' + payload.email;
-  };
+    await fetch('YOUR_WEB_APP_URL', {method: 'POST', body: JSON.stringify(d)});
+    window.location.href = '../onboarding.html?email=' + d.email;
+  }
 </script>
-    
