@@ -33,7 +33,7 @@
     </div>
 
     <script>
-        // Use your existing Script URL
+        // Points to your SSOT / Accountability System URL
         const ssotURL = "https://script.google.com/macros/s/AKfycbyqdgARBMulJ1ZsPQz9uQaFiCURJ5fzheRm7UxOk9ets8YfoIzfLHR7fRPvbBPL0xdd/exec";
 
         function renderTable(data) {
@@ -48,33 +48,35 @@
             msg.innerHTML = "System: <span style='color:#33B26E'>Live</span>";
             tbody.innerHTML = ""; 
 
+            // Starts at index 1 to skip the Spreadsheet header row
             for (let i = 1; i < data.length; i++) {
                 const row = data[i]; 
-                if (!row[1] || row[1] === "First Name") continue; // Skip empty/header rows
+                // Checks column 1 (First Name) to skip empty rows
+                if (!row[1] || row[1] === "First Name") continue; 
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><strong>${row[1]} ${row[2]}</strong></td>
-                    <td>${row[5] || ''}</td>
-                    <td><span class="status-badge">${row[6]}</span></td>
-                    <td>
-                        ${row[6] === 'Pending' ? `<button class="elect-btn" onclick="electWorker('${row[7]}', '${row[1]}', '${i+1}')">ELECT</button>` : '✅'}
+                    <td><strong>${row[1]}</strong></td> <td>${row[4] || ''}</td>      <td><span class="status-badge">${row[8] || 'Pending'}</span></td> <td>
+                        ${row[8] === 'Pending' ? `<button class="elect-btn" onclick="electWorker('${row[1]}', '${i+1}')">ELECT</button>` : '✅'}
                     </td>
                 `;
                 tbody.appendChild(tr);
             }
         }
 
-        function electWorker(fId, name, rowNum) {
+        function electWorker(name, rowNum) {
             if(!confirm("Elect " + name + "?")) return;
             fetch(ssotURL, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: JSON.stringify({ type: 'ELECT', row: rowNum })
-            }).then(() => { location.reload(); });
+            }).then(() => { 
+                alert(name + " Elected.");
+                location.reload(); 
+            });
         }
 
-        // This is the "Safe Read" part
+        // Logic: Dynamically creates a script tag for JSONP to bypass CORS
         const loader = document.createElement('script');
         loader.src = ssotURL + "?callback=renderTable";
         document.body.appendChild(loader);
