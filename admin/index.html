@@ -1,10 +1,10 @@
-<h1>Admin Panel</h1>
-<table id="adminTable">
-  <tr><th>Worker</th><th>Action</th></tr>
-  </table>
+<h1>Admin: Elect Worker</h1>
+<input type="email" id="target" placeholder="Worker Email">
+<button onclick="elect()">ELECT</button>
 <script>
-  async function electWorker(email) {
-    await fetch('YOUR_WEB_APP_URL', {method:'POST', body: JSON.stringify({action:'elect', email:email})});
-    alert('User status changed to ACTIVE / ELECTED');
+  async function elect() {
+    const em = document.getElementById('target').value;
+    await fetch('YOUR_WEB_APP_URL', {method: 'POST', body: JSON.stringify({action: 'elect', email: em})});
+    alert('User Elected - Move folder to Active_Jobs to trigger subfolders.');
   }
 </script>
