@@ -73,5 +73,37 @@
     &copy; 2026 Well Done Construction LLC | Integrity in Every Build
 </div>
 
+<script>
+    const ssotURL = "https://script.google.com/macros/s/AKfycbyQKTJaxDQRa3Q4IFMhVp3MgSWnefqkqnv1biGDJ2jWexm_oZQzwLAyJxUmhpYAMddwDg/exec";
+
+    function loadWorkerProfile() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const workerEmail = urlParams.get('email');
+        
+        if (!workerEmail) {
+            document.getElementById('workerName').innerText = "Guest User";
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = `${ssotURL}?callback=handleProfile&email=${workerEmail}`;
+        document.body.appendChild(script);
+    }
+
+    function handleProfile(data) {
+        const emailToFind = new URLSearchParams(window.location.search).get('email');
+        // Column 2 is Email (index 2), Column 1 is Name (index 1)
+        const worker = data.find(row => row[2] === emailToFind);
+
+        if (worker) {
+            document.getElementById('workerName').innerText = worker[1]; 
+        } else {
+            document.getElementById('workerName').innerText = "Worker Not Found";
+        }
+    }
+
+    window.onload = loadWorkerProfile;
+</script>
+
 </body>
 </html>
