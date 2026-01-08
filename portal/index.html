@@ -1,11 +1,5 @@
-<h1 id="welcome">Welcome</h1>
-<p>Status: <span id="status">...</span></p>
+<h1 id="welcome">Portal</h1>
 <script>
-  window.onload = async () => {
-    const email = new URLSearchParams(window.location.search).get('email');
-    const res = await fetch('YOUR_WEB_APP_URL?email=' + email);
-    const data = await res.json();
-    document.getElementById('welcome').innerText = "Welcome, " + data.firstName;
-    document.getElementById('status').innerText = data.status;
-  };
+  const email = new URLSearchParams(window.location.search).get('email');
+  document.getElementById('welcome').innerText = "Worker Portal: " + email;
 </script>
