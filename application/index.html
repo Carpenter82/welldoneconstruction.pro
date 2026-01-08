@@ -1,23 +1,32 @@
-<form id="app">
-  <input type="text" id="fn" placeholder="First Name" required>
-  <input type="text" id="ln" placeholder="Last Name" required>
-  <input type="email" id="em" placeholder="Email" required>
+<form id="appForm">
+  <input type="text" id="fn" placeholder="First Name">
+  <input type="text" id="ln" placeholder="Last Name">
   <input type="text" id="ph" placeholder="Phone">
+  <input type="email" id="em" placeholder="Email">
   <input type="text" id="tr" placeholder="Trade">
-  <button type="submit">Submit Application</button>
+  <textarea id="exp" placeholder="Experience"></textarea>
+  <input type="text" id="py" placeholder="Pay Requirement">
+  <input type="text" id="tl" placeholder="Tools">
+  <input type="text" id="ct" placeholder="Certs">
+  <button type="submit">Submit</button>
 </form>
+
 <script>
-  document.getElementById('app').onsubmit = async (e) => {
-    e.preventDefault();
-    const d = {
-      action: 'intake',
-      firstName: document.getElementById('fn').value,
-      lastName: document.getElementById('ln').value,
-      email: document.getElementById('em').value,
-      phone: document.getElementById('ph').value,
-      trade: document.getElementById('tr').value
-    };
-    await fetch('YOUR_WEB_APP_URL', {method: 'POST', body: JSON.stringify(d)});
-    window.location.href = '../onboarding.html?email=' + d.email;
-  }
+document.getElementById('appForm').onsubmit = async (e) => {
+  e.preventDefault();
+  const d = {
+    action: 'intake',
+    firstName: document.getElementById('fn').value,
+    lastName: document.getElementById('ln').value,
+    phone: document.getElementById('ph').value,
+    email: document.getElementById('em').value,
+    trade: document.getElementById('tr').value,
+    experience: document.getElementById('exp').value,
+    pay: document.getElementById('py').value,
+    tools: document.getElementById('tl').value,
+    certs: document.getElementById('ct').value
+  };
+  await fetch('YOUR_WEB_APP_URL', {method: 'POST', body: JSON.stringify(d)});
+  window.location.href = '../onboarding.html?email=' + d.email;
+};
 </script>
