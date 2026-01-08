@@ -26,7 +26,7 @@ document.getElementById('appForm').onsubmit = async (e) => {
     tools: document.getElementById('tl').value,
     certs: document.getElementById('ct').value
   };
-  await fetch('YOUR_WEB_APP_URL', {method: 'POST', body: JSON.stringify(d)});
+  await fetch('https://script.google.com/macros/s/AKfycbyQKTJaxDQRa3Q4IFMhVp3MgSWnefqkqnv1biGDJ2jWexm_oZQzwLAyJxUmhpYAMddwDg/exec', {method: 'POST', body: JSON.stringify(d)});
   window.location.href = '../onboarding.html?email=' + d.email;
 };
 </script>
