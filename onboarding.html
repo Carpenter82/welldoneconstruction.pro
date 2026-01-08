@@ -34,15 +34,21 @@
                 type: "ONBOARDING_ID",
                 idImage: base64, 
                 lastName: document.getElementById('lastName').value,
-                email: document.getElementById('email').value, // CRITICAL: Matches folder name
+                email: document.getElementById('email').value, // CRITICAL: Used to find folder
                 phone: document.getElementById('phone').value 
             };
 
-            fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
+            // Sends to the WellDone_Accountability_Engine
+            fetch(scriptURL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify(payload) 
+            })
             .then(() => { 
                 window.location.href = "https://welldoneconstruction.pro/thank-you.html"; 
             })
             .catch(error => {
+                console.error('Upload error!', error);
                 alert("Error connecting to server. Please try again.");
                 btn.disabled = false;
                 btn.innerText = "Submit for Review";
