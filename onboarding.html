@@ -1,15 +1,18 @@
 <h2>Upload ID</h2>
-<input type="file" id="i">
-<button onclick="up()">Upload</button>
+<input type="file" id="idFile">
+<button onclick="handleUpload()">Upload</button>
 <script>
-  async function up() {
+  async function handleUpload() {
     const email = new URLSearchParams(window.location.search).get('email');
-    const file = document.getElementById('i').files[0];
+    const file = document.getElementById('idFile').files[0];
     const reader = new FileReader();
     reader.onload = async () => {
       const base64 = reader.result.split(',')[1];
-      await fetch('API_URL', {method:'POST', body: JSON.stringify({action:'upload', email:email, base64:base64, filename:file.name, type:file.type})});
-      alert('ID Uploaded');
+      await fetch('YOUR_WEB_APP_URL', {
+        method: 'POST',
+        body: JSON.stringify({action:'upload', email:email, base64:base64, filename:file.name, type:file.type})
+      });
+      window.location.href = 'portal/index.html?email=' + email;
     };
     reader.readAsDataURL(file);
   }
