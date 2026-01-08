@@ -3,3 +3,20 @@
   const email = new URLSearchParams(window.location.search).get('email');
   document.getElementById('welcome').innerText = "Portal for: " + email;
 </script>
+// Add this to your portal/index.html script section
+async function loadPortal() {
+  const email = new URLSearchParams(window.location.search).get('email');
+  if (!email) { window.location.href = '../index.html'; return; }
+
+  // Fetches data from your doGet function in the script you shared earlier
+  const res = await fetch(`YOUR_WEB_APP_URL?email=${email}`);
+  const worker = await res.json();
+
+  if (worker.status === 'Not Found') {
+    alert('Profile not found. Please complete intake.');
+  } else {
+    document.getElementById('welcomeHeading').innerText = `Welcome, ${worker.firstName}`;
+    document.getElementById('statusBadge').innerText = worker.status;
+  }
+}
+window.onload = loadPortal;
