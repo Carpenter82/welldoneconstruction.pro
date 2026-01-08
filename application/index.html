@@ -2,7 +2,9 @@
   <input type="text" id="fn" placeholder="First Name" required>
   <input type="text" id="ln" placeholder="Last Name" required>
   <input type="email" id="em" placeholder="Email" required>
-  <button type="submit">Submit</button>
+  <input type="text" id="ph" placeholder="Phone">
+  <input type="text" id="tr" placeholder="Trade">
+  <button type="submit">Submit Application</button>
 </form>
 <script>
   document.getElementById('app').onsubmit = async (e) => {
@@ -11,7 +13,9 @@
       action: 'intake',
       firstName: document.getElementById('fn').value,
       lastName: document.getElementById('ln').value,
-      email: document.getElementById('em').value
+      email: document.getElementById('em').value,
+      phone: document.getElementById('ph').value,
+      trade: document.getElementById('tr').value
     };
     await fetch('YOUR_WEB_APP_URL', {method: 'POST', body: JSON.stringify(d)});
     window.location.href = '../onboarding.html?email=' + d.email;
