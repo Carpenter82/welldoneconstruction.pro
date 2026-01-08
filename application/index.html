@@ -1,18 +1,18 @@
-<form id="appForm">
-  <input type="text" id="fn" placeholder="First Name">
-  <input type="text" id="ln" placeholder="Last Name">
-  <input type="text" id="ph" placeholder="Phone">
-  <input type="email" id="em" placeholder="Email">
+<form id="intakeForm">
+  <input type="text" id="fn" placeholder="First Name" required>
+  <input type="text" id="ln" placeholder="Last Name" required>
+  <input type="text" id="ph" placeholder="Phone" required>
+  <input type="email" id="em" placeholder="Email" required>
   <input type="text" id="tr" placeholder="Trade">
-  <textarea id="exp" placeholder="Experience"></textarea>
-  <input type="text" id="py" placeholder="Pay Requirement">
+  <textarea id="ex" placeholder="Experience"></textarea>
+  <input type="text" id="py" placeholder="Pay Expectation">
   <input type="text" id="tl" placeholder="Tools">
   <input type="text" id="ct" placeholder="Certs">
-  <button type="submit">Submit</button>
+  <button type="submit">Submit Application</button>
 </form>
 
 <script>
-document.getElementById('appForm').onsubmit = async (e) => {
+document.getElementById('intakeForm').onsubmit = async (e) => {
   e.preventDefault();
   const d = {
     action: 'intake',
@@ -21,7 +21,7 @@ document.getElementById('appForm').onsubmit = async (e) => {
     phone: document.getElementById('ph').value,
     email: document.getElementById('em').value,
     trade: document.getElementById('tr').value,
-    experience: document.getElementById('exp').value,
+    experience: document.getElementById('ex').value,
     pay: document.getElementById('py').value,
     tools: document.getElementById('tl').value,
     certs: document.getElementById('ct').value
