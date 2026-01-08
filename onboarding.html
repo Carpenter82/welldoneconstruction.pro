@@ -1,16 +1,15 @@
-<h2>Upload ID</h2>
-<input type="file" id="idFile">
-<button onclick="handleUpload()">Upload</button>
+<h2>Onboarding: ID Upload</h2>
+<input type="file" id="f"><button onclick="up()">Upload</button>
 <script>
-  async function handleUpload() {
+  async function up() {
     const email = new URLSearchParams(window.location.search).get('email');
-    const file = document.getElementById('idFile').files[0];
+    const file = document.getElementById('f').files[0];
     const reader = new FileReader();
     reader.onload = async () => {
-      const base64 = reader.result.split(',')[1];
+      const b64 = reader.result.split(',')[1];
       await fetch('YOUR_WEB_APP_URL', {
         method: 'POST',
-        body: JSON.stringify({action:'upload', email:email, base64:base64, filename:file.name, type:file.type})
+        body: JSON.stringify({action: 'upload', email: email, base64: b64, filename: file.name, type: file.type})
       });
       window.location.href = 'portal/index.html?email=' + email;
     };
