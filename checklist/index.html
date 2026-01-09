@@ -1,62 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Site Accountability | Well Done</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body { font-family: sans-serif; padding: 20px; text-align: center; }
-        .task-box { text-align: left; max-width: 400px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }
-        .btn-checkin { background-color: #33B26E; color: white; padding: 20px; width: 100%; border: none; border-radius: 5px; font-weight: bold; font-size: 1.2rem; cursor: pointer; }
-        .btn-checkin:disabled { background-color: #ccc; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site Checklist | Well Done Construction</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .task-item { display: flex; align-items: center; background: #f9f9f9; padding: 15px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; }
+    .task-item input { width: 25px; height: 25px; margin-right: 15px; margin-top: 0; margin-bottom: 0; }
+    .task-item span { font-size: 1.1rem; font-weight: 500; }
+  </style>
 </head>
 <body>
 
-    <h2>Daily Site Checklist</h2>
-    <div class="task-box">
-        <label><input type="checkbox" class="task"> Site Cleaned</label><br><br>
-        <label><input type="checkbox" class="task"> Photos Taken</label><br><br>
-        <label><input type="checkbox" class="task"> Customer Updated</label>
-    </div>
+<div class="container">
+  <h2 style="text-align: center;">Daily Site Checklist</h2>
+  <p style="text-align: center; color: #6E797F; margin-bottom: 25px;">Complete all tasks to verify your location.</p>
+  
+  <div id="checklist">
+    <label class="task-item">
+      <input type="checkbox" class="task"> <span>Work area cleared of debris</span>
+    </label>
+    <label class="task-item">
+      <input type="checkbox" class="task"> <span>After photos uploaded</span>
+    </label>
+    <label class="task-item">
+      <input type="checkbox" class="task"> <span>Client verbal walkthrough</span>
+    </label>
+    <label class="task-item">
+      <input type="checkbox" class="task"> <span>Tools accounted for</span>
+    </label>
+  </div>
 
-    <button id="btn" class="btn-checkin" onclick="startCheckIn()">Submit & Verify Location</button>
-    <p id="status"></p>
+  <button id="submitBtn" class="btn" onclick="submitChecklist()" style="margin-top: 20px;">Submit & Verify GPS</button>
+  <p id="statusMsg" style="text-align: center; margin-top: 15px; font-weight: bold;"></p>
+</div>
 
-    <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const email = urlParams.get('email');
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const email = urlParams.get('email');
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
 
-        async function startCheckIn() {
-            const tasks = document.querySelectorAll('.task');
-            const allDone = Array.from(tasks).every(t => t.checked);
+  async function submitChecklist() {
+    const tasks = document.querySelectorAll('.task');
+    const allChecked = Array.from(tasks).every(t => t.checked);
+    const btn = document.getElementById('submitBtn');
+    const msg = document.getElementById('statusMsg');
 
-            if (!allDone) {
-                alert("Please check all boxes first.");
-                return;
-            }
+    if (!allChecked) {
+      alert("Please complete all checklist items first.");
+      return;
+    }
 
-            document.getElementById('btn').disabled = true;
-            document.getElementById('status').innerText = "Getting GPS...";
+    btn.innerText = "Getting GPS...";
+    btn.disabled = true;
 
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                const d = {
-                    action: 'checkin',
-                    email: email,
-                    lat: pos.coords.latitude,
-                    lng: pos.coords.longitude
-                };
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      msg.innerText = "Location found. Sending report...";
+      
+      const d = {
+        action: 'checkin',
+        email: email,
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude
+      };
 
-                await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-                
-                document.getElementById('status').innerText = "Verified! Returning to Portal...";
-                setTimeout(() => { window.location.href = `../portal/index.html?email=${email}`; }, 2000);
+      try {
+        await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
+        
+        msg.style.color = "green";
+        msg.innerText = "Verified! Returning to portal...";
+        setTimeout(() => {
+          window.location.href = `../portal/index.html?email=${encodeURIComponent(email)}`;
+        }, 2000);
 
-            }, (err) => {
-                alert("GPS Error. Please enable location services.");
-                document.getElementById('btn').disabled = false;
-            });
-        }
-    </script>
+      } catch (err) {
+        alert("Submission failed. Check your signal.");
+        btn.disabled = false;
+        btn.innerText = "Submit & Verify GPS";
+      }
+    }, (err) => {
+      alert("GPS Error. Please enable Location Services on your phone.");
+      btn.disabled = false;
+      btn.innerText = "Submit & Verify GPS";
+    });
+  }
+</script>
+
 </body>
 </html>
