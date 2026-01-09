@@ -1,10 +1,19 @@
-<style>
-  body { font-family: sans-serif; padding: 20px; }
-  .badge { padding: 10px 15px; border-radius: 5px; color: white; font-weight: bold; display: inline-block; }
-  .status-active { background-color: #28a745; } /* Green */
-  .status-pending { background-color: #ff8c00; } /* Orange */
-  .container { max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px; }
-</style>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Worker Portal | Well Done Construction</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background-color: #f8f9fa; }
+    .badge { padding: 10px 15px; border-radius: 5px; color: white; font-weight: bold; display: inline-block; }
+    .status-active { background-color: #28a745; } 
+    .status-pending { background-color: #ff8c00; } 
+    .container { max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: white; text-align: center; }
+    .btn { display: inline-block; margin-top: 20px; padding: 15px 25px; background-color: #33B26E; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
+  </style>
+</head>
+<body>
 
 <div class="container">
   <h1 id="welcomeHeading">Loading Portal...</h1>
@@ -14,18 +23,8 @@
     <hr>
     <h3>On-Call Roster Active</h3>
     <p>You are officially verified. Please keep your phone nearby for job notifications.</p>
-    </div>
-  <div id="portalContent" style="display:none;">
-    <hr>
-    <h3>On-Call Roster Active</h3>
-    <a href="../checklist/index.html" id="checklistLink" class="btn">Go to Site Checklist</a>
-</div>
-
-<script>
-    // Inside your loadPortal() function, after you get the worker data:
-    const email = new URLSearchParams(window.location.search).get('email');
-    document.getElementById('checklistLink').href = `../checklist/index.html?email=${email}`;
-</script>
+    <a href="#" id="checklistLink" class="btn">Start Daily Checklist</a>
+  </div>
 </div>
 
 <script>
@@ -39,7 +38,6 @@
     }
 
     try {
-      // UPDATED TO YOUR NEW PRODUCTION URL
       const response = await fetch(`https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec?email=${encodeURIComponent(email)}`);
       const worker = await response.json();
 
@@ -53,11 +51,14 @@
         const badge = document.getElementById('statusBadge');
         badge.innerText = worker.status;
 
-        // Change badge color to Green if they are fully active
+        // If they are ACTIVE, show the content and the checklist link
         if (worker.status.includes('ACTIVE')) {
           badge.classList.remove('status-pending');
           badge.classList.add('status-active');
           document.getElementById('portalContent').style.display = 'block';
+          
+          // Set the link to the checklist with the email attached
+          document.getElementById('checklistLink').href = `../checklist/index.html?email=${encodeURIComponent(email)}`;
         }
       }
     } catch (err) {
@@ -68,9 +69,5 @@
 
   window.onload = loadPortal;
 </script>
-// Add this inside the "if (worker.status.includes('ACTIVE'))" block in portal/index.html
-const checklistBtn = document.createElement('a');
-checklistBtn.href = `../checklist/index.html?email=${encodeURIComponent(email)}`;
-checklistBtn.className = 'btn';
-checklistBtn.innerText = 'Start Daily Checklist';
-document.getElementById('portalContent').appendChild(checklistBtn);
+</body>
+</html>
