@@ -1,83 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Daily Accountability Checklist</title>
+    <title>Site Accountability | Well Done</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../styles.css">
+    <style>
+        body { font-family: sans-serif; padding: 20px; text-align: center; }
+        .task-box { text-align: left; max-width: 400px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }
+        .btn-checkin { background-color: #33B26E; color: white; padding: 20px; width: 100%; border: none; border-radius: 5px; font-weight: bold; font-size: 1.2rem; cursor: pointer; }
+        .btn-checkin:disabled { background-color: #ccc; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Site Accountability</h2>
-        <p id="workerName">Loading worker profile...</p>
-        <hr>
 
-        <div id="tasklist">
-            <label><input type="checkbox" class="task"> Site Cleaned & Debris Removed</label><br>
-            <label><input type="checkbox" class="task"> Materials Organized/Staged</label><br>
-            <label><input type="checkbox" class="task"> Photo Documentation Uploaded</label><br>
-            <label><input type="checkbox" class="task"> Safety Check Completed</label><br>
-        </div>
-
-        <button id="checkInBtn" onclick="getLocation()" style="margin-top:20px; background:#33B26E; color:white; padding:15px; width:100%; border:none; border-radius:5px;">
-            Verify Location & Submit Checklist
-        </button>
-
-        <p id="statusMsg" style="color:orange; font-weight:bold;"></p>
+    <h2>Daily Site Checklist</h2>
+    <div class="task-box">
+        <label><input type="checkbox" class="task"> Site Cleaned</label><br><br>
+        <label><input type="checkbox" class="task"> Photos Taken</label><br><br>
+        <label><input type="checkbox" class="task"> Customer Updated</label>
     </div>
+
+    <button id="btn" class="btn-checkin" onclick="startCheckIn()">Submit & Verify Location</button>
+    <p id="status"></p>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('email');
         const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
 
-        if (!email) {
-            alert("No worker email detected. Please log in via the Portal.");
-            window.location.href = "../portal/index.html";
-        }
-
-        function getLocation() {
-            const btn = document.getElementById('checkInBtn');
-            const msg = document.getElementById('statusMsg');
-            
-            // Check if all boxes are checked
+        async function startCheckIn() {
             const tasks = document.querySelectorAll('.task');
-            const allChecked = Array.from(tasks).every(t => t.checked);
-            
-            if (!allChecked) {
-                alert("Please complete all checklist items first.");
+            const allDone = Array.from(tasks).every(t => t.checked);
+
+            if (!allDone) {
+                alert("Please check all boxes first.");
                 return;
             }
 
-            btn.disabled = true;
-            msg.innerText = "Acquiring GPS Signal...";
+            document.getElementById('btn').disabled = true;
+            document.getElementById('status').innerText = "Getting GPS...";
 
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(sendData, (err) => {
-                    alert("Error: Location access denied. Please enable GPS.");
-                    btn.disabled = false;
-                });
-            }
-        }
-
-        async function sendData(pos) {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-            
-            await fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const d = {
                     action: 'checkin',
                     email: email,
-                    lat: lat,
-                    lng: lng
-                })
-            });
+                    lat: pos.coords.latitude,
+                    lng: pos.coords.longitude
+                };
 
-            document.getElementById('statusMsg').innerText = "Check-in Successful! Redirecting to Portal...";
-            setTimeout(() => {
-                window.location.href = `../portal/index.html?email=${email}`;
-            }, 2000);
+                await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
+                
+                document.getElementById('status').innerText = "Verified! Returning to Portal...";
+                setTimeout(() => { window.location.href = `../portal/index.html?email=${email}`; }, 2000);
+
+            }, (err) => {
+                alert("GPS Error. Please enable location services.");
+                document.getElementById('btn').disabled = false;
+            });
         }
     </script>
 </body>
