@@ -1,7 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Application | Well Done Construction</title>
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<div class="container">
+  <h2>Worker Intake Form</h2>
+  <form id="appForm">
+    <input type="text" id="fn" placeholder="First Name" required>
+    <input type="text" id="ln" placeholder="Last Name" required>
+    <input type="tel" id="ph" placeholder="Phone Number" required>
+    <input type="email" id="em" placeholder="Email Address" required>
+    
+    <select id="tr">
+      <option value="">Select Primary Trade</option>
+      <option value="Handyman">Handyman</option>
+      <option value="Carpentry">Carpentry</option>
+      <option value="Plumbing">Plumbing / Electrical</option>
+      <option value="Painting">Painting / Drywall</option>
+    </select>
+
+    <input type="text" id="ex" placeholder="Years of Experience">
+    <input type="text" id="py" placeholder="Desired Hourly Pay">
+    <input type="text" id="tl" placeholder="Tools Owned (Truck, Drill, etc.)">
+    <input type="text" id="ct" placeholder="Certifications / Licenses">
+
+    <button type="submit" id="submitBtn" class="btn">Submit Application</button>
+  </form>
+</div>
+
 <script>
 document.getElementById('appForm').onsubmit = async (e) => {
   e.preventDefault();
-  const btn = e.target.querySelector('button');
+  const btn = document.getElementById('submitBtn');
   btn.innerText = "Processing..."; 
   btn.disabled = true;
 
@@ -19,16 +54,15 @@ document.getElementById('appForm').onsubmit = async (e) => {
   };
 
   try {
-    // This sends the data to your Google Sheet "Application" tab
+    // This sends data to your Google Script
     await fetch('https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec', {
       method: 'POST',
       mode: 'no-cors', 
       body: JSON.stringify(d)
     });
     
-    // CORRECTED: Redirect to the Thank You page inside the application folder
-    // This stops them here so you can review them and send the DocHub email
-    window.location.href = 'thank-you.html';
+    // This sends you to the Thank You page
+    window.location.href = '../thank-you.html';
 
   } catch (err) {
     alert("Submission Error. Please try again.");
@@ -37,5 +71,6 @@ document.getElementById('appForm').onsubmit = async (e) => {
   }
 };
 </script>
-// Inside application/index.html
-window.location.href = '../thank-you.html';
+
+</body>
+</html>
