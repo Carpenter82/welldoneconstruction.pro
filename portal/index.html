@@ -1,31 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Worker Portal | Well Done Construction</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; background-color: #f8f9fa; }
-    .badge { padding: 10px 15px; border-radius: 5px; color: white; font-weight: bold; display: inline-block; }
-    .status-active { background-color: #28a745; } 
-    .status-pending { background-color: #ff8c00; } 
-    .container { max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: white; text-align: center; }
-    .btn { display: inline-block; margin-top: 20px; padding: 15px 25px; background-color: #33B26E; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
-  </style>
+  <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
 
-<div class="container">
+<div class="container" style="text-align: center;">
   <h1 id="welcomeHeading">Loading Portal...</h1>
   <p>Employment Status: <span id="statusBadge" class="badge status-pending">Checking...</span></p>
   
   <div id="portalContent" style="display:none;">
-    <hr>
+    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
     <h3>On-Call Roster Active</h3>
-    <p>You are officially verified. Please keep your phone nearby for job notifications.</p>
+    <p style="color: #6E797F;">You are officially verified. Use the button below when you arrive at a job site.</p>
+    
     <a href="#" id="checklistLink" class="btn">Start Daily Checklist</a>
   </div>
 </div>
+
+<nav class="nav-dock">
+  <a href="../index.html">Home</a>
+  <a href="../application/index.html">Intake</a>
+  <a href="../onboarding.html">Onboarding</a>
+  <a href="index.html" class="active">Portal</a>
+</nav>
 
 <script>
   async function loadPortal() {
@@ -33,6 +34,8 @@
     const email = urlParams.get('email');
 
     if (!email) {
+      document.getElementById('welcomeHeading').innerText = "Access Denied";
+      alert("No email provided. Returning home.");
       window.location.href = '../index.html';
       return;
     }
@@ -45,19 +48,15 @@
         alert('Profile not found. Please complete intake.');
         window.location.href = '../index.html';
       } else {
-        // UI Updates
         document.getElementById('welcomeHeading').innerText = `Welcome, ${worker.firstName}`;
         
         const badge = document.getElementById('statusBadge');
         badge.innerText = worker.status;
 
-        // If they are ACTIVE, show the content and the checklist link
         if (worker.status.includes('ACTIVE')) {
           badge.classList.remove('status-pending');
           badge.classList.add('status-active');
           document.getElementById('portalContent').style.display = 'block';
-          
-          // Set the link to the checklist with the email attached
           document.getElementById('checklistLink').href = `../checklist/index.html?email=${encodeURIComponent(email)}`;
         }
       }
@@ -69,5 +68,6 @@
 
   window.onload = loadPortal;
 </script>
+
 </body>
 </html>
