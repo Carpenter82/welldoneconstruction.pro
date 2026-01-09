@@ -4,7 +4,6 @@
   --wd-slate: #6E797F;
   --wd-white: #FFFFFF;
   --wd-light: #F8F9FA;
-  --wd-error: #E74C3C;
 }
 
 body {
@@ -13,6 +12,7 @@ body {
   padding: 0;
   background-color: var(--wd-light);
   color: var(--wd-dark);
+  line-height: 1.6;
 }
 
 .container {
@@ -24,45 +24,16 @@ body {
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-h1, h2, h3 {
-  color: var(--wd-dark);
-  margin-top: 0;
-}
-
-/* Form & Input Styling */
-input[type="text"], 
-input[type="email"], 
-input[type="tel"], 
-input[type="file"],
-select {
+input, select, textarea {
   width: 100%;
   padding: 12px;
   margin: 8px 0 20px 0;
   border: 1px solid #ddd;
   border-radius: 6px;
   box-sizing: border-box;
-  font-size: 16px; /* Prevents auto-zoom on iPhone */
+  font-size: 16px;
 }
 
-/* Checkbox Styling */
-.task-item {
-  display: flex;
-  align-items: center;
-  padding: 15px;
-  background: #fff;
-  border: 1px solid #eee;
-  margin-bottom: 10px;
-  border-radius: 8px;
-}
-
-input[type="checkbox"] {
-  width: 24px;
-  height: 24px;
-  margin-right: 15px;
-  accent-color: var(--wd-green);
-}
-
-/* Button Styling */
 .btn {
   display: block;
   width: 100%;
@@ -76,14 +47,8 @@ input[type="checkbox"] {
   cursor: pointer;
   text-align: center;
   text-decoration: none;
-  transition: opacity 0.2s;
 }
 
-.btn:disabled {
-  background-color: #ccc;
-}
-
-/* Navigation Dock */
 .nav-dock {
   position: fixed;
   bottom: 0;
@@ -92,14 +57,15 @@ input[type="checkbox"] {
   background: var(--wd-dark);
   padding: 15px;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 20px;
   z-index: 1000;
 }
 
 .nav-dock a {
   color: #adb5bd;
   text-decoration: none;
-  font-size: 10px;
+  font-size: 11px;
   text-transform: uppercase;
   font-weight: bold;
 }
@@ -109,7 +75,6 @@ input[type="checkbox"] {
   border-bottom: 2px solid var(--wd-green);
 }
 
-/* Badge System */
 .badge {
   padding: 6px 12px;
   border-radius: 4px;
