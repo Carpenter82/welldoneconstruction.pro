@@ -2,7 +2,7 @@
 document.getElementById('appForm').onsubmit = async (e) => {
   e.preventDefault();
   const btn = e.target.querySelector('button');
-  btn.innerText = "Processing..."; // Prevents double-clicks
+  btn.innerText = "Processing..."; 
   btn.disabled = true;
 
   const d = {
@@ -19,15 +19,17 @@ document.getElementById('appForm').onsubmit = async (e) => {
   };
 
   try {
-    // UPDATED TO YOUR NEW CONSOLIDATED URL
+    // This sends the data to your Google Sheet "Application" tab
     await fetch('https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec', {
       method: 'POST',
-      mode: 'no-cors', // Essential for Google Apps Script redirects
+      mode: 'no-cors', 
       body: JSON.stringify(d)
     });
     
-    // Redirect to onboarding with their email in the URL
-    window.location.href = '../onboarding.html?email=' + encodeURIComponent(d.email);
+    // CORRECTED: Redirect to the Thank You page inside the application folder
+    // This stops them here so you can review them and send the DocHub email
+    window.location.href = 'thank-you.html';
+
   } catch (err) {
     alert("Submission Error. Please try again.");
     btn.innerText = "Submit Application";
