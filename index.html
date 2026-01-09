@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Join Well Done Construction LLC | Professional Remodeling</title>
   <style>
-    /* Brand Identity Constants */
     :root {
       --wd-green: #33B26E;
       --wd-dark: #343E47;
@@ -16,46 +15,19 @@
 
     body {
       font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       background-color: var(--wd-white);
       color: var(--wd-dark);
       line-height: 1.6;
     }
 
-    header {
-      padding: 30px 20px;
-      text-align: center;
-      background: var(--wd-white);
-    }
+    header { padding: 30px 20px; text-align: center; background: var(--wd-white); }
+    header img { max-width: 280px; height: auto; }
 
-    header img {
-      max-width: 280px;
-      height: auto;
-    }
+    .hero { padding: 60px 20px; text-align: center; max-width: 800px; margin: 0 auto; }
+    .hero h1 { font-size: 2.5rem; margin-bottom: 15px; font-weight: 700; }
+    .hero p { font-size: 1.25rem; color: var(--wd-slate); margin-bottom: 40px; }
 
-    /* Hero Section */
-    .hero {
-      padding: 60px 20px;
-      text-align: center;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .hero h1 {
-      font-size: 2.5rem;
-      color: var(--wd-dark);
-      margin-bottom: 15px;
-      font-weight: 700;
-    }
-
-    .hero p {
-      font-size: 1.25rem;
-      color: var(--wd-slate);
-      margin-bottom: 40px;
-    }
-
-    /* Primary Action Button */
     .btn-apply {
       display: inline-block;
       background-color: var(--wd-green);
@@ -69,76 +41,25 @@
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
-    .btn-apply:hover {
-      background-color: #2b965c;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-    }
-
-    /* Features Section */
     .info-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 30px;
-      padding: 40px 20px;
-      max-width: 1100px;
-      margin: 0 auto;
+      gap: 30px; padding: 40px 20px; max-width: 1100px; margin: 0 auto;
     }
 
-    .info-item {
-      text-align: center;
-      padding: 30px;
-      background: var(--wd-light);
-      border-radius: 8px;
-    }
+    .info-item { text-align: center; padding: 30px; background: var(--wd-light); border-radius: 8px; }
+    .info-item h3 { color: var(--wd-green); margin-top: 0; }
 
-    .info-item h3 {
-      color: var(--wd-green);
-      margin-top: 0;
-      font-size: 1.4rem;
-    }
+    footer { margin-top: 60px; padding: 40px 20px 100px 20px; border-top: 1px solid #eee; text-align: center; color: var(--wd-slate); font-size: 0.9rem; }
 
-    footer {
-      margin-top: 60px;
-      padding: 40px 20px 100px 20px;
-      border-top: 1px solid #eee;
-      text-align: center;
-      color: var(--wd-slate);
-      font-size: 0.9rem;
-    }
-
-    /* System Navigation Dock */
     .nav-dock {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--wd-dark);
-      padding: 12px;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      z-index: 1000;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--wd-dark); padding: 12px;
+      display: flex; justify-content: center; gap: 20px; z-index: 1000;
     }
 
-    .nav-dock a {
-      color: #adb5bd;
-      text-decoration: none;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: bold;
-    }
-
-    .nav-dock a:hover {
-      color: var(--wd-green);
-    }
-
-    .nav-dock a.active {
-      color: var(--wd-white);
-      border-bottom: 2px solid var(--wd-green);
-    }
+    .nav-dock a { color: #adb5bd; text-decoration: none; font-size: 11px; text-transform: uppercase; font-weight: bold; }
+    .nav-dock a.active { color: var(--wd-white); border-bottom: 2px solid var(--wd-green); }
   </style>
 </head>
 <body>
@@ -151,7 +72,7 @@
     <h1>Join Well Done Construction LLC</h1>
     <p>We are looking for dedicated professionals to join our remodeling and property maintenance team in Washoe County.</p>
     
-    <a href="/application/" class="btn-apply">
+    <a href="application/index.html" class="btn-apply">
       Submit Resume & Application
     </a>
   </main>
@@ -176,10 +97,10 @@
   </footer>
 
   <nav class="nav-dock">
-    <a href="/" class="active">P1: Home</a>
-    <a href="/application/">P2: Intake</a>
-    <a href="/portal/">P3: Portal</a>
-    <a href="/admin/">P4: Admin</a>
+    <a href="index.html" class="active">P1: Home</a>
+    <a href="application/index.html">P2: Intake</a>
+    <a href="onboarding.html">P3: Onboarding</a>
+    <a href="portal/index.html">P4: Portal</a>
   </nav>
 
 </body>
