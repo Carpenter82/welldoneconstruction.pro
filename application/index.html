@@ -1,19 +1,10 @@
-<form id="appForm">
-  <input type="text" id="fn" placeholder="First Name" required>
-  <input type="text" id="ln" placeholder="Last Name" required>
-  <input type="text" id="ph" placeholder="Phone" required>
-  <input type="email" id="em" placeholder="Email" required>
-  <input type="text" id="tr" placeholder="Trade">
-  <textarea id="ex" placeholder="Experience"></textarea>
-  <input type="text" id="py" placeholder="Pay Expectation">
-  <input type="text" id="tl" placeholder="Tools">
-  <input type="text" id="ct" placeholder="Certs">
-  <button type="submit">Submit Application</button>
-</form>
-
 <script>
 document.getElementById('appForm').onsubmit = async (e) => {
   e.preventDefault();
+  const btn = e.target.querySelector('button');
+  btn.innerText = "Processing..."; // Prevents double-clicks
+  btn.disabled = true;
+
   const d = {
     action: 'intake',
     firstName: document.getElementById('fn').value,
@@ -26,7 +17,21 @@ document.getElementById('appForm').onsubmit = async (e) => {
     tools: document.getElementById('tl').value,
     certs: document.getElementById('ct').value
   };
-  await fetch('https://script.google.com/macros/s/AKfycbyQKTJaxDQRa3Q4IFMhVp3MgSWnefqkqnv1biGDJ2jWexm_oZQzwLAyJxUmhpYAMddwDg/exec', {method: 'POST', body: JSON.stringify(d)});
-  window.location.href = '../onboarding.html?email=' + d.email;
+
+  try {
+    // UPDATED TO YOUR NEW CONSOLIDATED URL
+    await fetch('https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec', {
+      method: 'POST',
+      mode: 'no-cors', // Essential for Google Apps Script redirects
+      body: JSON.stringify(d)
+    });
+    
+    // Redirect to onboarding with their email in the URL
+    window.location.href = '../onboarding.html?email=' + encodeURIComponent(d.email);
+  } catch (err) {
+    alert("Submission Error. Please try again.");
+    btn.innerText = "Submit Application";
+    btn.disabled = false;
+  }
 };
 </script>
