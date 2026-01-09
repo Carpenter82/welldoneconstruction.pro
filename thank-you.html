@@ -1,40 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submission Received | Well Done Construction</title>
-    <style>
-        :root { --wd-green: #33B26E; --wd-dark: #343E47; --wd-bg: #F4F7F6; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--wd-bg); color: var(--wd-dark); margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .thank-you-container { max-width: 600px; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 8px solid var(--wd-green); text-align: left; }
-        h1 { color: var(--wd-dark); font-size: 1.8rem; margin-bottom: 20px; }
-        .status-badge { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; margin-bottom: 20px; }
-        p { line-height: 1.6; color: #444; margin-bottom: 20px; }
-        .next-steps { background: #fafafa; padding: 20px; border-radius: 4px; border-left: 4px solid #ccc; }
-        .next-steps h2 { font-size: 1.1rem; margin-top: 0; color: var(--wd-dark); }
-        .footer-logo { margin-top: 30px; font-weight: bold; color: #999; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Application Received</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f7fa;
+      color: #1f2933;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: #ffffff;
+      max-width: 520px;
+      width: 90%;
+      padding: 32px;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 12px;
+    }
+    p {
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .next {
+      background: #111827;
+      color: #ffffff;
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      margin-top: 20px;
+    }
+    .note {
+      font-size: 0.9rem;
+      color: #4b5563;
+      margin-top: 18px;
+    }
+  </style>
 </head>
 <body>
+  <div class="card">
+    <h1>Application Received</h1>
+    <p>Thanks for applying for the <strong>On‑Call Handyman</strong> position. Your information has been successfully submitted.</p>
 
-<div class="thank-you-container">
-    <div class="status-badge">File Pending Review</div>
-    <h1>Submission Received</h1>
-    
-    <p>Thank you for providing your identification. Your candidate file—including your Admission Form, signed Agreement, and ID—is now complete and has been submitted to our administration for review.</p>
+    <p>Every application is reviewed. You will receive an email either way once the review is complete.</p>
 
-    <div class="next-steps">
-        <h2>What to expect:</h2>
-        <p>Your documents will now undergo manual verification for <strong>W-2 payroll compliance</strong> and eligibility. This is a standard administrative procedure for all potential on-call staff.</p>
-        
-        <p>If your file is approved and you are elected to the roster, you will receive a final email titled <strong>"Welcome/Payroll"</strong>. That email will contain your authorized link to access the <strong>Worker Portal</strong>.</p>
-    </div>
+    <div class="next">What Happens Next</div>
 
-    <p>No further action is required from you at this time.</p>
+    <p class="note">
+      • Application review<br />
+      • If your skills match our current needs, you’ll receive a <strong>DocHub agreement</strong> by email<br />
+      • After the agreement is completed, you’ll be eligible for on-call assignments
+    </p>
 
-    <div class="footer-logo">Well Done Construction LLC</div>
-</div>
-
+    <p class="note">Text messages are typically answered faster than phone calls.</p>
+  </div>
 </body>
 </html>
