@@ -1,12 +1,70 @@
-async function elect() {
-    const em = document.getElementById('target').value;
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Well Done</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .worker-card { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; flex-direction: column; gap: 10px; }
+    @media(min-width: 600px) { .worker-card { flex-direction: row; justify-content: space-between; align-items: center; } }
+    .btn-group { display: flex; gap: 5px; }
+    .status-pill { font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; font-weight: bold; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+
+<div class="container" style="max-width: 800px;">
+  <h2 style="text-align: center;">Crew Management</h2>
+  <div id="workerList">Loading crew roster...</div>
+</div>
+
+<script>
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
+
+  async function loadWorkers() {
+    const resp = await fetch(scriptURL + '?action=getWorkers');
+    const workers = await resp.json();
+    let html = '';
+
+    workers.forEach((w, index) => {
+      const rowIndex = index + 2; 
+      let statusColor = '#f39c12'; // Default Yellow
+      if(w.status === 'ACTIVE') statusColor = '#33B26E';
+      if(w.status === 'TERMINATED') statusColor = '#e74c3c';
+      
+      html += `
+        <div class="worker-card">
+          <div>
+            <strong>${w.name}</strong> <span class="status-pill" style="background: ${statusColor}; color: white;">${w.status}</span><br>
+            <span style="color: #6E797F; font-size: 0.9rem;">${w.trade}</span>
+          </div>
+          <div class="btn-group">
+            <button onclick="updateStatus(${rowIndex}, 'ACTIVE')" style="background: #33B26E; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer;">Hire</button>
+            <button onclick="updateStatus(${rowIndex}, 'PAUSED')" style="background: #f1c40f; color: black; border: none; padding: 8px; border-radius: 4px; cursor: pointer;">Pause</button>
+            <button onclick="updateStatus(${rowIndex}, 'TERMINATED')" style="background: #e74c3c; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer;">Fire</button>
+          </div>
+        </div>
+      `;
+    });
+    document.getElementById('workerList').innerHTML = html || 'No workers found.';
+  }
+
+  async function updateStatus(row, newStatus) {
+    if(!confirm(`Change status to ${newStatus}?`)) return;
     
-    const response = await fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors', // Keeps it simple for Google redirects
-        body: JSON.stringify({action: 'elect', email: em})
+    await fetch(scriptURL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify({ action: 'updateStatus', row: row, status: newStatus })
     });
     
-    alert('User status updated to ELECTED. Remember to move their Google Drive folder to the Active_Jobs folder manually!');
-}
+    alert("Status Updated.");
+    location.reload();
+  }
+
+  window.onload = loadWorkers;
+</script>
+
+</body>
+</html>
