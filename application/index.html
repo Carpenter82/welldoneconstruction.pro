@@ -9,29 +9,34 @@
 <body>
 
 <div class="container">
-  <h2>Worker Intake Form</h2>
+  <h2 style="text-align: center;">Worker Intake Form</h2>
   <form id="appForm">
     <input type="text" id="fn" placeholder="First Name" required>
     <input type="text" id="ln" placeholder="Last Name" required>
     <input type="tel" id="ph" placeholder="Phone Number" required>
     <input type="email" id="em" placeholder="Email Address" required>
     
-    <select id="tr">
+    <select id="tr" required>
       <option value="">Select Primary Trade</option>
       <option value="Handyman">Handyman</option>
       <option value="Carpentry">Carpentry</option>
-      <option value="Plumbing">Plumbing / Electrical</option>
+      <option value="Plumbing">Plumbing</option>
       <option value="Painting">Painting / Drywall</option>
     </select>
 
     <input type="text" id="ex" placeholder="Years of Experience">
     <input type="text" id="py" placeholder="Desired Hourly Pay">
-    <input type="text" id="tl" placeholder="Tools Owned (Truck, Drill, etc.)">
-    <input type="text" id="ct" placeholder="Certifications / Licenses">
 
     <button type="submit" id="submitBtn" class="btn">Submit Application</button>
   </form>
 </div>
+
+<nav class="nav-dock">
+  <a href="../index.html">Home</a>
+  <a href="index.html" class="active">Intake</a>
+  <a href="../onboarding.html">Onboarding</a>
+  <a href="../portal/index.html">Portal</a>
+</nav>
 
 <script>
 document.getElementById('appForm').onsubmit = async (e) => {
@@ -48,24 +53,21 @@ document.getElementById('appForm').onsubmit = async (e) => {
     email: document.getElementById('em').value,
     trade: document.getElementById('tr').value,
     experience: document.getElementById('ex').value,
-    pay: document.getElementById('py').value,
-    tools: document.getElementById('tl').value,
-    certs: document.getElementById('ct').value
+    pay: document.getElementById('py').value
   };
 
   try {
-    // This sends data to your Google Script
     await fetch('https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec', {
       method: 'POST',
       mode: 'no-cors', 
       body: JSON.stringify(d)
     });
     
-    // This sends you to the Thank You page
+    // SUCCESS: Sends worker to the thank you page
     window.location.href = '../thank-you.html';
 
   } catch (err) {
-    alert("Submission Error. Please try again.");
+    alert("Connection error. Try again.");
     btn.innerText = "Submit Application";
     btn.disabled = false;
   }
