@@ -68,3 +68,9 @@
 
   window.onload = loadPortal;
 </script>
+// Add this inside the "if (worker.status.includes('ACTIVE'))" block in portal/index.html
+const checklistBtn = document.createElement('a');
+checklistBtn.href = `../checklist/index.html?email=${encodeURIComponent(email)}`;
+checklistBtn.className = 'btn';
+checklistBtn.innerText = 'Start Daily Checklist';
+document.getElementById('portalContent').appendChild(checklistBtn);
