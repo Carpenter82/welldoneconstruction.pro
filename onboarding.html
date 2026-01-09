@@ -1,58 +1,83 @@
-<div id="upload-container">
-  <input type="file" id="f" accept="image/*">
-  <button id="upBtn" onclick="up()">Upload ID & Activate Account</button>
-  <p id="msg" style="display:none; color: orange;">Uploading ID and setting up your payroll... please wait.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onboarding | Well Done Construction</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+  <h2 style="text-align: center;">Worker Onboarding</h2>
+  <p style="text-align: center; color: #6E797F;">Please upload a clear photo of your Driver's License or ID to activate your portal.</p>
+  
+  <form id="onboardForm">
+    <input type="email" id="em" placeholder="Confirm Your Email" required>
+    
+    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Upload ID Photo:</label>
+    <input type="file" id="file" accept="image/*" required>
+
+    <button type="submit" id="submitBtn" class="btn">Upload & Continue</button>
+  </form>
+  <p id="msg" style="text-align: center; margin-top: 15px; font-weight: bold;"></p>
 </div>
 
+<nav class="nav-dock">
+  <a href="index.html">Home</a>
+  <a href="application/index.html">Intake</a>
+  <a href="onboarding.html" class="active">Onboarding</a>
+  <a href="portal/index.html">Portal</a>
+</nav>
+
 <script>
-  async function up() {
-    const email = new URLSearchParams(window.location.search).get('email');
-    const fileInput = document.getElementById('f');
-    const btn = document.getElementById('upBtn');
-    const msg = document.getElementById('msg');
+document.getElementById('onboardForm').onsubmit = async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const msg = document.getElementById('msg');
+  const fileInput = document.getElementById('file');
+  const email = document.getElementById('em').value;
 
-    if (!fileInput.files[0]) {
-      alert("Please select a file first.");
-      return;
-    }
+  btn.innerText = "Uploading...";
+  btn.disabled = true;
 
-    // UI Feedback
-    btn.disabled = true;
-    btn.innerText = "Processing...";
-    msg.style.display = "block";
+  const file = fileInput.files[0];
+  const reader = new FileReader();
 
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-    
-    reader.onload = async () => {
-      const b64 = reader.result.split(',')[1];
-      
-      try {
-        await fetch('https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec', {
-          method: 'POST',
-          mode: 'no-cors', // Critical for Google Apps Script redirects
-          body: JSON.stringify({
-            action: 'upload', 
-            email: email, 
-            base64: b64, 
-            filename: file.name, 
-            type: file.type
-          })
-        });
-
-        // Small delay to allow Google to finish the status update before redirecting
-        setTimeout(() => {
-          window.location.href = 'portal/index.html?email=' + encodeURIComponent(email);
-        }, 1500);
-
-      } catch (err) {
-        alert("Upload failed. Please check your connection and try again.");
-        btn.disabled = false;
-        btn.innerText = "Upload ID";
-        msg.style.display = "none";
-      }
+  reader.onload = async (f) => {
+    const base64Data = f.target.result.split(',')[1];
+    const d = {
+      action: 'onboard',
+      email: email,
+      fileData: base64Data,
+      fileName: file.name,
+      fileType: file.type
     };
-    
-    reader.readAsDataURL(file);
-  }
+
+    try {
+      await fetch('https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(d)
+      });
+
+      msg.style.color = "green";
+      msg.innerText = "Upload Successful! Redirecting...";
+      
+      // Send them to the portal after 2 seconds
+      setTimeout(() => {
+        window.location.href = `portal/index.html?email=${encodeURIComponent(email)}`;
+      }, 2000);
+
+    } catch (err) {
+      alert("Upload failed. Try again.");
+      btn.innerText = "Upload & Continue";
+      btn.disabled = false;
+    }
+  };
+  reader.readAsDataURL(file);
+};
 </script>
+
+</body>
+</html>
