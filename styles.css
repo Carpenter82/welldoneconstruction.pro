@@ -1,32 +1,121 @@
-/* Well Done Construction LLC - Master Styles */
 :root {
   --wd-green: #33B26E;
   --wd-dark: #343E47;
   --wd-slate: #6E797F;
   --wd-white: #FFFFFF;
+  --wd-light: #F8F9FA;
+  --wd-error: #E74C3C;
 }
 
-/* Page 1 Button */
-.gatekeeper-btn {
+body {
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--wd-light);
+  color: var(--wd-dark);
+}
+
+.container {
+  max-width: 500px;
+  margin: 40px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+h1, h2, h3 {
+  color: var(--wd-dark);
+  margin-top: 0;
+}
+
+/* Form & Input Styling */
+input[type="text"], 
+input[type="email"], 
+input[type="tel"], 
+input[type="file"],
+select {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 20px 0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font-size: 16px; /* Prevents auto-zoom on iPhone */
+}
+
+/* Checkbox Styling */
+.task-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background: #fff;
+  border: 1px solid #eee;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  margin-right: 15px;
+  accent-color: var(--wd-green);
+}
+
+/* Button Styling */
+.btn {
+  display: block;
+  width: 100%;
   background-color: var(--wd-green);
-  color: var(--wd-white);
-  padding: 15px 30px;
-  border-radius: 4px;
+  color: white;
+  padding: 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
   text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.btn:disabled {
+  background-color: #ccc;
+}
+
+/* Navigation Dock */
+.nav-dock {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--wd-dark);
+  padding: 15px;
+  display: flex;
+  justify-content: space-around;
+  z-index: 1000;
+}
+
+.nav-dock a {
+  color: #adb5bd;
+  text-decoration: none;
+  font-size: 10px;
+  text-transform: uppercase;
   font-weight: bold;
 }
 
-/* Page 2 & 4 Headers/Sidebars */
-.admin-sidebar, .onboarding-header {
-  background-color: var(--wd-dark);
+.nav-dock a.active {
   color: var(--wd-white);
+  border-bottom: 2px solid var(--wd-green);
 }
 
-/* Accent lines and borders */
-.accent-border {
-  border-bottom: 3px solid var(--wd-green);
+/* Badge System */
+.badge {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: white;
 }
-
-.slate-text {
-  color: var(--wd-slate);
-}
+.status-active { background: var(--wd-green); }
+.status-pending { background: #f39c12; }
