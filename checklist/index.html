@@ -1,75 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <title>Daily Accountability Checklist</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WDC Quick Checklist</title>
-    <style>
-        body { font-family: -apple-system, sans-serif; padding: 20px; background-color: #f0f2f5; color: #1c1e21; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
-        h2 { color: #007bff; margin-bottom: 5px; }
-        .sub-text { color: #65676b; margin-bottom: 25px; font-size: 0.9em; }
-        .task { display: flex; align-items: center; background: #f8f9fa; padding: 15px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #dee2e6; cursor: pointer; }
-        input[type="checkbox"] { width: 20px; height: 20px; margin-right: 15px; }
-        button { background: #007bff; color: white; border: none; padding: 18px; width: 100%; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        button:disabled { background: #ccc; }
-        #status { text-align: center; margin-top: 15px; font-weight: bold; }
-    </style>
+    <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
-<div class="card">
-    <h2>Quick Checklist</h2>
-    <p id="empName" class="sub-text">Loading employee...</p>
-    <div id="tasks">
-        <label class="task"><input type="checkbox"> Start project on schedule</label>
-        <label class="task"><input type="checkbox"> Materials/tools on-site</label>
-        <label class="task"><input type="checkbox"> Work in progress photos sent</label>
-        <label class="task"><input type="checkbox"> Project completed</label>
-        <label class="task"><input type="checkbox"> Cleanup</label>
+    <div class="container">
+        <h2>Site Accountability</h2>
+        <p id="workerName">Loading worker profile...</p>
+        <hr>
+
+        <div id="tasklist">
+            <label><input type="checkbox" class="task"> Site Cleaned & Debris Removed</label><br>
+            <label><input type="checkbox" class="task"> Materials Organized/Staged</label><br>
+            <label><input type="checkbox" class="task"> Photo Documentation Uploaded</label><br>
+            <label><input type="checkbox" class="task"> Safety Check Completed</label><br>
+        </div>
+
+        <button id="checkInBtn" onclick="getLocation()" style="margin-top:20px; background:#33B26E; color:white; padding:15px; width:100%; border:none; border-radius:5px;">
+            Verify Location & Submit Checklist
+        </button>
+
+        <p id="statusMsg" style="color:orange; font-weight:bold;"></p>
     </div>
-    <button id="submitBtn" onclick="sendData()">Submit Checklist</button>
-    <p id="status"></p>
-</div>
 
-<script>
-    const urlParams = new URLSearchParams(window.location.search);
-    // 1. Get the email/ID from the URL (e.g., ?email=tee35081@gmail.com)
-    const workerEmail = urlParams.get('email') || urlParams.get('employee') || "Unknown_Worker";
-    document.getElementById('empName').innerText = "Account: " + workerEmail;
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
 
-    async function sendData() {
-        const btn = document.getElementById('submitBtn');
-        const status = document.getElementById('status');
-        btn.disabled = true;
-        status.innerText = "Filing to Records...";
+        if (!email) {
+            alert("No worker email detected. Please log in via the Portal.");
+            window.location.href = "../portal/index.html";
+        }
 
-        const checklistData = {
-            email: workerEmail, // CHANGED FROM 'employee' TO 'email' TO MATCH ENGINE
-            type: "Checklist",
-            submittedAt: new Date().toLocaleString(),
-            tasks: Array.from(document.querySelectorAll('.task')).map(t => ({
-                taskName: t.innerText.trim(),
-                done: t.querySelector('input').checked
-            }))
-        };
+        function getLocation() {
+            const btn = document.getElementById('checkInBtn');
+            const msg = document.getElementById('statusMsg');
+            
+            // Check if all boxes are checked
+            const tasks = document.querySelectorAll('.task');
+            const allChecked = Array.from(tasks).every(t => t.checked);
+            
+            if (!allChecked) {
+                alert("Please complete all checklist items first.");
+                return;
+            }
 
-        const scriptURL = "https://script.google.com/macros/s/AKfycbwImj4FnPHWpg1jWIo_Oh5dY0EiYVsficDcnWjmdz7t36e0ihIQnvXLrNk3lrG_JC8i/exec";
+            btn.disabled = true;
+            msg.innerText = "Acquiring GPS Signal...";
 
-        try {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendData, (err) => {
+                    alert("Error: Location access denied. Please enable GPS.");
+                    btn.disabled = false;
+                });
+            }
+        }
+
+        async function sendData(pos) {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            
             await fetch(scriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify(checklistData)
+                body: JSON.stringify({
+                    action: 'checkin',
+                    email: email,
+                    lat: lat,
+                    lng: lng
+                })
             });
-            status.innerText = "✅ Checklist Saved to Your Folder!";
-            status.style.color = "green";
-        } catch (e) {
-            status.innerText = "❌ Connection Error.";
-            status.style.color = "red";
-            btn.disabled = false;
+
+            document.getElementById('statusMsg').innerText = "Check-in Successful! Redirecting to Portal...";
+            setTimeout(() => {
+                window.location.href = `../portal/index.html?email=${email}`;
+            }, 2000);
         }
-    }
-</script>
+    </script>
 </body>
 </html>
