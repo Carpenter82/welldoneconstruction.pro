@@ -15,6 +15,17 @@
     <h3>On-Call Roster Active</h3>
     <p>You are officially verified. Please keep your phone nearby for job notifications.</p>
     </div>
+  <div id="portalContent" style="display:none;">
+    <hr>
+    <h3>On-Call Roster Active</h3>
+    <a href="../checklist/index.html" id="checklistLink" class="btn">Go to Site Checklist</a>
+</div>
+
+<script>
+    // Inside your loadPortal() function, after you get the worker data:
+    const email = new URLSearchParams(window.location.search).get('email');
+    document.getElementById('checklistLink').href = `../checklist/index.html?email=${email}`;
+</script>
 </div>
 
 <script>
