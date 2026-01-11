@@ -5,11 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Application | Well Done Construction</title>
   <link rel="stylesheet" href="../styles.css">
+  <style>
+    .disclaimer-box {
+      background: #fdfae3;
+      border: 1px solid #f1c40f;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      line-height: 1.5;
+      color: #343E47;
+      text-align: left;
+    }
+    .disclaimer-box h3 { margin-top: 0; color: #856404; font-size: 1.1rem; }
+    .disclaimer-box ul { padding-left: 20px; margin: 10px 0; }
+    .disclaimer-box li { margin-bottom: 5px; font-size: 0.95rem; }
+    
+    /* Ensure form inputs are full width */
+    input, select { width: 100%; margin-bottom: 15px; padding: 10px; box-sizing: border-box; }
+    .btn { width: 100%; padding: 12px; background: #33B26E; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
+    .btn:disabled { background: #ccc; }
+  </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container" style="max-width: 600px; margin: 0 auto; padding: 20px;">
   <h2 style="text-align: center;">Worker Intake Form</h2>
+
+  <div class="disclaimer-box">
+    <h3>Employment Disclosure</h3>
+    <p>This application is for <strong>on-call construction work</strong> with Well Done Construction LLC. Work is assigned by project, based on availability, performance, and client needs.</p>
+    <ul>
+      <li>Work includes general construction, repairs, and maintenance.</li>
+      <li>Assignments are typically short-notice and time-specific.</li>
+      <li>Pay is discussed per assignment.</li>
+      <li>You must be legally eligible to work and able to perform physical labor.</li>
+    </ul>
+    <p style="font-size: 0.85rem; border-top: 1px solid #ddd; padding-top: 10px; margin-top: 10px;">
+      <em>By submitting, you confirm this is an on-call position with no guaranteed hours.</em>
+    </p>
+  </div>
+
   <form id="appForm">
     <input type="text" id="fn" placeholder="First Name" required>
     <input type="text" id="ln" placeholder="Last Name" required>
@@ -39,39 +74,41 @@
 </nav>
 
 <script>
-document.getElementById('appForm').onsubmit = async (e) => {
-  e.preventDefault();
-  const btn = document.getElementById('submitBtn');
-  btn.innerText = "Processing..."; 
-  btn.disabled = true;
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
 
-  const d = {
-    action: 'intake',
-    firstName: document.getElementById('fn').value,
-    lastName: document.getElementById('ln').value,
-    phone: document.getElementById('ph').value,
-    email: document.getElementById('em').value,
-    trade: document.getElementById('tr').value,
-    experience: document.getElementById('ex').value,
-    pay: document.getElementById('py').value
+  document.getElementById('appForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.innerText = "Processing..."; 
+    btn.disabled = true;
+
+    const d = {
+      action: 'intake',
+      firstName: document.getElementById('fn').value,
+      lastName: document.getElementById('ln').value,
+      phone: document.getElementById('ph').value,
+      email: document.getElementById('em').value,
+      trade: document.getElementById('tr').value,
+      experience: document.getElementById('ex').value,
+      pay: document.getElementById('py').value
+    };
+
+    try {
+      await fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors', 
+        body: JSON.stringify(d)
+      });
+      
+      // SUCCESS: Sends worker to the thank you page
+      window.location.href = '../thank-you.html';
+
+    } catch (err) {
+      alert("Connection error. Try again.");
+      btn.innerText = "Submit Application";
+      btn.disabled = false;
+    }
   };
-
-  try {
-    await fetch('https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec', {
-      method: 'POST',
-      mode: 'no-cors', 
-      body: JSON.stringify(d)
-    });
-    
-    // SUCCESS: Sends worker to the thank you page
-    window.location.href = '../thank-you.html';
-
-  } catch (err) {
-    alert("Connection error. Try again.");
-    btn.innerText = "Submit Application";
-    btn.disabled = false;
-  }
-};
 </script>
 
 </body>
