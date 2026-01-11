@@ -14,13 +14,14 @@
     .worker-info h4 { margin: 0; color: #343E47; }
     .worker-info p { margin: 5px 0 0; color: #6E797F; font-size: 0.85rem; }
     
-    .btn-group { display: flex; gap: 10px; }
-    .action-btn { padding: 8px 12px; border-radius: 4px; border: none; font-size: 0.8rem; cursor: pointer; font-weight: bold; text-decoration: none; text-align: center; }
+    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .action-btn { padding: 8px 12px; border-radius: 4px; border: none; font-size: 0.75rem; cursor: pointer; font-weight: bold; text-decoration: none; text-align: center; min-width: 70px; }
+    
     .btn-assign { background: #4A90E2; color: white; }
     .btn-hire { background: #33B26E; color: white; }
+    .btn-pause { background: #f1c40f; color: #343E47; } /* Yellow for Caution/Pause */
     .btn-folder { background: #343E47; color: white; }
 
-    /* Modal Styling */
     #assignModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; }
     .modal-box { background:white; max-width:500px; margin:50px auto; padding:25px; border-radius:8px; }
     .modal-box input, .modal-box textarea { width: 100%; margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
@@ -28,7 +29,7 @@
 </head>
 <body>
 
-<div class="container" style="max-width: 900px; margin: 0 auto; padding: 20px;">
+<div class="container" style="max-width: 1000px; margin: 0 auto; padding: 20px;">
   <div class="admin-nav">
     <a href="index.html" class="active">Crew Management</a>
     <a href="activity.html">Site Activity Log</a>
@@ -42,17 +43,13 @@
   <div class="modal-box">
     <h3>Assign Project: <span id="assignName"></span></h3>
     <input type="hidden" id="assignEmail">
-    
     <label>Project Address:</label>
     <input type="text" id="jobLocation" placeholder="e.g. 123 Main St, Reno">
-    
     <label>Scope of Work:</label>
     <textarea id="jobScope" placeholder="Tasks to be completed..."></textarea>
-    
     <label>Pay Rate:</label>
     <input type="text" id="jobPay" placeholder="e.g. $250 Flat Rate">
-    
-    <button onclick="submitAssignment()" class="action-btn btn-hire" style="width: 100%; margin-bottom: 10px; height: 45px;">Send Assignment</button>
+    <button onclick="submitAssignment()" class="action-btn btn-hire" style="width: 100%; margin-bottom: 10px; height: 45px; font-size: 1rem;">Send Assignment</button>
     <button onclick="closeAssign()" class="action-btn" style="width: 100%; background: #eee;">Cancel</button>
   </div>
 </div>
@@ -66,21 +63,24 @@
     let html = '';
     
     workers.forEach(w => {
+      // Determine if worker is active or paused to toggle button visibility if desired, 
+      // but for now, we provide both options.
       html += `
         <div class="worker-card">
           <div class="worker-info">
             <h4>${w.name}</h4>
-            <p>${w.trade} | Status: <strong>${w.status}</strong></p>
+            <p>${w.trade} | Status: <strong style="color: ${w.status === 'ACTIVE' ? '#33B26E' : '#e67e22'}">${w.status}</strong></p>
           </div>
           <div class="btn-group">
             <button class="action-btn btn-assign" onclick="openAssign('${w.name}', '${w.email}')">Assign</button>
             <a href="${w.folderLink}" target="_blank" class="action-btn btn-folder">Folder</a>
             <button class="action-btn btn-hire" onclick="updateStatus(${w.rowIndex}, 'ACTIVE')">Hire</button>
+            <button class="action-btn btn-pause" onclick="updateStatus(${w.rowIndex}, 'ON HOLD')">Pause</button>
           </div>
         </div>
       `;
     });
-    document.getElementById('workerList').innerHTML = html;
+    document.getElementById('workerList').innerHTML = html || '<p style="text-align:center;">No workers found.</p>';
   }
 
   function openAssign(name, email) {
@@ -101,11 +101,12 @@
       pay: document.getElementById('jobPay').value
     };
     await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-    alert("Assignment Sent to Worker and Contract Folder!");
+    alert("Assignment Sent!");
     closeAssign();
   }
 
   async function updateStatus(row, status) {
+    if(!confirm(`Change worker status to ${status}?`)) return;
     await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({action: 'updateStatus', row: row, status: status}) });
     alert("Status Updated!");
     loadWorkers();
