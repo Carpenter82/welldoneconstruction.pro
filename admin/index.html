@@ -8,13 +8,14 @@
   <style>
     .worker-card { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; flex-direction: column; gap: 10px; }
     @media(min-width: 600px) { .worker-card { flex-direction: row; justify-content: space-between; align-items: center; } }
-    .btn-group { display: flex; gap: 5px; }
+    .btn-group { display: flex; gap: 5px; flex-wrap: wrap; }
     .status-pill { font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; font-weight: bold; text-transform: uppercase; }
+    .view-id-btn { text-decoration: none; background: #343E47; color: white; padding: 8px; border-radius: 4px; font-size: 0.8rem; display: inline-block; }
   </style>
 </head>
 <body>
 
-<div class="container" style="max-width: 800px;">
+<div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
   <h2 style="text-align: center;">Crew Management</h2>
   <div id="workerList">Loading crew roster...</div>
 </div>
@@ -23,44 +24,59 @@
   const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
 
   async function loadWorkers() {
-    const resp = await fetch(scriptURL + '?action=getWorkers');
-    const workers = await resp.json();
-    let html = '';
+    try {
+      const resp = await fetch(scriptURL + '?action=getWorkers');
+      const workers = await resp.json();
+      let html = '';
 
-    workers.forEach((w, index) => {
-      const rowIndex = index + 2; 
-      let statusColor = '#f39c12'; // Default Yellow
-      if(w.status === 'ACTIVE') statusColor = '#33B26E';
-      if(w.status === 'TERMINATED') statusColor = '#e74c3c';
-      
-      html += `
-        <div class="worker-card">
-          <div>
-            <strong>${w.name}</strong> <span class="status-pill" style="background: ${statusColor}; color: white;">${w.status}</span><br>
-            <span style="color: #6E797F; font-size: 0.9rem;">${w.trade}</span>
+      workers.forEach((w) => {
+        // Use the rowIndex provided by the backend script
+        const row = w.rowIndex; 
+        
+        let statusColor = '#f39c12'; // Default Yellow
+        if(w.status.includes('ACTIVE')) statusColor = '#33B26E';
+        if(w.status === 'TERMINATED') statusColor = '#e74c3c';
+        
+        html += `
+          <div class="worker-card">
+            <div>
+              <strong>${w.name}</strong> 
+              <span class="status-pill" style="background: ${statusColor}; color: white;">${w.status}</span><br>
+              <span style="color: #6E797F; font-size: 0.9rem;">${w.trade}</span>
+            </div>
+            <div class="btn-group">
+              ${w.idLink ? `<a href="${w.idLink}" target="_blank" class="view-id-btn">View ID</a>` : ''}
+              <button onclick="updateStatus(${row}, 'ACTIVE')" style="background: #33B26E; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer;">Hire</button>
+              <button onclick="updateStatus(${row}, 'PAUSED')" style="background: #f1c40f; color: black; border: none; padding: 8px; border-radius: 4px; cursor: pointer;">Pause</button>
+              <button onclick="updateStatus(${row}, 'TERMINATED')" style="background: #e74c3c; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer;">Fire</button>
+            </div>
           </div>
-          <div class="btn-group">
-            <button onclick="updateStatus(${rowIndex}, 'ACTIVE')" style="background: #33B26E; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer;">Hire</button>
-            <button onclick="updateStatus(${rowIndex}, 'PAUSED')" style="background: #f1c40f; color: black; border: none; padding: 8px; border-radius: 4px; cursor: pointer;">Pause</button>
-            <button onclick="updateStatus(${rowIndex}, 'TERMINATED')" style="background: #e74c3c; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer;">Fire</button>
-          </div>
-        </div>
-      `;
-    });
-    document.getElementById('workerList').innerHTML = html || 'No workers found.';
+        `;
+      });
+      document.getElementById('workerList').innerHTML = html || 'No workers found.';
+    } catch (err) {
+      document.getElementById('workerList').innerHTML = 'Error loading workers. Check console.';
+      console.error(err);
+    }
   }
 
   async function updateStatus(row, newStatus) {
     if(!confirm(`Change status to ${newStatus}?`)) return;
     
-    await fetch(scriptURL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: JSON.stringify({ action: 'updateStatus', row: row, status: newStatus })
-    });
-    
-    alert("Status Updated.");
-    location.reload();
+    // Optimistic UI: let the user know it's working
+    const msg = alert("Updating status, please wait...");
+
+    try {
+      await fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({ action: 'updateStatus', row: row, status: newStatus })
+      });
+      
+      location.reload(); // Refresh to show the new status
+    } catch (err) {
+      alert("Failed to update status.");
+    }
   }
 
   window.onload = loadWorkers;
