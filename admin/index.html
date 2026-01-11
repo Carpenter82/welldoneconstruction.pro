@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard | Well Done</title>
+  <title>Activity Log | Well Done</title>
   <link rel="stylesheet" href="../styles.css">
   <style>
     /* Admin Specific Styling */
@@ -11,98 +11,52 @@
     .admin-nav a { text-decoration: none; color: #343E47; font-weight: bold; font-size: 0.9rem; }
     .admin-nav a.active { color: #33B26E; border-bottom: 2px solid #33B26E; }
 
-    .worker-card { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; flex-direction: column; gap: 10px; }
-    @media(min-width: 600px) { .worker-card { flex-direction: row; justify-content: space-between; align-items: center; } }
-    
-    .btn-group { display: flex; gap: 5px; flex-wrap: wrap; }
-    .status-pill { font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; font-weight: bold; text-transform: uppercase; }
-    
-    /* Button Variations */
-    .view-btn { text-decoration: none; color: white; padding: 8px; border-radius: 4px; font-size: 0.8rem; display: inline-block; border: none; cursor: pointer; }
-    .btn-folder { background: #4A90E2; } /* Blue */
-    .btn-id { background: #343E47; }     /* Dark Grey */
-    .btn-hire { background: #33B26E; }   /* Green */
-    .btn-pause { background: #f1c40f; color: black !important; } /* Yellow */
-    .btn-fire { background: #e74c3c; }    /* Red */
+    .log-entry { border-left: 4px solid #33B26E; background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 0 8px 8px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .log-meta { font-size: 0.85rem; color: #6E797F; margin-bottom: 5px; }
+    .map-btn { display: inline-block; margin-top: 10px; background: #343E47; color: white; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-size: 0.8rem; font-weight: bold; }
+    .map-btn:hover { background: #4b5563; }
   </style>
 </head>
 <body>
 
 <div class="container" style="max-width: 900px; margin: 0 auto; padding: 20px;">
   <div class="admin-nav">
-    <a href="index.html" class="active">Crew Management</a>
-    <a href="activity.html">Site Activity Log</a>
+    <a href="index.html">Crew Management</a>
+    <a href="activity.html" class="active">Site Activity Log</a>
   </div>
 
-  <h2 style="text-align: center;">Crew Management</h2>
-  <div id="workerList">Loading crew roster...</div>
+  <h2 style="text-align: center;">Site Check-In Log</h2>
+  <div id="activityList">Loading recent check-ins...</div>
 </div>
 
 <script>
   const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
 
-  async function loadWorkers() {
+  async function loadActivity() {
     try {
-      const resp = await fetch(scriptURL + '?action=getWorkers');
-      const workers = await resp.json();
+      const resp = await fetch(scriptURL + '?action=getActivity');
+      const logs = await resp.json();
       let html = '';
 
-      workers.forEach((w) => {
-        const row = w.rowIndex; 
-        
-        let statusColor = '#f39c12'; // Default Yellow
-        if(w.status.includes('ACTIVE')) statusColor = '#33B26E';
-        if(w.status === 'TERMINATED') statusColor = '#e74c3c';
-        
+      logs.forEach(log => {
         html += `
-          <div class="worker-card">
-            <div>
-              <strong>${w.name}</strong> 
-              <span class="status-pill" style="background: ${statusColor}; color: white;">${w.status}</span><br>
-              <span style="color: #6E797F; font-size: 0.9rem;">${w.trade}</span>
+          <div class="log-entry">
+            <div class="log-meta">📅 ${log.timestamp}</div>
+            <div style="font-size: 1.1rem;">
+              <strong>${log.email}</strong> 
+              <span style="color: #33B26E; font-size: 0.9rem; margin-left: 10px;">✓ Verified On-Site</span>
             </div>
-            <div class="btn-group">
-              ${w.folderLink ? `<a href="${w.folderLink}" target="_blank" class="view-btn btn-folder">File Folder</a>` : ''}
-              ${w.idLink ? `<a href="${w.idLink}" target="_blank" class="view-btn btn-id">View ID</a>` : ''}
-              
-              <button onclick="updateStatus(${row}, 'ACTIVE')" class="view-btn btn-hire">Hire</button>
-              <button onclick="updateStatus(${row}, 'PAUSED')" class="view-btn btn-pause">Pause</button>
-              <button onclick="updateStatus(${row}, 'TERMINATED')" class="view-btn btn-fire">Fire</button>
-            </div>
+            <a href="${log.mapLink}" target="_blank" class="map-btn">📍 View GPS Location</a>
           </div>
         `;
       });
-      document.getElementById('workerList').innerHTML = html || 'No workers found.';
+      document.getElementById('activityList').innerHTML = html || '<p style="text-align:center;">No activity recorded yet.</p>';
     } catch (err) {
-      document.getElementById('workerList').innerHTML = 'Error loading workers. Check console.';
-      console.error(err);
+      document.getElementById('activityList').innerHTML = '<p style="text-align:center; color:red;">Error loading activity. Check Script URL.</p>';
     }
   }
 
-  async function updateStatus(row, newStatus) {
-    if(!confirm(`Change status to ${newStatus}?`)) return;
-    
-    // We use a temporary notification instead of a blocking alert
-    const btnGroup = event.target.parentElement;
-    const originalContent = btnGroup.innerHTML;
-    btnGroup.innerHTML = '<span style="font-size:0.8rem; color:#6E797F;">Updating...</span>';
-
-    try {
-      await fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify({ action: 'updateStatus', row: row, status: newStatus })
-      });
-      
-      // Short delay to allow Google Sheets to process
-      setTimeout(() => { location.reload(); }, 1000); 
-    } catch (err) {
-      alert("Failed to update status.");
-      btnGroup.innerHTML = originalContent;
-    }
-  }
-
-  window.onload = loadWorkers;
+  window.onload = loadActivity;
 </script>
 
 </body>
