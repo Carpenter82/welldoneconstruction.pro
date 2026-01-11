@@ -1,1 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activity Log | Well Done</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .log-entry { border-left: 4px solid #33B26E; background: #fff; padding: 15px; margin-bottom: 10px; border-radius: 0 8px 8px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .log-meta { font-size: 0.85rem; color: #6E797F; margin-bottom: 5px; }
+    .map-btn { display: inline-block; margin-top: 10px; background: #343E47; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 0.8rem; }
+  </style>
+</head>
+<body>
 
+<div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+  <h2 style="text-align: center;">Site Check-In Log</h2>
+  <div id="activityList">Loading recent check-ins...</div>
+</div>
+
+<script>
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
+
+  async function loadActivity() {
+    try {
+      const resp = await fetch(scriptURL + '?action=getActivity');
+      const logs = await resp.json();
+      let html = '';
+
+      logs.forEach(log => {
+        html += `
+          <div class="log-entry">
+            <div class="log-meta">${log.timestamp}</div>
+            <strong>${log.email}</strong> checked in from the site.
+            <br>
+            <a href="${log.mapLink}" target="_blank" class="map-btn">📍 View on Google Maps</a>
+          </div>
+        `;
+      });
+      document.getElementById('activityList').innerHTML = html || 'No activity recorded yet.';
+    } catch (err) {
+      document.getElementById('activityList').innerHTML = 'Error loading activity.';
+    }
+  }
+
+  window.onload = loadActivity;
+</script>
+
+</body>
+</html>
