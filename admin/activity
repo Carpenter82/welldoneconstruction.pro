@@ -13,7 +13,6 @@
     .log-entry { border-left: 4px solid #33B26E; background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 0 8px 8px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .log-meta { font-size: 0.85rem; color: #6E797F; margin-bottom: 5px; }
     .map-btn { display: inline-block; margin-top: 10px; background: #343E47; color: white; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-size: 0.8rem; font-weight: bold; }
-    .map-btn:hover { background: #4b5563; }
   </style>
 </head>
 <body>
@@ -24,8 +23,8 @@
     <a href="activity.html" class="active">Site Activity Log</a>
   </div>
 
-  <h2 style="text-align: center;">Site Check-In Log</h2>
-  <div id="activityList">Loading recent check-ins...</div>
+  <h2 style="text-align: center;">Recent Site Check-Ins</h2>
+  <div id="activityList">Loading logs...</div>
 </div>
 
 <script>
@@ -37,31 +36,23 @@
       const logs = await resp.json();
       let html = '';
 
-      if (!logs || logs.length === 0) {
-        document.getElementById('activityList').innerHTML = '<p style="text-align:center;">No activity recorded yet.</p>';
-        return;
-      }
-
       logs.forEach(log => {
         html += `
           <div class="log-entry">
             <div class="log-meta">📅 ${log.timestamp}</div>
-            <div style="font-size: 1.1rem;">
-              <strong>${log.email}</strong> 
-              <span style="color: #33B26E; font-size: 0.9rem; margin-left: 10px;">✓ Verified On-Site</span>
-            </div>
+            <strong>${log.email}</strong> checked in.
+            <br>
             <a href="${log.mapLink}" target="_blank" class="map-btn">📍 View GPS Location</a>
           </div>
         `;
       });
-      document.getElementById('activityList').innerHTML = html;
+      document.getElementById('activityList').innerHTML = html || 'No activity today.';
     } catch (err) {
-      document.getElementById('activityList').innerHTML = '<p style="text-align:center; color:red;">Error loading activity. Check Script URL.</p>';
+      document.getElementById('activityList').innerHTML = 'Error loading logs.';
     }
   }
 
   window.onload = loadActivity;
 </script>
-
 </body>
 </html>
