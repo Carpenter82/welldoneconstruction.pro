@@ -84,3 +84,28 @@ input, select, textarea {
 }
 .status-active { background: var(--wd-green); }
 .status-pending { background: #f39c12; }
+/* Make buttons easy to hit on a job site */
+.btn, button {
+  display: block;
+  width: 100%;
+  min-height: 60px; /* Bigger tap target */
+  font-size: 1.2rem !important;
+  font-weight: bold;
+  border-radius: 10px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+/* Add space at the bottom of the container so buttons aren't stuck at the edge */
+.container {
+  padding-bottom: 120px; /* Gives room above the bottom nav dock */
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Make form inputs larger for mobile */
+input[type="file"], select {
+  height: 50px;
+  font-size: 1rem;
+}
