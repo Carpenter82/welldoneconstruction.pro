@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found | Well Done</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: 100vh; 
+      margin: 0; 
+      text-align: center;
+    }
+    .error-card {
+      padding: 40px;
+      max-width: 400px;
+    }
+    .error-code {
+      font-size: 5rem;
+      font-weight: 800;
+      color: var(--wd-green);
+      margin: 0;
+    }
+    h1 { color: var(--wd-dark); margin-top: 0; }
+    p { color: var(--wd-slate); margin-bottom: 30px; }
+  </style>
+</head>
+<body>
+
+  <div class="error-card">
+    <p class="error-code">404</p>
+    <h1>Oops! Lost on the job?</h1>
+    <p>We couldn't find the page you're looking for. It might have been moved or the link might be broken.</p>
+    
+    <a href="index.html" class="btn">🏠 Back to Home</a>
+    <a href="portal/index.html" class="btn" style="background: var(--wd-dark); margin-top: 10px;">📲 Go to Worker Portal</a>
+  </div>
+
+</body>
+</html>
