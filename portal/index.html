@@ -6,72 +6,94 @@
   <title>Worker Portal | Well Done Construction</title>
   <link rel="stylesheet" href="../styles.css">
   <style>
-    .badge { padding: 5px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
-    .status-pending { background: #ffeaa7; color: #d6a031; }
-    .status-active { background: #55efc4; color: #00b894; }
+    /* Portal Specific UI */
+    .status-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
     
-    /* Field-Proof Button Styles */
-    .btn { 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      width: 100%; 
-      min-height: 60px; 
-      font-size: 1.1rem; 
-      font-weight: bold; 
-      border-radius: 10px; 
-      border: none;
-      cursor: pointer;
-      margin-bottom: 15px;
-      text-decoration: none;
+    #photoUploadSection { 
+      margin-top: 25px; 
+      padding: 20px; 
+      border: 2px dashed var(--wd-slate); 
+      border-radius: 12px; 
+      background: #fff; 
     }
 
-    #photoUploadSection { 
-      margin-top: 30px; 
-      padding: 20px; 
-      border: 1px dashed #ccc; 
-      border-radius: 8px; 
-      background: #fafafa; 
+    /* Preview Image Styling */
+    #lastPhotoPreview {
+      width: 100%;
+      max-height: 250px;
+      border-radius: 8px;
+      margin-top: 10px;
+      object-fit: cover;
+      border: 3px solid var(--wd-green);
     }
+
+    .loading-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--wd-green);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-<div class="container" style="text-align: center; max-width: 600px; margin: 0 auto; padding: 20px; padding-bottom: 120px;">
-  <h1 id="welcomeHeading">Loading Portal...</h1>
-  <p>Employment Status: <span id="statusBadge" class="badge status-pending">Checking...</span></p>
-  
-  <div id="portalContent" style="display:none;">
-    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-    <h3>On-Call Roster Active</h3>
+<div class="container" style="text-align: center;">
+  <div id="loader">
+    <div class="loading-spinner"></div>
+    <p>Opening your portal...</p>
+  </div>
+
+  <div id="mainUI" style="display:none;">
+    <h1 id="welcomeHeading" style="margin-bottom: 5px;">---</h1>
+    <div style="margin-bottom: 25px;">
+      <span id="statusBadge" class="badge">Checking Status...</span>
+    </div>
     
-    <a href="#" id="checklistLink" class="btn" style="background: #33B26E; color: white;">
-      📋 START DAILY CHECKLIST
-    </a>
+    <div id="activeContent" style="display:none;">
+      <a href="#" id="checklistLink" class="btn" style="background: var(--wd-green); color: white;">
+        📋 START DAILY CHECKLIST
+      </a>
 
-    <div id="photoUploadSection">
-      <h3>📸 Project Photo Upload</h3>
-      <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Upload Address, Before, and After photos.</p>
-      
-      <select id="photoType" style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ccc;">
-        <option value="Address">1. Address Verification</option>
-        <option value="Before">2. Before Photo</option>
-        <option value="After">3. After Photo</option>
-        <option value="Progress">4. Progress/Misc</option>
-      </select>
+      <div id="photoUploadSection">
+        <h3 style="margin-top:0;">📸 Site Photo Upload</h3>
+        <p style="font-size: 0.85rem; color: var(--wd-slate); margin-bottom: 15px;">Required: Address, Before, and After photos.</p>
+        
+        <select id="photoType">
+          <option value="Address">📍 1. Address Verification</option>
+          <option value="Before">🛠️ 2. Before Photo</option>
+          <option value="After">✅ 3. After Photo</option>
+          <option value="Progress">🔄 4. Progress/Misc</option>
+        </select>
 
-      <input type="file" id="photoFile" accept="image/*" capture="camera" style="width: 100%; margin-bottom: 15px;">
-      
-      <button onclick="uploadPhoto()" id="uploadBtn" class="btn" style="background: #4A90E2; color: white;">
-        📤 UPLOAD PHOTO
-      </button>
-      
-      <p id="uploadStatus" style="font-size: 0.9rem; margin-top: 10px; font-weight: bold;"></p>
+        <input type="file" id="photoFile" accept="image/*" capture="camera">
+        
+        <button onclick="uploadPhoto()" id="uploadBtn" class="btn" style="background: var(--wd-dark); color: white; margin-top: 10px;">
+          📤 UPLOAD TO PROJECT FOLDER
+        </button>
+        
+        <p id="uploadStatus" style="font-size: 0.9rem; margin-top: 10px; font-weight: bold;"></p>
 
-      <div id="photoPreviewContainer" style="display:none; margin-top: 15px; text-align: center;">
-        <p style="font-size: 0.8rem; color: #666;">Last Uploaded:</p>
-        <img id="lastPhotoPreview" src="" style="max-width: 100%; height: 180px; border-radius: 8px; border: 2px solid #33B26E; object-fit: cover;">
+        <div id="photoPreviewContainer" style="display:none;">
+          <p style="font-size: 0.8rem; color: var(--wd-slate); margin-bottom: 5px;">Last Successfully Uploaded:</p>
+          <img id="lastPhotoPreview" src="">
+        </div>
       </div>
+    </div>
+
+    <div id="pendingContent" style="display:none; padding: 40px 20px;">
+      <p style="font-size: 1.2rem; color: var(--wd-slate);">Your account is currently <strong>Pending</strong>.</p>
+      <p>Please ensure you have completed <a href="../onboarding.html" style="color: var(--wd-green); font-weight: bold;">Onboarding</a>. Once management approves your ID, your portal will activate.</p>
     </div>
   </div>
 </div>
@@ -92,32 +114,41 @@
     userEmail = urlParams.get('email');
 
     if (!userEmail) {
-      document.getElementById('welcomeHeading').innerText = "Access Denied";
-      alert("No email provided.");
+      alert("Please log in with your email.");
       window.location.href = '../index.html';
       return;
     }
 
     try {
-      const response = await fetch(`${scriptURL}?email=${encodeURIComponent(userEmail)}`);
+      // Fetch worker status from Google Sheet
+      const response = await fetch(`${scriptURL}?email=${encodeURIComponent(userEmail)}&action=getWorkerStatus`);
       const worker = await response.json();
 
-      if (worker.status === 'Not Found') {
-        alert('Profile not found.');
-        window.location.href = '../index.html';
-      } else {
-        document.getElementById('welcomeHeading').innerText = `Welcome, ${worker.firstName}`;
-        const badge = document.getElementById('statusBadge');
-        badge.innerText = worker.status;
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('mainUI').style.display = 'block';
 
-        if (worker.status.includes('ACTIVE')) {
-          badge.className = 'badge status-active';
-          document.getElementById('portalContent').style.display = 'block';
-          document.getElementById('checklistLink').href = `../checklist/index.html?email=${encodeURIComponent(userEmail)}`;
-        }
+      if (worker.status === 'Not Found') {
+        alert('No profile found for this email. Please apply first.');
+        window.location.href = '../application/index.html';
+        return;
       }
+
+      document.getElementById('welcomeHeading').innerText = `Hello, ${worker.firstName}!`;
+      const badge = document.getElementById('statusBadge');
+      badge.innerText = worker.status;
+
+      if (worker.status === 'ACTIVE') {
+        badge.className = 'badge status-active';
+        document.getElementById('activeContent').style.display = 'block';
+        document.getElementById('checklistLink').href = `../checklist/index.html?email=${encodeURIComponent(userEmail)}`;
+      } else {
+        badge.className = 'badge status-pending';
+        document.getElementById('pendingContent').style.display = 'block';
+      }
+      
     } catch (err) {
-      document.getElementById('welcomeHeading').innerText = "Connection Error";
+      console.error(err);
+      document.getElementById('loader').innerHTML = "<p style='color:red;'>Connection Error. Please refresh.</p>";
     }
   }
 
@@ -129,12 +160,12 @@
     const previewImg = document.getElementById('lastPhotoPreview');
     const previewContainer = document.getElementById('photoPreviewContainer');
 
-    if (!fileInput.files[0]) return alert("Please select or take a photo first.");
+    if (!fileInput.files[0]) return alert("Please take a photo first.");
 
     btn.disabled = true;
-    btn.innerText = "Uploading...";
-    status.style.color = "#333";
-    status.innerText = "Processing image...";
+    btn.innerText = "⏳ SENDING TO DRIVE...";
+    status.style.color = "#343E47";
+    status.innerText = "Uploading to project folder...";
 
     const file = fileInput.files[0];
     const reader = new FileReader();
@@ -156,18 +187,18 @@
           body: JSON.stringify(payload)
         });
 
-        // Show Success and Update Preview
+        // UI Update on Success
         previewImg.src = e.target.result;
         previewContainer.style.display = 'block';
         status.style.color = "green";
-        status.innerText = "✅ " + type + " photo saved!";
+        status.innerText = "✅ " + type + " photo saved successfully!";
         fileInput.value = ""; 
       } catch (err) {
         status.style.color = "red";
-        status.innerText = "Upload failed. Try again.";
+        status.innerText = "Upload failed. Check signal and try again.";
       } finally {
         btn.disabled = false;
-        btn.innerText = "📤 UPLOAD PHOTO";
+        btn.innerText = "📤 UPLOAD ANOTHER PHOTO";
       }
     };
     reader.readAsDataURL(file);
