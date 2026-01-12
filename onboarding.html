@@ -10,13 +10,16 @@
 
 <div class="container">
   <h2 style="text-align: center;">Worker Onboarding</h2>
-  <p style="text-align: center; color: #6E797F;">Please upload a clear photo of your Driver's License or ID to activate your portal.</p>
+  <p style="text-align: center; color: #6E797F;">Upload your documentation to activate your worker portal.</p>
   
   <form id="onboardForm">
     <input type="email" id="em" placeholder="Confirm Your Email" required>
     
-    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Upload ID Photo:</label>
-    <input type="file" id="file" accept="image/*" required>
+    <label style="font-weight: bold; display: block; margin-top: 20px; margin-bottom: 5px;">1. Driver's License / ID:</label>
+    <input type="file" id="idFile" accept="image/*" required>
+
+    <label style="font-weight: bold; display: block; margin-top: 10px; margin-bottom: 5px;">2. OSHA 10 Card:</label>
+    <input type="file" id="oshaFile" accept="image/*,application/pdf" required>
 
     <button type="submit" id="submitBtn" class="btn">Upload & Continue</button>
   </form>
@@ -31,51 +34,58 @@
 </nav>
 
 <script>
+// Helper function to convert file to Base64
+const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = error => reject(error);
+});
+
 document.getElementById('onboardForm').onsubmit = async (e) => {
   e.preventDefault();
   const btn = document.getElementById('submitBtn');
   const msg = document.getElementById('msg');
-  const fileInput = document.getElementById('file');
+  const idInput = document.getElementById('idFile');
+  const oshaInput = document.getElementById('oshaFile');
   const email = document.getElementById('em').value;
 
-  btn.innerText = "Uploading...";
+  btn.innerText = "Uploading Documents...";
   btn.disabled = true;
 
-  const file = fileInput.files[0];
-  const reader = new FileReader();
+  try {
+    // Process both files into Base64
+    const idData = await toBase64(idInput.files[0]);
+    const oshaData = await toBase64(oshaInput.files[0]);
 
-  reader.onload = async (f) => {
-    const base64Data = f.target.result.split(',')[1];
-    const d = {
+    const payload = {
       action: 'onboard',
       email: email,
-      fileData: base64Data,
-      fileName: file.name,
-      fileType: file.type
+      files: [
+        { data: idData, name: "ID_" + idInput.files[0].name, type: idInput.files[0].type, folder: "5. Misc" },
+        { data: oshaData, name: "OSHA10_" + oshaInput.files[0].name, type: oshaInput.files[0].type, folder: "4. Contracts" } // Placing in Contracts/Legal folder
+      ]
     };
 
-    try {
-      await fetch('https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec', {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify(d)
-      });
+    await fetch('https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify(payload)
+    });
 
-      msg.style.color = "green";
-      msg.innerText = "Upload Successful! Redirecting...";
-      
-      // Send them to the portal after 2 seconds
-      setTimeout(() => {
-        window.location.href = `portal/index.html?email=${encodeURIComponent(email)}`;
-      }, 2000);
+    msg.style.color = "green";
+    msg.innerText = "All Documents Saved! Redirecting...";
+    
+    setTimeout(() => {
+      window.location.href = `portal/index.html?email=${encodeURIComponent(email)}`;
+    }, 2000);
 
-    } catch (err) {
-      alert("Upload failed. Try again.");
-      btn.innerText = "Upload & Continue";
-      btn.disabled = false;
-    }
-  };
-  reader.readAsDataURL(file);
+  } catch (err) {
+    console.error(err);
+    alert("Upload failed. Please ensure both files are selected and try again.");
+    btn.innerText = "Upload & Continue";
+    btn.disabled = false;
+  }
 };
 </script>
 
