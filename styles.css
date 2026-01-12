@@ -1,9 +1,11 @@
 :root {
   --wd-green: #33B26E;
+  --wd-green-dark: #2b955c; /* Added for button presses */
   --wd-dark: #343E47;
   --wd-slate: #6E797F;
   --wd-white: #FFFFFF;
   --wd-light: #F8F9FA;
+  --wd-border: #E2E8F0;
 }
 
 body {
@@ -13,99 +15,114 @@ body {
   background-color: var(--wd-light);
   color: var(--wd-dark);
   line-height: 1.6;
+  -webkit-tap-highlight-color: transparent; /* Clean mobile feel */
 }
 
 .container {
   max-width: 500px;
-  margin: 40px auto;
+  margin: 0 auto;
   background: white;
   padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  min-height: 100vh; /* Ensures full height on mobile */
+  box-sizing: border-box;
+  padding-bottom: 140px; /* Extra room for the nav-dock */
 }
 
+/* --- Field-Proof Inputs --- */
 input, select, textarea {
   width: 100%;
-  padding: 12px;
+  padding: 14px; /* Slightly larger for easier tapping */
   margin: 8px 0 20px 0;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 2px solid var(--wd-border); /* Thicker border for visibility */
+  border-radius: 8px;
   box-sizing: border-box;
-  font-size: 16px;
+  font-size: 16px; /* Prevents iOS zoom-in */
+  background-color: var(--wd-white);
 }
 
-.btn {
-  display: block;
+input:focus, select:focus {
+  border-color: var(--wd-green);
+  outline: none;
+  background-color: #fff;
+}
+
+/* --- High-Response Buttons --- */
+.btn, button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
+  min-height: 65px; /* Maximum "thumb-ability" */
   background-color: var(--wd-green);
   color: white;
-  padding: 16px;
   border: none;
-  border-radius: 6px;
-  font-size: 1.1rem;
-  font-weight: bold;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 800; /* Extra bold for sunlight readability */
   cursor: pointer;
-  text-align: center;
-  text-decoration: none;
+  transition: transform 0.1s, background-color 0.2s;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+/* Visual feedback when pressed */
+.btn:active, button:active {
+  transform: scale(0.96); 
+  background-color: var(--wd-green-dark);
+}
+
+.btn:disabled, button:disabled {
+  background-color: #ccc;
+  transform: none;
+  box-shadow: none;
+}
+
+/* --- Navigation Dock --- */
 .nav-dock {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   background: var(--wd-dark);
-  padding: 15px;
+  padding: 20px 10px; /* Taller dock for easier reach */
   display: flex;
-  justify-content: center;
-  gap: 20px;
+  justify-content: space-around;
+  gap: 10px;
   z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
 }
 
 .nav-dock a {
   color: #adb5bd;
   text-decoration: none;
-  font-size: 11px;
+  font-size: 12px; /* Bumped up for readability */
   text-transform: uppercase;
   font-weight: bold;
+  flex: 1;
+  text-align: center;
 }
 
 .nav-dock a.active {
   color: var(--wd-white);
-  border-bottom: 2px solid var(--wd-green);
+  border-bottom: 3px solid var(--wd-green);
+  padding-bottom: 5px;
 }
 
+/* --- UI Components --- */
 .badge {
-  padding: 6px 12px;
-  border-radius: 4px;
+  padding: 8px 14px;
+  border-radius: 20px;
   font-size: 0.85rem;
   font-weight: bold;
-  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
-.status-active { background: var(--wd-green); }
-.status-pending { background: #f39c12; }
-/* Make buttons easy to hit on a job site */
-.btn, button {
-  display: block;
+.status-active { background: var(--wd-green); color: white; }
+.status-pending { background: #f39c12; color: white; }
+
+/* Photo Preview Box */
+#photoPreviewContainer img {
   width: 100%;
-  min-height: 60px; /* Bigger tap target */
-  font-size: 1.2rem !important;
-  font-weight: bold;
-  border-radius: 10px;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  cursor: pointer;
-}
-
-/* Add space at the bottom of the container so buttons aren't stuck at the edge */
-.container {
-  padding-bottom: 120px; /* Gives room above the bottom nav dock */
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-/* Make form inputs larger for mobile */
-input[type="file"], select {
-  height: 50px;
-  font-size: 1rem;
+  border-radius: 12px;
+  border: 3px solid var(--wd-green);
+  margin-top: 10px;
 }
