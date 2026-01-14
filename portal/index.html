@@ -13,31 +13,48 @@
         <p>Enter your email to access your tools.</p>
     </div>
     <div class="form-group">
-        <input type="email" id="workerEmail" placeholder="Email Address" required>
+        <input type="email" id="workerEmail" placeholder="Email Address" required style="text-transform: lowercase;">
         <button class="btn" onclick="portalLogin()" id="loginBtn">Access Portal</button>
     </div>
-    <p id="loginMsg" style="text-align: center; margin-top: 15px;"></p>
+    <p id="loginMsg" style="text-align: center; margin-top: 15px; font-weight: bold;"></p>
 </div>
+
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
+
     async function portalLogin() {
-        const email = document.getElementById('workerEmail').value.trim();
+        // Clean the email input
+        const email = document.getElementById('workerEmail').value.trim().toLowerCase();
         const btn = document.getElementById('loginBtn');
+        const msg = document.getElementById('loginMsg');
+
         if (!email) return alert("Please enter your email.");
+
         btn.innerText = "Verifying...";
         btn.disabled = true;
+        msg.innerText = "";
+
         try {
+            // Check Google Sheet
             const resp = await fetch(`${scriptURL}?action=getWorkerStatus&email=${encodeURIComponent(email)}`);
             const data = await resp.json();
+
             if (data.status === 'Not Found') {
-                document.getElementById('loginMsg').innerText = "Email not found. Please apply first.";
+                msg.style.color = "red";
+                msg.innerText = "Email not found. Please complete the Intake form.";
                 btn.disabled = false;
                 btn.innerText = "Access Portal";
             } else {
-                // REDIRECT to the dashboard with the email in the URL
-                window.location.href = `dashboard.html?email=${encodeURIComponent(email)}`;
+                // SUCCESS: Redirect to dashboard.html
+                // We use ./ to ensure it stays in the 'portal' folder
+                window.location.href = `./dashboard.html?email=${encodeURIComponent(email)}`;
             }
-        } catch (e) { alert("Connection Error"); btn.disabled = false; }
+        } catch (e) { 
+            console.error(e);
+            alert("Connection Error. Check your internet signal."); 
+            btn.disabled = false; 
+            btn.innerText = "Access Portal";
+        }
     }
 </script>
 </body>
