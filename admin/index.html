@@ -100,6 +100,26 @@
 
 <div id="assignModal">
   <div class="modal-box">
+  <h3>Assign Project</h3>
+  
+  <label>Select Worker</label>
+  <select id="assignWorkerSelect" style="width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ddd;">
+    <option value="">-- Choose a Worker --</option>
+  </select>
+  
+  <input type="hidden" id="assignEmail"> <label>Project Address</label>
+  <input type="text" id="jobLocation" placeholder="Street, City, Zip">
+  
+  <label>Work Scope</label>
+  <textarea id="jobScope" rows="4" placeholder="List tasks here..."></textarea>
+  
+  <label>Pay Details</label>
+  <input type="text" id="jobPay" placeholder="e.g. $250 Total">
+  
+  <button onclick="submitAssignment()" class="btn btn-hire">Send Assignment</button>
+  <button onclick="closeAssign()" style="background: none; color: var(--wd-slate); border: none; width: 100%; margin-top: 10px; cursor: pointer;">Cancel</button>
+</div>
+  <div class="modal-box">
     <h3>Assign Project</h3>
     <p id="assignNameDisplay" style="font-weight: bold; color: var(--wd-green);"></p>
     
