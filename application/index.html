@@ -7,10 +7,9 @@
   <title>Application | Well Done Construction</title>
   <link rel="stylesheet" href="../styles.css">
   <style>
-    /* Legal Scrollbox Style */
     .terms-box {
       background: #fff;
-      border: 2px solid var(--wd-border);
+      border: 2px solid #ddd;
       padding: 15px;
       border-radius: 8px;
       height: 150px;
@@ -31,10 +30,9 @@
     .checkbox-container input {
       width: 24px;
       height: 24px;
-      margin: 0;
       flex-shrink: 0;
     }
-    .checkbox-text { font-size: 0.9rem; font-weight: 500; color: var(--wd-dark); }
+    .checkbox-text { font-size: 0.9rem; font-weight: 500; }
   </style>
 </head>
 <body>
@@ -61,15 +59,15 @@
 
     <div class="terms-box">
       <strong>Terms & Conditions of On-Call Work:</strong><br><br>
-      1. <strong>No Guaranteed Hours:</strong> Applicant understands that this is an "on-call" position. Well Done Construction LLC does not guarantee a minimum number of hours or projects per week.<br><br>
-      2. <strong>Work Assignments:</strong> Assignments are offered based on project availability and worker performance. You have the right to decline any assignment offered.<br><br>
-      3. <strong>Safety & Equipment:</strong> Workers are expected to follow all OSHA safety guidelines. You must provide your own basic hand tools unless otherwise specified.<br><br>
-      4. <strong>Verification:</strong> By submitting, you authorize Well Done Construction LLC to verify your eligibility to work and perform background checks if required for specific job sites.
+      1. <strong>No Guaranteed Hours:</strong> Applicant understands that this is an "on-call" position. Well Done Construction LLC does not guarantee a minimum number of hours.<br><br>
+      2. <strong>Work Assignments:</strong> You have the right to decline any assignment offered.<br><br>
+      3. <strong>Safety & Equipment:</strong> Workers must provide their own basic hand tools.<br><br>
+      4. <strong>Verification:</strong> You authorize Well Done Construction LLC to verify eligibility.
     </div>
 
     <label class="checkbox-container">
       <input type="checkbox" id="termsConsent" required>
-      <span class="checkbox-text">I acknowledge that this is an on-call position with no guaranteed hours and agree to the terms above.</span>
+      <span class="checkbox-text">I acknowledge this is an on-call position and agree to the terms.</span>
     </label>
 
     <button type="submit" id="submitBtn" class="btn">Submit Application</button>
@@ -84,17 +82,12 @@
 </nav>
 
 <script>
+  // YOUR APPS SCRIPT URL
   const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
 
   document.getElementById('appForm').onsubmit = async (e) => {
     e.preventDefault();
     
-    // Safety check for checkbox
-    if(!document.getElementById('termsConsent').checked) {
-      alert("You must agree to the on-call terms to apply.");
-      return;
-    }
-
     const btn = document.getElementById('submitBtn');
     btn.innerText = "Processing..."; 
     btn.disabled = true;
@@ -108,20 +101,26 @@
       trade: document.getElementById('tr').value,
       experience: document.getElementById('ex').value,
       pay: document.getElementById('py').value,
-      consent: "AGREED" // This marks the sheet so you have proof
+      consent: "AGREED"
     };
 
     try {
+      // POSTING TO GOOGLE
       await fetch(scriptURL, {
         method: 'POST',
-        mode: 'no-cors', 
+        mode: 'no-cors', // Essential for Google Apps Script Web Apps
         body: JSON.stringify(d)
       });
       
-      window.location.href = '../thank-you.html';
+      // The redirect must happen after a short delay because 'no-cors' 
+      // hides the "Success" message from the browser
+      setTimeout(() => {
+        window.location.href = '../thank-you.html';
+      }, 800);
 
     } catch (err) {
-      alert("Connection error. Try again.");
+      console.error("Submission Error:", err);
+      alert("Submission failed. Please check your connection.");
       btn.innerText = "Submit Application";
       btn.disabled = false;
     }
