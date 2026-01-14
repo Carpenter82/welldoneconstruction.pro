@@ -209,4 +209,85 @@
 </script>
 
 </body>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Portal | Well Done Construction</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<div class="container" id="loginView">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2>Worker Portal</h2>
+        <p>Enter your registered email to access your dashboard.</p>
+    </div>
+
+    <div class="form-group">
+        <input type="email" id="workerEmail" placeholder="Email Address" required>
+        <button class="btn" onclick="portalLogin()" id="loginBtn">Access Portal</button>
+    </div>
+    <p id="loginMsg" style="text-align: center; margin-top: 15px;"></p>
+</div>
+
+<div class="container" id="dashboardView" style="display: none;">
+    <h2 id="welcomeName">Welcome</h2>
+    <div class="status-card">
+        <p>Status: <strong id="workerStatus">Checking...</strong></p>
+    </div>
+
+    <div class="grid-menu" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+        <a id="checklistLink" href="#" class="btn btn-secondary">Site Checklist</a>
+        <a id="uploadLink" href="#" class="btn btn-secondary">Upload Photos</a>
+    </div>
+    
+    <button class="btn btn-outline" style="margin-top: 30px;" onclick="location.reload()">Log Out</button>
+</div>
+
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
+
+    async function portalLogin() {
+        const email = document.getElementById('workerEmail').value.trim();
+        const btn = document.getElementById('loginBtn');
+        const msg = document.getElementById('loginMsg');
+
+        if (!email) return alert("Please enter your email.");
+
+        btn.innerText = "Verifying...";
+        btn.disabled = true;
+
+        try {
+            // This calls the 'getWorkerStatus' action in your Apps Script
+            const resp = await fetch(`${scriptURL}?action=getWorkerStatus&email=${encodeURIComponent(email)}`);
+            const data = await resp.json();
+
+            if (data.status === 'Not Found') {
+                msg.innerText = "Email not found. Please complete the Intake form first.";
+                msg.style.color = "red";
+                btn.innerText = "Access Portal";
+                btn.disabled = false;
+            } else {
+                // SUCCESS: Switch views
+                document.getElementById('loginView').style.display = 'none';
+                document.getElementById('dashboardView').style.display = 'block';
+                
+                document.getElementById('welcomeName').innerText = `Welcome, ${data.firstName}!`;
+                document.getElementById('workerStatus').innerText = data.status;
+
+                // Set up the links to include the email so the checklist knows who is checking in
+                document.getElementById('checklistLink').href = `../checklist/index.html?email=${encodeURIComponent(email)}`;
+                document.getElementById('uploadLink').href = `../portal/upload.html?email=${encodeURIComponent(email)}`;
+            }
+        } catch (e) {
+            alert("Error connecting to server.");
+            btn.disabled = false;
+        }
+    }
+</script>
+
+</body>
+</html>
 </html>
