@@ -1,1 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Well Done Construction</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .badge { padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; }
+    .status-active { background: #dcfce7; color: #166534; }
+    .status-pending { background: #fef9c3; color: #854d0e; }
+    #photoUploadSection { border: 2px dashed #ccc; padding: 20px; border-radius: 12px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+<div class="container" style="text-align: center;">
+    <h1 id="welcomeHeading">Loading...</h1>
+    <div style="margin-bottom: 25px;">
+      <span id="statusBadge" class="badge">Checking Status...</span>
+    </div>
+    
+    <div id="activeContent" style="display:none;">
+      <a href="#" id="checklistLink" class="btn" style="background: var(--wd-green); color: white;">📋 START DAILY CHECKLIST</a>
+      <div id="photoUploadSection">
+        <h3>📸 Site Photo Upload</h3>
+        <select id="photoType" style="margin-bottom:10px;">
+          <option value="Address">📍 1. Address Verification</option>
+          <option value="Before">🛠️ 2. Before Photo</option>
+          <option value="After">✅ 3. After Photo</option>
+        </select>
+        <input type="file" id="photoFile" accept="image/*" capture="camera">
+        <button onclick="uploadPhoto()" id="uploadBtn" class="btn" style="margin-top:10px;">📤 UPLOAD PHOTO</button>
+        <p id="uploadStatus" style="margin-top:10px; font-weight:bold;"></p>
+      </div>
+    </div>
 
+    <div id="pendingContent" style="display:none;">
+      <p>Your account is <strong>Pending</strong>. Please complete onboarding.</p>
+    </div>
+</div>
+
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
+    const urlParams = new URLSearchParams(window.location.search);
+    const userEmail = urlParams.get('email');
+
+    async function loadPortal() {
+        if (!userEmail) { window.location.href = 'index.html'; return; }
+        const resp = await fetch(`${scriptURL}?action=getWorkerStatus&email=${encodeURIComponent(userEmail)}`);
+        const worker = await resp.json();
+        
+        document.getElementById('welcomeHeading').innerText = `Hello, ${worker.firstName}!`;
+        const badge = document.getElementById('statusBadge');
+        badge.innerText = worker.status;
+
+        if (worker.status === 'ACTIVE' || worker.status === 'ID UPLOADED') {
+            badge.className = 'badge status-active';
+            document.getElementById('activeContent').style.display = 'block';
+            document.getElementById('checklistLink').href = `../checklist/index.html?email=${encodeURIComponent(userEmail)}`;
+        } else {
+            badge.className = 'badge status-pending';
+            document.getElementById('pendingContent').style.display = 'block';
+        }
+    }
+
+    async function uploadPhoto() {
+        const fileInput = document.getElementById('photoFile');
+        const btn = document.getElementById('uploadBtn');
+        const status = document.getElementById('uploadStatus');
+        if (!fileInput.files[0]) return alert("Take a photo first.");
+
+        btn.disabled = true; btn.innerText = "Uploading...";
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const base64Data = e.target.result.split(',')[1];
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    action: 'uploadJobPhoto',
+                    email: userEmail,
+                    fileData: base64Data,
+                    fileType: file.type,
+                    category: document.getElementById('photoType').value
+                })
+            });
+            status.innerText = "✅ Upload Successful!";
+            btn.disabled = false; btn.innerText = "UPLOAD ANOTHER";
+            fileInput.value = "";
+        };
+        reader.readAsDataURL(file);
+    }
+    window.onload = loadPortal;
+</script>
+</body>
+</html>
