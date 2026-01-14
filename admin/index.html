@@ -188,3 +188,32 @@
 </script>
 </body>
 </html>
+async function loadWorkers() {
+  try {
+    const resp = await fetch(`${scriptURL}?action=getWorkers&t=${Date.now()}`);
+    const workers = await resp.json();
+    let html = '';
+    
+    workers.forEach(w => {
+      // This builds the card using the data from the script above
+      html += `
+        <div class="worker-card">
+          <div class="worker-info">
+            <h4>${w.name}</h4>
+            <p>${w.trade} | <span class="badge status-${w.status.toLowerCase().replace(' ', '-')}">${w.status}</span></p>
+            <small style="color:#6E797F;">${w.email}</small>
+          </div>
+          <div class="btn-group">
+            <button class="action-btn btn-assign" onclick="openAssign('${w.name}', '${w.email}')">Assign</button>
+            <a href="${w.folderLink}" target="_blank" class="action-btn btn-folder">Files</a>
+            <button class="action-btn btn-hire" onclick="updateStatus(${w.rowIndex}, 'ACTIVE')">Hire</button>
+            <button class="action-btn btn-pause" onclick="updateStatus(${w.rowIndex}, 'ON HOLD')">Pause</button>
+          </div>
+        </div>
+      `;
+    });
+    document.getElementById('workerList').innerHTML = html || '<p style="text-align:center;">No active workers found.</p>';
+  } catch (e) {
+    document.getElementById('workerList').innerHTML = '<p style="text-align:center; color:red;">Error loading roster.</p>';
+  }
+}
