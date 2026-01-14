@@ -1,104 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Activity Log | Well Done</title>
+  <title>Site Activity | Well Done</title>
   <link rel="stylesheet" href="../styles.css">
-  <style>
-    /* Admin Dashboard Specific Styles */
-    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-    
-    .admin-nav { 
-      display: flex; 
-      justify-content: center; 
-      gap: 20px; 
-      margin-bottom: 30px; 
-      padding: 15px; 
-      background: white; 
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    
-    .admin-nav a { text-decoration: none; color: var(--wd-slate); font-weight: bold; font-size: 0.9rem; padding: 8px 12px; border-radius: 6px; }
-    .admin-nav a.active { color: var(--wd-green); background: #f0fff4; }
-
-    .log-entry { 
-      border-left: 5px solid var(--wd-green); 
-      background: #fff; 
-      padding: 20px; 
-      margin-bottom: 15px; 
-      border-radius: 0 12px 12px 0; 
-      box-shadow: 0 4px 6px rgba(0,0,0,0.03); 
-    }
-    
-    .log-meta { font-size: 0.85rem; color: var(--wd-slate); margin-bottom: 8px; font-weight: 600; }
-    
-    .worker-name { color: var(--wd-dark); font-size: 1.1rem; }
-
-    .refresh-btn {
-      float: right;
-      background: var(--wd-dark);
-      color: white;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
-  </style>
 </head>
 <body>
-
 <div class="container">
-  <div class="admin-nav">
-    <a href="index.html">Crew Roster</a>
-    <a href="activity.html" class="active">Site Activity Log</a>
-  </div>
-
-  <button class="refresh-btn" onclick="loadActivity()">🔄 Refresh Feed</button>
-  <h2>Recent Site Check-Ins</h2>
-  
-  <div id="activityList">Loading logs...</div>
+  <h2>Daily Site Activity</h2>
+  <div id="activityLog">Loading GPS logs...</div>
 </div>
 
 <script>
   const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
 
   async function loadActivity() {
-    const list = document.getElementById('activityList');
-    list.innerHTML = '<p style="text-align:center;">Fetching latest data...</p>';
-    
-    try {
-      // Note: Added a timestamp to the URL to prevent browser caching
-      const resp = await fetch(`${scriptURL}?action=getActivity&t=${Date.now()}`);
-      const logs = await resp.json();
-      
-      // We want NEWEST check-ins at the top
-      logs.reverse();
-
-      let html = '';
-      logs.forEach(log => {
-        // Fallback: If mapLink isn't provided by GAS, we generate it from Lat/Lng
-        const mapUrl = log.mapLink || `https://www.google.com/maps?q=${log.lat},${log.lng}`;
-        
-        html += `
-          <div class="log-entry">
-            <div class="log-meta">📅 ${new Date(log.timestamp).toLocaleString()}</div>
-            <strong class="worker-name">${log.email}</strong> 
-            <span style="color: #6E797F;">checked in from the field.</span>
-            <br>
-            <a href="${mapUrl}" target="_blank" class="map-btn">📍 View on Google Maps</a>
-          </div>
-        `;
-      });
-      list.innerHTML = html || '<p style="text-align:center;">No activity logged yet.</p>';
-    } catch (err) {
-      list.innerHTML = '<p style="color:red; text-align:center;">⚠️ Error loading logs. Check your Apps Script permissions.</p>';
-    }
+    const resp = await fetch(`${scriptURL}?action=getActivity`);
+    const logs = await resp.json();
+    const container = document.getElementById('activityLog');
+    container.innerHTML = logs.reverse().map(l => `
+      <div class="worker-card" style="border-left: 5px solid #343E47; margin-bottom:10px; padding:10px; background:white;">
+        <strong>${l.email}</strong><br>
+        <small>${new Date(l.timestamp).toLocaleString()}</small><br>
+        <a href="${l.mapLink}" target="_blank" style="color:#33B26E;">📍 View GPS Location</a>
+      </div>
+    `).join('');
   }
-
   window.onload = loadActivity;
 </script>
 </body>
