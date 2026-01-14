@@ -6,37 +6,70 @@
   <title>Dashboard | Well Done Construction</title>
   <link rel="stylesheet" href="../styles.css">
   <style>
-    .badge { padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; }
-    .status-active { background: #dcfce7; color: #166534; }
-    .status-pending { background: #fef9c3; color: #854d0e; }
-    #photoUploadSection { border: 2px dashed #ccc; padding: 20px; border-radius: 12px; margin-top: 20px; }
+    .badge { padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; }
+    .status-active { background: #33B26E; color: white; }
+    .status-pending { background: #FFB800; color: #343E47; }
+    
+    .action-card { 
+      background: white; 
+      padding: 20px; 
+      border-radius: 12px; 
+      margin-top: 20px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      text-align: left;
+    }
+    
+    .logout-btn {
+      background: none;
+      border: 1px solid #ddd;
+      color: #6E797F;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 40px;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
-<div class="container" style="text-align: center;">
-    <h1 id="welcomeHeading">Loading...</h1>
+
+<div class="container" style="text-align: center; padding-top: 20px;">
+    <h1 id="welcomeHeading">Loading Dashboard...</h1>
     <div style="margin-bottom: 25px;">
-      <span id="statusBadge" class="badge">Checking Status...</span>
+      <span id="statusBadge" class="badge">Checking...</span>
     </div>
     
     <div id="activeContent" style="display:none;">
-      <a href="#" id="checklistLink" class="btn" style="background: var(--wd-green); color: white;">📋 START DAILY CHECKLIST</a>
-      <div id="photoUploadSection">
-        <h3>📸 Site Photo Upload</h3>
-        <select id="photoType" style="margin-bottom:10px;">
+      <a href="#" id="checklistLink" class="btn" style="background: #33B26E; color: white; display: block; margin-bottom: 20px;">
+        📋 START DAILY CHECKLIST
+      </a>
+
+      <div class="action-card">
+        <h3 style="margin-top:0;">📸 Site Photo Upload</h3>
+        <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">Photos sync directly to your project folder.</p>
+        
+        <select id="photoType" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc;">
           <option value="Address">📍 1. Address Verification</option>
           <option value="Before">🛠️ 2. Before Photo</option>
           <option value="After">✅ 3. After Photo</option>
+          <option value="Misc">📦 4. Receipt/Misc</option>
         </select>
-        <input type="file" id="photoFile" accept="image/*" capture="camera">
-        <button onclick="uploadPhoto()" id="uploadBtn" class="btn" style="margin-top:10px;">📤 UPLOAD PHOTO</button>
-        <p id="uploadStatus" style="margin-top:10px; font-weight:bold;"></p>
+        
+        <input type="file" id="photoFile" accept="image/*" capture="camera" style="margin-bottom: 15px;">
+        
+        <button onclick="uploadPhoto()" id="uploadBtn" class="btn" style="width: 100%; background: #343E47; color: white;">
+          UPLOAD TO DRIVE
+        </button>
+        <p id="uploadStatus" style="margin-top:10px; text-align: center; font-size: 0.9rem;"></p>
       </div>
     </div>
 
-    <div id="pendingContent" style="display:none;">
-      <p>Your account is <strong>Pending</strong>. Please complete onboarding.</p>
+    <div id="pendingContent" style="display:none;" class="action-card">
+      <h3>Account Pending</h3>
+      <p>Management is currently reviewing your documents. Please ensure you have completed <a href="../onboarding.html">Onboarding</a>.</p>
     </div>
+
+    <button class="logout-btn" onclick="logout()">Logout of Portal</button>
 </div>
 
 <script>
@@ -46,20 +79,25 @@
 
     async function loadPortal() {
         if (!userEmail) { window.location.href = 'index.html'; return; }
-        const resp = await fetch(`${scriptURL}?action=getWorkerStatus&email=${encodeURIComponent(userEmail)}`);
-        const worker = await resp.json();
         
-        document.getElementById('welcomeHeading').innerText = `Hello, ${worker.firstName}!`;
-        const badge = document.getElementById('statusBadge');
-        badge.innerText = worker.status;
+        try {
+            const resp = await fetch(`${scriptURL}?action=getWorkerStatus&email=${encodeURIComponent(userEmail)}`);
+            const worker = await resp.json();
+            
+            document.getElementById('welcomeHeading').innerText = `Hello, ${worker.firstName}!`;
+            const badge = document.getElementById('statusBadge');
+            badge.innerText = worker.status;
 
-        if (worker.status === 'ACTIVE' || worker.status === 'ID UPLOADED') {
-            badge.className = 'badge status-active';
-            document.getElementById('activeContent').style.display = 'block';
-            document.getElementById('checklistLink').href = `../checklist/index.html?email=${encodeURIComponent(userEmail)}`;
-        } else {
-            badge.className = 'badge status-pending';
-            document.getElementById('pendingContent').style.display = 'block';
+            if (worker.status === 'ACTIVE' || worker.status === 'ID UPLOADED') {
+                badge.classList.add('status-active');
+                document.getElementById('activeContent').style.display = 'block';
+                document.getElementById('checklistLink').href = `../checklist/index.html?email=${encodeURIComponent(userEmail)}`;
+            } else {
+                badge.classList.add('status-pending');
+                document.getElementById('pendingContent').style.display = 'block';
+            }
+        } catch (e) {
+            document.getElementById('welcomeHeading').innerText = "Connection Error";
         }
     }
 
@@ -67,30 +105,49 @@
         const fileInput = document.getElementById('photoFile');
         const btn = document.getElementById('uploadBtn');
         const status = document.getElementById('uploadStatus');
-        if (!fileInput.files[0]) return alert("Take a photo first.");
+        
+        if (!fileInput.files[0]) return alert("Please capture an image.");
 
-        btn.disabled = true; btn.innerText = "Uploading...";
+        btn.disabled = true;
+        btn.innerText = "Uploading...";
+        
         const file = fileInput.files[0];
         const reader = new FileReader();
+        
         reader.onload = async (e) => {
             const base64Data = e.target.result.split(',')[1];
-            await fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({
-                    action: 'uploadJobPhoto',
-                    email: userEmail,
-                    fileData: base64Data,
-                    fileType: file.type,
-                    category: document.getElementById('photoType').value
-                })
-            });
-            status.innerText = "✅ Upload Successful!";
-            btn.disabled = false; btn.innerText = "UPLOAD ANOTHER";
-            fileInput.value = "";
+            try {
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        action: 'uploadJobPhoto',
+                        email: userEmail,
+                        fileData: base64Data,
+                        fileType: file.type,
+                        category: document.getElementById('photoType').value
+                    })
+                });
+                status.style.color = "green";
+                status.innerText = "✓ Photo Saved!";
+                fileInput.value = "";
+            } catch (err) {
+                status.style.color = "red";
+                status.innerText = "Upload failed. Try again.";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "UPLOAD ANOTHER";
+            }
         };
         reader.readAsDataURL(file);
     }
+
+    function logout() {
+        if(confirm("Are you sure you want to log out?")) {
+            window.location.href = 'index.html';
+        }
+    }
+
     window.onload = loadPortal;
 </script>
 </body>
