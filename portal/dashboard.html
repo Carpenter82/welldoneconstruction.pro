@@ -9,57 +9,33 @@
     .badge { padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; }
     .status-active { background: #33B26E; color: white; }
     .status-pending { background: #FFB800; color: #343E47; }
-    
-    .action-card { 
-      background: white; 
-      padding: 20px; 
-      border-radius: 12px; 
-      margin-top: 20px; 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      text-align: left;
-    }
-    
-    .logout-btn {
-      background: none;
-      border: 1px solid #ddd;
-      color: #6E797F;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 40px;
-      font-size: 0.9rem;
-    }
+    .action-card { background: white; padding: 20px; border-radius: 12px; margin-top: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: left; }
+    .logout-btn { background: none; border: 1px solid #ddd; color: #6E797F; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-top: 40px; font-size: 0.9rem; }
   </style>
 </head>
 <body>
 
 <div class="container" style="text-align: center; padding-top: 20px;">
-    <h1 id="welcomeHeading">Loading Dashboard...</h1>
+    <h1 id="welcomeHeading">Loading...</h1>
     <div style="margin-bottom: 25px;">
       <span id="statusBadge" class="badge">Checking...</span>
     </div>
     
     <div id="activeContent" style="display:none;">
-      <a href="#" id="checklistLink" class="btn" style="background: #33B26E; color: white; display: block; margin-bottom: 20px;">
+      <a href="#" id="checklistLink" class="btn" style="background: #33B26E; color: white; display: block; margin-bottom: 20px; text-decoration: none; padding: 15px; border-radius: 8px; font-weight: bold;">
         📋 START DAILY CHECKLIST
       </a>
 
       <div class="action-card">
         <h3 style="margin-top:0;">📸 Site Photo Upload</h3>
-        <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">Photos sync directly to your project folder.</p>
-        
-        <select id="photoType" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc;">
+        <select id="photoType" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px;">
           <option value="Address">📍 1. Address Verification</option>
           <option value="Before">🛠️ 2. Before Photo</option>
           <option value="After">✅ 3. After Photo</option>
           <option value="Misc">📦 4. Receipt/Misc</option>
         </select>
-        
-        <input type="file" id="photoFile" accept="image/*" capture="camera" style="margin-bottom: 15px;">
-        
-        <button onclick="uploadPhoto()" id="uploadBtn" class="btn" style="width: 100%; background: #343E47; color: white;">
-          UPLOAD TO DRIVE
-        </button>
+        <input type="file" id="photoFile" accept="image/*" capture="camera" style="margin-bottom: 15px; width: 100%;">
+        <button onclick="uploadPhoto()" id="uploadBtn" class="btn" style="width: 100%; background: #343E47; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">UPLOAD TO DRIVE</button>
         <p id="uploadStatus" style="margin-top:10px; text-align: center; font-size: 0.9rem;"></p>
       </div>
     </div>
@@ -69,11 +45,11 @@
       <p>Management is currently reviewing your documents. Please ensure you have completed <a href="../onboarding.html">Onboarding</a>.</p>
     </div>
 
-    <button class="logout-btn" onclick="logout()">Logout of Portal</button>
+    <button class="logout-btn" onclick="logout()">Logout</button>
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
     const urlParams = new URLSearchParams(window.location.search);
     const userEmail = urlParams.get('email');
 
@@ -84,11 +60,12 @@
             const resp = await fetch(`${scriptURL}?action=getWorkerStatus&email=${encodeURIComponent(userEmail)}`);
             const worker = await resp.json();
             
-            document.getElementById('welcomeHeading').innerText = `Hello, ${worker.firstName}!`;
+            document.getElementById('welcomeHeading').innerText = `Hello, ${worker.firstName || 'Worker'}!`;
             const badge = document.getElementById('statusBadge');
             badge.innerText = worker.status;
 
-            if (worker.status === 'ACTIVE' || worker.status === 'ID UPLOADED') {
+            // Updated logic to catch "ACTIVE / HIRED" which comes from the hireWorker function
+            if (worker.status.includes('ACTIVE') || worker.status === 'ID UPLOADED') {
                 badge.classList.add('status-active');
                 document.getElementById('activeContent').style.display = 'block';
                 document.getElementById('checklistLink').href = `../checklist/index.html?email=${encodeURIComponent(userEmail)}`;
@@ -97,7 +74,7 @@
                 document.getElementById('pendingContent').style.display = 'block';
             }
         } catch (e) {
-            document.getElementById('welcomeHeading').innerText = "Connection Error";
+            document.getElementById('welcomeHeading').innerText = "Dashboard Offline";
         }
     }
 
@@ -143,9 +120,7 @@
     }
 
     function logout() {
-        if(confirm("Are you sure you want to log out?")) {
-            window.location.href = 'index.html';
-        }
+        if(confirm("Logout?")) window.location.href = 'index.html';
     }
 
     window.onload = loadPortal;
