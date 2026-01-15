@@ -28,7 +28,7 @@
     .worker-meta { margin: 5px 0; font-size: 0.85rem; color: #6E797F; }
     .badge { font-weight: bold; text-transform: uppercase; font-size: 0.75rem; }
     
-    .worker-actions { display: flex; gap: 8px; }
+    .worker-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     
     .btn-sm { 
       padding: 8px 12px; 
@@ -39,9 +39,13 @@
       cursor: pointer; 
       font-weight: 600;
       transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: inline-block;
     }
     
     .btn-sm:hover { background: #f0f0f0; border-color: #bbb; }
+    .btn-projects { border-color: #33B26E; color: #2E7D32; }
     .toggle-btn { min-width: 80px; }
 
     @media (max-width: 600px) {
@@ -63,8 +67,8 @@
 
 <nav class="nav-dock">
   <a href="index.html" class="active">Roster</a>
-  <a href="activity.html">Activity Logs</a>
-  <a href="../portal/index.html">Portal View</a>
+  <a href="projects.html">Project Log</a>
+  <a href="activity.html">Activity</a>
 </nav>
 
 <script>
@@ -72,7 +76,6 @@
 
   async function loadWorkers() {
     try {
-      // Fetch with cache-buster to get fresh data from the Sheet
       const resp = await fetch(`${scriptURL}?action=getWorkers&t=${Date.now()}`);
       const workers = await resp.json();
       let html = '';
@@ -89,8 +92,12 @@
             </div>
             
             <div class="worker-actions">
+              <a href="projects.html?worker=${encodeURIComponent(w.email)}" class="btn-sm btn-projects">📋 Projects</a>
+              
               <button onclick="assignWork('${w.email}')" class="btn-sm">Assign</button>
-              <a href="${w.folderLink}" target="_blank" class="btn-sm" style="text-decoration:none; color:inherit; text-align:center;">Files</a>
+              
+              <a href="${w.folderLink}" target="_blank" class="btn-sm">Files</a>
+              
               <button onclick="updateStatus(${w.rowIndex}, '${isPaused ? 'ACTIVE' : 'PAUSED'}')" class="btn-sm toggle-btn">
                 ${isPaused ? '▶️ Resume' : '⏸️ Pause'}
               </button>
@@ -100,37 +107,52 @@
       });
       document.getElementById('workerList').innerHTML = html || '<p style="text-align:center;">No workers found in Active Roster.</p>';
     } catch (e) {
-      document.getElementById('workerList').innerHTML = '<p style="text-align:center; color:red;">Error loading roster. Check script permissions.</p>';
+      document.getElementById('workerList').innerHTML = '<p style="text-align:center; color:red;">Error loading roster.</p>';
     }
   }
 
-  // UPDATE STATUS (PAUSE/RESUME)
   async function updateStatus(row, newStatus) {
     if(!confirm(`Change worker status to ${newStatus}?`)) return;
-    
     try {
       await fetch(scriptURL, {
         method: 'POST',
         mode: 'no-cors',
         body: JSON.stringify({ action: 'updateStatus', row: row, status: newStatus })
       });
-      // Give the sheet a second to process before refreshing
       setTimeout(loadWorkers, 1200);
     } catch (e) { alert("Update failed."); }
   }
 
-  // ASSIGN JOB LOCATION
-  function assignWork(email) {
-    const loc = prompt("Enter Job Location / Address:");
-    const scope = prompt("Enter Work Scope (Tasks):");
-    if (!loc || !scope) return;
+  // CORRECTED: Assignment function now includes your specific fields
+  async function assignWork(email) {
+    const client = prompt("Client Name:");
+    const address = prompt("Project Street Address:");
+    const scope = prompt("Project Description / Scope:");
+    const budget = prompt("Estimated Budget ($):");
+    const source = prompt("Reference / Source (Optional):");
 
-    fetch(scriptURL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: JSON.stringify({ action: 'assignWork', email: email, location: loc, scope: scope })
-    });
-    alert("Assignment sent to project log for " + email);
+    if (!client || !address) return alert("Client Name and Address are required.");
+
+    try {
+      await fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({ 
+          action: 'assignWork', 
+          email: email, 
+          clientName: client,
+          location: address,
+          scope: scope,
+          budget: budget,
+          source: source,
+          notes: "Assigned via Admin Roster"
+        })
+      });
+      alert(`Assignment created for ${client}. Redirecting to Project Log...`);
+      window.location.href = `projects.html?worker=${encodeURIComponent(email)}`;
+    } catch (e) {
+      alert("Error saving assignment.");
+    }
   }
 
   window.onload = loadWorkers;
