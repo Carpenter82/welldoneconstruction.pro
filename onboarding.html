@@ -14,7 +14,7 @@
   <p style="text-align: center; color: #6E797F;">Upload your documentation to activate your worker portal.</p>
   
   <form id="onboardForm">
-    <input type="email" id="em" placeholder="Confirm Your Email" required>
+    <input type="email" id="em" placeholder="Confirm Your Email" required style="width:100%; padding:10px; margin-bottom:10px;">
     
     <label style="font-weight: bold; display: block; margin-top: 20px; margin-bottom: 5px;">1. Driver's License / ID:</label>
     <input type="file" id="idFile" accept="image/*" required>
@@ -22,7 +22,7 @@
     <label style="font-weight: bold; display: block; margin-top: 10px; margin-bottom: 5px;">2. OSHA 10 Card:</label>
     <input type="file" id="oshaFile" accept="image/*,application/pdf" required>
 
-    <button type="submit" id="submitBtn" class="btn">Upload & Continue</button>
+    <button type="submit" id="submitBtn" class="btn" style="width:100%; padding:15px; margin-top:20px; background:#33B26E; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">Upload & Continue</button>
   </form>
   <p id="msg" style="text-align: center; margin-top: 15px; font-weight: bold;"></p>
 </div>
@@ -49,9 +49,9 @@ document.getElementById('onboardForm').onsubmit = async (e) => {
   const msg = document.getElementById('msg');
   const idInput = document.getElementById('idFile');
   const oshaInput = document.getElementById('oshaFile');
-  const email = document.getElementById('em').value;
+  const email = document.getElementById('em').value.trim().toLowerCase();
 
-  btn.innerText = "Uploading Documents...";
+  btn.innerText = "Processing Files (Please Wait)...";
   btn.disabled = true;
 
   try {
@@ -63,27 +63,40 @@ document.getElementById('onboardForm').onsubmit = async (e) => {
       action: 'onboard',
       email: email,
       files: [
-        { data: idData, name: "ID_" + idInput.files[0].name, type: idInput.files[0].type, folder: "5. Misc" },
-        { data: oshaData, name: "OSHA10_" + oshaInput.files[0].name, type: oshaInput.files[0].type, folder: "4. Contracts" } // Placing in Contracts/Legal folder
+        { 
+            data: idData, 
+            name: "ID_" + email + "_" + Date.now(), 
+            type: idInput.files[0].type, 
+            folder: "1. Permits" // Changed to Permits for ID storage
+        },
+        { 
+            data: oshaData, 
+            name: "OSHA10_" + email + "_" + Date.now(), 
+            type: oshaInput.files[0].type, 
+            folder: "4. Contracts" 
+        }
       ]
     };
 
-    await fetch('https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec', {
+    // UPDATED SCRIPT URL
+    await fetch('https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec', {
       method: 'POST',
       mode: 'no-cors',
       body: JSON.stringify(payload)
     });
 
     msg.style.color = "green";
-    msg.innerText = "All Documents Saved! Redirecting...";
+    msg.innerText = "Upload Complete! Entering Portal...";
     
+    // Slight delay to allow Google Drive to process the folder creation
     setTimeout(() => {
       window.location.href = `portal/index.html?email=${encodeURIComponent(email)}`;
-    }, 2000);
+    }, 2500);
 
   } catch (err) {
     console.error(err);
-    alert("Upload failed. Please ensure both files are selected and try again.");
+    msg.style.color = "red";
+    msg.innerText = "Upload Error. Please try again.";
     btn.innerText = "Upload & Continue";
     btn.disabled = false;
   }
