@@ -1,33 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Site Activity | Well Done</title>
-  <link rel="stylesheet" href="../styles.css">
-</head>
-<body>
-<div class="container">
-  <h2>Daily Site Activity</h2>
-  <div id="activityLog">Loading GPS logs...</div>
-</div>
-
 <script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
 
   async function loadActivity() {
-    const resp = await fetch(`${scriptURL}?action=getActivity`);
-    const logs = await resp.json();
-    const container = document.getElementById('activityLog');
-    container.innerHTML = logs.reverse().map(l => `
-      <div class="worker-card" style="border-left: 5px solid #343E47; margin-bottom:10px; padding:10px; background:white;">
-        <strong>${l.email}</strong><br>
-        <small>${new Date(l.timestamp).toLocaleString()}</small><br>
-        <a href="${l.mapLink}" target="_blank" style="color:#33B26E;">📍 View GPS Location</a>
-      </div>
-    `).join('');
+    try {
+      const resp = await fetch(`${scriptURL}?action=getActivity`);
+      const logs = await resp.json();
+      const container = document.getElementById('activityLog');
+      // Reversing the array so newest check-ins appear first
+      container.innerHTML = logs.reverse().map(l => `
+        <div class="worker-card" style="border-left: 5px solid #343E47; margin-bottom:10px; padding:15px; background:white;">
+          <strong style="color:#33B26E;">${l.email}</strong><br>
+          <small>${new Date(l.timestamp).toLocaleString()}</small><br>
+          <a href="${l.mapLink}" target="_blank" style="display:inline-block; margin-top:8px; text-decoration:none; font-weight:bold;">📍 View Map Location</a>
+        </div>
+      `).join('');
+    } catch (e) {
+      document.getElementById('activityLog').innerText = "Failed to load logs.";
+    }
   }
   window.onload = loadActivity;
 </script>
-</body>
-</html>
