@@ -7,10 +7,8 @@
   <title>Site Checklist | Well Done Construction</title>
   <link rel="stylesheet" href="../styles.css">
   <style>
-    /* Base Styles */
     .container { max-width: 500px; margin: 0 auto; padding: 20px; }
     
-    /* Field-Proof Checklist Items */
     .task-item { 
       display: flex; 
       align-items: center; 
@@ -25,7 +23,6 @@
     
     .task-item:hover { background: #f0f0f0; }
     
-    /* Larger Checkboxes for Gloved/Busy Hands */
     .task-item input { 
       width: 30px; 
       height: 30px; 
@@ -40,7 +37,6 @@
       color: #343E47; 
     }
 
-    /* Highlight item when checked */
     .task-item:has(input:checked) {
       border-color: #33B26E;
       background: #f0fff4;
@@ -73,18 +69,18 @@
     </label>
   </div>
 
-  <button id="submitBtn" class="btn" onclick="submitChecklist()" style="margin-top: 20px; width: 100%; background: #33B26E;">Submit & Verify GPS</button>
+  <button id="submitBtn" class="btn" onclick="submitChecklist()" style="margin-top: 20px; width: 100%; background: #33B26E; color: white; padding: 18px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Submit & Verify GPS</button>
   <p id="statusMsg"></p>
 </div>
 
 <script>
   const urlParams = new URLSearchParams(window.location.search);
   const email = urlParams.get('email');
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
+  // UPDATED TO MATCH YOUR NEW DEPLOYMENT
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
 
-  // Security check
   if (!email) {
-    alert("Session expired or invalid. Please log in through the portal.");
+    alert("Session invalid. Redirecting to login...");
     window.location.href = '../portal/index.html';
   }
 
@@ -95,14 +91,13 @@
     const msg = document.getElementById('statusMsg');
 
     if (!allChecked) {
-      alert("Please complete all checklist items before submitting.");
+      alert("Please complete all checklist items first.");
       return;
     }
 
     btn.innerText = "Accessing GPS...";
     btn.disabled = true;
 
-    // Use high accuracy for site verification
     const geoOptions = {
       enableHighAccuracy: true,
       timeout: 10000,
@@ -131,17 +126,19 @@
         msg.innerText = "✓ Check-in Verified! Returning to portal...";
         
         setTimeout(() => {
-          window.location.href = `../portal/index.html?email=${encodeURIComponent(email)}`;
-        }, 2500);
+          // Returning to the dashboard with the email parameter intact
+          window.location.href = `../portal/dashboard.html?email=${encodeURIComponent(email)}`;
+        }, 2000);
 
       } catch (err) {
-        alert("Network error. Please try again.");
+        console.error(err);
+        alert("Upload failed. Check your data connection.");
         btn.disabled = false;
         btn.innerText = "Submit & Verify GPS";
       }
     }, (err) => {
       let errorMsg = "GPS Error. Please enable Location Services.";
-      if (err.code === 1) errorMsg = "Permission Denied. Please allow location access in settings.";
+      if (err.code === 1) errorMsg = "Permission Denied. Well Done requires GPS to verify site completion.";
       
       alert(errorMsg);
       btn.disabled = false;
