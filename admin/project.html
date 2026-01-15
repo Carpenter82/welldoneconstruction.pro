@@ -6,17 +6,43 @@
   <title>Project Log | Admin</title>
   <link rel="stylesheet" href="../styles.css">
   <style>
+    .total-card { 
+      background: #343E47; 
+      color: #33B26E; 
+      padding: 15px; 
+      border-radius: 8px; 
+      margin-bottom: 20px; 
+      text-align: center; 
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; font-size: 0.9rem; }
     th, td { padding: 12px; border: 1px solid #eee; text-align: left; }
     th { background: #343E47; color: white; }
-    .status-badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; }
+    .status-badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; text-transform: uppercase; }
+    
+    /* Status Colors */
     .assigned { background: #E3F2FD; color: #1976D2; }
     .verified { background: #E8F5E9; color: #2E7D32; }
+    .completed { background: #33B26E; color: white; }
+    
+    .nav-link { display: inline-block; margin-bottom: 15px; font-size: 0.85rem; color: #1976D2; text-decoration: none; font-weight: bold; }
   </style>
 </head>
 <body>
+
 <div class="container">
-  <h2>Project & Assignment Log</h2>
+  <a href="index.html" class="nav-link">← Back to Crew Roster</a>
+  
+  <h2 id="pageTitle">Project & Assignment Log</h2>
+  
+  <div id="totalBudgetDisplay" class="total-card">
+    <h3 id="totalValueText">Calculating Total Value...</h3>
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <a href="projects.html" id="viewAllLink" style="display:none; font-size: 0.8rem; color: #6E797F;">Show All Crew Projects</a>
+  </div>
+
   <div style="overflow-x:auto;">
     <table id="projectTable">
       <thead>
@@ -26,37 +52,69 @@
           <th>Client/Address</th>
           <th>Budget</th>
           <th>Status</th>
+          <th>Verify</th>
         </tr>
       </thead>
       <tbody id="projectBody">
-        </tbody>
+        <tr><td colspan="6" style="text-align:center;">Loading logs...</td></tr>
+      </tbody>
     </table>
   </div>
 </div>
 
 <script>
-  const scriptURL = 'YOUR_SCRIPT_URL';
+  // REPLACE with your actual Web App URL
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
 
   async function loadProjects() {
-    const resp = await fetch(`${scriptURL}?action=getActivity`); // We'll update the script to serve ProjectLog too
-    const data = await resp.json();
-    const body = document.getElementById('projectBody');
-    
-    // For now, this filters for entries that look like projects
-    body.innerHTML = data.map(p => `
-      <tr>
-        <td>${new Date(p.timestamp).toLocaleDateString()}</td>
-        <td>${p.email}</td>
-        <td><strong>${p.clientName || 'N/A'}</strong><br>${p.location || 'Site Check'}</td>
-        <td>${p.budget || '$0'}</td>
-        <td><span class="status-badge ${p.status?.toLowerCase()}">${p.status || 'LOGGED'}</span></td>
-      </tr>
-    `).join('');
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const filterEmail = urlParams.get('worker');
+      
+      // Fetch specifically from the ProjectLog action
+      const resp = await fetch(`${scriptURL}?action=getProjectLog&t=${Date.now()}`);
+      let projects = await resp.json();
+
+      if (filterEmail) {
+        projects = projects.filter(p => p.email === filterEmail);
+        document.getElementById('pageTitle').innerText = `Projects: ${filterEmail}`;
+        document.getElementById('viewAllLink').style.display = 'inline';
+      }
+
+      // --- CALCULATION LOGIC ---
+      const totalBudget = projects.reduce((sum, p) => {
+        // Strips any non-numeric chars like $ or ,
+        const amount = Number(String(p.budget || "0").replace(/[^0-9.-]+/g, ""));
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
+
+      document.getElementById('totalValueText').innerText = `Total Portfolio Value: $${totalBudget.toLocaleString()}`;
+
+      // --- RENDER TABLE ---
+      const body = document.getElementById('projectBody');
+      if (projects.length === 0) {
+        body.innerHTML = '<tr><td colspan="6" style="text-align:center;">No projects found.</td></tr>';
+        return;
+      }
+
+      body.innerHTML = projects.reverse().map(p => `
+        <tr>
+          <td>${new Date(p.timestamp).toLocaleDateString()}</td>
+          <td>${p.email}</td>
+          <td><strong>${p.clientName || 'N/A'}</strong><br>${p.location || 'No Address'}</td>
+          <td style="color:#2E7D32; font-weight:bold;">$${p.budget || '0'}</td>
+          <td><span class="status-badge ${p.status?.toLowerCase()}">${p.status || 'LOGGED'}</span></td>
+          <td>${p.mapLink ? `<a href="${p.mapLink}" target="_blank" style="text-decoration:none;">📍 View</a>` : '—'}</td>
+        </tr>
+      `).join('');
+
+    } catch (e) {
+      document.getElementById('projectBody').innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Error loading project data.</td></tr>';
+    }
   }
+
   window.onload = loadProjects;
 </script>
-  <div style="margin-bottom: 10px;">
-  <a href="projects.html" style="font-size: 0.8rem; color: #1976D2; text-decoration: none;">← View All Crew Projects</a>
-</div>
+
 </body>
 </html>
