@@ -1,78 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Roster | Well Done Construction</title>
-  <link rel="stylesheet" href="../styles.css">
-  <style>
-    /* Admin Specific UI */
-    .roster-grid { display: grid; gap: 15px; margin-top: 20px; }
-    
-    .worker-card { 
-      background: white; 
-      padding: 15px; 
-      border-radius: 10px; 
-      border-left: 6px solid #ccc;
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    
-    /* Dynamic Status Colors */
-    .status-active { border-left-color: #33B26E; }
-    .status-hold { border-left-color: #FFB800; background: #fafafa; }
-    
-    .worker-info h3 { margin: 0; font-size: 1.1rem; color: #343E47; }
-    .worker-meta { margin: 5px 0; font-size: 0.85rem; color: #6E797F; }
-    .badge { font-weight: bold; text-transform: uppercase; font-size: 0.75rem; }
-    
-    .worker-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-    
-    .btn-sm { 
-      padding: 8px 12px; 
-      font-size: 0.75rem; 
-      border-radius: 6px; 
-      border: 1px solid #ddd; 
-      background: white; 
-      cursor: pointer; 
-      font-weight: 600;
-      transition: all 0.2s;
-      text-decoration: none;
-      color: inherit;
-      display: inline-block;
-    }
-    
-    .btn-sm:hover { background: #f0f0f0; border-color: #bbb; }
-    .btn-projects { border-color: #33B26E; color: #2E7D32; }
-    .toggle-btn { min-width: 80px; }
-
-    @media (max-width: 600px) {
-      .worker-card { flex-direction: column; align-items: flex-start; gap: 15px; }
-      .worker-actions { width: 100%; justify-content: space-between; }
-    }
-  </style>
-</head>
-<body>
-
-<div class="container">
-  <h2 style="text-align: center;">Crew Roster</h2>
-  <p style="text-align: center; color: #6E797F;">Manage active workers, assign jobs, and view files.</p>
-  
-  <div id="workerList" class="roster-grid">
-      <p style="text-align: center; padding: 20px;">Loading crew data...</p>
-  </div>
-</div>
-
-<nav class="nav-dock">
-  <a href="index.html" class="active">Roster</a>
-  <a href="projects.html">Project Log</a>
-  <a href="activity.html">Activity</a>
-</nav>
-
+// ... existing head and styles ...
 <script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
 
   async function loadWorkers() {
     try {
@@ -81,82 +9,60 @@
       let html = '';
 
       workers.forEach(w => {
-        const isPaused = w.status === 'PAUSED' || w.status === 'ON HOLD' || w.status === 'PAUSE';
-        
+        const isPaused = w.status === 'PAUSED' || w.status === 'ON HOLD';
         html += `
           <div class="worker-card ${isPaused ? 'status-hold' : 'status-active'}">
             <div class="worker-info">
               <h3>${w.name}</h3>
-              <p class="worker-meta"><strong>${w.trade}</strong> | <span class="badge">${w.status}</span></p>
+              <p class="worker-meta"><strong>${w.trade}</strong> | <span class="badge">${w.status}</span> | Tier: ${w.tier || 'TBD'}</p>
               <p class="worker-email" style="font-size: 0.8rem; color: #999;">${w.email}</p>
             </div>
-            
             <div class="worker-actions">
               <a href="projects.html?worker=${encodeURIComponent(w.email)}" class="btn-sm btn-projects">📋 Projects</a>
-              
               <button onclick="assignWork('${w.email}')" class="btn-sm">Assign</button>
-              
               <a href="${w.folderLink}" target="_blank" class="btn-sm">Files</a>
-              
               <button onclick="updateStatus(${w.rowIndex}, '${isPaused ? 'ACTIVE' : 'PAUSED'}')" class="btn-sm toggle-btn">
                 ${isPaused ? '▶️ Resume' : '⏸️ Pause'}
               </button>
             </div>
-          </div>
-        `;
+          </div>`;
       });
-      document.getElementById('workerList').innerHTML = html || '<p style="text-align:center;">No workers found in Active Roster.</p>';
+      document.getElementById('workerList').innerHTML = html || '<p>No workers found.</p>';
     } catch (e) {
-      document.getElementById('workerList').innerHTML = '<p style="text-align:center; color:red;">Error loading roster.</p>';
+      document.getElementById('workerList').innerHTML = '<p style="color:red;">Error loading roster.</p>';
     }
   }
 
   async function updateStatus(row, newStatus) {
-    if(!confirm(`Change worker status to ${newStatus}?`)) return;
+    if(!confirm(`Set status to ${newStatus}?`)) return;
     try {
       await fetch(scriptURL, {
         method: 'POST',
         mode: 'no-cors',
         body: JSON.stringify({ action: 'updateStatus', row: row, status: newStatus })
       });
-      setTimeout(loadWorkers, 1200);
+      setTimeout(loadWorkers, 1000);
     } catch (e) { alert("Update failed."); }
   }
 
-  // CORRECTED: Assignment function now includes your specific fields
   async function assignWork(email) {
     const client = prompt("Client Name:");
-    const address = prompt("Project Street Address:");
-    const scope = prompt("Project Description / Scope:");
-    const budget = prompt("Estimated Budget ($):");
-    const source = prompt("Reference / Source (Optional):");
-
-    if (!client || !address) return alert("Client Name and Address are required.");
+    const address = prompt("Street Address:");
+    const scope = prompt("Description / Scope:");
+    const budget = prompt("Budget ($):");
+    if (!client || !address) return;
 
     try {
       await fetch(scriptURL, {
         method: 'POST',
         mode: 'no-cors',
         body: JSON.stringify({ 
-          action: 'assignWork', 
-          email: email, 
-          clientName: client,
-          location: address,
-          scope: scope,
-          budget: budget,
-          source: source,
-          notes: "Assigned via Admin Roster"
+          action: 'assignWork', email: email, clientName: client, location: address, scope: scope, budget: budget, source: "Admin Dashboard", notes: "Direct Assignment" 
         })
       });
-      alert(`Assignment created for ${client}. Redirecting to Project Log...`);
+      alert("Job assigned!");
       window.location.href = `projects.html?worker=${encodeURIComponent(email)}`;
-    } catch (e) {
-      alert("Error saving assignment.");
-    }
+    } catch (e) { alert("Error assigning job."); }
   }
-
   window.onload = loadWorkers;
 </script>
-
-</body>
-</html>
