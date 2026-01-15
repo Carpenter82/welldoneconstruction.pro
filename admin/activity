@@ -2,21 +2,44 @@
   const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
 
   async function loadActivity() {
+    const container = document.getElementById('activityLog');
     try {
-      const resp = await fetch(`${scriptURL}?action=getActivity`);
+      // Added a cache-buster (?t=...) to ensure you get the newest GPS pings
+      const resp = await fetch(`${scriptURL}?action=getActivity&t=${Date.now()}`);
       const logs = await resp.json();
-      const container = document.getElementById('activityLog');
-      // Reversing the array so newest check-ins appear first
-      container.innerHTML = logs.reverse().map(l => `
-        <div class="worker-card" style="border-left: 5px solid #343E47; margin-bottom:10px; padding:15px; background:white;">
-          <strong style="color:#33B26E;">${l.email}</strong><br>
-          <small>${new Date(l.timestamp).toLocaleString()}</small><br>
-          <a href="${l.mapLink}" target="_blank" style="display:inline-block; margin-top:8px; text-decoration:none; font-weight:bold;">📍 View Map Location</a>
-        </div>
-      `).join('');
+      
+      console.log("Activity Data Received:", logs); // Helps us debug in the browser (F12)
+
+      if (!logs || logs.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding:20px;">No GPS activity recorded yet.</p>';
+        return;
+      }
+
+      // Reversing the array safely
+      const reversedLogs = [...logs].reverse();
+
+      container.innerHTML = reversedLogs.map(l => {
+        // Handle potential empty timestamps
+        const logDate = l.timestamp ? new Date(l.timestamp).toLocaleString() : "Date Unknown";
+        
+        return `
+          <div class="worker-card" style="border-left: 5px solid #343E47; margin-bottom:15px; padding:15px; background:white; border-radius:8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <strong style="color:#33B26E; font-size:1.1rem;">${l.email || 'Unknown Worker'}</strong><br>
+            <span style="color:#666; font-size:0.85rem;">🕒 ${logDate}</span><br>
+            <div style="margin-top:10px;">
+              ${l.mapLink ? 
+                `<a href="${l.mapLink}" target="_blank" style="color:#1976D2; text-decoration:none; font-weight:bold;">📍 View Location on Map</a>` : 
+                `<span style="color:#999;">No GPS link available</span>`}
+            </div>
+          </div>
+        `;
+      }).join('');
+
     } catch (e) {
-      document.getElementById('activityLog').innerText = "Failed to load logs.";
+      console.error("Load Error:", e);
+      container.innerHTML = `<p style="text-align:center; color:red; padding:20px;">Error connecting to logs. Please refresh.</p>`;
     }
   }
+
   window.onload = loadActivity;
 </script>
