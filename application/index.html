@@ -23,7 +23,7 @@
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      margin-bottom: 25px;
+      margin-bottom: 15px; /* Adjusted margin */
       text-align: left;
       cursor: pointer;
     }
@@ -66,11 +66,16 @@
     </div>
 
     <label class="checkbox-container">
+      <input type="checkbox" id="toolsOwn">
+      <span class="checkbox-text">I own my own basic hand tools and reliable transportation.</span>
+    </label>
+
+    <label class="checkbox-container">
       <input type="checkbox" id="termsConsent" required>
       <span class="checkbox-text">I acknowledge this is an on-call position and agree to the terms.</span>
     </label>
 
-    <button type="submit" id="submitBtn" class="btn">Submit Application</button>
+    <button type="submit" id="submitBtn" class="btn" style="width:100%; padding: 15px; background: #33B26E; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Submit Application</button>
   </form>
 </div>
 
@@ -82,8 +87,8 @@
 </nav>
 
 <script>
-  // YOUR APPS SCRIPT URL
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
+  // UPDATED TO YOUR NEWEST DEPLOYMENT URL
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
 
   document.getElementById('appForm').onsubmit = async (e) => {
     e.preventDefault();
@@ -92,6 +97,7 @@
     btn.innerText = "Processing..."; 
     btn.disabled = true;
 
+    // Mapping fields exactly to your Google Script 'intake' block
     const d = {
       action: 'intake',
       firstName: document.getElementById('fn').value,
@@ -101,22 +107,20 @@
       trade: document.getElementById('tr').value,
       experience: document.getElementById('ex').value,
       pay: document.getElementById('py').value,
+      tools: document.getElementById('toolsOwn').checked ? "YES" : "NO", // Added tools field
       consent: "AGREED"
     };
 
     try {
-      // POSTING TO GOOGLE
       await fetch(scriptURL, {
         method: 'POST',
-        mode: 'no-cors', // Essential for Google Apps Script Web Apps
+        mode: 'no-cors', 
         body: JSON.stringify(d)
       });
       
-      // The redirect must happen after a short delay because 'no-cors' 
-      // hides the "Success" message from the browser
       setTimeout(() => {
         window.location.href = '../thank-you.html';
-      }, 800);
+      }, 1000);
 
     } catch (err) {
       console.error("Submission Error:", err);
