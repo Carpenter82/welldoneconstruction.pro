@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Worker Login | Well Done Construction</title>
-  <link rel="stylesheet" href="../styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Login | Well Done Construction</title>
+    <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
 <div class="container">
@@ -13,30 +13,30 @@
         <p>Enter your email to access your tools.</p>
     </div>
     <div class="form-group">
-        <input type="email" id="workerEmail" placeholder="Email Address" required style="text-transform: lowercase;">
-        <button class="btn" onclick="portalLogin()" id="loginBtn">Access Portal</button>
+        <input type="email" id="workerEmail" placeholder="Email Address" required style="text-transform: lowercase; width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd;">
+        <button class="btn" onclick="portalLogin()" id="loginBtn" style="width: 100%; background: #33B26E; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Access Portal</button>
     </div>
     <p id="loginMsg" style="text-align: center; margin-top: 15px; font-weight: bold;"></p>
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbx3JdShPWsv2leCEdh7Q7ebzbu3HZHXSGJgG3wgeKf7r2vvE-3YKKzHIiEmdTmIRZKg/exec';
+    // UPDATED SCRIPT URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
 
     async function portalLogin() {
-        // Clean the email input
-        const email = document.getElementById('workerEmail').value.trim().toLowerCase();
+        const emailInput = document.getElementById('workerEmail').value.trim().toLowerCase();
         const btn = document.getElementById('loginBtn');
         const msg = document.getElementById('loginMsg');
 
-        if (!email) return alert("Please enter your email.");
+        if (!emailInput) return alert("Please enter your email.");
 
         btn.innerText = "Verifying...";
         btn.disabled = true;
         msg.innerText = "";
 
         try {
-            // Check Google Sheet
-            const resp = await fetch(`${scriptURL}?action=getWorkerStatus&email=${encodeURIComponent(email)}`);
+            // We fetch the status from the 'application' sheet via your script
+            const resp = await fetch(`${scriptURL}?action=getWorkerStatus&email=${encodeURIComponent(emailInput)}`);
             const data = await resp.json();
 
             if (data.status === 'Not Found') {
@@ -45,13 +45,13 @@
                 btn.disabled = false;
                 btn.innerText = "Access Portal";
             } else {
-                // SUCCESS: Redirect to dashboard.html
-                // We use ./ to ensure it stays in the 'portal' folder
-                window.location.href = `./dashboard.html?email=${encodeURIComponent(email)}`;
+                // Success - Pass email to dashboard
+                window.location.href = `./dashboard.html?email=${encodeURIComponent(emailInput)}`;
             }
         } catch (e) { 
             console.error(e);
-            alert("Connection Error. Check your internet signal."); 
+            msg.style.color = "orange";
+            msg.innerText = "Connection error. Please try again.";
             btn.disabled = false; 
             btn.innerText = "Access Portal";
         }
