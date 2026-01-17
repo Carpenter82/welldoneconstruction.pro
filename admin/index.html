@@ -34,12 +34,37 @@
             <small>Construction Management System</small>
         </div>
         <div class="nav-links">
-            <a href="index.html">🏠 Roster</a>
-            <a href="projects.html">📋 All Projects</a>
-            <a href="activity.html">📍 GPS Activity</a>
-        </div>
+    <a href="index.html">🏠 Roster</a>
+    <a href="projects.html">📋 Projects</a>
+    <a href="activity.html">📍 GPS</a>
+    <a href="https://docs.google.com/spreadsheets/d/1TVnkUDhrvu32AB6KUBIIoTofXUsZr65_hteG6OL7f2Q/edit#gid=YOUR_SHEET_ID" target="_blank" style="color: #f1c40f;">💰 Payroll Sheet</a>
+</div>
     </div>
 
+    // Function to handle ID Rejection
+async function rejectID(email, firstName) {
+    if (!confirm(`Reject ID for ${firstName} and send retry email?`)) return;
+    
+    await fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'rejectID', email: email, firstName: firstName })
+    });
+    alert("Rejection email sent.");
+    refreshAllData();
+}
+
+// Function to handle the Yearly/Seasonal Pause
+async function toggleWorkerStatus(row, currentStatus) {
+    const newStatus = (currentStatus === 'ACTIVE') ? 'PAUSED / INACTIVE' : 'ACTIVE';
+    if (!confirm(`Switch worker to ${newStatus}?`)) return;
+
+    await fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'updateStatus', row: row, status: newStatus })
+    });
+    alert("Status Updated.");
+    refreshAllData();
+}
     <div class="admin-section">
         <h2>📋 New Applicants & Onboarding</h2>
         <table>
