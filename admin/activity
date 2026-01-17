@@ -1,61 +1,68 @@
-<script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
-
-  async function loadActivity() {
-    const container = document.getElementById('activityLog');
-    try {
-      // Cache-buster ensures you see the ping they just sent 10 seconds ago
-      const resp = await fetch(`${scriptURL}?action=getActivity&t=${Date.now()}`);
-      const logs = await resp.json();
-      
-      console.log("Activity Data Received:", logs);
-
-      if (!logs || logs.length === 0) {
-        container.innerHTML = '<p style="text-align:center; padding:20px; color:#666;">No GPS activity recorded yet.</p>';
-        return;
-      }
-
-      // Latest check-ins at the top
-      const reversedLogs = [...logs].reverse();
-
-      container.innerHTML = reversedLogs.map(l => {
-        const logDate = l.timestamp ? new Date(l.timestamp).toLocaleString() : "Date Unknown";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Well Done | GPS Activity</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; font-size: 0.9rem; }
         
-        // Clean up the email to show the name/prefix if the email is too long
-        const displayName = l.email ? l.email.split('@')[0].toUpperCase() : 'UNKNOWN';
-        
-        return `
-          <div class="activity-card" style="border-left: 5px solid #33B26E; margin-bottom:15px; padding:15px; background:white; border-radius:8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s;">
-            <div style="display: flex; justify-content: space-between; align-items: start;">
-              <div>
-                <strong style="color:#2c3e50; font-size:1.1rem;">${displayName}</strong>
-                <br>
-                <span style="color:#888; font-size:0.85rem;">${l.email}</span>
-              </div>
-              <span style="background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">CHECK-IN</span>
-            </div>
-            
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
-            
-            <div style="color:#666; font-size:0.9rem;">🕒 ${logDate}</div>
-            
-            <div style="margin-top:12px;">
-              ${l.mapLink && l.mapLink.includes('http') ? 
-                `<a href="${l.mapLink}" target="_blank" style="display:inline-block; background:#1976D2; color:white; padding:8px 12px; border-radius:4px; text-decoration:none; font-size:0.85rem; font-weight:bold;">📍 View Location</a>` : 
-                `<span style="color:#d32f2f; font-size:0.85rem; font-style:italic;">⚠️ GPS Data Unavailable</span>`}
-            </div>
-          </div>
-        `;
-      }).join('');
+        #activityLog { max-width: 800px; margin: 0 auto; }
+        .activity-card { background: white; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 5px solid var(--accent); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .activity-details strong { color: var(--primary); }
+        .activity-details small { color: #888; display: block; margin-top: 4px; }
+        .btn-map { background: #1976d2; color: white; text-decoration: none; padding: 8px 15px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+    </style>
+</head>
+<body>
 
-    } catch (e) {
-      console.error("Load Error:", e);
-      container.innerHTML = `<div style="text-align:center; padding:20px;">
-        <p style="color:red;">⚠️ Error connecting to Activity Logs.</p>
-        <button onclick="loadActivity()" style="padding:10px 20px; cursor:pointer;">Retry Connection</button>
-      </div>`;
-    }
-  }
+    <div class="header">
+        <div>
+            <h1 style="margin:0; font-size: 1.5rem;">GPS Audit Trail</h1>
+            <small>Live Field Check-ins</small>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">🏠 Roster</a>
+            <a href="projects.html">📋 All Projects</a>
+            <a href="activity.html">📍 GPS Activity</a>
+        </div>
+    </div>
 
-  window.onload = loadActivity;
-</script>
+    <div id="activityLog">
+        <p style="text-align:center; padding:50px; color:#999;">📡 Syncing GPS Logs...</p>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
+
+        async function loadActivity() {
+            const container = document.getElementById('activityLog');
+            try {
+                const resp = await fetch(`${scriptURL}?action=getActivity&t=${Date.now()}`);
+                const logs = await resp.json();
+
+                if (!logs || logs.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; margin-top:50px;">No recent GPS pings found.</p>';
+                    return;
+                }
+
+                container.innerHTML = [...logs].reverse().map(l => `
+                    <div class="activity-card">
+                        <div class="activity-details">
+                            <strong>${l.email.split('@')[0].toUpperCase()}</strong>
+                            <small>🕒 ${new Date(l.timestamp).toLocaleString()}</small>
+                        </div>
+                        <a href="${l.mapLink}" target="_blank" class="btn-map">📍 View on Map</a>
+                    </div>
+                `).join('');
+            } catch (e) {
+                container.innerHTML = '<p style="color:red; text-align:center;">Error loading GPS trail.</p>';
+            }
+        }
+        window.onload = loadActivity;
+    </script>
+</body>
+</html>
