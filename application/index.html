@@ -7,31 +7,21 @@
   <title>Application | Well Done Construction</title>
   <link rel="stylesheet" href="../styles.css">
   <style>
+    .container { max-width: 500px; margin: 0 auto; padding: 20px; }
+    .input-group { margin-bottom: 15px; text-align: left; }
+    .input-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; color: #2c3e50; }
+    input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; background: white; font-size: 1rem; box-sizing: border-box; margin-bottom: 10px; }
+    
     .terms-box {
-      background: #fff;
-      border: 2px solid #ddd;
-      padding: 15px;
-      border-radius: 8px;
-      height: 150px;
-      overflow-y: scroll;
-      font-size: 0.85rem;
-      color: #4b5563;
-      margin-bottom: 15px;
-      text-align: left;
+      background: #fff; border: 2px solid #ddd; padding: 15px; border-radius: 8px;
+      height: 150px; overflow-y: scroll; font-size: 0.85rem; color: #4b5563;
+      margin-bottom: 15px; text-align: left;
     }
     .checkbox-container {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 15px; /* Adjusted margin */
-      text-align: left;
-      cursor: pointer;
+      display: flex; align-items: flex-start; gap: 12px; margin-bottom: 15px;
+      text-align: left; cursor: pointer;
     }
-    .checkbox-container input {
-      width: 24px;
-      height: 24px;
-      flex-shrink: 0;
-    }
+    .checkbox-container input { width: 24px; height: 24px; flex-shrink: 0; }
     .checkbox-text { font-size: 0.9rem; font-weight: 500; }
   </style>
 </head>
@@ -46,16 +36,30 @@
     <input type="tel" id="ph" placeholder="Phone Number" required>
     <input type="email" id="em" placeholder="Email Address" required>
     
-    <select id="tr" required>
-      <option value="">Select Primary Trade</option>
-      <option value="Handyman">Handyman</option>
-      <option value="Carpentry">Carpentry</option>
-      <option value="Plumbing">Plumbing</option>
-      <option value="Painting">Painting / Drywall</option>
-    </select>
+    <div class="input-group">
+      <label for="tr">Primary Trade</label>
+      <select id="tr" required>
+        <option value="" disabled selected>Select your main trade...</option>
+        <option value="General Handyman">General Handyman</option>
+        <option value="Carpentry">Carpentry</option>
+        <option value="Drywall/Paint">Drywall & Paint</option>
+        <option value="Plumbing/Electrical">Plumbing or Electrical (Minor)</option>
+        <option value="Flooring/Tile">Flooring & Tile</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
 
-    <input type="text" id="ex" placeholder="Years of Experience">
-    <input type="text" id="py" placeholder="Desired Hourly Pay">
+    <div class="input-group">
+      <label for="py">Worker Tier (Requested Level)</label>
+      <select id="py" required>
+        <option value="" disabled selected>Select your experience level...</option>
+        <option value="Tier 1 (Helper)">Tier 1 — Helper (Entry Level)</option>
+        <option value="Tier 2 (Skilled)">Tier 2 — Skilled (Experienced)</option>
+        <option value="Tier 3 (Foreman)">Tier 3 — Foreman (Lead/Supervisor)</option>
+      </select>
+    </div>
+
+    <input type="text" id="ex" placeholder="Years of Experience" required>
 
     <div class="terms-box">
       <strong>Terms & Conditions of On-Call Work:</strong><br><br>
@@ -79,15 +83,7 @@
   </form>
 </div>
 
-<nav class="nav-dock">
-  <a href="../index.html">Home</a>
-  <a href="index.html" class="active">Intake</a>
-  <a href="../onboarding.html">Onboarding</a>
-  <a href="../portal/index.html">Portal</a>
-</nav>
-
 <script>
-  // UPDATED TO YOUR NEWEST DEPLOYMENT URL
   const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
 
   document.getElementById('appForm').onsubmit = async (e) => {
@@ -97,7 +93,6 @@
     btn.innerText = "Processing..."; 
     btn.disabled = true;
 
-    // Mapping fields exactly to your Google Script 'intake' block
     const d = {
       action: 'intake',
       firstName: document.getElementById('fn').value,
@@ -106,8 +101,8 @@
       email: document.getElementById('em').value,
       trade: document.getElementById('tr').value,
       experience: document.getElementById('ex').value,
-      pay: document.getElementById('py').value,
-      tools: document.getElementById('toolsOwn').checked ? "YES" : "NO", // Added tools field
+      pay: document.getElementById('py').value, // This is now the Tier
+      tools: document.getElementById('toolsOwn').checked ? "YES" : "NO",
       consent: "AGREED"
     };
 
@@ -123,13 +118,11 @@
       }, 1000);
 
     } catch (err) {
-      console.error("Submission Error:", err);
-      alert("Submission failed. Please check your connection.");
+      alert("Submission failed. Check your connection.");
       btn.innerText = "Submit Application";
       btn.disabled = false;
     }
   };
 </script>
-
 </body>
 </html>
