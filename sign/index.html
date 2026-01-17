@@ -22,24 +22,10 @@
         .btn-primary { background: var(--primary); color: white; margin-top: 15px; }
         
         .checkbox-area { background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        
+        .signature-footer { margin-top: 40px; display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px solid #333; padding-top: 20px; }
     </style>
 </head>
-    <div style="margin-top: 30px; display: flex; justify-content: space-between; border-top: 1px solid #eee; padding-top: 20px;">
-    <div>
-        <p><strong>Employee Signature:</strong></p>
-        <p style="color: #666; font-style: italic;">[Digitally Signed Above]</p>
-    </div>
-    <div style="text-align: right;">
-        <p><strong>Well Done Construction LLC</strong></p>
-        <p><img src="URL_TO_YOUR_STAMP_OR_LOGO" alt="Authorized Signature" style="height: 50px; display: block; margin-left: auto;"></p>
-        <p><strong>Date:</strong> 01/01/<span id="currentYear"></span></p>
-    </div>
-</div>
-
-<script>
-    // This handles the auto-year update
-    document.getElementById('currentYear').innerText = new Date().getFullYear();
-</script>
 <body>
 
 <div class="container">
@@ -64,7 +50,18 @@
         <h4>10. CONFIDENTIALITY</h4>
         <p>Employee may not solicit Company clients or use Company info for personal gain.</p>
 
-        <p><em>[Full Legal Text as provided in previous step...]</em></p>
+        <div class="signature-footer">
+            <div style="flex: 1;">
+                <p style="margin: 0; font-size: 0.8rem; text-transform: uppercase; color: #666;">Employee Signature</p>
+                <div id="display-sig" style="font-style: italic; color: #2c3e50; padding: 10px 0;">[Digital Signature Captured Below]</div>
+            </div>
+
+            <div style="flex: 1; text-align: right;">
+                <p style="margin: 0; font-size: 0.8rem; text-transform: uppercase; color: #666;">Well Done Construction LLC</p>
+                <img src="https://welldoneconstruction.pro/assets/well-done-signature.png" alt="Authorized Signature" style="width: 220px; height: auto; margin-left: auto; display: block; filter: contrast(1.2);">
+                <p style="margin: 0; font-weight: bold; font-size: 1rem;">Date: 01/01/<span id="currentYear"></span></p>
+            </div>
+        </div>
     </div>
 
     <div class="checkbox-area">
@@ -90,18 +87,23 @@
     const canvas = document.getElementById('canvas');
     const pad = new SignaturePad(canvas);
 
+    // Auto-update the year to current (e.g., 2026)
+    document.getElementById('currentYear').innerText = new Date().getFullYear();
+
     // Show Signature only when checkbox is checked
     document.getElementById('consent').addEventListener('change', function() {
         document.getElementById('sig-area').style.display = this.checked ? 'block' : 'none';
+        // Scroll to the signature pad when it appears
+        if(this.checked) {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
     });
 
     async function saveContract() {
         if (pad.isEmpty()) return alert("Please sign the agreement.");
-        if (!userEmail) return alert("Error: No email found in link.");
+        if (!userEmail) return alert("Error: No email found in link. Please use the link sent to your email.");
 
         const sigData = pad.toDataURL().split(',')[1];
-        
-        // Change button text to show progress
         const btn = document.querySelector('.btn-primary');
         btn.innerText = "Processing Legal Execution...";
         btn.disabled = true;
@@ -118,16 +120,15 @@
                 })
             });
 
-            // Redirect to ID Verification / Intake
             alert("Agreement Signed Successfully!");
             window.location.href = `https://welldoneconstruction.pro/intake/index.html?email=${encodeURIComponent(userEmail)}`;
             
         } catch (e) {
             alert("Error saving. Please try again.");
             btn.disabled = false;
+            btn.innerText = "EXECUTE AGREEMENT & CONTINUE";
         }
     }
 </script>
-
 </body>
 </html>
