@@ -1,48 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | Well Done Construction</title>
-  <link rel="stylesheet" href="../styles.css">
-  <style>
-    .badge { padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; }
-    .status-active { background: #33B26E; color: white; }
-    .status-pending { background: #FFB800; color: #343E47; }
-    .action-card { background: white; padding: 20px; border-radius: 12px; margin-top: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: left; }
-    .logout-btn { background: none; border: 1px solid #ddd; color: #6E797F; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-top: 40px; font-size: 0.9rem; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Well Done Construction</title>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #f4f7f6; padding: 20px; color: #343E47; }
+        .container { max-width: 500px; margin: 0 auto; text-align: center; }
+        .badge { padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; }
+        .status-active { background: #33B26E; color: white; }
+        .status-pending { background: #FFB800; color: #343E47; }
+        .action-card { background: white; padding: 20px; border-radius: 12px; margin-top: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: left; }
+        .btn { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-decoration: none; display: block; margin-top: 10px; }
+        .legal-box { background:#fff3cd; padding:15px; border:1px solid #ffeeba; margin:15px 0; border-radius: 8px; font-size: 0.9rem; text-align: left; }
+        canvas { border: 1px solid #ccc; background: #fff; width: 100%; border-radius: 8px; }
+        .logout-btn { background: none; border: 1px solid #ddd; color: #6E797F; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-top: 40px; }
+    </style>
 </head>
 <body>
 
-<div class="container" style="text-align: center; padding-top: 20px;">
-    <h1 id="welcomeHeading">Loading...</h1>
+<div class="container">
+    <h1 id="welcomeHeading">Syncing...</h1>
     <div style="margin-bottom: 25px;">
-      <span id="statusBadge" class="badge">Checking...</span>
-    </div>
-    
-    <div id="activeContent" style="display:none;">
-      <a href="#" id="checklistLink" class="btn" style="background: #33B26E; color: white; display: block; margin-bottom: 20px; text-decoration: none; padding: 15px; border-radius: 8px; font-weight: bold;">
-        📋 START DAILY CHECKLIST
-      </a>
-
-      <div class="action-card">
-        <h3 style="margin-top:0;">📸 Site Photo Upload</h3>
-        <select id="photoType" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px;">
-          <option value="Address">📍 1. Address Verification</option>
-          <option value="Before">🛠️ 2. Before Photo</option>
-          <option value="After">✅ 3. After Photo</option>
-          <option value="Misc">📦 4. Receipt/Misc</option>
-        </select>
-        <input type="file" id="photoFile" accept="image/*" capture="camera" style="margin-bottom: 15px; width: 100%;">
-        <button onclick="uploadPhoto()" id="uploadBtn" class="btn" style="width: 100%; background: #343E47; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">UPLOAD TO DRIVE</button>
-        <p id="uploadStatus" style="margin-top:10px; text-align: center; font-size: 0.9rem;"></p>
-      </div>
+        <span id="statusBadge" class="badge">Checking...</span>
     </div>
 
-    <div id="pendingContent" style="display:none;" class="action-card">
-      <h3>Account Pending</h3>
-      <p>Management is currently reviewing your documents. Please ensure you have completed <a href="../onboarding.html">Onboarding</a>.</p>
+    <div id="portal-view">
+        <p>Loading Assignment Details...</p>
     </div>
 
     <button class="logout-btn" onclick="logout()">Logout</button>
@@ -52,78 +37,157 @@
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
     const urlParams = new URLSearchParams(window.location.search);
     const userEmail = urlParams.get('email');
+    let signaturePad;
 
     async function loadPortal() {
         if (!userEmail) { window.location.href = 'index.html'; return; }
-        
+
         try {
-            const resp = await fetch(`${scriptURL}?action=getWorkerStatus&email=${encodeURIComponent(userEmail)}`);
-            const worker = await resp.json();
+            // 1. Check Worker General Status
+            const statusResp = await fetch(`${scriptURL}?action=getWorkerStatus&email=${encodeURIComponent(userEmail)}`);
+            const worker = await statusResp.json();
             
             document.getElementById('welcomeHeading').innerText = `Hello, ${worker.firstName || 'Worker'}!`;
             const badge = document.getElementById('statusBadge');
             badge.innerText = worker.status;
 
-            // Updated logic to catch "ACTIVE / HIRED" which comes from the hireWorker function
-            if (worker.status.includes('ACTIVE') || worker.status === 'ID UPLOADED') {
-                badge.classList.add('status-active');
-                document.getElementById('activeContent').style.display = 'block';
-                document.getElementById('checklistLink').href = `../checklist/index.html?email=${encodeURIComponent(userEmail)}`;
-            } else {
-                badge.classList.add('status-pending');
-                document.getElementById('pendingContent').style.display = 'block';
+            if (!worker.status.includes('ACTIVE')) {
+                badge.className = 'badge status-pending';
+                document.getElementById('portal-view').innerHTML = `<div class="action-card"><h3>Account Pending</h3><p>Management is reviewing your documents.</p></div>`;
+                return;
             }
+            badge.className = 'badge status-active';
+
+            // 2. Check for Active Assignments (The Gatekeeper)
+            const projResp = await fetch(`${scriptURL}?action=getProjectLog&t=${Date.now()}`);
+            const projects = await projResp.json();
+            
+            // Find the LATEST project for this user
+            const myProject = projects.reverse().find(p => p.email === userEmail);
+
+            if (!myProject) {
+                renderEmptyState();
+            } else if (myProject.status === "ASSIGNED") {
+                renderAcceptanceScreen(myProject);
+            } else {
+                renderWorkTools(myProject);
+            }
+
         } catch (e) {
-            document.getElementById('welcomeHeading').innerText = "Dashboard Offline";
+            document.getElementById('welcomeHeading').innerText = "System Offline";
+            console.error(e);
         }
+    }
+
+    function renderAcceptanceScreen(job) {
+        document.getElementById('portal-view').innerHTML = `
+            <div class="action-card">
+                <h2 style="margin-top:0;">📋 New Work Order</h2>
+                <p><strong>Site:</strong> ${job.location}</p>
+                <p><strong>Scope:</strong> ${job.scope}</p>
+                
+                <div class="legal-box">
+                    <p><em>"I accept this on-call work assignment and agree to perform only authorized tasks, follow company instructions, and not exceed scope, time, or cost limits without approval."</em></p>
+                    <label style="font-weight:bold; display:block; margin-top:10px;">
+                        <input type="checkbox" id="accept-terms"> I Agree to these terms
+                    </label>
+                </div>
+
+                <div id="sig-area" style="display:none; margin-top:15px;">
+                    <p style="font-size:0.8rem; color:#666;">Sign Below (Finger or Stylus):</p>
+                    <canvas id="sig-pad" width="400" height="200"></canvas>
+                    <button onclick="executeAcceptance()" class="btn" style="background:#2c3e50; color:white;">ACCEPT & START WORK</button>
+                    <button onclick="signaturePad.clear()" style="background:none; border:none; color:#666; font-size:0.7rem; margin-top:5px; cursor:pointer;">Clear Signature</button>
+                </div>
+            </div>
+        `;
+        
+        const canvas = document.getElementById('sig-pad');
+        signaturePad = new SignaturePad(canvas);
+
+        document.getElementById('accept-terms').onclick = function() {
+            document.getElementById('sig-area').style.display = this.checked ? 'block' : 'none';
+        };
+    }
+
+    async function executeAcceptance() {
+        if (signaturePad.isEmpty()) return alert("Please sign to proceed.");
+        const sigData = signaturePad.toDataURL().split(',')[1];
+
+        document.getElementById('portal-view').innerHTML = "<p>Saving Signature & Unlocking Tools...</p>";
+
+        try {
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    action: 'saveSignature',
+                    email: userEmail,
+                    signatureData: sigData,
+                    fileName: `WO_Acceptance_${Date.now()}.png`
+                })
+            });
+            alert("Work Order Accepted!");
+            loadPortal(); // Refresh to show tools
+        } catch (e) { alert("Error saving acceptance."); }
+    }
+
+    function renderWorkTools(job) {
+        document.getElementById('portal-view').innerHTML = `
+            <a href="../checklist/index.html?email=${encodeURIComponent(userEmail)}" class="btn" style="background: #33B26E; color: white;">
+                📋 START DAILY CHECKLIST
+            </a>
+
+            <div class="action-card">
+                <h3 style="margin-top:0;">📸 Site Photo Upload</h3>
+                <p style="font-size:0.8rem; margin-bottom:15px;"><strong>Active Site:</strong> ${job.location}</p>
+                <select id="photoType" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px;">
+                    <option value="Address">📍 1. Address Verification</option>
+                    <option value="Before">🛠️ 2. Before Photo</option>
+                    <option value="After">✅ 3. After Photo</option>
+                </select>
+                <input type="file" id="photoFile" accept="image/*" capture="camera" style="margin-bottom: 15px; width: 100%;">
+                <button onclick="uploadPhoto()" id="uploadBtn" class="btn" style="background: #343E47; color: white;">UPLOAD TO DRIVE</button>
+                <p id="uploadStatus"></p>
+            </div>
+        `;
+    }
+
+    function renderEmptyState() {
+        document.getElementById('portal-view').innerHTML = `<div class="action-card"><p style="text-align:center;">No active assignments. Check back later.</p></div>`;
     }
 
     async function uploadPhoto() {
         const fileInput = document.getElementById('photoFile');
-        const btn = document.getElementById('uploadBtn');
-        const status = document.getElementById('uploadStatus');
-        
         if (!fileInput.files[0]) return alert("Please capture an image.");
+        
+        const btn = document.getElementById('uploadBtn');
+        btn.disabled = true; btn.innerText = "Uploading...";
 
-        btn.disabled = true;
-        btn.innerText = "Uploading...";
-        
-        const file = fileInput.files[0];
         const reader = new FileReader();
-        
         reader.onload = async (e) => {
             const base64Data = e.target.result.split(',')[1];
-            try {
-                await fetch(scriptURL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({
-                        action: 'uploadJobPhoto',
-                        email: userEmail,
-                        fileData: base64Data,
-                        fileType: file.type,
-                        category: document.getElementById('photoType').value
-                    })
-                });
-                status.style.color = "green";
-                status.innerText = "✓ Photo Saved!";
-                fileInput.value = "";
-            } catch (err) {
-                status.style.color = "red";
-                status.innerText = "Upload failed. Try again.";
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "UPLOAD ANOTHER";
-            }
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    action: 'uploadJobPhoto',
+                    email: userEmail,
+                    fileData: base64Data,
+                    fileType: fileInput.files[0].type,
+                    category: document.getElementById('photoType').value
+                })
+            });
+            document.getElementById('uploadStatus').innerText = "✓ Photo Saved!";
+            btn.disabled = false; btn.innerText = "UPLOAD ANOTHER";
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(fileInput.files[0]);
     }
 
-    function logout() {
-        if(confirm("Logout?")) window.location.href = 'index.html';
-    }
+    function logout() { if(confirm("Logout?")) window.location.href = 'index.html'; }
 
     window.onload = loadPortal;
 </script>
+
 </body>
 </html>
