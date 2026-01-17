@@ -5,36 +5,62 @@
     try {
       const urlParams = new URLSearchParams(window.location.search);
       const filterEmail = urlParams.get('worker');
+      
+      // Fetch fresh data from the Google Script
       const resp = await fetch(`${scriptURL}?action=getProjectLog&t=${Date.now()}`);
       let projects = await resp.json();
 
+      // Handle Filtering
       if (filterEmail) {
-        projects = projects.filter(p => p.email === filterEmail);
+        projects = projects.filter(p => p.email.toLowerCase() === filterEmail.toLowerCase());
         document.getElementById('pageTitle').innerText = `Projects for ${filterEmail}`;
-        document.getElementById('viewAllLink').style.display = 'inline';
+        
+        const viewAllBtn = document.getElementById('viewAllLink');
+        if (viewAllBtn) viewAllBtn.style.display = 'inline-block';
       }
 
+      // Calculate Portfolio Value (Cleaning currency strings)
       const totalBudget = projects.reduce((sum, p) => {
-        const val = String(p.budget || "0").replace(/[^0-9.-]+/g, "");
+        // Removes '$' and ',' so the math doesn't break
+        const val = String(p.budget || "0").replace(/[$,]/g, "");
         return sum + (parseFloat(val) || 0);
       }, 0);
 
-      document.getElementById('totalValueText').innerText = `Total Portfolio Value: $${totalBudget.toLocaleString()}`;
+      const totalDisplay = document.getElementById('totalValueText');
+      if (totalDisplay) {
+        totalDisplay.innerText = `Total Portfolio Value: $${totalBudget.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+      }
 
+      // Populate Table (Latest projects first)
       const body = document.getElementById('projectBody');
-      body.innerHTML = projects.reverse().map(p => `
-        <tr>
-          <td>${new Date(p.timestamp).toLocaleDateString()}</td>
-          <td>${p.email}</td>
-          <td><strong>${p.clientName}</strong><br><small>${p.location}</small></td>
-          <td style="color:#2E7D32; font-weight:bold;">$${p.budget}</td>
-          <td><span class="status-badge ${p.status?.toLowerCase() || ''}">${p.status || 'LOGGED'}</span></td>
-          <td>${p.mapLink ? `<a href="${p.mapLink}" target="_blank">📍 View</a>` : '—'}</td>
-        </tr>
-      `).join('');
+      body.innerHTML = projects.reverse().map(p => {
+        // Basic Date formatting
+        const dateStr = p.timestamp ? new Date(p.timestamp).toLocaleDateString() : 'N/A';
+        
+        return `
+          <tr>
+            <td>${dateStr}</td>
+            <td><small>${p.email}</small></td>
+            <td>
+              <strong>${p.clientName || 'N/A'}</strong><br>
+              <small style="color: #666;">${p.location || 'No Location'}</small>
+            </td>
+            <td style="color:#2E7D32; font-weight:bold;">${p.budget.includes('$') ? p.budget : '$' + p.budget}</td>
+            <td><span class="status-badge ${p.status?.toLowerCase().replace(/\s+/g, '-') || 'logged'}">${p.status || 'LOGGED'}</span></td>
+            <td>
+              ${p.mapLink && p.mapLink !== "" 
+                ? `<a href="${p.mapLink}" target="_blank" class="map-btn">📍 View</a>` 
+                : '<span style="color:#ccc">N/A</span>'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
     } catch (e) {
-      document.getElementById('projectBody').innerHTML = '<tr><td colspan="6">Error loading data.</td></tr>';
+      console.error("Project Load Error:", e);
+      document.getElementById('projectBody').innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">⚠️ Error loading project data.</td></tr>';
     }
   }
+
   window.onload = loadProjects;
 </script>
