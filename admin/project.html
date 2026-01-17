@@ -7,95 +7,130 @@
     <style>
         :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        .nav-links a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; font-size: 0.9rem; }
         
-        .stats-bar { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; align-items: center; }
+        /* Header & Nav */
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; font-size: 0.9rem; transition: 0.3s; }
+        .nav-links a:hover { color: var(--accent); }
+        
+        /* Stats & Container */
+        .stats-bar { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; gap: 20px; }
+        .stat-item { font-size: 0.9rem; font-weight: bold; color: var(--primary); }
         .container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
+        /* Table Styling */
         table { width: 100%; border-collapse: collapse; text-align: left; }
         th { background: #f8f9fa; padding: 15px; font-size: 0.85rem; color: #666; text-transform: uppercase; }
-        td { padding: 15px; border-top: 1px solid #eee; vertical-align: middle; }
+        td { padding: 15px; border-top: 1px solid #eee; vertical-align: middle; font-size: 0.9rem; }
         
+        /* Badges */
         .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
-        .status-badge.assigned { background: #e3f2fd; color: #1976d2; }
+        .status-badge.assigned { background: #fff3e0; color: #ef6c00; }
+        .status-badge.signed { background: #e3f2fd; color: #1976d2; }
         .status-badge.verified { background: #e8f5e9; color: #2e7d32; }
+        .status-badge.file-saved { background: #f3e5f5; color: #7b1fa2; }
         
         .map-link { color: #1976d2; text-decoration: none; font-weight: bold; font-size: 0.85rem; }
+        .loading { padding: 40px; text-align: center; color: #666; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div>
-            <h1 id="pageTitle" style="margin:0; font-size: 1.5rem;">Project Portfolio</h1>
+            <h1 style="margin:0; font-size: 1.5rem;">Project Portfolio</h1>
             <small>Financial & Assignment Log</small>
         </div>
         <div class="nav-links">
             <a href="index.html">🏠 Roster</a>
-            <a href="projects.html">📋 All Projects</a>
-            <a href="activity.html">📍 GPS Activity</a>
+            <a href="projects.html" style="color: var(--accent);">📋 All Projects</a>
+            <a href="activity.html">📍 Activity</a>
         </div>
     </div>
 
     <div class="stats-bar">
-        <strong id="totalValueText">Calculating Total Portfolio Value...</strong>
-        <a href="projects.html" id="viewAllLink" style="display:none; margin-left:20px; color:var(--accent); text-decoration:none;">(View All)</a>
+        <div class="stat-item" id="totalProjects">Loading Projects...</div>
+        <div class="stat-item" id="totalBudget">Total Budget: $0</div>
     </div>
 
     <div class="container">
-        <table>
+        <table id="projectsTable">
             <thead>
                 <tr>
                     <th>Date</th>
                     <th>Worker</th>
-                    <th>Client / Location</th>
+                    <th>Client / Scope</th>
                     <th>Budget</th>
                     <th>Status</th>
-                    <th>Proof</th>
+                    <th>Proof/Map</th>
                 </tr>
             </thead>
-            <tbody id="projectBody">
-                <tr><td colspan="6" style="text-align:center; padding:50px; color:#999;">📡 Fetching Project Data...</td></tr>
+            <tbody id="projectData">
+                <tr><td colspan="6" class="loading">Fetching project logs...</td></tr>
             </tbody>
         </table>
     </div>
 
-    <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
 
-        async function loadProjects() {
-            try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const filterEmail = urlParams.get('worker');
-                const resp = await fetch(`${scriptURL}?action=getProjectLog&t=${Date.now()}`);
-                let projects = await resp.json();
-
-                if (filterEmail) {
-                    projects = projects.filter(p => p.email.toLowerCase() === filterEmail.toLowerCase());
-                    document.getElementById('pageTitle').innerText = `Projects: ${filterEmail}`;
-                    document.getElementById('viewAllLink').style.display = 'inline';
-                }
-
-                const total = projects.reduce((sum, p) => sum + (parseFloat(String(p.budget).replace(/[$,]/g, "")) || 0), 0);
-                document.getElementById('totalValueText').innerText = `Total Value: $${total.toLocaleString()}`;
-
-                const body = document.getElementById('projectBody');
-                body.innerHTML = projects.reverse().map(p => `
-                    <tr>
-                        <td>${new Date(p.timestamp).toLocaleDateString()}</td>
-                        <td><small>${p.email}</small></td>
-                        <td><strong>${p.clientName}</strong><br><small>${p.location}</small></td>
-                        <td style="color:#2E7D32; font-weight:bold;">$${p.budget}</td>
-                        <td><span class="status-badge ${p.status?.toLowerCase()}">${p.status || 'LOGGED'}</span></td>
-                        <td>${p.mapLink ? `<a href="${p.mapLink}" target="_blank" class="map-link">📍 Proof</a>` : '—'}</td>
-                    </tr>
-                `).join('');
-            } catch (e) {
-                document.getElementById('projectBody').innerHTML = '<tr><td colspan="6">Error loading project history.</td></tr>';
-            }
+    async function loadProjectLog() {
+        try {
+            const response = await fetch(scriptURL + '?action=getProjectLog');
+            const data = await response.json();
+            renderProjects(data);
+        } catch (error) {
+            console.error("Error loading projects:", error);
+            document.getElementById('projectData').innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Error loading data.</td></tr>';
         }
-        window.onload = loadProjects;
-    </script>
+    }
+
+    function renderProjects(data) {
+        const container = document.getElementById('projectData');
+        const countSpan = document.getElementById('totalProjects');
+        const budgetSpan = document.getElementById('totalBudget');
+        
+        if (data.length === 0) {
+            container.innerHTML = '<tr><td colspan="6" class="loading">No projects logged yet.</td></tr>';
+            countSpan.innerText = "0 Projects Found";
+            return;
+        }
+
+        let totalBudget = 0;
+        
+        container.innerHTML = data.map(p => {
+            // Clean up budget string and add to total
+            const numericBudget = parseFloat(p.budget.replace(/[^0-9.-]+/g,"")) || 0;
+            totalBudget += numericBudget;
+
+            const date = new Date(p.timestamp).toLocaleDateString();
+            const statusClass = p.status.toLowerCase().replace(/ /g, '-').replace(/\//g, '-');
+
+            return `
+                <tr>
+                    <td>${date}</td>
+                    <td><strong>${p.email.split('@')[0]}</strong></td>
+                    <td>
+                        <div style="font-weight:bold;">${p.clientName || 'N/A'}</div>
+                        <div style="font-size:0.8rem; color:#666;">${p.scope}</div>
+                    </td>
+                    <td><strong>${p.budget}</strong></td>
+                    <td><span class="status-badge ${statusClass}">${p.status}</span></td>
+                    <td>
+                        ${p.mapLink ? `<a href="${p.mapLink}" target="_blank" class="map-link">📍 View Location</a>` : 
+                          p.link ? `<a href="${p.link}" target="_blank" class="map-link">📄 View File</a>` : '---'}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        countSpan.innerText = `${data.length} Total Logs`;
+        budgetSpan.innerText = `Total Portfolio: $${totalBudget.toLocaleString()}`;
+    }
+
+    // Initialize
+    loadProjectLog();
+</script>
+
 </body>
 </html>
