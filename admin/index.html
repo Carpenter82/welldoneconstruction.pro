@@ -5,34 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Well Done | Admin Dashboard</title>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --accent: #33B26E;
-            --hold: #e74c3c;
-            --bg: #f4f7f6;
-        }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        
+        :root { --primary: #2c3e50; --accent: #33B26E; --hold: #e74c3c; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
         .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
         .nav-links a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; font-size: 0.9rem; }
         
-        #workerList { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .admin-section { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; }
         
-        .worker-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 5px solid var(--accent); }
-        .status-hold { border-top-color: var(--hold); opacity: 0.8; }
-        
-        .worker-info h3 { margin: 0; color: var(--primary); }
-        .worker-meta { color: #666; font-size: 0.9rem; margin: 10px 0; }
-        .badge { background: #eee; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
-        
-        .worker-actions { margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap; }
-        
-        .btn-sm { padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; background: #eee; color: var(--primary); text-decoration: none; }
-        .btn-projects { background: var(--primary); color: white; }
-        .toggle-btn { background: #34495e; color: white; }
-        .btn-sm:hover { filter: brightness(90%); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; background: #f8f9fa; padding: 12px; font-size: 0.8rem; color: #666; text-transform: uppercase; }
+        td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
 
-        .loading-msg { text-align: center; padding: 50px; color: #666; font-style: italic; }
+        .badge { background: #eee; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; }
+        .btn-sm { padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; text-decoration: none; display: inline-block; }
+        .btn-blue { background: #3498db; color: white; }
+        .btn-green { background: var(--accent); color: white; }
+        
+        #workerList { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .worker-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 5px solid var(--accent); }
     </style>
 </head>
 <body>
@@ -49,124 +40,104 @@
         </div>
     </div>
 
-    <div id="workerList">
-        <div class="loading-msg">📡 Connecting to Google Database...</div>
+    <div class="admin-section">
+        <h2>📋 New Applicants & Onboarding</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Trade/Pay</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="applicantData">
+                <tr><td colspan="4">📡 Loading applicants...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="admin-section">
+        <h2>✅ Active Verified Roster</h2>
+        <div id="workerList">
+            <div class="loading-msg">📡 Loading active crew...</div>
+        </div>
     </div>
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
 
+        async function refreshAllData() {
+            await loadApplicants();
+            await loadWorkers();
+        }
+
+        // LOAD APPLICANTS (Section 1)
+        async function loadApplicants() {
+            try {
+                const resp = await fetch(`${scriptURL}?action=getApplicants`);
+                const data = await resp.json();
+                const container = document.getElementById('applicantData');
+                
+                container.innerHTML = data.map(app => `
+                    <tr>
+                        <td><strong>${app.name}</strong><br><small>${app.email}</small></td>
+                        <td>${app.trade}<br><small>${app.pay}</small></td>
+                        <td><span class="badge">${app.status}</span></td>
+                        <td>
+                            <button onclick="sendAgreementEmail('${app.email}', '${app.firstName}')" class="btn-sm btn-blue">📩 Send Agreement</button>
+                            <button onclick="hireWorker('${app.email}')" class="btn-sm btn-green">🔨 Hire</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        // LOAD VERIFIED WORKERS (Section 2)
         async function loadWorkers() {
             const container = document.getElementById('workerList');
             try {
-                const resp = await fetch(`${scriptURL}?action=getWorkers&t=${Date.now()}`);
+                const resp = await fetch(`${scriptURL}?action=getWorkers`);
                 const workers = await resp.json();
                 
-                if (!workers || workers.length === 0) {
-                    container.innerHTML = '<div class="worker-card"><h3>No Workers Found</h3><p>Hire someone in the Google Sheet to see them here.</p></div>';
-                    return;
-                }
-
-                let html = '';
-                workers.forEach(w => {
-                    const isPaused = w.status === 'PAUSED' || w.status === 'ON HOLD';
-                    html += `
-                        <div class="worker-card ${isPaused ? 'status-hold' : ''}">
-                            <div class="worker-info">
-                                <h3>${w.name}</h3>
-                                <p class="worker-meta">
-                                    <strong>${w.trade}</strong> | <span class="badge">${w.status}</span> | Tier: ${w.tier || 'TBD'}
-                                </p>
-                                <p style="font-size: 0.8rem; color: #999;">${w.email}</p>
-                            </div>
-                            <div class="worker-actions">
-                                <a href="projects.html?worker=${encodeURIComponent(w.email)}" class="btn-sm btn-projects">📋 Projects</a>
-                                <button onclick="assignWork('${w.email}')" class="btn-sm" style="background: #33B26E; color: white;">Assign Work</button>
-                                <a href="${w.folderLink}" target="_blank" class="btn-sm">Files</a>
-                                <button onclick="updateStatus(${w.rowIndex}, '${isPaused ? 'ACTIVE' : 'PAUSED'}')" class="btn-sm toggle-btn">
-                                    ${isPaused ? '▶️ Resume' : '⏸️ Pause'}
-                                </button>
+                container.innerHTML = workers.map(w => {
+                    const isPaused = w.status === 'PAUSED';
+                    return `
+                        <div class="worker-card">
+                            <h3>${w.name}</h3>
+                            <p class="badge">${w.status}</p>
+                            <div style="margin-top:10px;">
+                                <button onclick="assignWork('${w.email}')" class="btn-sm btn-green">Assign Work</button>
+                                <a href="${w.folderLink}" target="_blank" class="btn-sm">📁 Files</a>
                             </div>
                         </div>`;
-                });
-                container.innerHTML = html;
-            } catch (e) {
-                container.innerHTML = '<p style="color:red; text-align:center;">⚠️ Error connecting to database. Make sure your Google Script is deployed.</p>';
-            }
+                }).join('');
+            } catch (e) { console.error(e); }
         }
 
-        async function updateStatus(row, newStatus) {
-            if(!confirm(`Set status to ${newStatus}?`)) return;
-            try {
-                await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'updateStatus', row: row, status: newStatus }) });
-                setTimeout(loadWorkers, 1200);
-            } catch (e) { alert("Update failed."); }
+        // ACTION: SEND EMAIL
+        async function sendAgreementEmail(email, firstName) {
+            if (!confirm("Send Master Agreement to " + firstName + "?")) return;
+            await fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'sendAgreementEmail', email: email, firstName: firstName })
+            });
+            alert("Agreement Sent!");
+            refreshAllData();
         }
 
-        async function assignWork(email) {
-            // 1. Select the Legal Framework
-            const typeChoice = prompt(
-                "SELECT WORK ORDER TYPE:\n" +
-                "1 - 🔍 INSPECTION (On-Call Addition)\n" +
-                "2 - 🛠️ SERVICE CALL (On-Call Authorization)\n" +
-                "3 - ✅ APPROVED REPAIR (Small Project Safeguard)"
-            );
-
-            if (!['1', '2', '3'].includes(typeChoice)) {
-                alert("Assignment cancelled: You must select a valid type (1, 2, or 3).");
-                return;
-            }
-
-            const client = prompt("Enter Client Name:");
-            if (!client) return;
-
-            const address = prompt("Enter Street Address:");
-            if (!address) return;
-
-            const baseScope = prompt("Describe the specific task:");
-            const budget = prompt("Budget Amount ($):");
-
-            // 2. Define the Legal "Protective Wrapper"
-            const globalSafeguard = "\n\n--- GLOBAL SAFEGUARDS ---\n" +
-                "Total costs shall not exceed $10,000. No full remodels or structural alterations authorized.";
-
-            let typeSpecificClause = "";
-            if (typeChoice === '1') {
-                typeSpecificClause = "\n\n--- 1️⃣ INSPECTION WORK ORDER ---\n" +
-                    "On-Call Service: Inspection findings do not guarantee repair authorization. Limited to one system.";
-            } else if (typeChoice === '2') {
-                typeSpecificClause = "\n\n--- 2️⃣ SERVICE CALL AUTHORIZATION ---\n" +
-                    "Minor corrective work only. Does not convert into renovation or rebuild.";
-            } else if (typeChoice === '3') {
-                typeSpecificClause = "\n\n--- 3️⃣ APPROVED REPAIR ---\n" +
-                    "Single defined task. Authorization expires if scope expands or hits regulatory limits.";
-            }
-
-            const finalScope = baseScope.toUpperCase() + typeSpecificClause + globalSafeguard;
-
-            try {
-                await fetch(scriptURL, { 
-                    method: 'POST', 
-                    mode: 'no-cors', 
-                    body: JSON.stringify({ 
-                        action: 'assignWork', 
-                        email: email, 
-                        clientName: client, 
-                        location: address, 
-                        scope: finalScope, 
-                        budget: budget || "$0",
-                        source: "Admin Dashboard" 
-                    }) 
-                });
-
-                alert(`✅ ASSIGNED: ${client} dispatched to ${email}`);
-                window.location.href = `projects.html?worker=${encodeURIComponent(email)}`;
-            } catch (e) {
-                alert("Error: Assignment failed.");
-            }
+        // ACTION: HIRE
+        async function hireWorker(email) {
+            if (!confirm("Move this worker to Active Roster?")) return;
+            await fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'hireWorker', email: email })
+            });
+            alert("Worker Hired!");
+            refreshAllData();
         }
 
-        window.onload = loadWorkers;
+        window.onload = refreshAllData;
     </script>
 </body>
 </html>
