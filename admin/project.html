@@ -1,66 +1,101 @@
-<script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
-
-  async function loadProjects() {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const filterEmail = urlParams.get('worker');
-      
-      // Fetch fresh data from the Google Script
-      const resp = await fetch(`${scriptURL}?action=getProjectLog&t=${Date.now()}`);
-      let projects = await resp.json();
-
-      // Handle Filtering
-      if (filterEmail) {
-        projects = projects.filter(p => p.email.toLowerCase() === filterEmail.toLowerCase());
-        document.getElementById('pageTitle').innerText = `Projects for ${filterEmail}`;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Well Done | Project Log</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; font-size: 0.9rem; }
         
-        const viewAllBtn = document.getElementById('viewAllLink');
-        if (viewAllBtn) viewAllBtn.style.display = 'inline-block';
-      }
-
-      // Calculate Portfolio Value (Cleaning currency strings)
-      const totalBudget = projects.reduce((sum, p) => {
-        // Removes '$' and ',' so the math doesn't break
-        const val = String(p.budget || "0").replace(/[$,]/g, "");
-        return sum + (parseFloat(val) || 0);
-      }, 0);
-
-      const totalDisplay = document.getElementById('totalValueText');
-      if (totalDisplay) {
-        totalDisplay.innerText = `Total Portfolio Value: $${totalBudget.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-      }
-
-      // Populate Table (Latest projects first)
-      const body = document.getElementById('projectBody');
-      body.innerHTML = projects.reverse().map(p => {
-        // Basic Date formatting
-        const dateStr = p.timestamp ? new Date(p.timestamp).toLocaleDateString() : 'N/A';
+        .stats-bar { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; align-items: center; }
+        .container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
-        return `
-          <tr>
-            <td>${dateStr}</td>
-            <td><small>${p.email}</small></td>
-            <td>
-              <strong>${p.clientName || 'N/A'}</strong><br>
-              <small style="color: #666;">${p.location || 'No Location'}</small>
-            </td>
-            <td style="color:#2E7D32; font-weight:bold;">${p.budget.includes('$') ? p.budget : '$' + p.budget}</td>
-            <td><span class="status-badge ${p.status?.toLowerCase().replace(/\s+/g, '-') || 'logged'}">${p.status || 'LOGGED'}</span></td>
-            <td>
-              ${p.mapLink && p.mapLink !== "" 
-                ? `<a href="${p.mapLink}" target="_blank" class="map-btn">📍 View</a>` 
-                : '<span style="color:#ccc">N/A</span>'}
-            </td>
-          </tr>
-        `;
-      }).join('');
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: #f8f9fa; padding: 15px; font-size: 0.85rem; color: #666; text-transform: uppercase; }
+        td { padding: 15px; border-top: 1px solid #eee; vertical-align: middle; }
+        
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        .status-badge.assigned { background: #e3f2fd; color: #1976d2; }
+        .status-badge.verified { background: #e8f5e9; color: #2e7d32; }
+        
+        .map-link { color: #1976d2; text-decoration: none; font-weight: bold; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
 
-    } catch (e) {
-      console.error("Project Load Error:", e);
-      document.getElementById('projectBody').innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">⚠️ Error loading project data.</td></tr>';
-    }
-  }
+    <div class="header">
+        <div>
+            <h1 id="pageTitle" style="margin:0; font-size: 1.5rem;">Project Portfolio</h1>
+            <small>Financial & Assignment Log</small>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">🏠 Roster</a>
+            <a href="projects.html">📋 All Projects</a>
+            <a href="activity.html">📍 GPS Activity</a>
+        </div>
+    </div>
 
-  window.onload = loadProjects;
-</script>
+    <div class="stats-bar">
+        <strong id="totalValueText">Calculating Total Portfolio Value...</strong>
+        <a href="projects.html" id="viewAllLink" style="display:none; margin-left:20px; color:var(--accent); text-decoration:none;">(View All)</a>
+    </div>
+
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Worker</th>
+                    <th>Client / Location</th>
+                    <th>Budget</th>
+                    <th>Status</th>
+                    <th>Proof</th>
+                </tr>
+            </thead>
+            <tbody id="projectBody">
+                <tr><td colspan="6" style="text-align:center; padding:50px; color:#999;">📡 Fetching Project Data...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
+
+        async function loadProjects() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const filterEmail = urlParams.get('worker');
+                const resp = await fetch(`${scriptURL}?action=getProjectLog&t=${Date.now()}`);
+                let projects = await resp.json();
+
+                if (filterEmail) {
+                    projects = projects.filter(p => p.email.toLowerCase() === filterEmail.toLowerCase());
+                    document.getElementById('pageTitle').innerText = `Projects: ${filterEmail}`;
+                    document.getElementById('viewAllLink').style.display = 'inline';
+                }
+
+                const total = projects.reduce((sum, p) => sum + (parseFloat(String(p.budget).replace(/[$,]/g, "")) || 0), 0);
+                document.getElementById('totalValueText').innerText = `Total Value: $${total.toLocaleString()}`;
+
+                const body = document.getElementById('projectBody');
+                body.innerHTML = projects.reverse().map(p => `
+                    <tr>
+                        <td>${new Date(p.timestamp).toLocaleDateString()}</td>
+                        <td><small>${p.email}</small></td>
+                        <td><strong>${p.clientName}</strong><br><small>${p.location}</small></td>
+                        <td style="color:#2E7D32; font-weight:bold;">$${p.budget}</td>
+                        <td><span class="status-badge ${p.status?.toLowerCase()}">${p.status || 'LOGGED'}</span></td>
+                        <td>${p.mapLink ? `<a href="${p.mapLink}" target="_blank" class="map-link">📍 Proof</a>` : '—'}</td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                document.getElementById('projectBody').innerHTML = '<tr><td colspan="6">Error loading project history.</td></tr>';
+            }
+        }
+        window.onload = loadProjects;
+    </script>
+</body>
+</html>
