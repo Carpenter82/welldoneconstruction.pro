@@ -106,14 +106,65 @@
                 setTimeout(loadWorkers, 1200);
             } catch (e) { alert("Update failed."); }
         }
+async function assignWork(email) {
+    // 1. Pick the Work Order Type
+    const typeChoice = prompt(
+        "Select Work Order Type:\n" +
+        "1 - Inspection (On-Call)\n" +
+        "2 - Service Call (Minor Corrective)\n" +
+        "3 - Approved Repair (Small Project)"
+    );
 
-        async function assignWork(email) {
-            const client = prompt(`Assigning job to: ${email}\nClient Name:`);
-            if (!client) return;
-            const address = prompt("Job Site Address:");
-            const scope = prompt("Work Description:");
-            const budget = prompt("Budget ($):");
+    if (!['1', '2', '3'].includes(typeChoice)) {
+        alert("Invalid selection. Assignment cancelled.");
+        return;
+    }
 
+    const client = prompt("Client Name:");
+    const address = prompt("Street Address:");
+    const baseScope = prompt("Work Description / Scope:");
+    const budget = prompt("Budget ($):");
+
+    if (!client || !address) return;
+
+    // 2. Define the Legal Add-ons
+    const globalSafeguard = "\n\n--- NEVADA PROJECT LIMIT & SCOPE SAFEGUARD ---\n" +
+        "Total costs shall not exceed $10,000. Work must stop if limit is approached.\n" +
+        "No authorized remodels, structural alterations, or aggregated scopes.";
+
+    let typeSpecificClause = "";
+    if (typeChoice === '1') {
+        typeSpecificClause = "\n\n--- INSPECTION ON-CALL CLAUSE ---\n" +
+            "Inspection findings only. Does not guarantee repair authorization. One system limit.";
+    } else if (typeChoice === '2') {
+        typeSpecificClause = "\n\n--- SERVICE CALL AUTHORIZATION ---\n" +
+            "Minor corrective work only. Does not convert into renovation/rebuild.";
+    } else if (typeChoice === '3') {
+        typeSpecificClause = "\n\n--- APPROVED REPAIR SAFEGUARD ---\n" +
+            "Single defined task. No aggregation of calls to bypass regulatory thresholds.";
+    }
+
+    const finalScope = baseScope + typeSpecificClause + globalSafeguard;
+
+    // 3. Send to Google Sheets
+    try {
+        await fetch(scriptURL, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: JSON.stringify({ 
+                action: 'assignWork', 
+                email: email, 
+                clientName: client, 
+                location: address, 
+                scope: finalScope, // Sends the legally protected scope
+                budget: budget, 
+                source: "Admin Dashboard" 
+            }) 
+        });
+        alert("✅ Work Order Created with Safeguards!");
+        window.location.href = `projects.html?worker=${encodeURIComponent(email)}`;
+    } catch (e) { alert("Error assigning job."); }
+}
             try {
                 await fetch(scriptURL, { 
                     method: 'POST', 
