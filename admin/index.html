@@ -13,14 +13,11 @@
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; }
         
-        /* Dashboard Header */
         .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
         .nav-links a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; font-size: 0.9rem; }
         
-        /* Worker Grid */
         #workerList { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         
-        /* Worker Cards */
         .worker-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 5px solid var(--accent); }
         .status-hold { border-top-color: var(--hold); opacity: 0.8; }
         
@@ -30,7 +27,6 @@
         
         .worker-actions { margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap; }
         
-        /* Buttons */
         .btn-sm { padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; background: #eee; color: var(--primary); text-decoration: none; }
         .btn-projects { background: var(--primary); color: white; }
         .toggle-btn { background: #34495e; color: white; }
@@ -85,7 +81,7 @@
                             </div>
                             <div class="worker-actions">
                                 <a href="projects.html?worker=${encodeURIComponent(w.email)}" class="btn-sm btn-projects">📋 Projects</a>
-                                <button onclick="assignWork('${w.email}')" class="btn-sm">Assign</button>
+                                <button onclick="assignWork('${w.email}')" class="btn-sm" style="background: #33B26E; color: white;">Assign Work</button>
                                 <a href="${w.folderLink}" target="_blank" class="btn-sm">Files</a>
                                 <button onclick="updateStatus(${w.rowIndex}, '${isPaused ? 'ACTIVE' : 'PAUSED'}')" class="btn-sm toggle-btn">
                                     ${isPaused ? '▶️ Resume' : '⏸️ Pause'}
@@ -106,74 +102,68 @@
                 setTimeout(loadWorkers, 1200);
             } catch (e) { alert("Update failed."); }
         }
-async function assignWork(email) {
-    // 1. Pick the Work Order Type
-    const typeChoice = prompt(
-        "Select Work Order Type:\n" +
-        "1 - Inspection (On-Call)\n" +
-        "2 - Service Call (Minor Corrective)\n" +
-        "3 - Approved Repair (Small Project)"
-    );
 
-    if (!['1', '2', '3'].includes(typeChoice)) {
-        alert("Invalid selection. Assignment cancelled.");
-        return;
-    }
+        async function assignWork(email) {
+            // 1. Select the Legal Framework
+            const typeChoice = prompt(
+                "SELECT WORK ORDER TYPE:\n" +
+                "1 - 🔍 INSPECTION (On-Call Addition)\n" +
+                "2 - 🛠️ SERVICE CALL (On-Call Authorization)\n" +
+                "3 - ✅ APPROVED REPAIR (Small Project Safeguard)"
+            );
 
-    const client = prompt("Client Name:");
-    const address = prompt("Street Address:");
-    const baseScope = prompt("Work Description / Scope:");
-    const budget = prompt("Budget ($):");
+            if (!['1', '2', '3'].includes(typeChoice)) {
+                alert("Assignment cancelled: You must select a valid type (1, 2, or 3).");
+                return;
+            }
 
-    if (!client || !address) return;
+            const client = prompt("Enter Client Name:");
+            if (!client) return;
 
-    // 2. Define the Legal Add-ons
-    const globalSafeguard = "\n\n--- NEVADA PROJECT LIMIT & SCOPE SAFEGUARD ---\n" +
-        "Total costs shall not exceed $10,000. Work must stop if limit is approached.\n" +
-        "No authorized remodels, structural alterations, or aggregated scopes.";
+            const address = prompt("Enter Street Address:");
+            if (!address) return;
 
-    let typeSpecificClause = "";
-    if (typeChoice === '1') {
-        typeSpecificClause = "\n\n--- INSPECTION ON-CALL CLAUSE ---\n" +
-            "Inspection findings only. Does not guarantee repair authorization. One system limit.";
-    } else if (typeChoice === '2') {
-        typeSpecificClause = "\n\n--- SERVICE CALL AUTHORIZATION ---\n" +
-            "Minor corrective work only. Does not convert into renovation/rebuild.";
-    } else if (typeChoice === '3') {
-        typeSpecificClause = "\n\n--- APPROVED REPAIR SAFEGUARD ---\n" +
-            "Single defined task. No aggregation of calls to bypass regulatory thresholds.";
-    }
+            const baseScope = prompt("Describe the specific task:");
+            const budget = prompt("Budget Amount ($):");
 
-    const finalScope = baseScope + typeSpecificClause + globalSafeguard;
+            // 2. Define the Legal "Protective Wrapper"
+            const globalSafeguard = "\n\n--- GLOBAL SAFEGUARDS ---\n" +
+                "Total costs shall not exceed $10,000. No full remodels or structural alterations authorized.";
 
-    // 3. Send to Google Sheets
-    try {
-        await fetch(scriptURL, { 
-            method: 'POST', 
-            mode: 'no-cors', 
-            body: JSON.stringify({ 
-                action: 'assignWork', 
-                email: email, 
-                clientName: client, 
-                location: address, 
-                scope: finalScope, // Sends the legally protected scope
-                budget: budget, 
-                source: "Admin Dashboard" 
-            }) 
-        });
-        alert("✅ Work Order Created with Safeguards!");
-        window.location.href = `projects.html?worker=${encodeURIComponent(email)}`;
-    } catch (e) { alert("Error assigning job."); }
-}
+            let typeSpecificClause = "";
+            if (typeChoice === '1') {
+                typeSpecificClause = "\n\n--- 1️⃣ INSPECTION WORK ORDER ---\n" +
+                    "On-Call Service: Inspection findings do not guarantee repair authorization. Limited to one system.";
+            } else if (typeChoice === '2') {
+                typeSpecificClause = "\n\n--- 2️⃣ SERVICE CALL AUTHORIZATION ---\n" +
+                    "Minor corrective work only. Does not convert into renovation or rebuild.";
+            } else if (typeChoice === '3') {
+                typeSpecificClause = "\n\n--- 3️⃣ APPROVED REPAIR ---\n" +
+                    "Single defined task. Authorization expires if scope expands or hits regulatory limits.";
+            }
+
+            const finalScope = baseScope.toUpperCase() + typeSpecificClause + globalSafeguard;
+
             try {
                 await fetch(scriptURL, { 
                     method: 'POST', 
                     mode: 'no-cors', 
-                    body: JSON.stringify({ action: 'assignWork', email: email, clientName: client, location: address, scope: scope, budget: budget, source: "Admin Dashboard" }) 
+                    body: JSON.stringify({ 
+                        action: 'assignWork', 
+                        email: email, 
+                        clientName: client, 
+                        location: address, 
+                        scope: finalScope, 
+                        budget: budget || "$0",
+                        source: "Admin Dashboard" 
+                    }) 
                 });
-                alert("✅ Job Assigned!");
+
+                alert(`✅ ASSIGNED: ${client} dispatched to ${email}`);
                 window.location.href = `projects.html?worker=${encodeURIComponent(email)}`;
-            } catch (e) { alert("Error assigning job."); }
+            } catch (e) {
+                alert("Error: Assignment failed.");
+            }
         }
 
         window.onload = loadWorkers;
