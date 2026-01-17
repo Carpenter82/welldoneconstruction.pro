@@ -36,19 +36,19 @@
         <p>This Agreement is entered into by and between <strong>Well Done Construction LLC</strong> and the undersigned <strong>Employee</strong>.</p>
         
         <h4>1. EMPLOYMENT STATUS</h4>
-        <p>Employee is hired as a W-2, at-will, on-call employee. No minimum hours are guaranteed. Employment may be terminated by either party at any time.</p>
+        <p>Employee is hired as a W-2, at-will, on-call employee. No minimum hours are guaranteed. Work is offered on an as-needed basis and may be accepted or declined by the Employee. Employment may be terminated by either party at any time, with or without cause or notice, in accordance with applicable law.</p>
 
         <h4>2. SCOPE OF WORK</h4>
-        <p>Duties include carpentry, labor, site documentation, and repairs. Employee may NOT provide pricing, modify scope, or pull permits without authorization.</p>
+        <p>Employee may be assigned duties including general carpentry and construction labor, repairs, site documentation, and photographs. Employee may NOT provide pricing, modify the scope of work without authorization, or pull permits.</p>
 
-        <h4>3. PERFORMANCE</h4>
-        <p>Work must be professional. Substandard work must be corrected. Refusal to follow instructions is grounds for termination.</p>
+        <h4>3. PERFORMANCE STANDARDS</h4>
+        <p>Employee is expected to perform all work in a professional and competent manner. Failure to correct substandard work or unsafe practices are grounds for immediate termination.</p>
 
-        <h4>8. SAFETY & OSHA</h4>
-        <p>OSHA-10 is required. Proper PPE must be used at all times. Drug/Alcohol use on-site is strictly prohibited.</p>
+        <h4>8. SAFETY & OSHA COMPLIANCE</h4>
+        <p>Employee must comply with all job site safety rules. OSHA-10 certification is required. Proper personal protective equipment (PPE) must be used at all times.</p>
 
-        <h4>10. CONFIDENTIALITY</h4>
-        <p>Employee may not solicit Company clients or use Company info for personal gain.</p>
+        <h4>10. CONFIDENTIALITY & PROTECTION</h4>
+        <p>Employee may not solicit Company clients for personal work or use Company contacts for personal gain. These obligations survive termination of employment.</p>
 
         <div class="signature-footer">
             <div style="flex: 1;">
@@ -58,7 +58,7 @@
 
             <div style="flex: 1; text-align: right;">
                 <p style="margin: 0; font-size: 0.8rem; text-transform: uppercase; color: #666;">Well Done Construction LLC</p>
-                <img src="https://welldoneconstruction.pro/assets/well-done-signature.png" alt="Authorized Signature" style="width: 220px; height: auto; margin-left: auto; display: block; filter: contrast(1.2);">
+                <img src="https://welldoneconstruction.pro/assets/well_done_signature-removebg-preview.png" alt="Authorized Signature" style="width: 220px; height: auto; margin-left: auto; display: block;">
                 <p style="margin: 0; font-weight: bold; font-size: 1rem;">Date: 01/01/<span id="currentYear"></span></p>
             </div>
         </div>
@@ -87,13 +87,12 @@
     const canvas = document.getElementById('canvas');
     const pad = new SignaturePad(canvas);
 
-    // Auto-update the year to current (e.g., 2026)
+    // Auto-update the year
     document.getElementById('currentYear').innerText = new Date().getFullYear();
 
-    // Show Signature only when checkbox is checked
+    // Show Signature Pad only when checkbox is checked
     document.getElementById('consent').addEventListener('change', function() {
         document.getElementById('sig-area').style.display = this.checked ? 'block' : 'none';
-        // Scroll to the signature pad when it appears
         if(this.checked) {
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
@@ -101,7 +100,7 @@
 
     async function saveContract() {
         if (pad.isEmpty()) return alert("Please sign the agreement.");
-        if (!userEmail) return alert("Error: No email found in link. Please use the link sent to your email.");
+        if (!userEmail) return alert("Error: No email found. Please use the link sent to your email.");
 
         const sigData = pad.toDataURL().split(',')[1];
         const btn = document.querySelector('.btn-primary');
