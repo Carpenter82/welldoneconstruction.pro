@@ -24,6 +24,22 @@
         .checkbox-area { background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
     </style>
 </head>
+    <div style="margin-top: 30px; display: flex; justify-content: space-between; border-top: 1px solid #eee; padding-top: 20px;">
+    <div>
+        <p><strong>Employee Signature:</strong></p>
+        <p style="color: #666; font-style: italic;">[Digitally Signed Above]</p>
+    </div>
+    <div style="text-align: right;">
+        <p><strong>Well Done Construction LLC</strong></p>
+        <p><img src="URL_TO_YOUR_STAMP_OR_LOGO" alt="Authorized Signature" style="height: 50px; display: block; margin-left: auto;"></p>
+        <p><strong>Date:</strong> 01/01/<span id="currentYear"></span></p>
+    </div>
+</div>
+
+<script>
+    // This handles the auto-year update
+    document.getElementById('currentYear').innerText = new Date().getFullYear();
+</script>
 <body>
 
 <div class="container">
