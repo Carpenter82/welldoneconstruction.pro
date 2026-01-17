@@ -3,189 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Well Done | Admin Dashboard</title>
+    <title>Well Done | Command Center</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #33B26E; --hold: #e74c3c; --bg: #f4f7f6; --blue: #3498db; --orange: #f39c12; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; --blue: #3498db; --orange: #f39c12; --red: #e74c3c; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        .nav-links a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; font-size: 0.9rem; }
-        
-        .admin-section { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; background: #f8f9fa; padding: 12px; font-size: 0.8rem; color: #666; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        /* Layout Wrappers */
+        .container { max-width: 1200px; margin: 0 auto; }
+        .section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 25px; }
+        h2 { margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
 
-        .badge { background: #eee; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: #333; }
-        .btn-sm { padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; text-decoration: none; display: inline-block; margin: 2px; transition: 0.2s; }
-        .btn-blue { background: var(--blue); color: white; }
-        .btn-green { background: var(--accent); color: white; }
-        .btn-orange { background: var(--orange); color: white; }
-        .btn-red { background: var(--hold); color: white; }
-        .btn-sm:hover { opacity: 0.8; }
-        
-        #workerList { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
-        .worker-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 5px solid var(--accent); }
-        .worker-card h3 { margin: 0 0 10px 0; color: var(--primary); }
-        .loading-msg { padding: 20px; color: #666; font-style: italic; }
+        /* Work Intake Form */
+        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        textarea { grid-column: span 1; height: 100px; }
+        @media (min-width: 600px) { textarea { grid-column: span 2; } }
+
+        /* Tables & Lists */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; background: #f8f9fa; padding: 12px; font-size: 0.8rem; color: #666; text-transform: uppercase; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+
+        /* Buttons */
+        .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; color: white; }
+        .btn-blue { background: var(--blue); }
+        .btn-green { background: var(--accent); }
+        .btn-orange { background: var(--orange); }
+        .btn-red { background: var(--red); }
+        .btn:hover { opacity: 0.8; }
+
+        /* Worker Cards (Active Roster) */
+        .roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+        .card { background: #fff; border-left: 5px solid var(--accent); padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .card h3 { margin: 0 0 5px 0; font-size: 1.1rem; }
+        .badge { display: inline-block; background: #eee; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div>
-            <h1 style="margin:0; font-size: 1.5rem;">Well Done Admin</h1>
-            <small>Construction Management System</small>
+<div class="container">
+    
+    <div class="section">
+        <h2>🛠️ New Project Intake</h2>
+        <div class="grid-form">
+            <input type="text" id="clientName" placeholder="Client Name">
+            <input type="text" id="streetAddress" placeholder="Street Address">
+            <input type="text" id="tradeReq" placeholder="Trade Required">
+            <input type="text" id="source" placeholder="Source (Yelp, etc)">
+            <input type="text" id="budget" placeholder="Budget ($)">
+            <textarea id="notes" placeholder="Job Scope / Message"></textarea>
         </div>
-        <div class="nav-links">
-            <a href="#">🏠 Roster</a>
-            <a href="#">📋 Projects</a>
-            <a href="#">📍 GPS</a>
-            <a href="https://docs.google.com/spreadsheets/d/1TVnkUDhrvu32AB6KUBIIoTofXUsZr65_hteG6OL7f2Q/edit" target="_blank" style="color: #f1c40f;">💰 Payroll Sheet</a>
+        <button onclick="registerProject()" class="btn btn-blue" style="margin-top: 15px;">Register Project & Generate ID</button>
+    </div>
+
+    <div class="section" style="background: #eef2f3; border: 2px dashed #bdc3c7;">
+        <h2>🔗 Dispatch Worker to Job</h2>
+        <div class="grid-form">
+            <select id="pickJob">
+                <option value="">-- Select Registered Job ID --</option>
+            </select>
+            <select id="pickWorker">
+                <option value="">-- Select Worker from Settings --</option>
+            </select>
+            <button onclick="assignToRoster()" class="btn btn-green">Confirm Assignment</button>
         </div>
     </div>
 
-    <div class="admin-section">
-        <h2>📋 New Applicants & Onboarding</h2>
+    <div class="section">
+        <h2>📋 Onboarding Applicants</h2>
         <table>
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Trade/Pay</th>
+                    <th>Trade</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="applicantData">
-                <tr><td colspan="4" class="loading-msg">📡 Loading applicants...</td></tr>
+            <tbody id="applicantTable">
+                <tr><td colspan="4">Loading...</td></tr>
             </tbody>
         </table>
     </div>
 
-    <div class="admin-section">
-        <h2>✅ Active Verified Roster</h2>
-        <div id="workerList">
-            <div class="loading-msg">📡 Loading active crew...</div>
-        </div>
+    <div class="section">
+        <h2>✅ Active Roster (On-Site)</h2>
+        <div id="rosterGrid" class="roster-grid">
+            </div>
     </div>
 
-    <script>
-        // REPLACE THIS WITH YOUR CURRENT DEPLOYED SCRIPT URL
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
+</div>
 
-        async function refreshAllData() {
-            await loadApplicants();
-            await loadWorkers();
-        }
+<script>
+    const scriptURL = 'YOUR_WEB_APP_URL_HERE';
 
-        // 1. FETCH APPLICANTS
-        async function loadApplicants() {
-            try {
-                const resp = await fetch(`${scriptURL}?action=getApplicants`);
-                const data = await resp.json();
-                const container = document.getElementById('applicantData');
-                
-                if (data.length === 0) {
-                    container.innerHTML = '<tr><td colspan="4">No new applicants found.</td></tr>';
-                    return;
-                }
+    async function refreshData() {
+        loadApplicants();
+        loadRoster();
+        loadDropdowns();
+    }
 
-                container.innerHTML = data.map(app => {
-                    // Decide if we should show the Reject ID button
-                    const canReject = app.status.includes("ID UPLOADED") || app.status.includes("PENDING REVIEW") || app.status.includes("SIGNED");
+    // --- FORM SUBMISSION ---
+    async function registerProject() {
+        const data = {
+            action: 'registerProject',
+            clientName: document.getElementById('clientName').value,
+            location: document.getElementById('streetAddress').value,
+            trade: document.getElementById('tradeReq').value,
+            source: document.getElementById('source').value,
+            budget: document.getElementById('budget').value,
+            notes: document.getElementById('notes').value,
+            mapLink: "https://www.google.com/maps/search/" + encodeURIComponent(document.getElementById('streetAddress').value)
+        };
 
-                    return `
-                        <tr>
-                            <td><strong>${app.name}</strong><br><small>${app.email}</small></td>
-                            <td>${app.trade}<br><small>${app.pay}</small></td>
-                            <td><span class="badge">${app.status}</span></td>
-                            <td>
-                                <button onclick="sendAgreementEmail('${app.email}', '${app.firstName}')" class="btn-sm btn-blue">📩 Send Agreement</button>
-                                ${canReject ? `<button onclick="rejectID('${app.email}', '${app.firstName}')" class="btn-sm btn-orange">⚠️ Reject ID</button>` : ''}
-                                <button onclick="hireWorker('${app.email}')" class="btn-sm btn-green">🔨 Hire</button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            } catch (e) { 
-                console.error("Load Applicants Error:", e);
-                document.getElementById('applicantData').innerHTML = '<tr><td colspan="4">Error loading data. Check console.</td></tr>';
-            }
-        }
+        const resp = await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        alert("Project Registered! ID will be generated in the log.");
+        refreshData();
+    }
 
-        // 2. FETCH ACTIVE WORKERS
-        async function loadWorkers() {
-            const container = document.getElementById('workerList');
-            try {
-                const resp = await fetch(`${scriptURL}?action=getWorkers`);
-                const workers = await resp.json();
-                
-                if (workers.length === 0) {
-                    container.innerHTML = '<div class="loading-msg">No active workers found.</div>';
-                    return;
-                }
+    // --- LOADING DATA ---
+    async function loadApplicants() {
+        const resp = await fetch(`${scriptURL}?action=getApplicants`);
+        const data = await resp.json();
+        const html = data.map(app => `
+            <tr>
+                <td><strong>${app.name}</strong></td>
+                <td>${app.trade}</td>
+                <td><span class="badge">${app.status}</span></td>
+                <td>
+                    <button onclick="hire('${app.email}')" class="btn btn-green" style="padding:5px 10px; font-size:0.7rem;">Hire</button>
+                    <button onclick="reject('${app.email}', '${app.firstName}')" class="btn btn-red" style="padding:5px 10px; font-size:0.7rem;">Reject ID</button>
+                </td>
+            </tr>
+        `).join('');
+        document.getElementById('applicantTable').innerHTML = html || '<tr><td colspan="4">No applicants.</td></tr>';
+    }
 
-                container.innerHTML = workers.map(w => {
-                    const isPaused = w.status.includes('PAUSED') || w.status.includes('INACTIVE');
-                    return `
-                        <div class="worker-card" style="border-top-color: ${isPaused ? '#e74c3c' : '#33B26E'}">
-                            <h3>${w.name}</h3>
-                            <p><span class="badge">${w.status}</span></p>
-                            <p><small>${w.trade} | ${w.tier || 'No Tier'}</small></p>
-                            <div style="margin-top:15px;">
-                                <button onclick="assignWork('${w.email}')" class="btn-sm btn-green">Assign Work</button>
-                                <a href="${w.folderLink}" target="_blank" class="btn-sm btn-blue" style="text-decoration:none;">📁 Files</a>
-                                <button onclick="toggleWorkerStatus('${w.rowIndex}', '${w.status}', '${w.email}')" class="btn-sm" style="background:#34495e; color:white;">
-                                    ${isPaused ? '▶️ Resume' : '⏸️ Pause'}
-                                </button>
-                            </div>
-                        </div>`;
-                }).join('');
-            } catch (e) { console.error("Load Workers Error:", e); }
-        }
+    async function loadRoster() {
+        const resp = await fetch(`${scriptURL}?action=getWorkers`);
+        const data = await resp.json();
+        const html = data.map(w => `
+            <div class="card">
+                <h3>${w.name}</h3>
+                <div class="badge" style="background: #d4edda; color: #155724;">Pay: ${w.status}</div>
+                <p style="margin: 10px 0; font-size: 0.8rem;">
+                    <strong>Trade:</strong> ${w.trade}<br>
+                    <strong>JOB ID:</strong> ${w.jobId || 'N/A'}
+                </p>
+                <a href="${w.folderLink}" target="_blank" class="btn btn-blue" style="font-size:0.7rem; text-decoration:none;">📁 View Folder</a>
+            </div>
+        `).join('');
+        document.getElementById('rosterGrid').innerHTML = html || 'No active workers.';
+    }
 
-        // --- BUTTON ACTIONS ---
+    async function hire(email) {
+        if(!confirm("Hire to Settings (Rap Sheet)?")) return;
+        await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({action:'hireWorker', email}) });
+        refreshData();
+    }
 
-        async function sendAgreementEmail(email, firstName) {
-            if (!confirm(`Send Master Agreement link to ${firstName}?`)) return;
-            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'sendAgreementEmail', email, firstName }) });
-            alert("Agreement Dispatch Request Sent!");
-            refreshAllData();
-        }
+    window.onload = refreshData;
+</script>
 
-        async function hireWorker(email) {
-            if (!confirm("Move this worker to Active Roster and send Welcome Email?")) return;
-            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'hireWorker', email }) });
-            alert("Hire process triggered! Updating roster...");
-            refreshAllData();
-        }
-
-        async function rejectID(email, firstName) {
-            if (!confirm(`Reject ID for ${firstName}? This sends the specific Driver's License requirement email.`)) return;
-            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'rejectID', email, firstName }) });
-            alert("ID Rejection Email Sent.");
-            refreshAllData();
-        }
-
-        async function assignWork(email) {
-            const client = prompt("Enter Client Name:");
-            if (!client) return;
-            const address = prompt("Enter Site Address:");
-            const scope = prompt("Work Scope:");
-            const budget = prompt("Budget ($):", "$0");
-
-            await fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ action: 'assignWork', email, clientName: client, location: address, scope, budget, source: "Portal" })
-            });
-            alert(`✅ Work order dispatched to ${email}`);
-        }
-
-        // Initial Load
-        window.onload = refreshAllData;
-    </script>
 </body>
 </html>
