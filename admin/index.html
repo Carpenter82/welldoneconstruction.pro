@@ -18,9 +18,11 @@
         td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
 
         .badge { background: #eee; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; }
-        .btn-sm { padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; text-decoration: none; display: inline-block; }
+        .btn-sm { padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; text-decoration: none; display: inline-block; margin: 2px; }
         .btn-blue { background: #3498db; color: white; }
         .btn-green { background: var(--accent); color: white; }
+        .btn-orange { background: #f39c12; color: white; }
+        .btn-red { background: #e74c3c; color: white; }
         
         #workerList { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         .worker-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 5px solid var(--accent); }
@@ -34,37 +36,13 @@
             <small>Construction Management System</small>
         </div>
         <div class="nav-links">
-    <a href="index.html">🏠 Roster</a>
-    <a href="projects.html">📋 Projects</a>
-    <a href="activity.html">📍 GPS</a>
-    <a href="https://docs.google.com/spreadsheets/d/1TVnkUDhrvu32AB6KUBIIoTofXUsZr65_hteG6OL7f2Q/edit#gid=YOUR_SHEET_ID" target="_blank" style="color: #f1c40f;">💰 Payroll Sheet</a>
-</div>
+            <a href="index.html">🏠 Roster</a>
+            <a href="projects.html">📋 Projects</a>
+            <a href="activity.html">📍 GPS</a>
+            <a href="https://docs.google.com/spreadsheets/d/1TVnkUDhrvu32AB6KUBIIoTofXUsZr65_hteG6OL7f2Q/edit#gid=0" target="_blank" style="color: #f1c40f;">💰 Payroll Sheet</a>
+        </div>
     </div>
 
-    // Function to handle ID Rejection
-async function rejectID(email, firstName) {
-    if (!confirm(`Reject ID for ${firstName} and send retry email?`)) return;
-    
-    await fetch(scriptURL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'rejectID', email: email, firstName: firstName })
-    });
-    alert("Rejection email sent.");
-    refreshAllData();
-}
-
-// Function to handle the Yearly/Seasonal Pause
-async function toggleWorkerStatus(row, currentStatus) {
-    const newStatus = (currentStatus === 'ACTIVE') ? 'PAUSED / INACTIVE' : 'ACTIVE';
-    if (!confirm(`Switch worker to ${newStatus}?`)) return;
-
-    await fetch(scriptURL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'updateStatus', row: row, status: newStatus })
-    });
-    alert("Status Updated.");
-    refreshAllData();
-}
     <div class="admin-section">
         <h2>📋 New Applicants & Onboarding</h2>
         <table>
@@ -97,28 +75,34 @@ async function toggleWorkerStatus(row, currentStatus) {
             await loadWorkers();
         }
 
-        // LOAD APPLICANTS (Section 1)
+        // LOAD APPLICANTS (Top Table)
         async function loadApplicants() {
             try {
                 const resp = await fetch(`${scriptURL}?action=getApplicants`);
                 const data = await resp.json();
                 const container = document.getElementById('applicantData');
                 
-                container.innerHTML = data.map(app => `
-                    <tr>
-                        <td><strong>${app.name}</strong><br><small>${app.email}</small></td>
-                        <td>${app.trade}<br><small>${app.pay}</small></td>
-                        <td><span class="badge">${app.status}</span></td>
-                        <td>
-                            <button onclick="sendAgreementEmail('${app.email}', '${app.firstName}')" class="btn-sm btn-blue">📩 Send Agreement</button>
-                            <button onclick="hireWorker('${app.email}')" class="btn-sm btn-green">🔨 Hire</button>
-                        </td>
-                    </tr>
-                `).join('');
+                container.innerHTML = data.map(app => {
+                    // Logic to show "Reject ID" only if they've uploaded something
+                    const showReject = app.status.includes("ID UPLOADED") || app.status.includes("PENDING REVIEW");
+
+                    return `
+                        <tr>
+                            <td><strong>${app.name}</strong><br><small>${app.email}</small></td>
+                            <td>${app.trade}<br><small>${app.pay}</small></td>
+                            <td><span class="badge">${app.status}</span></td>
+                            <td>
+                                <button onclick="sendAgreementEmail('${app.email}', '${app.firstName}')" class="btn-sm btn-blue">📩 Send Agreement</button>
+                                ${showReject ? `<button onclick="rejectID('${app.email}', '${app.firstName}')" class="btn-sm btn-orange">⚠️ Reject ID</button>` : ''}
+                                <button onclick="hireWorker('${app.email}')" class="btn-sm btn-green">🔨 Hire</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
             } catch (e) { console.error(e); }
         }
 
-        // LOAD VERIFIED WORKERS (Section 2)
+        // LOAD VERIFIED WORKERS (Bottom Grid)
         async function loadWorkers() {
             const container = document.getElementById('workerList');
             try {
@@ -126,40 +110,69 @@ async function toggleWorkerStatus(row, currentStatus) {
                 const workers = await resp.json();
                 
                 container.innerHTML = workers.map(w => {
-                    const isPaused = w.status === 'PAUSED';
+                    const isPaused = w.status.includes('PAUSED') || w.status.includes('INACTIVE');
                     return `
-                        <div class="worker-card">
+                        <div class="worker-card" style="border-top-color: ${isPaused ? '#e74c3c' : '#33B26E'}">
                             <h3>${w.name}</h3>
                             <p class="badge">${w.status}</p>
                             <div style="margin-top:10px;">
                                 <button onclick="assignWork('${w.email}')" class="btn-sm btn-green">Assign Work</button>
                                 <a href="${w.folderLink}" target="_blank" class="btn-sm">📁 Files</a>
+                                <button onclick="toggleWorkerStatus('${w.rowIndex}', '${w.status}', '${w.email}')" class="btn-sm" style="background:#34495e; color:white;">
+                                    ${isPaused ? '▶️ Resume' : '⏸️ Pause'}
+                                </button>
                             </div>
                         </div>`;
                 }).join('');
             } catch (e) { console.error(e); }
         }
 
-        // ACTION: SEND EMAIL
+        // --- ACTION FUNCTIONS ---
+
         async function sendAgreementEmail(email, firstName) {
             if (!confirm("Send Master Agreement to " + firstName + "?")) return;
-            await fetch(scriptURL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'sendAgreementEmail', email: email, firstName: firstName })
-            });
+            await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'sendAgreementEmail', email, firstName }) });
             alert("Agreement Sent!");
             refreshAllData();
         }
 
-        // ACTION: HIRE
         async function hireWorker(email) {
             if (!confirm("Move this worker to Active Roster?")) return;
-            await fetch(scriptURL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'hireWorker', email: email })
-            });
+            await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'hireWorker', email }) });
             alert("Worker Hired!");
             refreshAllData();
+        }
+
+        async function rejectID(email, firstName) {
+            if (!confirm(`Reject ID for ${firstName}? This will email them to re-upload.`)) return;
+            await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'rejectID', email, firstName }) });
+            alert("Rejection Sent.");
+            refreshAllData();
+        }
+
+        async function toggleWorkerStatus(row, currentStatus, email) {
+            const newStatus = (currentStatus === 'ACTIVE') ? 'PAUSED / INACTIVE' : 'ACTIVE';
+            if (!confirm(`Switch worker to ${newStatus}?`)) return;
+            // Note: Reuse updateStatus if added to Apps Script, or update via hireWorker logic
+            await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'updateStatus', row, status: newStatus }) });
+            alert("Status Updated.");
+            refreshAllData();
+        }
+
+        async function assignWork(email) {
+            const client = prompt("Enter Client Name:");
+            if (!client) return;
+            const address = prompt("Enter Site Address:");
+            if (!address) return;
+            const scope = prompt("Work Scope:");
+            if (!scope) return;
+            const budget = prompt("Budget ($):", "$0");
+
+            await fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'assignWork', email, clientName: client, location: address, scope, budget, source: "Portal" })
+            });
+            alert(`✅ Dispatched to ${email}`);
         }
 
         window.onload = refreshAllData;
