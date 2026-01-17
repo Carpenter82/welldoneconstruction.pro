@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Well Done | Admin Dashboard</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #33B26E; --hold: #e74c3c; --bg: #f4f7f6; }
+        :root { --primary: #2c3e50; --accent: #33B26E; --hold: #e74c3c; --bg: #f4f7f6; --blue: #3498db; --orange: #f39c12; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        
         .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
         .nav-links a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; font-size: 0.9rem; }
         
@@ -17,15 +18,18 @@
         th { text-align: left; background: #f8f9fa; padding: 12px; font-size: 0.8rem; color: #666; text-transform: uppercase; }
         td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
 
-        .badge { background: #eee; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; }
-        .btn-sm { padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; text-decoration: none; display: inline-block; margin: 2px; }
-        .btn-blue { background: #3498db; color: white; }
+        .badge { background: #eee; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: #333; }
+        .btn-sm { padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; text-decoration: none; display: inline-block; margin: 2px; transition: 0.2s; }
+        .btn-blue { background: var(--blue); color: white; }
         .btn-green { background: var(--accent); color: white; }
-        .btn-orange { background: #f39c12; color: white; }
-        .btn-red { background: #e74c3c; color: white; }
+        .btn-orange { background: var(--orange); color: white; }
+        .btn-red { background: var(--hold); color: white; }
+        .btn-sm:hover { opacity: 0.8; }
         
         #workerList { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         .worker-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 5px solid var(--accent); }
+        .worker-card h3 { margin: 0 0 10px 0; color: var(--primary); }
+        .loading-msg { padding: 20px; color: #666; font-style: italic; }
     </style>
 </head>
 <body>
@@ -36,10 +40,10 @@
             <small>Construction Management System</small>
         </div>
         <div class="nav-links">
-            <a href="index.html">🏠 Roster</a>
-            <a href="projects.html">📋 Projects</a>
-            <a href="activity.html">📍 GPS</a>
-            <a href="https://docs.google.com/spreadsheets/d/1TVnkUDhrvu32AB6KUBIIoTofXUsZr65_hteG6OL7f2Q/edit#gid=0" target="_blank" style="color: #f1c40f;">💰 Payroll Sheet</a>
+            <a href="#">🏠 Roster</a>
+            <a href="#">📋 Projects</a>
+            <a href="#">📍 GPS</a>
+            <a href="https://docs.google.com/spreadsheets/d/1TVnkUDhrvu32AB6KUBIIoTofXUsZr65_hteG6OL7f2Q/edit" target="_blank" style="color: #f1c40f;">💰 Payroll Sheet</a>
         </div>
     </div>
 
@@ -55,7 +59,7 @@
                 </tr>
             </thead>
             <tbody id="applicantData">
-                <tr><td colspan="4">📡 Loading applicants...</td></tr>
+                <tr><td colspan="4" class="loading-msg">📡 Loading applicants...</td></tr>
             </tbody>
         </table>
     </div>
@@ -68,6 +72,7 @@
     </div>
 
     <script>
+        // REPLACE THIS WITH YOUR CURRENT DEPLOYED SCRIPT URL
         const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
 
         async function refreshAllData() {
@@ -75,16 +80,21 @@
             await loadWorkers();
         }
 
-        // LOAD APPLICANTS (Top Table)
+        // 1. FETCH APPLICANTS
         async function loadApplicants() {
             try {
                 const resp = await fetch(`${scriptURL}?action=getApplicants`);
                 const data = await resp.json();
                 const container = document.getElementById('applicantData');
                 
+                if (data.length === 0) {
+                    container.innerHTML = '<tr><td colspan="4">No new applicants found.</td></tr>';
+                    return;
+                }
+
                 container.innerHTML = data.map(app => {
-                    // Logic to show "Reject ID" only if they've uploaded something
-                    const showReject = app.status.includes("ID UPLOADED") || app.status.includes("PENDING REVIEW");
+                    // Decide if we should show the Reject ID button
+                    const canReject = app.status.includes("ID UPLOADED") || app.status.includes("PENDING REVIEW") || app.status.includes("SIGNED");
 
                     return `
                         <tr>
@@ -93,69 +103,69 @@
                             <td><span class="badge">${app.status}</span></td>
                             <td>
                                 <button onclick="sendAgreementEmail('${app.email}', '${app.firstName}')" class="btn-sm btn-blue">📩 Send Agreement</button>
-                                ${showReject ? `<button onclick="rejectID('${app.email}', '${app.firstName}')" class="btn-sm btn-orange">⚠️ Reject ID</button>` : ''}
+                                ${canReject ? `<button onclick="rejectID('${app.email}', '${app.firstName}')" class="btn-sm btn-orange">⚠️ Reject ID</button>` : ''}
                                 <button onclick="hireWorker('${app.email}')" class="btn-sm btn-green">🔨 Hire</button>
                             </td>
                         </tr>
                     `;
                 }).join('');
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error("Load Applicants Error:", e);
+                document.getElementById('applicantData').innerHTML = '<tr><td colspan="4">Error loading data. Check console.</td></tr>';
+            }
         }
 
-        // LOAD VERIFIED WORKERS (Bottom Grid)
+        // 2. FETCH ACTIVE WORKERS
         async function loadWorkers() {
             const container = document.getElementById('workerList');
             try {
                 const resp = await fetch(`${scriptURL}?action=getWorkers`);
                 const workers = await resp.json();
                 
+                if (workers.length === 0) {
+                    container.innerHTML = '<div class="loading-msg">No active workers found.</div>';
+                    return;
+                }
+
                 container.innerHTML = workers.map(w => {
                     const isPaused = w.status.includes('PAUSED') || w.status.includes('INACTIVE');
                     return `
                         <div class="worker-card" style="border-top-color: ${isPaused ? '#e74c3c' : '#33B26E'}">
                             <h3>${w.name}</h3>
-                            <p class="badge">${w.status}</p>
-                            <div style="margin-top:10px;">
+                            <p><span class="badge">${w.status}</span></p>
+                            <p><small>${w.trade} | ${w.tier || 'No Tier'}</small></p>
+                            <div style="margin-top:15px;">
                                 <button onclick="assignWork('${w.email}')" class="btn-sm btn-green">Assign Work</button>
-                                <a href="${w.folderLink}" target="_blank" class="btn-sm">📁 Files</a>
+                                <a href="${w.folderLink}" target="_blank" class="btn-sm btn-blue" style="text-decoration:none;">📁 Files</a>
                                 <button onclick="toggleWorkerStatus('${w.rowIndex}', '${w.status}', '${w.email}')" class="btn-sm" style="background:#34495e; color:white;">
                                     ${isPaused ? '▶️ Resume' : '⏸️ Pause'}
                                 </button>
                             </div>
                         </div>`;
                 }).join('');
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Load Workers Error:", e); }
         }
 
-        // --- ACTION FUNCTIONS ---
+        // --- BUTTON ACTIONS ---
 
         async function sendAgreementEmail(email, firstName) {
-            if (!confirm("Send Master Agreement to " + firstName + "?")) return;
-            await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'sendAgreementEmail', email, firstName }) });
-            alert("Agreement Sent!");
+            if (!confirm(`Send Master Agreement link to ${firstName}?`)) return;
+            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'sendAgreementEmail', email, firstName }) });
+            alert("Agreement Dispatch Request Sent!");
             refreshAllData();
         }
 
         async function hireWorker(email) {
-            if (!confirm("Move this worker to Active Roster?")) return;
-            await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'hireWorker', email }) });
-            alert("Worker Hired!");
+            if (!confirm("Move this worker to Active Roster and send Welcome Email?")) return;
+            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'hireWorker', email }) });
+            alert("Hire process triggered! Updating roster...");
             refreshAllData();
         }
 
         async function rejectID(email, firstName) {
-            if (!confirm(`Reject ID for ${firstName}? This will email them to re-upload.`)) return;
-            await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'rejectID', email, firstName }) });
-            alert("Rejection Sent.");
-            refreshAllData();
-        }
-
-        async function toggleWorkerStatus(row, currentStatus, email) {
-            const newStatus = (currentStatus === 'ACTIVE') ? 'PAUSED / INACTIVE' : 'ACTIVE';
-            if (!confirm(`Switch worker to ${newStatus}?`)) return;
-            // Note: Reuse updateStatus if added to Apps Script, or update via hireWorker logic
-            await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'updateStatus', row, status: newStatus }) });
-            alert("Status Updated.");
+            if (!confirm(`Reject ID for ${firstName}? This sends the specific Driver's License requirement email.`)) return;
+            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'rejectID', email, firstName }) });
+            alert("ID Rejection Email Sent.");
             refreshAllData();
         }
 
@@ -163,18 +173,18 @@
             const client = prompt("Enter Client Name:");
             if (!client) return;
             const address = prompt("Enter Site Address:");
-            if (!address) return;
             const scope = prompt("Work Scope:");
-            if (!scope) return;
             const budget = prompt("Budget ($):", "$0");
 
             await fetch(scriptURL, {
                 method: 'POST',
+                mode: 'no-cors',
                 body: JSON.stringify({ action: 'assignWork', email, clientName: client, location: address, scope, budget, source: "Portal" })
             });
-            alert(`✅ Dispatched to ${email}`);
+            alert(`✅ Work order dispatched to ${email}`);
         }
 
+        // Initial Load
         window.onload = refreshAllData;
     </script>
 </body>
