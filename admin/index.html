@@ -1,7 +1,7 @@
-// ... existing head and styles ...
 <script>
   const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
 
+  // --- 1. LOAD WORKERS ---
   async function loadWorkers() {
     try {
       const resp = await fetch(`${scriptURL}?action=getWorkers&t=${Date.now()}`);
@@ -14,7 +14,11 @@
           <div class="worker-card ${isPaused ? 'status-hold' : 'status-active'}">
             <div class="worker-info">
               <h3>${w.name}</h3>
-              <p class="worker-meta"><strong>${w.trade}</strong> | <span class="badge">${w.status}</span> | Tier: ${w.tier || 'TBD'}</p>
+              <p class="worker-meta">
+                <strong>${w.trade}</strong> | 
+                <span class="badge">${w.status}</span> | 
+                Tier: ${w.tier || 'TBD'}
+              </p>
               <p class="worker-email" style="font-size: 0.8rem; color: #999;">${w.email}</p>
             </div>
             <div class="worker-actions">
@@ -29,10 +33,12 @@
       });
       document.getElementById('workerList').innerHTML = html || '<p>No workers found.</p>';
     } catch (e) {
+      console.error("Load Error:", e);
       document.getElementById('workerList').innerHTML = '<p style="color:red;">Error loading roster.</p>';
     }
   }
 
+  // --- 2. UPDATE WORKER STATUS (Pause/Resume) ---
   async function updateStatus(row, newStatus) {
     if(!confirm(`Set status to ${newStatus}?`)) return;
     try {
@@ -41,29 +47,53 @@
         mode: 'no-cors',
         body: JSON.stringify({ action: 'updateStatus', row: row, status: newStatus })
       });
-      setTimeout(loadWorkers, 1000);
-    } catch (e) { alert("Update failed."); }
+      // Give Google Sheets a second to update before refreshing
+      setTimeout(loadWorkers, 1200);
+    } catch (e) { 
+      alert("Update failed."); 
+    }
   }
 
+  // --- 3. ASSIGN WORK ---
   async function assignWork(email) {
-    const client = prompt("Client Name:");
-    const address = prompt("Street Address:");
-    const scope = prompt("Description / Scope:");
+    const client = prompt(`Assigning new job to: ${email}\nEnter Client Name:`);
+    if (!client) return;
+
+    const address = prompt("Street Address / Job Site:");
+    if (!address) return;
+
+    const scope = prompt("Description / Scope of Work:");
     const budget = prompt("Budget ($):");
-    if (!client || !address) return;
 
     try {
+      // Basic UI feedback
+      console.log("Assigning job...");
+      
       await fetch(scriptURL, {
         method: 'POST',
         mode: 'no-cors',
         body: JSON.stringify({ 
-          action: 'assignWork', email: email, clientName: client, location: address, scope: scope, budget: budget, source: "Admin Dashboard", notes: "Direct Assignment" 
+          action: 'assignWork', 
+          email: email, 
+          clientName: client, 
+          location: address, 
+          scope: scope, 
+          budget: budget, 
+          source: "Admin Dashboard", 
+          notes: "Direct Assignment" 
         })
       });
-      alert("Job assigned!");
+
+      alert("✅ Job successfully logged to ProjectLog!");
+      // Redirect to see the worker's history
       window.location.href = `projects.html?worker=${encodeURIComponent(email)}`;
-    } catch (e) { alert("Error assigning job."); }
-    
+      
+    } catch (e) {
+      console.error("Assignment Error:", e);
+      alert("❌ Error assigning job. Check console.");
+    }
   }
+
+  // Initialize on load
   window.onload = loadWorkers;
 </script>
