@@ -6,10 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Application Received | Well Done</title>
   <style>
-    body { font-family: -apple-system, sans-serif; background: #f4f7f6; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; }
+    body { font-family: -apple-system, sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
     .card { background: white; max-width: 500px; width: 90%; padding: 40px; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; }
-    .next-steps { background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: left; margin-top: 25px; border-left: 4px solid #33B26E; }
-    h1 { color: #33B26E; margin-bottom: 10px; }
+    .next-steps { background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: left; margin-top: 25px; border-left: 4px solid var(--accent); }
+    h1 { color: var(--accent); margin-bottom: 10px; font-size: 1.8rem; }
   </style>
 </head>
 <body>
