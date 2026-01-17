@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID Verification | Well Done Construction</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); padding: 20px; text-align: center; color: #343E47; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .instruction { font-size: 1.1rem; margin-bottom: 20px; color: var(--primary); font-weight: bold; }
+        .upload-area { border: 2px dashed #ccc; padding: 30px; border-radius: 8px; margin-bottom: 20px; cursor: pointer; background: #fafafa; }
+        .btn { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: var(--accent); color: white; font-size: 1rem; }
+        #preview { width: 100%; border-radius: 8px; margin-bottom: 15px; display: none; border: 1px solid #ddd; }
+        .status { margin-top: 15px; font-weight: bold; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <img src="../sign/assets/well-done-signature.png" alt="Well Done Logo" style="width: 120px; margin-bottom: 10px; opacity: 0.5;">
+    <h2>Final Step: ID Verification</h2>
+    <p class="instruction">Position your ID in the frame and take a clear photo.</p>
+    
+    <div class="upload-area" onclick="document.getElementById('idFile').click()">
+        <img id="preview" src="" alt="ID Preview">
+        <p id="upload-text">📷 TAP TO OPEN CAMERA</p>
+        <input type="file" id="idFile" accept="image/*" capture="camera" style="display: none;">
+    </div>
+
+    <button id="submitBtn" class="btn" onclick="uploadID()">UPLOAD & COMPLETE ONBOARDING</button>
+    <div id="status" class="status"></div>
+</div>
+
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
+    const urlParams = new URLSearchParams(window.location.search);
+    const userEmail = urlParams.get('email');
+
+    // Handle Image Preview
+    document.getElementById('idFile').onchange = function(e) {
+        if (!e.target.files[0]) return;
+        const reader = new FileReader();
+        reader.onload = function() {
+            const preview = document.getElementById('preview');
+            preview.src = reader.result;
+            preview.style.display = 'block';
+            document.getElementById('upload-text').style.display = 'none';
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    };
+
+    async function uploadID() {
+        const fileInput = document.getElementById('idFile');
+        if (!fileInput.files[0]) return alert("Please capture your ID first.");
+        if (!userEmail) return alert("Error: Email missing. Use the link from your email.");
+
+        const btn = document.getElementById('submitBtn');
+        const statusDiv = document.getElementById('status');
+        
+        btn.disabled = true;
+        btn.innerText = "Processing ID...";
+        statusDiv.innerText = "Securing photo to your worker folder...";
+
+        const reader = new FileReader();
+        reader.onload = async function() {
+            const base64Data = reader.result.split(',')[1];
+            
+            try {
+                // Sends photo to the worker's "2. Photos" folder in Drive
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        action: 'uploadJobPhoto',
+                        email: userEmail,
+                        fileData: base64Data,
+                        fileType: fileInput.files[0].type,
+                        category: "ID_VERIFICATION_ONBOARDING"
+                    })
+                });
+
+                statusDiv.style.color = "#33B26E";
+                statusDiv.innerText = "✓ ID Verified. You're all set!";
+                btn.innerText = "ONBOARDING COMPLETE";
+                
+                // Direct them to their Dashboard after 2 seconds
+                setTimeout(() => {
+                    window.location.href = `https://welldoneconstruction.pro/dashboard.html?email=${encodeURIComponent(userEmail)}`;
+                }, 2500);
+
+            } catch (err) {
+                statusDiv.style.color = "#e74c3c";
+                statusDiv.innerText = "Upload failed. Check connection and retry.";
+                btn.disabled = false;
+                btn.innerText = "RETRY UPLOAD";
+            }
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    }
+</script>
+
+</body>
+</html>
