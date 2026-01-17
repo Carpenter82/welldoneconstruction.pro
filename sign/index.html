@@ -1,1 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Agreement | Well Done Construction</title>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <style>
+        :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: #333; line-height: 1.5; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        .contract-box { 
+            height: 400px; overflow-y: scroll; border: 1px solid #ddd; padding: 20px; 
+            background: #fff; margin-bottom: 20px; font-size: 0.9rem; border-radius: 8px;
+        }
 
+        .sig-section { display: none; margin-top: 20px; border-top: 2px solid #eee; padding-top: 20px; }
+        canvas { border: 1px solid #ccc; background: #fff; width: 100%; border-radius: 8px; cursor: crosshair; }
+        
+        .btn { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .btn-primary { background: var(--primary); color: white; margin-top: 15px; }
+        
+        .checkbox-area { background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="text-align: center; color: var(--primary);">On-Call Employee Agreement</h2>
+    
+    <div class="contract-box" id="contract">
+        <h3>ON-CALL EMPLOYEE AGREEMENT (W-2 | At-Will)</h3>
+        <p>This Agreement is entered into by and between <strong>Well Done Construction LLC</strong> and the undersigned <strong>Employee</strong>.</p>
+        
+        <h4>1. EMPLOYMENT STATUS</h4>
+        <p>Employee is hired as a W-2, at-will, on-call employee. No minimum hours are guaranteed. Employment may be terminated by either party at any time.</p>
+
+        <h4>2. SCOPE OF WORK</h4>
+        <p>Duties include carpentry, labor, site documentation, and repairs. Employee may NOT provide pricing, modify scope, or pull permits without authorization.</p>
+
+        <h4>3. PERFORMANCE</h4>
+        <p>Work must be professional. Substandard work must be corrected. Refusal to follow instructions is grounds for termination.</p>
+
+        <h4>8. SAFETY & OSHA</h4>
+        <p>OSHA-10 is required. Proper PPE must be used at all times. Drug/Alcohol use on-site is strictly prohibited.</p>
+
+        <h4>10. CONFIDENTIALITY</h4>
+        <p>Employee may not solicit Company clients or use Company info for personal gain.</p>
+
+        <p><em>[Full Legal Text as provided in previous step...]</em></p>
+    </div>
+
+    <div class="checkbox-area">
+        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <input type="checkbox" id="consent" style="transform: scale(1.5);">
+            <strong>I have read the agreement and accept all terms.</strong>
+        </label>
+    </div>
+
+    <div id="sig-area" class="sig-section">
+        <p><strong>Please Sign Below:</strong></p>
+        <canvas id="canvas" width="600" height="250"></canvas>
+        <button onclick="saveContract()" class="btn btn-primary">EXECUTE AGREEMENT & CONTINUE</button>
+        <button onclick="pad.clear()" style="background:none; border:none; color:grey; margin-top:10px; cursor:pointer;">Clear Signature</button>
+    </div>
+</div>
+
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
+    const urlParams = new URLSearchParams(window.location.search);
+    const userEmail = urlParams.get('email');
+
+    const canvas = document.getElementById('canvas');
+    const pad = new SignaturePad(canvas);
+
+    // Show Signature only when checkbox is checked
+    document.getElementById('consent').addEventListener('change', function() {
+        document.getElementById('sig-area').style.display = this.checked ? 'block' : 'none';
+    });
+
+    async function saveContract() {
+        if (pad.isEmpty()) return alert("Please sign the agreement.");
+        if (!userEmail) return alert("Error: No email found in link.");
+
+        const sigData = pad.toDataURL().split(',')[1];
+        
+        // Change button text to show progress
+        const btn = document.querySelector('.btn-primary');
+        btn.innerText = "Processing Legal Execution...";
+        btn.disabled = true;
+
+        try {
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    action: 'saveSignature',
+                    email: userEmail,
+                    signatureData: sigData,
+                    fileName: `Signed_Agreement_${userEmail}_${Date.now()}.png`
+                })
+            });
+
+            // Redirect to ID Verification / Intake
+            alert("Agreement Signed Successfully!");
+            window.location.href = `https://welldoneconstruction.pro/intake/index.html?email=${encodeURIComponent(userEmail)}`;
+            
+        } catch (e) {
+            alert("Error saving. Please try again.");
+            btn.disabled = false;
+        }
+    }
+</script>
+
+</body>
+</html>
