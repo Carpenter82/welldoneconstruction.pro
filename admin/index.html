@@ -1,94 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../styles.css">
-    <title>Admin Dashboard | Well Done</title>
-</head>
+<html>
+<head><link rel="stylesheet" href="../styles.css"><title>Admin</title></head>
 <body>
-    <div class="container">
-        <h2>Admin Command Center</h2>
-        <p style="font-size: 0.9rem; color: #666;">Set Pay Tier in Column L of the spreadsheet to activate workers.</p>
-        
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Trade</th>
-                    <th>Tier (Col L)</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="applicantTable">
-                <tr><td colspan="4">Connecting to system...</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <script>
-        // Update this URL with your current Web App URL (Permanent ID)
-        const scriptURL = 'YOUR_DEPLOY_URL';
-
-        async function load() {
-            try {
-                const resp = await fetch(`${scriptURL}?action=getApplicants`);
-                const data = await resp.json();
-                
-                if (data.length === 0) {
-                    document.getElementById('applicantTable').innerHTML = '<tr><td colspan="4">No new applicants.</td></tr>';
-                    return;
-                }
-
-                document.getElementById('applicantTable').innerHTML = data.map(app => {
-                    // Button only unlocks if Tier is not empty and not "TBD"
-                    const isReady = app.tier && app.tier !== "TBD" && app.tier !== "";
-                    
-                    return `
-                    <tr>
-                        <td><strong>${app.name}</strong></td>
-                        <td>${app.trade}</td>
-                        <td style="color: ${isReady ? '#33B26E' : '#cc0000'}">${app.tier}</td>
-                        <td>
-                            <button onclick="hire('${app.email}')" 
-                                    style="background: ${isReady ? '#33B26E' : '#ccc'}" 
-                                    ${!isReady ? 'disabled' : ''}>
-                                ${isReady ? 'ACTIVATE' : 'LOCKED'}
-                            </button>
-                        </td>
-                    </tr>`;
-                }).join('');
-            } catch (err) {
-                document.getElementById('applicantTable').innerHTML = '<tr><td colspan="4">Error loading data. Check Deployment.</td></tr>';
-            }
-        }
-
-        async function hire(email) {
-            if(!confirm("Are you sure? This will move the worker to the Roster and send a confirmation email.")) return;
-            
-            // Show processing status
-            const btn = event.target;
-            btn.innerText = "Processing...";
-            btn.disabled = true;
-
-            try {
-                // Using text/plain ensures no-cors requests bypass pre-flight blocks
-                await fetch(scriptURL, { 
-                    method: 'POST', 
-                    mode: 'no-cors', 
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({action: 'hireWorker', email: email}) 
-                });
-                
-                alert("Success: Worker moved to Settings and Email Sent.");
-                load();
-            } catch (err) {
-                alert("Error activating worker. Check script logs.");
-                load();
-            }
-        }
-
-        window.onload = load;
-    </script>
+<div class="container" style="max-width:800px;">
+    <h2>Admin Command Center</h2>
+    <table>
+        <thead><tr><th>Name</th><th>Trade</th><th>Tier</th><th>Action</th></tr></thead>
+        <tbody id="t"></tbody>
+    </table>
+</div>
+<script>
+    const scriptURL = 'YOUR_DEPLOY_URL';
+    async function load() {
+        const r = await fetch(`${scriptURL}?action=getApplicants`);
+        const d = await r.json();
+        document.getElementById('t').innerHTML = d.map(a => `
+            <tr><td>${a.name}</td><td>${a.trade}</td><td>${a.tier}</td>
+            <td><button onclick="hire('${a.email}')" ${a.tier === 'TBD' ? 'disabled' : ''}>ACTIVATE</button></td></tr>`).join('');
+    }
+    async function hire(email) {
+        await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({action:'hireWorker', email}) });
+        alert("Worker Activated."); load();
+    }
+    window.onload = load;
+</script>
 </body>
 </html>
