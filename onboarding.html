@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Onboarding | Well Done</title>
@@ -21,31 +22,50 @@
     <button onclick="uploadFiles()" id="upBtn">Sync to Drive</button>
   </div>
   <script>
+    // Points to your active ...M5/exec URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzQT7DP6beojo_8pcOP3VFPcsBhvxI1nUYxbUQvThdnWuMvw8InEogp2TwoKS9RQ_M5/exec';
-    const toBase64 = (f) => new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.readAsDataURL(f); });
+    
+    const toBase64 = (f) => new Promise(res => { 
+        const r = new FileReader(); 
+        r.onload = () => res(r.result.split(',')[1]); 
+        r.readAsDataURL(f); 
+    });
     
     async function uploadFiles() {
         const em = document.getElementById('email').value;
         const dlFile = document.getElementById('dl').files[0];
         const oshaFile = document.getElementById('osha').files[0];
+        
         if(!em || !dlFile || !oshaFile) return alert("All fields required");
         
         const btn = document.getElementById('upBtn');
-        btn.disabled = true; btn.innerText = "Syncing Docs...";
+        btn.disabled = true; 
+        btn.innerText = "Syncing Docs...";
 
         const payload = { 
-            action: 'onboarding', 
+            action: 'onboard', // Aligned with Code.gs 'onboard'
             email: em, 
             files: [ 
                 {data: await toBase64(dlFile), name: 'DL.jpg', folder: '1. Permits'}, 
                 {data: await toBase64(oshaFile), name: 'OSHA.jpg', folder: '5. Misc'} 
             ] 
         };
+
         try {
-            await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
+            // Fetch without 'no-cors' for reliability
+            await fetch(scriptURL, { 
+                method: 'POST', 
+                body: JSON.stringify(payload) 
+            });
+            
             alert("Documents Secured!"); 
-            window.location.href = "portal/index.html";
-        } catch(e) { alert("Upload failed. Try again."); btn.disabled = false; }
+            // Redirect to the portal dashboard
+            window.location.href = "portal/index.html?email=" + encodeURIComponent(em);
+        } catch(e) { 
+            alert("Upload failed. Check your connection."); 
+            btn.disabled = false; 
+            btn.innerText = "Sync to Drive";
+        }
     }
   </script>
 </body>
