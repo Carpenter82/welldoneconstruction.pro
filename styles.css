@@ -1,8 +1,89 @@
-body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
-.container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-input, select, textarea, button { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-button { background: #33B26E; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-button:hover { background: #2a9159; }
-button:disabled { background: #ccc; }
-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; }
+:root {
+    --primary: #33B26E;
+    --dark: #2c3e50;
+    --light: #f8f9fa;
+    --border: #e0e0e0;
+}
+
+body { 
+    font-family: 'Inter', -apple-system, sans-serif; 
+    background-color: #f4f7f6; 
+    margin: 0; 
+    padding: 20px; 
+    color: var(--dark);
+}
+
+.container { 
+    max-width: 1000px; 
+    margin: 40px auto; 
+    background: white; 
+    padding: 30px; 
+    border-radius: 12px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+}
+
+h2 { 
+    margin-top: 0; 
+    border-bottom: 2px solid var(--primary); 
+    padding-bottom: 10px;
+    display: inline-block;
+}
+
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 25px; 
+    background: white;
+}
+
+th { 
+    background: var(--light); 
+    text-align: left; 
+    padding: 15px; 
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--border);
+}
+
+td { 
+    padding: 15px; 
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+tr:hover { background: #fafafa; }
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border 0.3s;
+}
+
+input:focus { border-color: var(--primary); outline: none; }
+
+button { 
+    padding: 10px 20px; 
+    background: var(--primary); 
+    color: white; 
+    border: none; 
+    border-radius: 6px; 
+    font-weight: 600; 
+    cursor: pointer; 
+    transition: all 0.3s ease;
+}
+
+button:hover { background: #2a9159; transform: translateY(-1px); }
+button:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    background: #eee;
+}
