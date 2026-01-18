@@ -1,31 +1,30 @@
 <!DOCTYPE html>
 <html>
-<head><link rel="stylesheet" href="../styles.css"></head>
+<head><link rel="stylesheet" href="../styles.css"><title>Apply | Well Done</title></head>
 <body>
-  <h2>Worker Application</h2>
-  <form id="f">
-    <input id="fn" placeholder="First Name" required>
-    <input id="ln" placeholder="Last Name" required>
-    <input id="em" type="email" placeholder="Email" required>
-    <input id="ph" placeholder="Phone" required>
-    <input id="tr" placeholder="Trade" required>
-    <button type="submit">Submit Application</button>
-  </form>
-  <script>
+<div class="container">
+    <h2>Worker Application</h2>
+    <form id="f">
+        <input id="fn" placeholder="First Name" required>
+        <input id="ln" placeholder="Last Name" required>
+        <input id="em" type="email" placeholder="Email" required>
+        <input id="ph" placeholder="Phone" required>
+        <input id="tr" placeholder="Trade" required>
+        <input id="exp" placeholder="Experience (Years)" required>
+        <input id="pay" placeholder="Desired Pay" required>
+        <input id="tools" placeholder="Own Tools? (Yes/No)" required>
+        <button type="submit" id="b">Submit Application</button>
+    </form>
+</div>
+<script>
+    const scriptURL = 'YOUR_DEPLOY_URL';
     document.getElementById('f').onsubmit = async (e) => {
-      e.preventDefault();
-      const data = {
-        action: 'intake',
-        firstName: document.getElementById('fn').value,
-        lastName: document.getElementById('ln').value,
-        email: document.getElementById('em').value,
-        phone: document.getElementById('ph').value,
-        trade: document.getElementById('tr').value
-      };
-      await fetch('YOUR_DEPLOY_URL', { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-      alert("Applied! Check your email.");
-      window.location.href = "../onboarding.html";
+        e.preventDefault();
+        document.getElementById('b').disabled = true;
+        const data = { action: 'intake', firstName: document.getElementById('fn').value, lastName: document.getElementById('ln').value, email: document.getElementById('em').value, phone: document.getElementById('ph').value, trade: document.getElementById('tr').value, experience: document.getElementById('exp').value, pay: document.getElementById('pay').value, tools: document.getElementById('tools').value };
+        await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        window.location.href = "../onboarding.html";
     }
-  </script>
+</script>
 </body>
 </html>
