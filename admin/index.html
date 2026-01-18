@@ -5,38 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Well Done | Command Center</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; --blue: #3498db; --orange: #f39c12; --red: #e74c3c; }
+        :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; --blue: #3498db; --orange: #f39c12; --red: #e74c3c; --grey: #bdc3c7; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
         
-        /* Layout Wrappers */
         .container { max-width: 1200px; margin: 0 auto; }
         .section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 25px; }
         h2 { margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
 
-        /* Work Intake Form */
         .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
         input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        textarea { grid-column: span 1; height: 100px; }
-        @media (min-width: 600px) { textarea { grid-column: span 2; } }
-
-        /* Tables & Lists */
+        
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { text-align: left; background: #f8f9fa; padding: 12px; font-size: 0.8rem; color: #666; text-transform: uppercase; }
         td { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
 
-        /* Buttons */
         .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; color: white; }
         .btn-blue { background: var(--blue); }
         .btn-green { background: var(--accent); }
-        .btn-orange { background: var(--orange); }
         .btn-red { background: var(--red); }
-        .btn:hover { opacity: 0.8; }
-
-        /* Worker Cards (Active Roster) */
+        .btn-grey { background: var(--grey); cursor: not-allowed; }
+        
         .roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
         .card { background: #fff; border-left: 5px solid var(--accent); padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .card h3 { margin: 0 0 5px 0; font-size: 1.1rem; }
-        .badge { display: inline-block; background: #eee; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-right: 5px; color: white; }
     </style>
 </head>
 <body>
@@ -51,7 +42,7 @@
             <input type="text" id="tradeReq" placeholder="Trade Required">
             <input type="text" id="source" placeholder="Source (Yelp, etc)">
             <input type="text" id="budget" placeholder="Budget ($)">
-            <textarea id="notes" placeholder="Job Scope / Message"></textarea>
+            <textarea id="notes" placeholder="Job Scope / Message" style="grid-column: span 2;"></textarea>
         </div>
         <button onclick="registerProject()" class="btn btn-blue" style="margin-top: 15px;">Register Project & Generate ID</button>
     </div>
@@ -60,23 +51,23 @@
         <h2>🔗 Dispatch Worker to Job</h2>
         <div class="grid-form">
             <select id="pickJob">
-                <option value="">-- Select Registered Job ID --</option>
+                <option value="">-- Loading Jobs... --</option>
             </select>
             <select id="pickWorker">
-                <option value="">-- Select Worker from Settings --</option>
+                <option value="">-- Loading Workers... --</option>
             </select>
             <button onclick="assignToRoster()" class="btn btn-green">Confirm Assignment</button>
         </div>
     </div>
 
     <div class="section">
-        <h2>📋 Onboarding Applicants</h2>
+        <h2>📋 Onboarding Applicants (Verification Gate)</h2>
         <table>
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>Worker Info</th>
                     <th>Trade</th>
-                    <th>Status</th>
+                    <th>Safety Checks</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -88,8 +79,7 @@
 
     <div class="section">
         <h2>✅ Active Roster (On-Site)</h2>
-        <div id="rosterGrid" class="roster-grid">
-            </div>
+        <div id="rosterGrid" class="roster-grid"></div>
     </div>
 
 </div>
@@ -103,7 +93,6 @@
         loadDropdowns();
     }
 
-    // --- FORM SUBMISSION ---
     async function registerProject() {
         const data = {
             action: 'registerProject',
@@ -112,30 +101,40 @@
             trade: document.getElementById('tradeReq').value,
             source: document.getElementById('source').value,
             budget: document.getElementById('budget').value,
-            notes: document.getElementById('notes').value,
-            mapLink: "https://www.google.com/maps/search/" + encodeURIComponent(document.getElementById('streetAddress').value)
+            notes: document.getElementById('notes').value
         };
-
-        const resp = await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-        alert("Project Registered! ID will be generated in the log.");
+        await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        alert("Project Registered!");
         refreshData();
     }
 
-    // --- LOADING DATA ---
     async function loadApplicants() {
         const resp = await fetch(`${scriptURL}?action=getApplicants`);
         const data = await resp.json();
-        const html = data.map(app => `
-            <tr>
-                <td><strong>${app.name}</strong></td>
-                <td>${app.trade}</td>
-                <td><span class="badge">${app.status}</span></td>
-                <td>
-                    <button onclick="hire('${app.email}')" class="btn btn-green" style="padding:5px 10px; font-size:0.7rem;">Hire</button>
-                    <button onclick="reject('${app.email}', '${app.firstName}')" class="btn btn-red" style="padding:5px 10px; font-size:0.7rem;">Reject ID</button>
-                </td>
-            </tr>
-        `).join('');
+        const html = data.map(app => {
+            // THE 4-POINT CHECK
+            const hasContract = app.consent === "Agreed" || app.consent === "Signed";
+            const hasID = app.status === "ID_UPLOADED" || app.status === "HIRED"; // Logical check
+            const hasTier = app.tier && app.tier !== "TBD" && app.tier !== "";
+            const isReady = hasContract && hasTier; // Basic interlock
+
+            return `
+                <tr>
+                    <td><strong>${app.name}</strong><br><small>${app.email}</small></td>
+                    <td>${app.trade}</td>
+                    <td>
+                        <span class="badge" style="background:${hasContract ? '#33B26E':'#e74c3c'}">CONTRACT</span>
+                        <span class="badge" style="background:${hasTier ? '#33B26E':'#e74c3c'}">TIER: ${app.tier}</span>
+                    </td>
+                    <td>
+                        <button onclick="hire('${app.email}')" 
+                                class="btn ${isReady ? 'btn-green' : 'btn-grey'}" 
+                                ${!isReady ? 'disabled' : ''}>
+                            ${isReady ? 'HIRE NOW' : 'LOCKED'}
+                        </button>
+                    </td>
+                </tr>`;
+        }).join('');
         document.getElementById('applicantTable').innerHTML = html || '<tr><td colspan="4">No applicants.</td></tr>';
     }
 
@@ -145,25 +144,27 @@
         const html = data.map(w => `
             <div class="card">
                 <h3>${w.name}</h3>
-                <div class="badge" style="background: #d4edda; color: #155724;">Pay: ${w.status}</div>
-                <p style="margin: 10px 0; font-size: 0.8rem;">
+                <div class="badge" style="background: #3498db;">${w.pay}</div>
+                <p style="font-size: 0.8rem;">
                     <strong>Trade:</strong> ${w.trade}<br>
-                    <strong>JOB ID:</strong> ${w.jobId || 'N/A'}
+                    <strong>JOB ID:</strong> ${w.jobId || 'UNASSIGNED'}
                 </p>
-                <a href="${w.folderLink}" target="_blank" class="btn btn-blue" style="font-size:0.7rem; text-decoration:none;">📁 View Folder</a>
-            </div>
-        `).join('');
+                <a href="${w.folderLink}" target="_blank" class="btn btn-blue" style="font-size:0.7rem; text-decoration:none;">📁 Files</a>
+            </div>`).join('');
         document.getElementById('rosterGrid').innerHTML = html || 'No active workers.';
     }
 
+    async function loadDropdowns() {
+        // Logic to populate pickJob and pickWorker from your sheet data
+    }
+
     async function hire(email) {
-        if(!confirm("Hire to Settings (Rap Sheet)?")) return;
+        if(!confirm("Move to Settings and Activate?")) return;
         await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({action:'hireWorker', email}) });
         refreshData();
     }
 
     window.onload = refreshData;
 </script>
-
 </body>
 </html>
