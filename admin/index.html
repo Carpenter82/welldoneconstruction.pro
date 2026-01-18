@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard | Well Done</title>
   <link rel="stylesheet" href="../styles.css">
   <style>
     .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-    .badge-new { background: #e3f2fd; color: #1976d2; }
-    .badge-hired { background: #e8f5e9; color: #2e7d32; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+    .badge-new { background: #fff3e0; color: #ef6c00; } /* NEW / DOCS UPLOADED */
+    .badge-hired { background: #e8f5e9; color: #2e7d32; } /* ACTIVE */
     @media (max-width: 800px) { .split-grid { grid-template-columns: 1fr; } }
+    .card { position: relative; border-left: 5px solid #ccc; }
+    .card.active-status { border-left-color: var(--accent); }
   </style>
 </head>
 <body>
@@ -18,18 +21,20 @@
 <div class="container" style="max-width: 1000px;">
   <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h2>Admin Command Center</h2>
-    <a href="project.html" class="nav-link" style="color: var(--accent);">+ New Project</a>
+    <div>
+      <a href="project.html" class="btn" style="padding: 10px 15px; text-decoration: none; font-size: 14px;">+ Register Project</a>
+    </div>
   </header>
 
   <div class="split-grid">
     <section>
-      <h3 style="border-bottom: 2px solid var(--accent); padding-bottom: 10px;">New Applicants</h3>
-      <div id="applicantList">Loading...</div>
+      <h3 style="border-bottom: 2px solid var(--accent); padding-bottom: 10px;">Applicants (Intake)</h3>
+      <div id="applicantList">Loading Applicants...</div>
     </section>
 
     <section>
-      <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Verified Active Crew</h3>
-      <div id="crewList">Loading...</div>
+      <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Master Roster (Settings)</h3>
+      <div id="crewList">Loading Roster...</div>
     </section>
   </div>
 </div>
@@ -42,43 +47,49 @@
       const response = await fetch(scriptURL + "?action=getDashboard");
       const data = await response.json();
 
-      // Render Applicants
+      // Render Applicants (From 'application' sheet)
       const appContainer = document.getElementById('applicantList');
       appContainer.innerHTML = data.applicants.length ? data.applicants.map(a => `
         <div class="card">
           <span class="badge badge-new">${a.status}</span>
           <p><strong>${a.name}</strong><br>${a.trade}</p>
-          <button onclick="hireWorker('${a.email}')" style="padding: 10px; font-size: 12px;">HIRE & ACTIVATE</button>
+          <button onclick="hireWorker('${a.email}')" style="padding: 8px; font-size: 11px; background:#33B26E;">HIRE TO ROSTER</button>
         </div>
-      `).join('') : '<p>No new applicants.</p>';
+      `).join('') : '<p>No pending applications.</p>';
 
-      // Render Active Crew
+      // Render Crew (From 'Settings' sheet)
       const crewContainer = document.getElementById('crewList');
       crewContainer.innerHTML = data.activeCrew.length ? data.activeCrew.map(c => `
-        <div class="card" style="border-left-color: var(--primary);">
+        <div class="card active-status">
           <span class="badge badge-hired">${c.status}</span>
-          <p><strong>${c.name}</strong><br>${c.tier}</p>
+          <p><strong>${c.name}</strong><br>${c.trade} | ${c.tier}</p>
           <div style="display:flex; gap:5px;">
-             <button onclick="pauseWorker('${c.email}')" style="padding: 10px; font-size: 12px; background: #6c757d;">PAUSE</button>
-             <button onclick="window.open('${c.folder}')" style="padding: 10px; font-size: 12px; background: #343E47;">VAULT</button>
+             <button onclick="window.open('${c.folder}')" style="padding: 8px; font-size: 11px; background: #343E47;">VIEW VAULT</button>
+             <button onclick="assignJob('${c.email}')" style="padding: 8px; font-size: 11px; background: var(--primary);">ASSIGN JOB</button>
           </div>
         </div>
-      `).join('') : '<p>No active crew members.</p>';
+      `).join('') : '<p>No workers in Master Roster.</p>';
 
     } catch (err) {
-      console.error(err);
-      document.getElementById('applicantList').innerText = "Error loading data.";
+      document.getElementById('applicantList').innerText = "Error syncing with Sheets.";
     }
   }
 
   async function hireWorker(email) {
-    if(!confirm("Hire this worker? This will move them to the Active Roster.")) return;
+    if(!confirm("Move worker to Master Roster (Settings)?")) return;
     await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'hireWorker', email: email }) });
-    alert("Worker Hired!");
+    alert("Worker Activated in Settings!");
     loadDashboard();
   }
 
-  // Initial Load
+  async function assignJob(email) {
+    const jobId = prompt("Enter JOB ID from ProjectLog to assign to this worker:");
+    if(!jobId) return;
+    await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'assignToRoster', email: email, jobId: jobId }) });
+    alert("Worker Assigned to Job!");
+    loadDashboard();
+  }
+
   window.onload = loadDashboard;
 </script>
 
