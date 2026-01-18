@@ -1,68 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Well Done | GPS Activity</title>
-    <style>
-        :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        .nav-links a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; font-size: 0.9rem; }
-        
-        #activityLog { max-width: 800px; margin: 0 auto; }
-        .activity-card { background: white; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 5px solid var(--accent); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .activity-details strong { color: var(--primary); }
-        .activity-details small { color: #888; display: block; margin-top: 4px; }
-        .btn-map { background: #1976d2; color: white; text-decoration: none; padding: 8px 15px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activity Log | Admin</title>
+  <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
-
-    <div class="header">
-        <div>
-            <h1 style="margin:0; font-size: 1.5rem;">GPS Audit Trail</h1>
-            <small>Live Field Check-ins</small>
-        </div>
-        <div class="nav-links">
-            <a href="index.html">🏠 Roster</a>
-            <a href="projects.html">📋 All Projects</a>
-            <a href="activity.html">📍 GPS Activity</a>
-        </div>
-    </div>
-
-    <div id="activityLog">
-        <p style="text-align:center; padding:50px; color:#999;">📡 Syncing GPS Logs...</p>
-    </div>
-
-    <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
-
-        async function loadActivity() {
-            const container = document.getElementById('activityLog');
-            try {
-                const resp = await fetch(`${scriptURL}?action=getActivity&t=${Date.now()}`);
-                const logs = await resp.json();
-
-                if (!logs || logs.length === 0) {
-                    container.innerHTML = '<p style="text-align:center; margin-top:50px;">No recent GPS pings found.</p>';
-                    return;
-                }
-
-                container.innerHTML = [...logs].reverse().map(l => `
-                    <div class="activity-card">
-                        <div class="activity-details">
-                            <strong>${l.email.split('@')[0].toUpperCase()}</strong>
-                            <small>🕒 ${new Date(l.timestamp).toLocaleString()}</small>
-                        </div>
-                        <a href="${l.mapLink}" target="_blank" class="btn-map">📍 View on Map</a>
-                    </div>
-                `).join('');
-            } catch (e) {
-                container.innerHTML = '<p style="color:red; text-align:center;">Error loading GPS trail.</p>';
-            }
-        }
-        window.onload = loadActivity;
-    </script>
+  <div class="container" style="max-width: 800px;">
+    <h2>GPS Activity Audit</h2>
+    <div id="logContent">Loading activity...</div>
+  </div>
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzQT7DP6beojo_8pcOP3VFPcsBhvxI1nUYxbUQvThdnWuMvw8InEogp2TwoKS9RQ_M5/exec';
+    async function loadLogs() {
+        const res = await fetch(scriptURL + "?action=getDashboard"); // Uses the getter in Code.gs
+        const data = await res.json();
+        // Simple display logic for the audit trail
+        document.getElementById('logContent').innerHTML = data.applicants.map(a => `
+            <div class="card">
+                <b>${a.name}</b> applied for ${a.trade}<br>
+                Status: ${a.status}
+            </div>
+        `).join('');
+    }
+    window.onload = loadLogs;
+  </script>
 </body>
 </html>
