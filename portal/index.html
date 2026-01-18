@@ -1,11 +1,41 @@
 <!DOCTYPE html>
-<html>
-<head><link rel="stylesheet" href="../styles.css"><title>Login</title></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles.css">
+    <title>Worker Login | Well Done</title>
+</head>
 <body>
-<div class="container" style="text-align:center;">
-    <h2>Worker Portal</h2>
-    <input type="email" id="em" placeholder="Enter your email">
-    <button onclick="window.location.href='dashboard.html?email='+document.getElementById('em').value">Login</button>
-</div>
+    <div class="container" style="text-align:center; margin-top: 100px;">
+        <h2>Worker Portal</h2>
+        <p style="color: #666; margin-bottom: 20px;">Enter your email to view your site assignment.</p>
+        
+        <input type="email" id="em" placeholder="Enter your email" required>
+        
+        <button onclick="loginWorker()" id="loginBtn">Login</button>
+    </div>
+
+    <script>
+        function loginWorker() {
+            const emailValue = document.getElementById('em').value.trim().toLowerCase();
+            
+            if (!emailValue) {
+                alert("Please enter your email address.");
+                return;
+            }
+
+            // Accuracy Fix: encodeURIComponent handles special characters in emails
+            const destination = 'dashboard.html?email=' + encodeURIComponent(emailValue);
+            window.location.href = destination;
+        }
+
+        // Efficiency: Allow 'Enter' key to trigger login
+        document.getElementById('em').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                loginWorker();
+            }
+        });
+    </script>
 </body>
 </html>
