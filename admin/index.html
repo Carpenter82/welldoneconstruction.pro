@@ -3,44 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register Project | Admin</title>
+  <title>Admin Dashboard | Well Done</title>
   <link rel="stylesheet" href="../styles.css">
+  <style>
+    .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+    .badge-new { background: #e3f2fd; color: #1976d2; }
+    .badge-hired { background: #e8f5e9; color: #2e7d32; }
+    @media (max-width: 800px) { .split-grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h2>New Project Registration</h2>
-    <form id="projectForm">
-      <input type="text" id="client" placeholder="Client Name" required>
-      <input type="text" id="address" placeholder="Project Address" required>
-      <input type="text" id="trade" placeholder="Trade (e.g. Website Build)" required>
-      <input type="text" id="budget" placeholder="Budget Amount" required>
-      <textarea id="notes" placeholder="Job Notes"></textarea>
-      <button type="submit" id="projBtn">LOG PROJECT & GEN ID</button>
-    </form>
-    <div id="result" style="margin-top:20px; font-weight:bold; text-align:center; color:#33B26E;"></div>
+
+<div class="container" style="max-width: 1000px;">
+  <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>Admin Command Center</h2>
+    <a href="project.html" class="nav-link" style="color: var(--accent);">+ New Project</a>
+  </header>
+
+  <div class="split-grid">
+    <section>
+      <h3 style="border-bottom: 2px solid var(--accent); padding-bottom: 10px;">New Applicants</h3>
+      <div id="applicantList">Loading...</div>
+    </section>
+
+    <section>
+      <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Verified Active Crew</h3>
+      <div id="crewList">Loading...</div>
+    </section>
   </div>
-  <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzQT7DP6beojo_8pcOP3VFPcsBhvxI1nUYxbUQvThdnWuMvw8InEogp2TwoKS9RQ_M5/exec';
-    document.getElementById('projectForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('projBtn');
-        btn.disabled = true;
+</div>
 
-        const data = {
-            action: 'registerProject',
-            client: document.getElementById('client').value,
-            address: document.getElementById('address').value,
-            trade: document.getElementById('trade').value,
-            budget: document.getElementById('budget').value,
-            notes: document.getElementById('notes').value
-        };
+<script>
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbzQT7DP6beojo_8pcOP3VFPcsBhvxI1nUYxbUQvThdnWuMvw8InEogp2TwoKS9RQ_M5/exec';
 
-        const response = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(data) });
-        const jobId = await response.text();
-        document.getElementById('result').innerText = "SUCCESS! JOB ID: " + jobId;
-        e.target.reset();
-        btn.disabled = false;
-    };
-  </script>
+  async function loadDashboard() {
+    try {
+      const response = await fetch(scriptURL + "?action=getDashboard");
+      const data = await response.json();
+
+      // Render Applicants
+      const appContainer = document.getElementById('applicantList');
+      appContainer.innerHTML = data.applicants.length ? data.applicants.map(a => `
+        <div class="card">
+          <span class="badge badge-new">${a.status}</span>
+          <p><strong>${a.name}</strong><br>${a.trade}</p>
+          <button onclick="hireWorker('${a.email}')" style="padding: 10px; font-size: 12px;">HIRE & ACTIVATE</button>
+        </div>
+      `).join('') : '<p>No new applicants.</p>';
+
+      // Render Active Crew
+      const crewContainer = document.getElementById('crewList');
+      crewContainer.innerHTML = data.activeCrew.length ? data.activeCrew.map(c => `
+        <div class="card" style="border-left-color: var(--primary);">
+          <span class="badge badge-hired">${c.status}</span>
+          <p><strong>${c.name}</strong><br>${c.tier}</p>
+          <div style="display:flex; gap:5px;">
+             <button onclick="pauseWorker('${c.email}')" style="padding: 10px; font-size: 12px; background: #6c757d;">PAUSE</button>
+             <button onclick="window.open('${c.folder}')" style="padding: 10px; font-size: 12px; background: #343E47;">VAULT</button>
+          </div>
+        </div>
+      `).join('') : '<p>No active crew members.</p>';
+
+    } catch (err) {
+      console.error(err);
+      document.getElementById('applicantList').innerText = "Error loading data.";
+    }
+  }
+
+  async function hireWorker(email) {
+    if(!confirm("Hire this worker? This will move them to the Active Roster.")) return;
+    await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'hireWorker', email: email }) });
+    alert("Worker Hired!");
+    loadDashboard();
+  }
+
+  // Initial Load
+  window.onload = loadDashboard;
+</script>
+
 </body>
 </html>
