@@ -5,24 +5,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Onboarding | Well Done Construction</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+    .container { max-width: 500px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    input[type="file"] { margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; width: 100%; border-radius: 5px; }
+    .btn { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+    .btn:disabled { background: #ccc; cursor: not-allowed; }
+    .nav-dock { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #ddd; }
+    .nav-dock a { text-decoration: none; color: #666; font-size: 0.9rem; }
+    .active { color: var(--accent) !important; font-weight: bold; }
+  </style>
 </head>
 <body>
 
 <div class="container">
   <h2 style="text-align: center;">Worker Onboarding</h2>
-  <p style="text-align: center; color: #6E797F;">Upload your documentation to activate your worker portal.</p>
+  <p style="text-align: center; color: #6E797F;">Upload ID and OSHA card to activate your profile.</p>
   
   <form id="onboardForm">
-    <input type="email" id="em" placeholder="Confirm Your Email" required style="width:100%; padding:10px; margin-bottom:10px;">
+    <input type="email" id="em" placeholder="Confirm Your Email" required style="width:100%; padding:10px; margin-bottom:20px; border: 1px solid #ccc; border-radius: 5px;">
     
-    <label style="font-weight: bold; display: block; margin-top: 20px; margin-bottom: 5px;">1. Driver's License / ID:</label>
+    <label style="font-weight: bold; display: block; margin-bottom: 5px;">1. Driver's License / ID:</label>
     <input type="file" id="idFile" accept="image/*" required>
 
-    <label style="font-weight: bold; display: block; margin-top: 10px; margin-bottom: 5px;">2. OSHA 10 Card:</label>
+    <label style="font-weight: bold; display: block; margin-bottom: 5px;">2. OSHA 10 Card (or similar):</label>
     <input type="file" id="oshaFile" accept="image/*,application/pdf" required>
 
-    <button type="submit" id="submitBtn" class="btn" style="width:100%; padding:15px; margin-top:20px; background:#33B26E; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">Upload & Continue</button>
+    <button type="submit" id="submitBtn" class="btn">Upload & Continue</button>
   </form>
   <p id="msg" style="text-align: center; margin-top: 15px; font-weight: bold;"></p>
 </div>
@@ -35,7 +45,8 @@
 </nav>
 
 <script>
-// Helper function to convert file to Base64
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
+
 const toBase64 = file => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -47,17 +58,14 @@ document.getElementById('onboardForm').onsubmit = async (e) => {
   e.preventDefault();
   const btn = document.getElementById('submitBtn');
   const msg = document.getElementById('msg');
-  const idInput = document.getElementById('idFile');
-  const oshaInput = document.getElementById('oshaFile');
   const email = document.getElementById('em').value.trim().toLowerCase();
 
-  btn.innerText = "Processing Files (Please Wait)...";
+  btn.innerText = "Uploading Documents...";
   btn.disabled = true;
 
   try {
-    // Process both files into Base64
-    const idData = await toBase64(idInput.files[0]);
-    const oshaData = await toBase64(oshaInput.files[0]);
+    const idData = await toBase64(document.getElementById('idFile').files[0]);
+    const oshaData = await toBase64(document.getElementById('oshaFile').files[0]);
 
     const payload = {
       action: 'onboard',
@@ -65,43 +73,41 @@ document.getElementById('onboardForm').onsubmit = async (e) => {
       files: [
         { 
             data: idData, 
-            name: "ID_" + email + "_" + Date.now(), 
-            type: idInput.files[0].type, 
-            folder: "1. Permits" // Changed to Permits for ID storage
+            name: `ID_${email}.jpg`, 
+            type: "image/jpeg", 
+            folder: "1. Permits" 
         },
         { 
             data: oshaData, 
-            name: "OSHA10_" + email + "_" + Date.now(), 
-            type: oshaInput.files[0].type, 
-            folder: "4. Contracts" 
+            name: `OSHA_${email}.jpg`, 
+            type: "image/jpeg", 
+            folder: "5. Misc" 
         }
       ]
     };
 
-    // UPDATED SCRIPT URL
-    await fetch('https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec', {
+    // Using regular POST. Note: no-cors means we can't read the response, 
+    // but the data will still hit the Google Script.
+    await fetch(SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
       body: JSON.stringify(payload)
     });
 
     msg.style.color = "green";
-    msg.innerText = "Upload Complete! Entering Portal...";
+    msg.innerText = "Success! ID and OSHA card received.";
     
-    // Slight delay to allow Google Drive to process the folder creation
     setTimeout(() => {
       window.location.href = `portal/index.html?email=${encodeURIComponent(email)}`;
-    }, 2500);
+    }, 2000);
 
   } catch (err) {
-    console.error(err);
     msg.style.color = "red";
-    msg.innerText = "Upload Error. Please try again.";
+    msg.innerText = "Error uploading. Check your connection.";
     btn.innerText = "Upload & Continue";
     btn.disabled = false;
   }
 };
 </script>
-
 </body>
 </html>
