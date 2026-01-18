@@ -1,193 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Well Done Construction</title>
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-    <style>
-        body { font-family: -apple-system, sans-serif; background: #f4f7f6; padding: 20px; color: #343E47; }
-        .container { max-width: 500px; margin: 0 auto; text-align: center; }
-        .badge { padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; }
-        .status-active { background: #33B26E; color: white; }
-        .status-pending { background: #FFB800; color: #343E47; }
-        .action-card { background: white; padding: 20px; border-radius: 12px; margin-top: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: left; }
-        .btn { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-decoration: none; display: block; margin-top: 10px; }
-        .legal-box { background:#fff3cd; padding:15px; border:1px solid #ffeeba; margin:15px 0; border-radius: 8px; font-size: 0.9rem; text-align: left; }
-        canvas { border: 1px solid #ccc; background: #fff; width: 100%; border-radius: 8px; }
-        .logout-btn { background: none; border: 1px solid #ddd; color: #6E797F; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-top: 40px; }
-    </style>
+    <link rel="stylesheet" href="../styles.css">
+    <title>My Assignment | Well Done</title>
 </head>
 <body>
+    <div class="container">
+        <h2 id="welcome">Loading Assignment...</h2>
+        
+        <div id="jobCard" style="display:none; border: 2px solid #33B26E; padding: 20px; border-radius: 8px; background: #fff;">
+            <h3 id="jobId">Job ID: ---</h3>
+            <hr>
+            <p><strong>📍 Address:</strong> <span id="address">---</span></p>
+            <p><strong>💰 Budget:</strong> <span id="budget">---</span></p>
+            <p><strong>📝 Notes:</strong> <span id="notes">---</span></p>
+            
+            <button onclick="openMap()" style="background: #3498db;">Get Directions (Google Maps)</button>
+        </div>
 
-<div class="container">
-    <h1 id="welcomeHeading">Syncing...</h1>
-    <div style="margin-bottom: 25px;">
-        <span id="statusBadge" class="badge">Checking...</span>
+        <div id="noJob" style="display:none; text-align: center; padding: 40px;">
+            <h3>No Active Assignment</h3>
+            <p>Contact your supervisor to be dispatched to a Job ID.</p>
+        </div>
+        
+        <button onclick="window.location.href='index.html'" style="margin-top: 20px; background: #666;">Logout</button>
     </div>
 
-    <div id="portal-view">
-        <p>Loading Assignment Details...</p>
-    </div>
+    <script>
+        const scriptURL = 'YOUR_DEPLOY_URL'; // SAME URL FROM CODE.GS
+        const params = new URLSearchParams(window.location.search);
+        const email = params.get('email');
 
-    <button class="logout-btn" onclick="logout()">Logout</button>
-</div>
+        async function loadDashboard() {
+            if(!email) return window.location.href = 'index.html';
 
-<script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
-    const urlParams = new URLSearchParams(window.location.search);
-    const userEmail = urlParams.get('email');
-    let signaturePad;
+            try {
+                const resp = await fetch(`${scriptURL}?action=getWorkerStatus&email=${encodeURIComponent(email)}`);
+                const data = await resp.json();
 
-    async function loadPortal() {
-        if (!userEmail) { window.location.href = 'index.html'; return; }
+                if (data.status === 'Not Found') {
+                    alert("Email not recognized. Please apply first.");
+                    window.location.href = '../intake/index.html';
+                    return;
+                }
 
-        try {
-            // 1. Check Worker General Status
-            const statusResp = await fetch(`${scriptURL}?action=getWorkerStatus&email=${encodeURIComponent(userEmail)}`);
-            const worker = await statusResp.json();
-            
-            document.getElementById('welcomeHeading').innerText = `Hello, ${worker.firstName || 'Worker'}!`;
-            const badge = document.getElementById('statusBadge');
-            badge.innerText = worker.status;
+                document.getElementById('welcome').innerText = `Welcome, ${data.name}`;
 
-            if (!worker.status.includes('ACTIVE')) {
-                badge.className = 'badge status-pending';
-                document.getElementById('portal-view').innerHTML = `<div class="action-card"><h3>Account Pending</h3><p>Management is reviewing your documents.</p></div>`;
-                return;
+                if (data.jobId && data.jobId !== "UNASSIGNED") {
+                    document.getElementById('jobCard').style.display = 'block';
+                    document.getElementById('jobId').innerText = `Job ID: ${data.jobId}`;
+                    document.getElementById('address').innerText = data.details.address;
+                    document.getElementById('budget').innerText = data.details.budget;
+                    document.getElementById('notes').innerText = data.details.notes;
+                } else {
+                    document.getElementById('noJob').style.display = 'block';
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error connecting to server.");
             }
-            badge.className = 'badge status-active';
-
-            // 2. Check for Active Assignments (The Gatekeeper)
-            const projResp = await fetch(`${scriptURL}?action=getProjectLog&t=${Date.now()}`);
-            const projects = await projResp.json();
-            
-            // Find the LATEST project for this user
-            const myProject = projects.reverse().find(p => p.email === userEmail);
-
-            if (!myProject) {
-                renderEmptyState();
-            } else if (myProject.status === "ASSIGNED") {
-                renderAcceptanceScreen(myProject);
-            } else {
-                renderWorkTools(myProject);
-            }
-
-        } catch (e) {
-            document.getElementById('welcomeHeading').innerText = "System Offline";
-            console.error(e);
         }
-    }
 
-    function renderAcceptanceScreen(job) {
-        document.getElementById('portal-view').innerHTML = `
-            <div class="action-card">
-                <h2 style="margin-top:0;">📋 New Work Order</h2>
-                <p><strong>Site:</strong> ${job.location}</p>
-                <p><strong>Scope:</strong> ${job.scope}</p>
-                
-                <div class="legal-box">
-                    <p><em>"I accept this on-call work assignment and agree to perform only authorized tasks, follow company instructions, and not exceed scope, time, or cost limits without approval."</em></p>
-                    <label style="font-weight:bold; display:block; margin-top:10px;">
-                        <input type="checkbox" id="accept-terms"> I Agree to these terms
-                    </label>
-                </div>
+        function openMap() {
+            const addr = document.getElementById('address').innerText;
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`, '_blank');
+        }
 
-                <div id="sig-area" style="display:none; margin-top:15px;">
-                    <p style="font-size:0.8rem; color:#666;">Sign Below (Finger or Stylus):</p>
-                    <canvas id="sig-pad" width="400" height="200"></canvas>
-                    <button onclick="executeAcceptance()" class="btn" style="background:#2c3e50; color:white;">ACCEPT & START WORK</button>
-                    <button onclick="signaturePad.clear()" style="background:none; border:none; color:#666; font-size:0.7rem; margin-top:5px; cursor:pointer;">Clear Signature</button>
-                </div>
-            </div>
-        `;
-        
-        const canvas = document.getElementById('sig-pad');
-        signaturePad = new SignaturePad(canvas);
-
-        document.getElementById('accept-terms').onclick = function() {
-            document.getElementById('sig-area').style.display = this.checked ? 'block' : 'none';
-        };
-    }
-
-    async function executeAcceptance() {
-        if (signaturePad.isEmpty()) return alert("Please sign to proceed.");
-        const sigData = signaturePad.toDataURL().split(',')[1];
-
-        document.getElementById('portal-view').innerHTML = "<p>Saving Signature & Unlocking Tools...</p>";
-
-        try {
-            await fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({
-                    action: 'saveSignature',
-                    email: userEmail,
-                    signatureData: sigData,
-                    fileName: `WO_Acceptance_${Date.now()}.png`
-                })
-            });
-            alert("Work Order Accepted!");
-            loadPortal(); // Refresh to show tools
-        } catch (e) { alert("Error saving acceptance."); }
-    }
-
-    function renderWorkTools(job) {
-        document.getElementById('portal-view').innerHTML = `
-            <a href="../checklist/index.html?email=${encodeURIComponent(userEmail)}" class="btn" style="background: #33B26E; color: white;">
-                📋 START DAILY CHECKLIST
-            </a>
-
-            <div class="action-card">
-                <h3 style="margin-top:0;">📸 Site Photo Upload</h3>
-                <p style="font-size:0.8rem; margin-bottom:15px;"><strong>Active Site:</strong> ${job.location}</p>
-                <select id="photoType" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px;">
-                    <option value="Address">📍 1. Address Verification</option>
-                    <option value="Before">🛠️ 2. Before Photo</option>
-                    <option value="After">✅ 3. After Photo</option>
-                </select>
-                <input type="file" id="photoFile" accept="image/*" capture="camera" style="margin-bottom: 15px; width: 100%;">
-                <button onclick="uploadPhoto()" id="uploadBtn" class="btn" style="background: #343E47; color: white;">UPLOAD TO DRIVE</button>
-                <p id="uploadStatus"></p>
-            </div>
-        `;
-    }
-
-    function renderEmptyState() {
-        document.getElementById('portal-view').innerHTML = `<div class="action-card"><p style="text-align:center;">No active assignments. Check back later.</p></div>`;
-    }
-
-    async function uploadPhoto() {
-        const fileInput = document.getElementById('photoFile');
-        if (!fileInput.files[0]) return alert("Please capture an image.");
-        
-        const btn = document.getElementById('uploadBtn');
-        btn.disabled = true; btn.innerText = "Uploading...";
-
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            const base64Data = e.target.result.split(',')[1];
-            await fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({
-                    action: 'uploadJobPhoto',
-                    email: userEmail,
-                    fileData: base64Data,
-                    fileType: fileInput.files[0].type,
-                    category: document.getElementById('photoType').value
-                })
-            });
-            document.getElementById('uploadStatus').innerText = "✓ Photo Saved!";
-            btn.disabled = false; btn.innerText = "UPLOAD ANOTHER";
-        };
-        reader.readAsDataURL(fileInput.files[0]);
-    }
-
-    function logout() { if(confirm("Logout?")) window.location.href = 'index.html'; }
-
-    window.onload = loadPortal;
-</script>
-
+        loadDashboard();
+    </script>
 </body>
 </html>
