@@ -1,30 +1,47 @@
 <!DOCTYPE html>
 <html>
-<head><link rel="stylesheet" href="../styles.css"><title>My Job</title></head>
+<head>
+    <link rel="stylesheet" href="../styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Worker Dashboard</title>
+</head>
 <body>
-<div class="container">
-    <h2 id="w">Loading...</h2>
-    <div id="j" style="display:none; border:2px solid #33B26E; padding:20px; border-radius:10px;">
-        <h3>Current Job ID: <span id="id"></span></h3>
-        <p>Location: <span id="loc"></span></p>
-        <button onclick="window.open('https://www.google.com/maps/search/'+encodeURIComponent(document.getElementById('loc').innerText))">Get Directions</button>
+    <div class="container">
+        <h2>Your Assignment</h2>
+        <div id="jobCard" class="card" style="display:none;">
+            <p><strong>Job ID:</strong> <span id="jobId"></span></p>
+            <p><strong>Location:</strong> <span id="jobLoc"></span></p>
+            <button onclick="goToChecklist()" style="background:#33B26E;">Open Daily Checklist</button>
+        </div>
+        <div id="noJob" style="display:none; text-align:center;">
+            <p>No active assignment found for this email.</p>
+        </div>
     </div>
-</div>
-<script>
-    const scriptURL = 'YOUR_DEPLOY_URL';
-    const em = new URLSearchParams(window.location.search).get('email');
-    async function load() {
-        const r = await fetch(`${scriptURL}?action=getWorkerStatus&email=${em}`);
-        const d = await r.json();
-        if(d.status === 'Not Found') return alert("Record not found");
-        document.getElementById('w').innerText = "Hello, " + d.name;
-        if(d.jobId !== "UNASSIGNED") {
-            document.getElementById('j').style.display = 'block';
-            document.getElementById('id').innerText = d.jobId;
-            document.getElementById('loc').innerText = d.details.address;
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzQT7DP6beojo_8pcOP3VFPcsBhvxI1nUYxbUQvThdnWuMvw8InEogp2TwoKS9RQ_M5/exec';
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+
+        async function loadJob() {
+            // This calls a 'get' action in your script to find the worker's row
+            const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}`);
+            const data = await res.json();
+
+            if (data.jobId) {
+                document.getElementById('jobId').innerText = data.jobId;
+                document.getElementById('jobLoc').innerText = data.address;
+                document.getElementById('jobCard').style.display = 'block';
+            } else {
+                document.getElementById('noJob').style.display = 'block';
+            }
         }
-    }
-    window.onload = load;
-</script>
+
+        function goToChecklist() {
+            window.location.href = `../checklist/index.html?email=${encodeURIComponent(email)}`;
+        }
+
+        if(email) loadJob();
+    </script>
 </body>
 </html>
