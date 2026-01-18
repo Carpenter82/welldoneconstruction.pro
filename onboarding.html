@@ -1,113 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Onboarding | Well Done Construction</title>
-  <style>
-    :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; }
-    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-    .container { max-width: 500px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    input[type="file"] { margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; width: 100%; border-radius: 5px; }
-    .btn { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1rem; }
-    .btn:disabled { background: #ccc; cursor: not-allowed; }
-    .nav-dock { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #ddd; }
-    .nav-dock a { text-decoration: none; color: #666; font-size: 0.9rem; }
-    .active { color: var(--accent) !important; font-weight: bold; }
-  </style>
-</head>
+<html>
+<head><link rel="stylesheet" href="styles.css"></head>
 <body>
-
-<div class="container">
-  <h2 style="text-align: center;">Worker Onboarding</h2>
-  <p style="text-align: center; color: #6E797F;">Upload ID and OSHA card to activate your profile.</p>
-  
-  <form id="onboardForm">
-    <input type="email" id="em" placeholder="Confirm Your Email" required style="width:100%; padding:10px; margin-bottom:20px; border: 1px solid #ccc; border-radius: 5px;">
-    
-    <label style="font-weight: bold; display: block; margin-bottom: 5px;">1. Driver's License / ID:</label>
-    <input type="file" id="idFile" accept="image/*" required>
-
-    <label style="font-weight: bold; display: block; margin-bottom: 5px;">2. OSHA 10 Card (or similar):</label>
-    <input type="file" id="oshaFile" accept="image/*,application/pdf" required>
-
-    <button type="submit" id="submitBtn" class="btn">Upload & Continue</button>
-  </form>
-  <p id="msg" style="text-align: center; margin-top: 15px; font-weight: bold;"></p>
-</div>
-
-<nav class="nav-dock">
-  <a href="index.html">Home</a>
-  <a href="application/index.html">Intake</a>
-  <a href="onboarding.html" class="active">Onboarding</a>
-  <a href="portal/index.html">Portal</a>
-</nav>
-
-<script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
-
-const toBase64 = file => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = error => reject(error);
-});
-
-document.getElementById('onboardForm').onsubmit = async (e) => {
-  e.preventDefault();
-  const btn = document.getElementById('submitBtn');
-  const msg = document.getElementById('msg');
-  const email = document.getElementById('em').value.trim().toLowerCase();
-
-  btn.innerText = "Uploading Documents...";
-  btn.disabled = true;
-
-  try {
-    const idData = await toBase64(document.getElementById('idFile').files[0]);
-    const oshaData = await toBase64(document.getElementById('oshaFile').files[0]);
-
-    const payload = {
-      action: 'onboard',
-      email: email,
-      files: [
-        { 
-            data: idData, 
-            name: `ID_${email}.jpg`, 
-            type: "image/jpeg", 
-            folder: "1. Permits" 
-        },
-        { 
-            data: oshaData, 
-            name: `OSHA_${email}.jpg`, 
-            type: "image/jpeg", 
-            folder: "5. Misc" 
-        }
-      ]
-    };
-
-    // Using regular POST. Note: no-cors means we can't read the response, 
-    // but the data will still hit the Google Script.
-    await fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: JSON.stringify(payload)
-    });
-
-    msg.style.color = "green";
-    msg.innerText = "Success! ID and OSHA card received.";
-    
-    setTimeout(() => {
-      window.location.href = `portal/index.html?email=${encodeURIComponent(email)}`;
-    }, 2000);
-
-  } catch (err) {
-    msg.style.color = "red";
-    msg.innerText = "Error uploading. Check your connection.";
-    btn.innerText = "Upload & Continue";
-    btn.disabled = false;
-  }
-};
-</script>
+  <h2>Document Onboarding</h2>
+  <input type="email" id="email" placeholder="Confirm Email">
+  <input type="file" id="idFile">
+  <button onclick="upload()">Upload ID</button>
+  <script>
+    async function upload() {
+      const file = document.getElementById('idFile').files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = async () => {
+        const data = {
+          action: 'onboard',
+          email: document.getElementById('email').value,
+          files: [{ data: reader.result.split(',')[1], name: 'ID.jpg', type: 'image/jpeg', folder: '1. Permits' }]
+        };
+        await fetch('YOUR_DEPLOY_URL', { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        alert("ID Uploaded.");
+      };
+    }
+  </script>
 </body>
 </html>
