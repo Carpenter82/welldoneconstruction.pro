@@ -1,136 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Well Done | Project Log</title>
-    <style>
-        :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        
-        /* Header & Nav */
-        .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        .nav-links a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; font-size: 0.9rem; transition: 0.3s; }
-        .nav-links a:hover { color: var(--accent); }
-        
-        /* Stats & Container */
-        .stats-bar { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; gap: 20px; }
-        .stat-item { font-size: 0.9rem; font-weight: bold; color: var(--primary); }
-        .container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        
-        /* Table Styling */
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background: #f8f9fa; padding: 15px; font-size: 0.85rem; color: #666; text-transform: uppercase; }
-        td { padding: 15px; border-top: 1px solid #eee; vertical-align: middle; font-size: 0.9rem; }
-        
-        /* Badges */
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
-        .status-badge.assigned { background: #fff3e0; color: #ef6c00; }
-        .status-badge.signed { background: #e3f2fd; color: #1976d2; }
-        .status-badge.verified { background: #e8f5e9; color: #2e7d32; }
-        .status-badge.file-saved { background: #f3e5f5; color: #7b1fa2; }
-        
-        .map-link { color: #1976d2; text-decoration: none; font-weight: bold; font-size: 0.85rem; }
-        .loading { padding: 40px; text-align: center; color: #666; }
-    </style>
-</head>
+<html>
+<head><link rel="stylesheet" href="../styles.css"><title>New Project</title></head>
 <body>
-
-    <div class="header">
-        <div>
-            <h1 style="margin:0; font-size: 1.5rem;">Project Portfolio</h1>
-            <small>Financial & Assignment Log</small>
-        </div>
-        <div class="nav-links">
-            <a href="index.html">🏠 Roster</a>
-            <a href="projects.html" style="color: var(--accent);">📋 All Projects</a>
-            <a href="activity.html">📍 Activity</a>
-        </div>
-    </div>
-
-    <div class="stats-bar">
-        <div class="stat-item" id="totalProjects">Loading Projects...</div>
-        <div class="stat-item" id="totalBudget">Total Budget: $0</div>
-    </div>
-
-    <div class="container">
-        <table id="projectsTable">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Worker</th>
-                    <th>Client / Scope</th>
-                    <th>Budget</th>
-                    <th>Status</th>
-                    <th>Proof/Map</th>
-                </tr>
-            </thead>
-            <tbody id="projectData">
-                <tr><td colspan="6" class="loading">Fetching project logs...</td></tr>
-            </tbody>
-        </table>
-    </div>
-
+<div class="container">
+    <h2>New Project Registration</h2>
+    <form id="pf">
+        <input id="c" placeholder="Client Name" required>
+        <input id="a" placeholder="Address" required>
+        <input id="b" placeholder="Budget">
+        <textarea id="n" placeholder="Notes"></textarea>
+        <button type="submit">Create Job ID</button>
+    </form>
+</div>
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
-
-    async function loadProjectLog() {
-        try {
-            const response = await fetch(scriptURL + '?action=getProjectLog');
-            const data = await response.json();
-            renderProjects(data);
-        } catch (error) {
-            console.error("Error loading projects:", error);
-            document.getElementById('projectData').innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Error loading data.</td></tr>';
-        }
+    const scriptURL = 'YOUR_DEPLOY_URL';
+    document.getElementById('pf').onsubmit = async (e) => {
+        e.preventDefault();
+        const data = { action: 'registerProject', client: document.getElementById('c').value, address: document.getElementById('a').value, budget: document.getElementById('b').value, notes: document.getElementById('n').value };
+        const r = await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        alert("Project Registered."); location.reload();
     }
-
-    function renderProjects(data) {
-        const container = document.getElementById('projectData');
-        const countSpan = document.getElementById('totalProjects');
-        const budgetSpan = document.getElementById('totalBudget');
-        
-        if (data.length === 0) {
-            container.innerHTML = '<tr><td colspan="6" class="loading">No projects logged yet.</td></tr>';
-            countSpan.innerText = "0 Projects Found";
-            return;
-        }
-
-        let totalBudget = 0;
-        
-        container.innerHTML = data.map(p => {
-            // Clean up budget string and add to total
-            const numericBudget = parseFloat(p.budget.replace(/[^0-9.-]+/g,"")) || 0;
-            totalBudget += numericBudget;
-
-            const date = new Date(p.timestamp).toLocaleDateString();
-            const statusClass = p.status.toLowerCase().replace(/ /g, '-').replace(/\//g, '-');
-
-            return `
-                <tr>
-                    <td>${date}</td>
-                    <td><strong>${p.email.split('@')[0]}</strong></td>
-                    <td>
-                        <div style="font-weight:bold;">${p.clientName || 'N/A'}</div>
-                        <div style="font-size:0.8rem; color:#666;">${p.scope}</div>
-                    </td>
-                    <td><strong>${p.budget}</strong></td>
-                    <td><span class="status-badge ${statusClass}">${p.status}</span></td>
-                    <td>
-                        ${p.mapLink ? `<a href="${p.mapLink}" target="_blank" class="map-link">📍 View Location</a>` : 
-                          p.link ? `<a href="${p.link}" target="_blank" class="map-link">📄 View File</a>` : '---'}
-                    </td>
-                </tr>
-            `;
-        }).join('');
-
-        countSpan.innerText = `${data.length} Total Logs`;
-        budgetSpan.innerText = `Total Portfolio: $${totalBudget.toLocaleString()}`;
-    }
-
-    // Initialize
-    loadProjectLog();
 </script>
-
 </body>
 </html>
