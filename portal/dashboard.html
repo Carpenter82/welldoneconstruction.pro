@@ -1,72 +1,30 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <link rel="stylesheet" href="../styles.css">
-    <title>My Assignment | Well Done</title>
-</head>
+<head><link rel="stylesheet" href="../styles.css"><title>My Job</title></head>
 <body>
-    <div class="container">
-        <h2 id="welcome">Loading Assignment...</h2>
-        
-        <div id="jobCard" style="display:none; border: 2px solid #33B26E; padding: 20px; border-radius: 8px; background: #fff;">
-            <h3 id="jobId">Job ID: ---</h3>
-            <hr>
-            <p><strong>📍 Address:</strong> <span id="address">---</span></p>
-            <p><strong>💰 Budget:</strong> <span id="budget">---</span></p>
-            <p><strong>📝 Notes:</strong> <span id="notes">---</span></p>
-            
-            <button onclick="openMap()" style="background: #3498db;">Get Directions (Google Maps)</button>
-        </div>
-
-        <div id="noJob" style="display:none; text-align: center; padding: 40px;">
-            <h3>No Active Assignment</h3>
-            <p>Contact your supervisor to be dispatched to a Job ID.</p>
-        </div>
-        
-        <button onclick="window.location.href='index.html'" style="margin-top: 20px; background: #666;">Logout</button>
+<div class="container">
+    <h2 id="w">Loading...</h2>
+    <div id="j" style="display:none; border:2px solid #33B26E; padding:20px; border-radius:10px;">
+        <h3>Current Job ID: <span id="id"></span></h3>
+        <p>Location: <span id="loc"></span></p>
+        <button onclick="window.open('https://www.google.com/maps/search/'+encodeURIComponent(document.getElementById('loc').innerText))">Get Directions</button>
     </div>
-
-    <script>
-        const scriptURL = 'YOUR_DEPLOY_URL'; // SAME URL FROM CODE.GS
-        const params = new URLSearchParams(window.location.search);
-        const email = params.get('email');
-
-        async function loadDashboard() {
-            if(!email) return window.location.href = 'index.html';
-
-            try {
-                const resp = await fetch(`${scriptURL}?action=getWorkerStatus&email=${encodeURIComponent(email)}`);
-                const data = await resp.json();
-
-                if (data.status === 'Not Found') {
-                    alert("Email not recognized. Please apply first.");
-                    window.location.href = '../intake/index.html';
-                    return;
-                }
-
-                document.getElementById('welcome').innerText = `Welcome, ${data.name}`;
-
-                if (data.jobId && data.jobId !== "UNASSIGNED") {
-                    document.getElementById('jobCard').style.display = 'block';
-                    document.getElementById('jobId').innerText = `Job ID: ${data.jobId}`;
-                    document.getElementById('address').innerText = data.details.address;
-                    document.getElementById('budget').innerText = data.details.budget;
-                    document.getElementById('notes').innerText = data.details.notes;
-                } else {
-                    document.getElementById('noJob').style.display = 'block';
-                }
-            } catch (err) {
-                console.error(err);
-                alert("Error connecting to server.");
-            }
+</div>
+<script>
+    const scriptURL = 'YOUR_DEPLOY_URL';
+    const em = new URLSearchParams(window.location.search).get('email');
+    async function load() {
+        const r = await fetch(`${scriptURL}?action=getWorkerStatus&email=${em}`);
+        const d = await r.json();
+        if(d.status === 'Not Found') return alert("Record not found");
+        document.getElementById('w').innerText = "Hello, " + d.name;
+        if(d.jobId !== "UNASSIGNED") {
+            document.getElementById('j').style.display = 'block';
+            document.getElementById('id').innerText = d.jobId;
+            document.getElementById('loc').innerText = d.details.address;
         }
-
-        function openMap() {
-            const addr = document.getElementById('address').innerText;
-            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`, '_blank');
-        }
-
-        loadDashboard();
-    </script>
+    }
+    window.onload = load;
+</script>
 </body>
 </html>
