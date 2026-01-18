@@ -1,27 +1,52 @@
 <!DOCTYPE html>
-<html>
-<head><link rel="stylesheet" href="styles.css"><title>Onboarding</title></head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onboarding | Well Done</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
 <body>
-<div class="container">
-    <h2>Step 2: Upload DL & OSHA</h2>
-    <input type="email" id="email" placeholder="Confirm Email" required>
-    <label>Driver's License</label><input type="file" id="dl" accept="image/*">
-    <label>OSHA Card</label><input type="file" id="osha" accept="image/*">
-    <button onclick="up()" id="ub">Sync to Drive</button>
-</div>
-<script>
-    const scriptURL = 'YOUR_DEPLOY_URL';
-    const read = (f) => new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.readAsDataURL(f); });
-    async function up() {
+  <div class="container">
+    <h2>Step 2: Compliance Docs</h2>
+    <p>Upload your ID and OSHA card to secure your profile.</p>
+    <input type="email" id="email" placeholder="Confirm Email Address" required>
+    
+    <label>Driver's License (Front)</label>
+    <input type="file" id="dl" accept="image/*" capture="camera">
+    
+    <label>OSHA 10/30 Card</label>
+    <input type="file" id="osha" accept="image/*" capture="camera">
+    
+    <button onclick="uploadFiles()" id="upBtn">Sync to Drive</button>
+  </div>
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzQT7DP6beojo_8pcOP3VFPcsBhvxI1nUYxbUQvThdnWuMvw8InEogp2TwoKS9RQ_M5/exec';
+    const toBase64 = (f) => new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.readAsDataURL(f); });
+    
+    async function uploadFiles() {
         const em = document.getElementById('email').value;
-        const dl = document.getElementById('dl').files[0];
-        const osha = document.getElementById('osha').files[0];
-        if(!em || !dl || !osha) return alert("All fields required");
-        document.getElementById('ub').disabled = true;
-        const payload = { action: 'onboard', email: em, files: [ {data: await read(dl), name: 'DL.jpg', folder: '1. Permits'}, {data: await read(osha), name: 'OSHA.jpg', folder: '5. Misc'} ] };
-        await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-        alert("Success!"); window.location.href = "portal/index.html";
+        const dlFile = document.getElementById('dl').files[0];
+        const oshaFile = document.getElementById('osha').files[0];
+        if(!em || !dlFile || !oshaFile) return alert("All fields required");
+        
+        const btn = document.getElementById('upBtn');
+        btn.disabled = true; btn.innerText = "Syncing Docs...";
+
+        const payload = { 
+            action: 'onboarding', 
+            email: em, 
+            files: [ 
+                {data: await toBase64(dlFile), name: 'DL.jpg', folder: '1. Permits'}, 
+                {data: await toBase64(oshaFile), name: 'OSHA.jpg', folder: '5. Misc'} 
+            ] 
+        };
+        try {
+            await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
+            alert("Documents Secured!"); 
+            window.location.href = "portal/index.html";
+        } catch(e) { alert("Upload failed. Try again."); btn.disabled = false; }
     }
-</script>
+  </script>
 </body>
 </html>
