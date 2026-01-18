@@ -1,91 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../styles.css">
-    <title>Admin Dashboard | Well Done</title>
-</head>
-<body>
-    <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>Admin Command Center</h2>
-            <button onclick="load()" style="background: var(--dark);">Refresh Data</button>
-        </div>
-        
-        <p style="color: #666;">Personnel management and worker activation.</p>
+<h3>Project Registration</h3>
+<form id="projectForm" style="display:grid; gap:10px; background:#f4f4f4; padding:20px; border-radius:8px;">
+    <input type="text" id="client" placeholder="Client Name" required>
+    <input type="text" id="address" placeholder="Project Address" required>
+    <input type="text" id="trade" placeholder="Trade (e.g. Website Build)" required>
+    <input type="text" id="source" placeholder="Source (e.g. Square)" required>
+    <input type="text" id="budget" placeholder="Budget Amount" required>
+    <textarea id="notes" placeholder="Job Notes"></textarea>
+    <input type="number" id="hours" placeholder="Flat Rate Hours (Whole Number)" step="1" required>
+    <button type="submit" style="background:#333; color:white; padding:10px;">LOG PROJECT & GEN ID</button>
+</form>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Worker Info</th>
-                    <th>Trade</th>
-                    <th>Pay Tier</th>
-                    <th style="text-align: right;">Action</th>
-                </tr>
-            </thead>
-            <tbody id="applicantTable">
-                <tr><td colspan="4" style="text-align:center; padding: 50px;">Connecting to Google Sheets...</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <script>
-        const scriptURL = 'YOUR_DEPLOY_URL';
-
-        async function load() {
-            try {
-                const resp = await fetch(`${scriptURL}?action=getApplicants`);
-                const data = await resp.json();
-                const table = document.getElementById('applicantTable');
-
-                if (!data || data.length === 0) {
-                    table.innerHTML = '<tr><td colspan="4" style="text-align:center;">No applicants found.</td></tr>';
-                    return;
-                }
-
-                table.innerHTML = data.map(app => {
-                    const isReady = app.tier && app.tier !== "TBD";
-                    return `
-                        <tr>
-                            <td>
-                                <div style="font-weight: bold;">${app.name}</div>
-                                <div style="font-size: 0.8rem; color: #777;">${app.email}</div>
-                            </td>
-                            <td><span class="status-badge">${app.trade}</span></td>
-                            <td style="font-weight: 600; color: ${isReady ? '#33B26E' : '#e74c3c'};">
-                                ${app.tier}
-                            </td>
-                            <td style="text-align: right;">
-                                <button onclick="hire('${app.email}')" ${!isReady ? 'disabled' : ''}>
-                                    ${isReady ? 'ACTIVATE' : 'PENDING TIER'}
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            } catch (err) {
-                document.getElementById('applicantTable').innerHTML = '<tr><td colspan="4" style="text-align:center; color: red;">Failed to load data. Verify Script URL.</td></tr>';
-            }
-        }
-
-        async function hire(email) {
-            if(!confirm("Activate this worker and move to roster?")) return;
-            const btn = event.target;
-            btn.innerText = "Processing...";
-            btn.disabled = true;
-
-            await fetch(scriptURL, { 
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: JSON.stringify({action:'hireWorker', email: email}) 
-            });
-
-            alert("Worker successfully activated.");
-            load();
-        }
-
-        window.onload = load;
-    </script>
-</body>
-</html>
+<script>
+document.getElementById('projectForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const data = {
+        action: 'registerProject',
+        client: document.getElementById('client').value,
+        address: document.getElementById('address').value,
+        trade: document.getElementById('trade').value,
+        source: document.getElementById('source').value,
+        budget: document.getElementById('budget').value,
+        notes: document.getElementById('notes').value,
+        hours: document.getElementById('hours').value
+    };
+    await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+    alert("Project Logged to Google Sheet!");
+    e.target.reset();
+};
+</script>
