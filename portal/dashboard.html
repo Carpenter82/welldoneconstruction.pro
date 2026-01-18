@@ -1,20 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Dashboard | Well Done</title>
     <link rel="stylesheet" href="../styles.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Worker Dashboard</title>
 </head>
 <body>
     <div class="container">
-        <h2>Your Assignment</h2>
-        <div id="jobCard" class="card" style="display:none;">
-            <p><strong>Job ID:</strong> <span id="jobId"></span></p>
-            <p><strong>Location:</strong> <span id="jobLoc"></span></p>
-            <button onclick="goToChecklist()" style="background:#33B26E;">Open Daily Checklist</button>
+        <h2 id="workerGreeting">Loading Assignment...</h2>
+        
+        <div id="jobCard" class="card" style="display:none; border-top: 5px solid #33B26E;">
+            <p><strong>CURRENT ASSIGNMENT</strong></p>
+            <hr>
+            <p><strong>Job ID:</strong> <span id="jobIdDisplay">---</span></p>
+            <p><strong>Pay Tier:</strong> <span id="tierDisplay">---</span></p>
+            
+            <div style="margin-top: 20px; display: grid; gap: 10px;">
+                <button onclick="goToChecklist()" class="btn">📋 OPEN DAILY CHECKLIST</button>
+                <button id="vaultBtn" onclick="" class="btn" style="background:#343E47;">📂 VIEW JOB DOCS (VAULT)</button>
+            </div>
         </div>
-        <div id="noJob" style="display:none; text-align:center;">
-            <p>No active assignment found for this email.</p>
+
+        <div id="noJob" class="card" style="display:none; text-align:center;">
+            <p>You have no active job assignments at this time.</p>
+            <p style="font-size: 0.8rem; color: #666;">Contact dispatch if this is an error.</p>
         </div>
     </div>
 
@@ -23,17 +34,33 @@
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('email');
 
-        async function loadJob() {
-            // This calls a 'get' action in your script to find the worker's row
-            const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}`);
-            const data = await res.json();
+        async function loadDashboard() {
+            if (!email) {
+                window.location.href = 'index.html';
+                return;
+            }
 
-            if (data.jobId) {
-                document.getElementById('jobId').innerText = data.jobId;
-                document.getElementById('jobLoc').innerText = data.address;
-                document.getElementById('jobCard').style.display = 'block';
-            } else {
-                document.getElementById('noJob').style.display = 'block';
+            try {
+                // Calls the 'getWorkerJob' action we put in Code.gs
+                const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}`);
+                const data = await res.json();
+
+                if (data.jobId && data.jobId !== "error") {
+                    document.getElementById('workerGreeting').innerText = `Hello, ${data.name.split(' ')[0]}!`;
+                    document.getElementById('jobIdDisplay').innerText = data.jobId;
+                    document.getElementById('tierDisplay').innerText = data.tier;
+                    
+                    // Set the Vault button to open their specific Drive folder
+                    document.getElementById('vaultBtn').onclick = () => window.open(data.folder);
+                    
+                    document.getElementById('jobCard').style.display = 'block';
+                } else {
+                    document.getElementById('workerGreeting').innerText = "Portal Active";
+                    document.getElementById('noJob').style.display = 'block';
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('workerGreeting').innerText = "Connection Error";
             }
         }
 
@@ -41,7 +68,7 @@
             window.location.href = `../checklist/index.html?email=${encodeURIComponent(email)}`;
         }
 
-        if(email) loadJob();
+        window.onload = loadDashboard;
     </script>
 </body>
 </html>
