@@ -11,16 +11,8 @@
     .input-group { margin-bottom: 15px; text-align: left; }
     .input-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; color: #2c3e50; }
     input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; background: white; font-size: 1rem; box-sizing: border-box; margin-bottom: 10px; }
-    
-    .terms-box {
-      background: #fff; border: 2px solid #ddd; padding: 15px; border-radius: 8px;
-      height: 150px; overflow-y: scroll; font-size: 0.85rem; color: #4b5563;
-      margin-bottom: 15px; text-align: left;
-    }
-    .checkbox-container {
-      display: flex; align-items: flex-start; gap: 12px; margin-bottom: 15px;
-      text-align: left; cursor: pointer;
-    }
+    .terms-box { background: #fff; border: 2px solid #ddd; padding: 15px; border-radius: 8px; height: 150px; overflow-y: scroll; font-size: 0.85rem; color: #4b5563; margin-bottom: 15px; text-align: left; }
+    .checkbox-container { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 15px; text-align: left; cursor: pointer; }
     .checkbox-container input { width: 24px; height: 24px; flex-shrink: 0; }
     .checkbox-text { font-size: 0.9rem; font-weight: 500; }
   </style>
@@ -28,7 +20,7 @@
 <body>
 
 <div class="container">
-  <h2 style="text-align: center;">Worker Intake Form</h2>
+  <h2 style="text-align: center;">Well Done Construction Application Form</h2>
 
   <form id="appForm">
     <input type="text" id="fn" placeholder="First Name" required>
@@ -63,7 +55,7 @@
 
     <div class="terms-box">
       <strong>Terms & Conditions of On-Call Work:</strong><br><br>
-      1. <strong>No Guaranteed Hours:</strong> Applicant understands that this is an "on-call" position. Well Done Construction LLC does not guarantee a minimum number of hours.<br><br>
+      1. <strong>No Guaranteed Hours:</strong> Applicant understands that this is an "on-call" position.<br><br>
       2. <strong>Work Assignments:</strong> You have the right to decline any assignment offered.<br><br>
       3. <strong>Safety & Equipment:</strong> Workers must provide their own basic hand tools.<br><br>
       4. <strong>Verification:</strong> You authorize Well Done Construction LLC to verify eligibility.
@@ -79,16 +71,16 @@
       <span class="checkbox-text">I acknowledge this is an on-call position and agree to the terms.</span>
     </label>
 
-    <button type="submit" id="submitBtn" class="btn" style="width:100%; padding: 15px; background: #33B26E; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Submit Application</button>
+    <button type="submit" id="submitBtn" style="width:100%; padding: 15px; background: #33B26E; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Submit Application</button>
   </form>
 </div>
 
 <script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
+  // Updated URL to your latest deployment
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbzQT7DP6beojo_8pcOP3VFPcsBhvxI1nUYxbUQvThdnWuMvw8InEogp2TwoKS9RQ_M5/exec';
 
   document.getElementById('appForm').onsubmit = async (e) => {
     e.preventDefault();
-    
     const btn = document.getElementById('submitBtn');
     btn.innerText = "Processing..."; 
     btn.disabled = true;
@@ -101,21 +93,19 @@
       email: document.getElementById('em').value,
       trade: document.getElementById('tr').value,
       experience: document.getElementById('ex').value,
-      pay: document.getElementById('py').value, // This is now the Tier
+      pay: document.getElementById('py').value, 
       tools: document.getElementById('toolsOwn').checked ? "YES" : "NO",
       consent: "AGREED"
     };
 
     try {
+      // Standard fetch (removes no-cors to ensure script triggers correctly)
       await fetch(scriptURL, {
         method: 'POST',
-        mode: 'no-cors', 
         body: JSON.stringify(d)
       });
       
-      setTimeout(() => {
-        window.location.href = '../thank-you.html';
-      }, 1000);
+      window.location.href = '../onboarding.html';
 
     } catch (err) {
       alert("Submission failed. Check your connection.");
