@@ -1,61 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worker Login | Well Done Construction</title>
     <link rel="stylesheet" href="../styles.css">
+    <title>Worker Login | Well Done</title>
 </head>
 <body>
-<div class="container">
-    <div style="text-align: center; margin-bottom: 30px;">
+    <div class="container">
         <h2>Worker Portal</h2>
-        <p>Enter your email to access your tools.</p>
+        <p>Enter your email to view your active assignment.</p>
+        <input type="email" id="workerEmail" placeholder="your@email.com" required>
+        <button onclick="login()">Access Dashboard</button>
+        <p id="msg"></p>
     </div>
-    <div class="form-group">
-        <input type="email" id="workerEmail" placeholder="Email Address" required style="text-transform: lowercase; width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd;">
-        <button class="btn" onclick="portalLogin()" id="loginBtn" style="width: 100%; background: #33B26E; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Access Portal</button>
-    </div>
-    <p id="loginMsg" style="text-align: center; margin-top: 15px; font-weight: bold;"></p>
-</div>
 
-<script>
-    // UPDATED SCRIPT URL
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
-
-    async function portalLogin() {
-        const emailInput = document.getElementById('workerEmail').value.trim().toLowerCase();
-        const btn = document.getElementById('loginBtn');
-        const msg = document.getElementById('loginMsg');
-
-        if (!emailInput) return alert("Please enter your email.");
-
-        btn.innerText = "Verifying...";
-        btn.disabled = true;
-        msg.innerText = "";
-
-        try {
-            // We fetch the status from the 'application' sheet via your script
-            const resp = await fetch(`${scriptURL}?action=getWorkerStatus&email=${encodeURIComponent(emailInput)}`);
-            const data = await resp.json();
-
-            if (data.status === 'Not Found') {
-                msg.style.color = "red";
-                msg.innerText = "Email not found. Please complete the Intake form.";
-                btn.disabled = false;
-                btn.innerText = "Access Portal";
-            } else {
-                // Success - Pass email to dashboard
-                window.location.href = `./dashboard.html?email=${encodeURIComponent(emailInput)}`;
-            }
-        } catch (e) { 
-            console.error(e);
-            msg.style.color = "orange";
-            msg.innerText = "Connection error. Please try again.";
-            btn.disabled = false; 
-            btn.innerText = "Access Portal";
+    <script>
+        function login() {
+            const email = document.getElementById('workerEmail').value.trim().toLowerCase();
+            if(!email) return alert("Email required");
+            // Pass the email to the dashboard via the URL
+            window.location.href = `dashboard.html?email=${encodeURIComponent(email)}`;
         }
-    }
-</script>
+    </script>
 </body>
 </html>
