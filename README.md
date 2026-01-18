@@ -65,3 +65,23 @@ Database: Google Sheets
 Backend: Google Apps Script (JavaScript)
 
 UI/UX: HTML5 / CSS3 (Custom "Field-Proof" Mobile Design)# welldoneconstruction.pro
+
+# Well Done Construction Admin System
+
+### 📊 Spreadsheet Requirements
+To maintain accuracy, do not delete or reorder these columns:
+
+#### 1. 'application' Tab
+- **Col E:** Worker Email (Primary Key)
+- **Col G:** Status (Auto-updates to HIRED/DOCS UPLOADED)
+- **Col L:** Pay Tier (Manual entry required to enable ACTIVATE button)
+
+#### 2. 'Settings' Tab
+- **Col B:** Worker Email
+- **Col E:** Job ID (Assign ID here for the Worker Portal to display it)
+
+### 🚀 Deployment Workflow
+1. Update `Code.gs` in Google Apps Script.
+2. **Deploy > Manage Deployments**.
+3. Edit the active deployment and select **New Version**.
+4. Click **Deploy**. (This ensures all HTML files remain connected without changing URLs).
