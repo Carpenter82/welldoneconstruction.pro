@@ -1,78 +1,27 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <link rel="stylesheet" href="styles.css">
-    <title>Onboarding | Well Done Construction</title>
-</head>
+<head><link rel="stylesheet" href="styles.css"><title>Onboarding</title></head>
 <body>
-    <div class="container">
-        <h2 style="text-align:center;">Worker Onboarding</h2>
-        <p style="text-align:center; color:#666;">Step 2: Verify Identity & Safety Certs</p>
-        
-        <div id="uploadForm">
-            <label>Confirm Email</label>
-            <input type="email" id="email" placeholder="your@email.com" required>
-
-            <div style="border: 1px dashed #ccc; padding: 15px; margin-bottom: 10px;">
-                <label><strong>1. Driver's License (Front)</strong></label>
-                <input type="file" id="dlFile" accept="image/*">
-            </div>
-
-            <div style="border: 1px dashed #ccc; padding: 15px; margin-bottom: 10px;">
-                <label><strong>2. OSHA 10 Card</strong></label>
-                <input type="file" id="oshaFile" accept="image/*,application/pdf">
-            </div>
-
-            <button id="upBtn" onclick="handleUploads()">Upload Documentation</button>
-            <div id="status" style="margin-top:10px; font-weight:bold;"></div>
-        </div>
-    </div>
-
-    <script>
-        const scriptURL = 'YOUR_DEPLOY_URL';
-
-        const toBase64 = file => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.onerror = error => reject(error);
-        });
-
-        async function handleUploads() {
-            const email = document.getElementById('email').value.toLowerCase();
-            const dl = document.getElementById('dlFile').files[0];
-            const osha = document.getElementById('oshaFile').files[0];
-            const btn = document.getElementById('upBtn');
-
-            if(!email || !dl || !osha) return alert("Please provide email and both files.");
-
-            btn.disabled = true;
-            btn.innerText = "Processing Files...";
-
-            try {
-                const dlBase64 = await toBase64(dl);
-                const oshaBase64 = await toBase64(osha);
-
-                const payload = {
-                    action: 'onboard',
-                    email: email,
-                    files: [
-                        { data: dlBase64, name: `DL_${email}.jpg`, type: dl.type, folder: '1. Permits' },
-                        { data: oshaBase64, name: `OSHA_${email}.jpg`, type: osha.type, folder: '5. Misc' }
-                    ]
-                };
-
-                await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-
-                document.getElementById('status').innerHTML = "✅ Upload Complete! Redirecting to portal...";
-                setTimeout(() => window.location.href = "portal/index.html", 3000);
-
-            } catch (err) {
-                alert("Upload failed. Try again.");
-                btn.disabled = false;
-                btn.innerText = "Upload Documentation";
-            }
-        }
-    </script>
+<div class="container">
+    <h2>Step 2: Upload DL & OSHA</h2>
+    <input type="email" id="email" placeholder="Confirm Email" required>
+    <label>Driver's License</label><input type="file" id="dl" accept="image/*">
+    <label>OSHA Card</label><input type="file" id="osha" accept="image/*">
+    <button onclick="up()" id="ub">Sync to Drive</button>
+</div>
+<script>
+    const scriptURL = 'YOUR_DEPLOY_URL';
+    const read = (f) => new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.readAsDataURL(f); });
+    async function up() {
+        const em = document.getElementById('email').value;
+        const dl = document.getElementById('dl').files[0];
+        const osha = document.getElementById('osha').files[0];
+        if(!em || !dl || !osha) return alert("All fields required");
+        document.getElementById('ub').disabled = true;
+        const payload = { action: 'onboard', email: em, files: [ {data: await read(dl), name: 'DL.jpg', folder: '1. Permits'}, {data: await read(osha), name: 'OSHA.jpg', folder: '5. Misc'} ] };
+        await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        alert("Success!"); window.location.href = "portal/index.html";
+    }
+</script>
 </body>
 </html>
