@@ -1,25 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../styles.css">
     <title>Worker Login | Well Done</title>
 </head>
 <body>
-    <div class="container">
+    <div class="container" style="text-align: center; margin-top: 50px;">
         <h2>Worker Portal</h2>
-        <p>Enter your email to view your active assignment.</p>
-        <input type="email" id="workerEmail" placeholder="your@email.com" required>
-        <button onclick="login()">Access Dashboard</button>
-        <p id="msg"></p>
+        <p style="color: #666;">Enter your email to view your active assignment.</p>
+        
+        <div style="max-width: 400px; margin: auto;">
+            <input type="email" id="workerEmail" placeholder="your@email.com" required 
+                   style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            
+            <button id="loginBtn" onclick="login()" 
+                    style="width: 100%; padding: 15px; background: #33B26E; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
+                Access Dashboard
+            </button>
+            
+            <p id="msg" style="margin-top: 15px; font-weight: bold;"></p>
+        </div>
     </div>
 
     <script>
         function login() {
-            const email = document.getElementById('workerEmail').value.trim().toLowerCase();
-            if(!email) return alert("Email required");
-            // Pass the email to the dashboard via the URL
+            const emailInput = document.getElementById('workerEmail');
+            const btn = document.getElementById('loginBtn');
+            const email = emailInput.value.trim().toLowerCase();
+
+            if(!email) {
+                alert("Email required to find your assignment.");
+                return;
+            }
+
+            // Visual feedback for the worker
+            btn.innerText = "Checking Roster...";
+            btn.disabled = true;
+
+            // Redirect to dashboard with email in URL
+            // dashboard.html will use this email to pull their specific Job ID
             window.location.href = `dashboard.html?email=${encodeURIComponent(email)}`;
         }
+
+        // Allow pressing "Enter" key to login
+        document.getElementById('workerEmail').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
     </script>
 </body>
 </html>
