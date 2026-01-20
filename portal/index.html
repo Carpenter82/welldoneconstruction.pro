@@ -5,36 +5,91 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../styles.css">
     <title>Worker Login | Well Done</title>
+    <style>
+        /* Ensuring internal consistency with your warehouse-theme */
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid var(--primary);
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .login-btn:hover {
+            background: #34495e;
+        }
+        .info-list {
+            padding-left: 20px;
+            text-align: left;
+        }
+        .info-list li {
+            margin-bottom: 8px;
+        }
+    </style>
 </head>
 <body class="warehouse-theme">
 
     <div class="warehouse-card" style="max-width: 450px; margin: 40px auto; text-align: center;">
         <div class="poster-header">WORKER PORTAL LOGIN</div>
         <p>Enter email to view your site assignment.</p>
-        <input type="email" id="em" placeholder="worker@email.com" style="width:100%; padding:12px; margin-bottom:15px;">
-        <button onclick="loginWorker()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; font-weight:bold; cursor:pointer;">AUTHENTICATE</button>
+        
+        <input type="email" id="em" class="login-input" placeholder="worker@email.com" 
+               onkeypress="if(event.key === 'Enter') loginWorker()">
+        
+        <button onclick="loginWorker()" class="login-btn">AUTHENTICATE</button>
     </div>
 
-    <div class="poster-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto;">
+    <div class="poster-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; padding: 0 20px;">
+        
         <div class="warehouse-card">
             <div class="poster-header">STATUS: W-2 ON-CALL</div>
             <div class="warning-stripe"></div>
-            <ul style="font-size: 0.85rem;">
-                <li><strong>NO GUARANTEED HOURS:</strong> Work assigned as needed.</li>
-                <li><strong>AT-WILL:</strong> Employment can end at any time.</li>
+            <ul class="info-list" style="font-size: 0.9rem;">
+                <li><strong>NO GUARANTEED HOURS:</strong> Work is assigned on an as-needed basis.</li>
+                <li><strong>AT-WILL:</strong> Employment relationship may be terminated by either party at any time.</li>
+                <li><strong>REPORTING:</strong> All hours must be logged via the portal.</li>
             </ul>
         </div>
+
         <div class="warehouse-card" style="border-color: #c0392b;">
             <div class="poster-header" style="background:#c0392b;">ZERO TOLERANCE</div>
-            <p style="text-align:center; font-weight:bold; font-size: 0.8rem;">SAFETY VIOLATIONS | NO-SHOWS | DRUGS/ALCOHOL</p>
+            <p style="text-align:center; font-weight:900; font-size: 0.85rem; letter-spacing: 1px; margin: 10px 0;">
+                SAFETY VIOLATIONS | NO-SHOWS | DRUGS/ALCOHOL
+            </p>
             <div class="warning-stripe" style="background: repeating-linear-gradient(45deg, #000, #000 10px, #c0392b 10px, #c0392b 20px);"></div>
+            <p style="font-size: 0.8rem; text-align: center; color: #c0392b; font-weight: bold;">
+                IMMEDIATE TERMINATION FOR NON-COMPLIANCE
+            </p>
         </div>
+
     </div>
 
     <script>
         function loginWorker() {
-            const emailValue = document.getElementById('em').value.trim().toLowerCase();
-            if (!emailValue) return alert("Please enter email.");
+            const emailInput = document.getElementById('em');
+            const emailValue = emailInput.value.trim().toLowerCase();
+            
+            // Basic email validation regex
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!emailValue || !emailPattern.test(emailValue)) {
+                alert("Please enter a valid worker email address.");
+                emailInput.focus();
+                return;
+            }
+            
+            // Redirect to dashboard with email as a URL parameter
             window.location.href = 'dashboard.html?email=' + encodeURIComponent(emailValue);
         }
     </script>
