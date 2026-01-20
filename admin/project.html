@@ -5,15 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dispatch Work | Well Done</title>
-    <link rel="stylesheet" href="../styles.css">
     <style>
         :root { --primary: #2c3e50; --accent: #33B26E; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f7f6; margin: 0; }
         .container { max-width: 600px; margin: 30px auto; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .form-section { border: 1px solid #eee; padding: 20px; border-radius: 8px; margin-bottom: 20px; background: #fafafa; }
+        .form-section { border: 1px solid #eee; padding: 20px; border-radius: 8px; margin-bottom: 20px; background: #fafafa; transition: opacity 0.3s; }
         input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 1rem; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-dispatch { background: var(--accent); color: white; display: none; }
+        .btn-primary:disabled { background: #95a5a6; }
+        .btn-dispatch { background: var(--accent); color: white; }
+        #statusResult { text-align:center; margin-top:15px; font-weight:bold; min-height: 1.2em; }
     </style>
 </head>
 <body>
@@ -37,55 +39,81 @@
             <select id="workerSelect">
                 <option value="">Loading Roster...</option>
             </select>
-            <button onclick="dispatchWO()" id="dispatchBtn" class="btn" style="background: var(--accent); color: white;">SEND WORK ORDER EMAIL</button>
+            <button onclick="dispatchWO()" id="dispatchBtn" class="btn btn-dispatch">SEND WORK ORDER EMAIL</button>
         </div>
 
-        <div id="statusResult" style="text-align:center; margin-top:15px; font-weight:bold;"></div>
-        <a href="index.html" style="display:block; text-align:center; margin-top:20px; color:#666; text-decoration:none;">← Return to Command Center</a>
+        <div id="statusResult"></div>
+        <a href="index.html" style="display:block; text-align:center; margin-top:20px; color:#666; text-decoration:none; font-size: 0.9rem;">← Return to Command Center</a>
     </div>
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
         let currentGeneratedId = "";
 
-        // Function to pull Gen Pop (Settings tab)
         async function loadFullRoster() {
-            const res = await fetch(scriptURL + "?action=getDashboard");
-            const data = await res.json();
-            const select = document.getElementById('workerSelect');
-            select.innerHTML = '<option value="" disabled selected>Select from Hired Roster...</option>';
-            data.activeCrew.forEach(worker => {
-                select.innerHTML += `<option value="${worker.email}">${worker.name} — ${worker.trade} (${worker.tier})</option>`;
-            });
+            try {
+                const res = await fetch(scriptURL + "?action=getDashboard");
+                const data = await res.json();
+                const select = document.getElementById('workerSelect');
+                select.innerHTML = '<option value="" disabled selected>Select from Hired Roster...</option>';
+                
+                if (data.activeCrew && data.activeCrew.length > 0) {
+                    data.activeCrew.forEach(worker => {
+                        const opt = document.createElement('option');
+                        opt.value = worker.email;
+                        opt.textContent = `${worker.name} — ${worker.trade} (${worker.tier})`;
+                        select.appendChild(opt);
+                    });
+                } else {
+                    select.innerHTML = '<option value="">No workers found</option>';
+                }
+            } catch (err) {
+                console.error("Roster load error:", err);
+                document.getElementById('workerSelect').innerHTML = '<option value="">Error loading roster</option>';
+            }
         }
 
         document.getElementById('projectForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('projBtn');
+            const status = document.getElementById('statusResult');
+            
             btn.innerText = "Generating ID...";
             btn.disabled = true;
 
-            const data = {
-                action: 'registerProject',
-                client: document.getElementById('client').value,
-                address: document.getElementById('address').value,
-                trade: document.getElementById('trade').value,
-                budget: document.getElementById('budget').value,
-                notes: document.getElementById('notes').value
-            };
+            // Using URLSearchParams for better compatibility with Apps Script doPost(e)
+            const params = new URLSearchParams();
+            params.append('action', 'registerProject');
+            params.append('client', document.getElementById('client').value);
+            params.append('address', document.getElementById('address').value);
+            params.append('trade', document.getElementById('trade').value);
+            params.append('budget', document.getElementById('budget').value);
+            params.append('notes', document.getElementById('notes').value);
 
             try {
-                const response = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(data) });
-                currentGeneratedId = await response.text();
+                // Note: Apps Script requires follow redirects
+                const response = await fetch(scriptURL, { 
+                    method: 'POST', 
+                    body: params,
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                });
+                
+                const result = await response.text();
+                currentGeneratedId = result;
                 
                 document.getElementById('displayJobId').innerText = currentGeneratedId;
                 document.getElementById('assignmentSection').style.display = 'block';
                 document.getElementById('step1').style.opacity = '0.5';
-                document.getElementById('statusResult').innerText = "Project Saved: " + currentGeneratedId;
+                status.innerHTML = `<span style="color:var(--primary)">Project Saved: ${currentGeneratedId}</span>`;
                 
                 await loadFullRoster();
-            } catch (err) { alert("Registration Failed."); }
-            finally { btn.innerText = "LOG PROJECT & GEN ID"; btn.disabled = false; }
+            } catch (err) { 
+                console.error(err);
+                alert("Registration Failed. Check console for details."); 
+            } finally { 
+                btn.innerText = "LOG PROJECT & GEN ID"; 
+                btn.disabled = false; 
+            }
         };
 
         async function dispatchWO() {
@@ -93,17 +121,29 @@
             if(!email) return alert("Select a worker!");
             
             const btn = document.getElementById('dispatchBtn');
+            const status = document.getElementById('statusResult');
+            
             btn.innerText = "Dispatching...";
             btn.disabled = true;
+
+            const params = new URLSearchParams();
+            params.append('action', 'assignToRoster');
+            params.append('email', email);
+            params.append('jobId', currentGeneratedId);
 
             try {
                 await fetch(scriptURL, {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'assignToRoster', email: email, jobId: currentGeneratedId })
+                    body: params,
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
                 });
-                document.getElementById('statusResult').innerHTML = `<span style="color:var(--accent)">WORK ORDER SENT TO ${email}</span>`;
+                status.innerHTML = `<span style="color:var(--accent)">WORK ORDER SENT TO ${email}</span>`;
                 btn.innerText = "WORK ORDER DISPATCHED";
-            } catch (e) { alert("Dispatch Error."); btn.disabled = false; }
+            } catch (e) { 
+                alert("Dispatch Error."); 
+                btn.disabled = false; 
+                btn.innerText = "SEND WORK ORDER EMAIL";
+            }
         }
     </script>
 </body>
