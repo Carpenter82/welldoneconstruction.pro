@@ -7,108 +7,64 @@
     <title>Worker Dashboard | Well Done</title>
     <link rel="stylesheet" href="../styles.css">
     <style>
-        :root { --industrial: #2c3e50; --caution: #f39c12; --danger: #e74c3c; --success: #33B26E; }
-        
-        /* Safety Gate Styling */
-        .safety-gate { 
-            background: #fffbe6; 
-            border: 2px dashed var(--caution); 
-            padding: 15px; 
-            margin: 15px 0; 
-            text-align: left;
-        }
-        .safety-gate label { 
-            display: flex; 
-            align-items: flex-start; 
-            gap: 10px; 
-            margin-bottom: 10px; 
-            font-size: 0.9rem; 
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .safety-gate input { width: 18px; height: 18px; margin-top: 2px; }
-        
-        .btn-accept { background: var(--success); color: white; margin-bottom: 10px; width: 100%; }
+        .safety-gate { background: #fffbe6; border: 2px dashed var(--caution); padding: 15px; margin: 15px 0; border-radius: 8px; }
+        .safety-gate label { display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.9rem; font-weight: 500; }
+        .btn-accept { background: var(--accent); color: white; width: 100%; padding: 15px; border:none; border-radius: 8px; font-weight:bold; cursor:pointer; }
         .btn-accept:disabled { background: #ccc; cursor: not-allowed; }
-        .btn-decline { background: none; color: #666; border: 1px solid #ccc; width: 100%; margin-top: 10px; }
-        
-        .card { border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2 id="workerGreeting">Checking System...</h2>
-        
-        <div id="workOrderCard" class="card" style="display:none; border-top: 6px solid var(--caution); padding: 25px;">
+        <h2 id="workerGreeting" style="text-align:center;">Syncing...</h2>
+
+        <div id="workOrderCard" class="card" style="display:none; border-top-color: var(--caution);">
             <div style="text-align: center;">
-                <span style="background: var(--caution); color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.8rem;">ACTION REQUIRED</span>
-                <h3 style="margin: 15px 0 5px 0;">New Work Order</h3>
-                <p style="color: #666; font-size: 0.9rem;">Job ID: <strong id="woId">---</strong></p>
+                <span style="background: var(--caution); color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.75rem;">ACTION REQUIRED</span>
+                <h3>New Work Order</h3>
+                <p>Job ID: <strong id="woId">---</strong></p>
             </div>
             
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-
             <div class="safety-gate">
-                <p style="margin-top: 0; font-weight: bold; color: #856404; font-size: 0.8rem; text-transform: uppercase;">Safety & Policy Acknowledgment</p>
-                
-                <label>
-                    <input type="checkbox" class="safety-check">
-                    <span>I have all required PPE (Hard Hat, High-Vis, Steel-Toes) ready for site.</span>
-                </label>
-                
-                <label>
-                    <input type="checkbox" class="safety-check">
-                    <span>I acknowledge this is an On-Call W-2 shift with no minimum hours guaranteed.</span>
-                </label>
-                
-                <label>
-                    <input type="checkbox" class="safety-check">
-                    <span>I confirm I am fit for duty and will comply with the Drug/Alcohol-Free Policy.</span>
-                </label>
+                <p style="margin-top:0; font-weight:bold; font-size:0.8rem; color:#856404;">SAFETY ACKNOWLEDGMENT</p>
+                <label><input type="checkbox" class="safety-check"> I have all required PPE (Hard Hat/Steel Toes).</label>
+                <label><input type="checkbox" class="safety-check"> I am fit for duty (Drug/Alcohol Free).</label>
+                <label><input type="checkbox" class="safety-check"> I accept this On-Call W-2 shift.</label>
             </div>
 
-            <button onclick="respondToJob('Accepted')" id="acceptBtn" class="btn btn-accept" disabled>✅ ACCEPT ASSIGNMENT</button>
-            <button onclick="respondToJob('Declined')" class="btn btn-decline">❌ Decline Shift</button>
+            <button onclick="respondToJob('Accepted')" id="acceptBtn" class="btn-accept" disabled>✅ ACCEPT ASSIGNMENT</button>
+            <button onclick="respondToJob('Declined')" style="width:100%; background:none; border:none; color:#666; margin-top:10px; cursor:pointer;">Decline Shift</button>
         </div>
 
-        <div id="jobCard" class="card" style="display:none; border-top: 6px solid var(--success); padding: 25px;">
-            <p style="text-align:center; font-weight:bold; color: var(--success);">ACTIVE ASSIGNMENT</p>
-            <hr>
+        <div id="jobCard" class="card" style="display:none;">
+            <p style="text-align:center; font-weight:bold; color: var(--accent);">ACTIVE ASSIGNMENT</p>
             <p><strong>Job ID:</strong> <span id="jobIdDisplay">---</span></p>
             <p><strong>Pay Tier:</strong> <span id="tierDisplay">---</span></p>
-            
-            <div style="margin-top: 20px; display: grid; gap: 10px;">
-                <button onclick="goToChecklist()" class="btn" style="background: var(--success);">📋 OPEN DAILY CHECKLIST</button>
-                <button id="vaultBtn" class="btn" style="background:#343E47;">📂 VIEW JOB DOCS (VAULT)</button>
-            </div>
+            <button onclick="goToChecklist()" class="btn-accept">📋 OPEN DAILY CHECKLIST</button>
+            <button id="vaultBtn" style="width:100%; padding:12px; margin-top:10px; background:#343E47; color:white; border:none; border-radius:8px; cursor:pointer;">📂 VIEW JOB VAULT</button>
         </div>
 
-        <div id="noJob" class="card" style="display:none; text-align:center; padding: 40px;">
-            <p style="color: #666;">You have no active assignments at this time.</p>
+        <div id="noJob" style="display:none; text-align:center; padding:40px; color:#666;">
+            No active assignments found.
         </div>
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzQT7DP6beojo_8pcOP3VFPcsBhvxI1nUYxbUQvThdnWuMvw8InEogp2TwoKS9RQ_M5/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('email');
 
-        // Safety Gate Logic: Enable Accept button only when all checked
         document.addEventListener('change', function(e) {
             if (e.target.classList.contains('safety-check')) {
-                const checks = document.querySelectorAll('.safety-check');
-                const allChecked = Array.from(checks).every(c => c.checked);
+                const allChecked = Array.from(document.querySelectorAll('.safety-check')).every(c => c.checked);
                 document.getElementById('acceptBtn').disabled = !allChecked;
             }
         });
 
         async function loadDashboard() {
             if (!email) { window.location.href = 'index.html'; return; }
-
             try {
                 const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}`);
                 const data = await res.json();
-
                 document.getElementById('workerGreeting').innerText = `Hello, ${data.name.split(' ')[0]}!`;
 
                 if (data.jobStatus === "Pending") {
@@ -123,34 +79,14 @@
                     document.getElementById('noJob').style.display = 'block';
                 }
             } catch (err) {
-                document.getElementById('workerGreeting').innerText = "Portal Ready";
                 document.getElementById('noJob').style.display = 'block';
             }
         }
 
         async function respondToJob(response) {
-            const currentJobId = document.getElementById('woId').innerText;
-            const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = "Syncing...";
-            btn.disabled = true;
-
-            try {
-                await fetch(scriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: 'respondToWorkOrder',
-                        email: email,
-                        jobId: currentJobId,
-                        response: response
-                    })
-                });
-                location.reload();
-            } catch (e) {
-                alert("Connection error. Try again.");
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
+            const jobId = document.getElementById('woId').innerText;
+            await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'respondToWorkOrder', email: email, jobId: jobId, response: response }) });
+            location.reload();
         }
 
         function goToChecklist() {
