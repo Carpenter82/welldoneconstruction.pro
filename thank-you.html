@@ -4,30 +4,111 @@
   <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Application Received | Well Done</title>
+  <title>Application Received | Well Done Construction</title>
   <style>
-    :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; }
-    body { font-family: -apple-system, sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-    .card { background: white; max-width: 500px; width: 90%; padding: 40px; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; }
-    .next-steps { background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: left; margin-top: 25px; border-left: 4px solid var(--accent); }
-    h1 { color: var(--accent); margin-bottom: 10px; font-size: 1.8rem; }
+    :root { 
+      --primary: #2c3e50; 
+      --accent: #33B26E; 
+      --bg: #f4f7f6; 
+      --text: #343E47;
+    }
+
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      background: var(--bg); 
+      color: var(--text);
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: 100vh; 
+      margin: 0; 
+    }
+
+    .card { 
+      background: white; 
+      max-width: 500px; 
+      width: 90%; 
+      padding: 40px; 
+      border-radius: 16px; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+      text-align: center; 
+    }
+
+    h1 { 
+      color: var(--accent); 
+      margin-bottom: 10px; 
+      font-size: 1.8rem; 
+      font-weight: 800;
+    }
+
+    p { line-height: 1.5; color: #4b5563; }
+
+    .next-steps { 
+      background: #f9fafb; 
+      padding: 25px; 
+      border-radius: 12px; 
+      text-align: left; 
+      margin-top: 25px; 
+      border-left: 5px solid var(--accent); 
+    }
+
+    .next-steps strong {
+      color: var(--primary);
+      font-size: 1.1rem;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    ul { 
+      padding-left: 20px; 
+      margin: 0;
+      color: #4b5563; 
+      font-size: 0.95rem; 
+      line-height: 1.7; 
+    }
+
+    li { margin-bottom: 8px; }
+
+    .footer-note { 
+      margin-top: 30px; 
+      font-size: 0.85rem; 
+      color: #9ca3af; 
+    }
+
+    .home-link {
+      display: inline-block;
+      margin-top: 20px;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .home-link:hover {
+      border-color: var(--primary);
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>Application Submitted</h1>
-    <p>Thanks for applying for the <strong>On-Call Handyman</strong> position.</p>
+    <div style="font-size: 3rem; margin-bottom: 10px;">✅</div>
+    <h1>Application Received</h1>
+    <p>Thanks for applying to <strong>Well Done Construction LLC</strong>. Your information has been successfully logged into our system.</p>
 
     <div class="next-steps">
-      <strong style="display: block; margin-bottom: 10px;">Application Received</strong>
-      <ul style="padding-left: 20px; color: #4b5563; font-size: 0.95rem; line-height: 1.6;">
-        <li>Your application will be reviewed by our team.</li>
-        <li>If qualified, you will receive an email to sign our <strong>Master Agreement</strong> and onboarding instructions.</li>
-        <li>Once verified, you'll gain access to our daily job portal.</li>
+      <strong>What happens next?</strong>
+      <ul>
+        <li><strong>Review:</strong> Our admin team will review your trade skills and experience.</li>
+        <li><strong>Email:</strong> If you are a good fit, we will email you a link to sign our <strong>Master Agreement</strong>.</li>
+        <li><strong>Onboarding:</strong> After signing, you will be directed to upload your ID and complete the final onboarding steps.</li>
       </ul>
     </div>
 
-    <p style="margin-top: 30px; font-size: 0.9rem; color: #6E797F;">Text messages are typically answered faster than phone calls.</p>
+    <p class="footer-note">Note: Please keep an eye on your email (including spam) for the agreement link.</p>
+    
+    <a href="index.html" class="home-link">Return to Home Page</a>
   </div>
 </body>
 </html>
