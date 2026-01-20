@@ -1,46 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register Project | Admin</title>
-  <link rel="stylesheet" href="../styles.css">
+    <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Project | Admin</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        :root { --primary: #2c3e50; --accent: #33B26E; }
+        .container { max-width: 600px; margin: 50px auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 25px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        input, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        textarea { height: 100px; font-family: inherit; }
+        .btn-log { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .btn-log:hover { background: #34495e; }
+        .back-link { display: block; text-align: center; margin-top: 20px; color: #666; text-decoration: none; font-size: 0.9rem; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h2>New Project Registration</h2>
-    <form id="projectForm">
-      <input type="text" id="client" placeholder="Client Name" required>
-      <input type="text" id="address" placeholder="Project Address" required>
-      <input type="text" id="trade" placeholder="Trade (e.g. Website Build)" required>
-      <input type="text" id="budget" placeholder="Budget Amount" required>
-      <textarea id="notes" placeholder="Job Notes"></textarea>
-      <button type="submit" id="projBtn">LOG PROJECT & GEN ID</button>
-    </form>
-    <div id="result" style="margin-top:20px; font-weight:bold; text-align:center; color:#33B26E;"></div>
-  </div>
-  <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzQT7DP6beojo_8pcOP3VFPcsBhvxI1nUYxbUQvThdnWuMvw8InEogp2TwoKS9RQ_M5/exec';
-    document.getElementById('projectForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('projBtn');
-        btn.disabled = true;
+    <div class="container">
+        <h2>New Project Registration</h2>
+        <form id="projectForm">
+            <input type="text" id="client" placeholder="Client Name" required>
+            <input type="text" id="address" placeholder="Project Site Address" required>
+            <input type="text" id="trade" placeholder="Scope of Work (e.g. Finish Carpentry)" required>
+            <input type="number" id="budget" placeholder="Budget Amount ($)" required>
+            <textarea id="notes" placeholder="Detailed Job Notes / Access Codes / Special Instructions"></textarea>
+            
+            <button type="submit" id="projBtn" class="btn-log">LOG PROJECT & GENERATE ID</button>
+        </form>
+        
+        <div id="result" style="margin-top:20px; font-weight:bold; text-align:center; color:#33B26E; padding: 15px; border-radius: 8px;"></div>
+        
+        <a href="index.html" class="back-link">← Return to Admin Command Center</a>
+    </div>
 
-        const data = {
-            action: 'registerProject',
-            client: document.getElementById('client').value,
-            address: document.getElementById('address').value,
-            trade: document.getElementById('trade').value,
-            budget: document.getElementById('budget').value,
-            notes: document.getElementById('notes').value
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzQT7DP6beojo_8pcOP3VFPcsBhvxI1nUYxbUQvThdnWuMvw8InEogp2TwoKS9RQ_M5/exec';
+        
+        document.getElementById('projectForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('projBtn');
+            const resDiv = document.getElementById('result');
+            
+            btn.disabled = true;
+            btn.innerText = "Generating ID...";
+            resDiv.innerText = "";
+            resDiv.style.background = "none";
+
+            const data = {
+                action: 'registerProject',
+                client: document.getElementById('client').value,
+                address: document.getElementById('address').value,
+                trade: document.getElementById('trade').value,
+                budget: document.getElementById('budget').value,
+                notes: document.getElementById('notes').value
+            };
+
+            try {
+                // We use no-cors if the script just appends, 
+                // but since we need the JOB ID returned, we must handle the response.
+                const response = await fetch(scriptURL, { 
+                    method: 'POST', 
+                    body: JSON.stringify(data) 
+                });
+                
+                const jobId = await response.text();
+                
+                resDiv.style.background = "#e8f5e9";
+                resDiv.innerText = "SUCCESS! JOB ID: " + jobId;
+                e.target.reset();
+                
+            } catch (err) {
+                resDiv.style.color = "#c0392b";
+                resDiv.innerText = "Error logging project. Verify Script Deployment.";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "LOG PROJECT & GENERATE ID";
+            }
         };
-
-        const response = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(data) });
-        const jobId = await response.text();
-        document.getElementById('result').innerText = "SUCCESS! JOB ID: " + jobId;
-        e.target.reset();
-        btn.disabled = false;
-    };
-  </script>
+    </script>
 </body>
 </html>
