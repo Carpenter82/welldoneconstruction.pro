@@ -1,32 +1,33 @@
-/* --- GLOBAL PROFESSIONAL THEME (Standard for Dashboard/Admin) --- */
+/* --- GLOBAL PROFESSIONAL THEME --- */
 :root {
     --primary: #2c3e50;
     --accent: #33B26E;
+    --caution: #f39c12;
+    --danger: #e74c3c;
     --bg-light: #f4f7f6;
-    --text: #333;
 }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: var(--bg-light);
-    color: var(--text);
     margin: 0;
+    color: var(--primary);
 }
 
-/* Professional Card (Dashboard Style) */
+.container { max-width: 600px; margin: 0 auto; padding: 20px; }
+
+/* Dashboard Card Style */
 .card {
     background: white;
     border-radius: 12px;
     padding: 25px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    border-top: 5px solid var(--accent);
     margin-bottom: 20px;
+    border-top: 5px solid var(--accent);
 }
 
-/* --- WAREHOUSE THEME (Specific to Login Page) --- */
-body.warehouse-theme {
-    background-color: #dfe6e9; /* Concrete Gray */
-}
+/* --- WAREHOUSE THEME (Login Only) --- */
+body.warehouse-theme { background-color: #dfe6e9; padding: 20px; }
 
 .warehouse-theme .warehouse-card {
     background: #fff;
@@ -43,6 +44,7 @@ body.warehouse-theme {
     padding: 10px;
     font-weight: bold;
     text-transform: uppercase;
+    margin: -20px -20px 20px -20px;
 }
 
 .warehouse-theme .warning-stripe {
