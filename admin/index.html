@@ -4,106 +4,102 @@
   <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard | Well Done</title>
+  <title>Admin Command Center | Well Done</title>
   <link rel="stylesheet" href="../styles.css">
   <style>
+    :root { --primary: #2c3e50; --accent: #33B26E; }
     .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
-    .badge-new { background: #fff3e0; color: #ef6c00; } /* NEW / DOCS UPLOADED */
-    .badge-hired { background: #e8f5e9; color: #2e7d32; } /* ACTIVE */
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; display: inline-block; margin-bottom: 5px; }
+    .badge-new { background: #fff3e0; color: #ef6c00; } 
+    .badge-hired { background: #e8f5e9; color: #2e7d32; } 
+    .badge-pending { background: #fdf2f2; color: #c81e1e; }
     @media (max-width: 800px) { .split-grid { grid-template-columns: 1fr; } }
-    .card { position: relative; border-left: 5px solid #ccc; }
+    .card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; border-left: 5px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .card.active-status { border-left-color: var(--accent); }
+    button { cursor: pointer; border: none; border-radius: 4px; color: white; font-weight: bold; transition: 0.2s; }
+    button:hover { opacity: 0.8; }
   </style>
 </head>
 <body>
 
-<div class="container" style="max-width: 1000px;">
-  <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h2>Admin Command Center</h2>
-    <div>
-      <a href="project.html" class="btn" style="padding: 10px 15px; text-decoration: none; font-size: 14px;">+ Register Project</a>
+<div class="container" style="max-width: 1000px; margin: 0 auto; padding: 20px;">
+  <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+    <h2 style="color: var(--primary); margin: 0;">Command Center</h2>
+    <div style="display: flex; gap: 10px;">
+      <a href="project.html" class="btn" style="background: var(--primary); padding: 10px 15px; color: white; text-decoration: none; border-radius: 5px; font-size: 13px; font-weight: bold;">+ DISPATCH WORK</a>
     </div>
   </header>
 
   <div class="split-grid">
     <section>
-      <h3 style="border-bottom: 2px solid var(--accent); padding-bottom: 10px;">Applicants (Intake)</h3>
-      <div id="applicantList">Loading Applicants...</div>
+      <h3 style="color: var(--accent); font-size: 1.1rem; text-transform: uppercase;">1. New Applicants</h3>
+      <div id="applicantList">Loading...</div>
     </section>
 
     <section>
-      <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Master Roster (Settings)</h3>
-      <div id="crewList">Loading Roster...</div>
+      <h3 style="color: var(--primary); font-size: 1.1rem; text-transform: uppercase;">2. Active Crew (Gen Pop)</h3>
+      <div id="crewList">Loading...</div>
     </section>
   </div>
 </div>
 
 <script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbzQT7DP6beojo_8pcOP3VFPcsBhvxI1nUYxbUQvThdnWuMvw8InEogp2TwoKS9RQ_M5/exec';
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
 
   async function loadDashboard() {
     try {
       const response = await fetch(scriptURL + "?action=getDashboard");
       const data = await response.json();
 
-      // Render Applicants (From 'application' sheet)
+      // Render Applicants
       const appContainer = document.getElementById('applicantList');
       appContainer.innerHTML = data.applicants.length ? data.applicants.map(a => `
         <div class="card">
           <span class="badge badge-new">${a.status}</span>
-          <p><strong>${a.name}</strong><br>${a.trade}</p>
-          <button onclick="hireWorker('${a.email}')" style="padding: 8px; font-size: 11px; background:#33B26E;">HIRE TO ROSTER</button>
+          <p style="margin: 5px 0;"><strong>${a.name}</strong><br><small>${a.trade}</small></p>
+          <button onclick="hireProcess('${a.email}')" style="padding: 8px; width: 100%; background: var(--accent); font-size: 11px;">APPROVE & SET TIER</button>
         </div>
       `).join('') : '<p>No pending applications.</p>';
 
-      // Render Crew (From 'Settings' sheet)
+      // Render Crew (Gen Pop)
       const crewContainer = document.getElementById('crewList');
       crewContainer.innerHTML = data.activeCrew.length ? data.activeCrew.map(c => `
         <div class="card active-status">
-          <span class="badge badge-hired">${c.status}</span>
-          <p><strong>${c.name}</strong><br>${c.trade} | ${c.tier}</p>
-          <div style="display:flex; gap:5px;">
-             <button onclick="window.open('${c.folder}')" style="padding: 8px; font-size: 11px; background: #343E47;">VIEW VAULT</button>
-             <button onclick="assignJob('${c.email}')" style="padding: 8px; font-size: 11px; background: var(--primary);">ASSIGN JOB</button>
+          <span class="badge ${c.jobStatus === 'Accepted' ? 'badge-hired' : 'badge-pending'}">
+            ${c.jobStatus || 'Available'}
+          </span>
+          <p style="margin: 5px 0;"><strong>${c.name}</strong><br><small>${c.trade} | ${c.tier}</small></p>
+          <div style="display:flex; gap:5px; margin-top:10px;">
+             <button onclick="window.open('${c.folder}')" style="flex:1; padding: 7px; font-size: 10px; background: #343E47;">VAULT</button>
+             <button onclick="sendWorkOrder('${c.email}')" style="flex:2; padding: 7px; font-size: 10px; background: var(--primary);">SEND WORK ORDER</button>
           </div>
         </div>
-      `).join('') : '<p>No workers in Master Roster.</p>';
+      `).join('') : '<p>No workers in roster.</p>';
 
     } catch (err) {
-      document.getElementById('applicantList').innerText = "Error syncing with Sheets.";
+      console.error(err);
+      document.getElementById('applicantList').innerText = "Sync Error.";
     }
   }
 
-  async function hireWorker(email) {
-    if(!confirm("Move worker to Master Roster (Settings)?")) return;
-    await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'hireWorker', email: email }) });
-    alert("Worker Activated in Settings!");
+  async function hireProcess(email) {
+    const tier = prompt("Assign Pay Tier for this worker (e.g., Tier 1 $20, Tier 2 $25):");
+    if(!tier) return;
+    
+    await fetch(scriptURL, { 
+      method: 'POST', 
+      body: JSON.stringify({ action: 'hireWorker', email: email, assignedTier: tier }) 
+    });
+    alert("Worker Hired to Gen Pop!");
     loadDashboard();
   }
 
-  async function assignJob(email) {
-    const jobId = prompt("Enter JOB ID from ProjectLog to assign to this worker:");
-    if(!jobId) return;
-    await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'assignToRoster', email: email, jobId: jobId }) });
-    alert("Worker Assigned to Job!");
-    loadDashboard();
+  async function sendWorkOrder(email) {
+    // This takes you to the registration page where you can generate ID and Send WO in one go
+    window.location.href = `project.html?prefillEmail=${encodeURIComponent(email)}`;
   }
 
   window.onload = loadDashboard;
 </script>
-  // Render Crew (Updated with Status Check)
-const crewContainer = document.getElementById('crewList');
-crewContainer.innerHTML = data.activeCrew.length ? data.activeCrew.map(c => `
-  <div class="card active-status">
-    <span class="badge ${c.jobStatus === 'Accepted' ? 'badge-hired' : 'badge-new'}">${c.jobStatus || 'No Active Job'}</span>
-    <p><strong>${c.name}</strong><br>${c.trade} | ${c.tier}</p>
-    <div style="display:flex; gap:5px;">
-       <button onclick="window.open('${c.folder}')" style="background: #343E47;">VAULT</button>
-       <button onclick="assignJob('${c.email}')" style="background: var(--primary);">SEND WO</button>
-    </div>
-  </div>
-`).join('') : '<p>No workers in Master Roster.</p>';
-
 </body>
 </html>
