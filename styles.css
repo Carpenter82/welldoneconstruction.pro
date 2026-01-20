@@ -1,126 +1,51 @@
-/* CONSTRUCTWELL NV - MASTER DESIGN SYSTEM */
+/* --- GLOBAL PROFESSIONAL THEME (Standard for Dashboard/Admin) --- */
 :root {
-  --primary: #343E47;    /* Dark Slate */
-  --accent: #33B26E;     /* "Well Done" Green */
-  --bg: #F8F9FA;         /* Clean Light Grey */
-  --text: #2C3E50;
-  --white: #FFFFFF;
+    --primary: #2c3e50;
+    --accent: #33B26E;
+    --bg-light: #f4f7f6;
+    --text: #333;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: var(--bg);
-  color: var(--text);
-  margin: 0;
-  padding: 0;
-  line-height: 1.6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text);
+    margin: 0;
 }
 
-.container {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-/* High-Contrast Inputs for Construction Sites */
-input, select, textarea {
-  width: 100%;
-  padding: 15px;
-  margin-bottom: 15px;
-  border: 2px solid #D1D8DD;
-  border-radius: 8px;
-  font-size: 16px; /* Prevents iOS zoom-in on focus */
-  box-sizing: border-box;
-}
-
-/* Big "Gloved-Hand" Friendly Buttons */
-button, .cta-button {
-  width: 100%;
-  background-color: var(--accent);
-  color: var(--white);
-  padding: 18px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: transform 0.1s, background-color 0.2s;
-}
-
-button:active {
-  transform: scale(0.98);
-  background-color: #28a061;
-}
-
-/* The Navigation Bar */
-nav {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: var(--primary);
-  display: flex;
-  justify-content: space-around;
-  padding: 15px 0;
-  z-index: 1000;
-}
-
-.nav-link {
-  color: #ADB5BD;
-  text-decoration: none;
-  font-size: 0.85rem;
-  font-weight: bold;
-}
-
-.nav-link.active {
-  color: var(--accent);
-}
-
-/* Cards for Admin & Portal Views */
+/* Professional Card (Dashboard Style) */
 .card {
-  background: var(--white);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  margin-bottom: 20px;
-  border-left: 5px solid var(--accent);
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border-top: 5px solid var(--accent);
+    margin-bottom: 20px;
 }
 
-:root {
-    --caution-yellow: #f1c40f;
-    --hazard-orange: #e67e22;
-    --industrial-gray: #2c3e50;
-    --danger-red: #c0392b;
+/* --- WAREHOUSE THEME (Specific to Login Page) --- */
+body.warehouse-theme {
+    background-color: #dfe6e9; /* Concrete Gray */
 }
 
-.warehouse-card {
+.warehouse-theme .warehouse-card {
     background: #fff;
-    border: 4px solid var(--industrial-gray);
-    box-shadow: 5px 5px 0px #bbb;
+    border: 4px solid var(--primary);
     padding: 20px;
-    margin-bottom: 25px;
-    position: relative;
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
 }
 
-.poster-header {
-    background: var(--industrial-gray);
+.warehouse-theme .poster-header {
+    background: var(--primary);
     color: white;
     text-align: center;
     padding: 10px;
-    font-family: 'Impact', sans-serif;
+    font-weight: bold;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    margin: -20px -20px 20px -20px;
 }
 
-.warning-stripe {
+.warehouse-theme .warning-stripe {
     height: 15px;
-    background: repeating-linear-gradient(
-      45deg,
-      #000,
-      #000 10px,
-      var(--caution-yellow) 10px,
-      var(--caution-yellow) 20px
-    );
-    margin-bottom: 15px;
+    background: repeating-linear-gradient(45deg, #000, #000 10px, #f1c40f 10px, #f1c40f 20px);
 }
