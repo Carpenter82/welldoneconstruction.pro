@@ -1,102 +1,68 @@
-// This function pulls everyone from the 'Settings' tab (Gen Pop)
-async function loadFullRoster() {
-    try {
-        const res = await fetch(scriptURL + "?action=getDashboard");
-        const data = await res.json();
-        const select = document.getElementById('workerSelect');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispatch Work | Well Done</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        :root { --primary: #2c3e50; --accent: #33B26E; }
+        .container { max-width: 600px; margin: 30px auto; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .form-section { border: 1px solid #eee; padding: 20px; border-radius: 8px; margin-bottom: 20px; background: #fafafa; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-dispatch { background: var(--accent); color: white; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="text-align: center; color: var(--primary);">Work Order Dispatch</h2>
         
-        // Clear the dropdown and add the default prompt
-        select.innerHTML = '<option value="" disabled selected>Select from Hired Roster...</option>';
-        
-        // Loop through all active crew members from 'Settings'
-        data.activeCrew.forEach(worker => {
-            // Display: Name | Trade | Pay Tier
-            select.innerHTML += `<option value="${worker.email}">${worker.name} — ${worker.trade} (${worker.tier})</option>`;
-        });
-    } catch (e) {
-        console.error("Failed to load roster:", e);
-        alert("Error loading workers. Check your connection.");
-    }
-}
-
-// Logic to unlock Step 2 after Step 1 is successful
-document.getElementById('projectForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('projBtn');
-    btn.innerText = "Generating ID...";
-    btn.disabled = true;
-
-    const data = {
-        action: 'registerProject',
-        client: document.getElementById('client').value,
-        address: document.getElementById('address').value,
-        trade: document.getElementById('trade').value,
-        budget: document.getElementById('budget').value,
-        notes: document.getElementById('notes').value
-    };
-
-    try {
-        const response = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(data) });
-        currentGeneratedId = await response.text();
-        
-        // Unlock the Roster Dropdown
-        document.getElementById('displayJobId').innerText = currentGeneratedId;
-        document.getElementById('assignmentSection').style.display = 'block';
-        
-        // Load the full "Gen Pop" list
-        loadFullRoster(); 
-        
-    } catch (err) {
-        alert("ID Generation Failed.");
-    } finally {
-        btn.disabled = false;
-        btn.innerText = "LOG PROJECT & GEN ID";
-    }
-};
+        <div class="form-section" id="step1">
             <p style="margin-top:0; font-weight:bold;">1. Register Project Data</p>
             <form id="projectForm">
                 <input type="text" id="client" placeholder="Client Name" required>
                 <input type="text" id="address" placeholder="Site Address" required>
-                <input type="text" id="trade" placeholder="Trade (e.g. Flooring)" required>
-                <input type="number" id="budget" placeholder="Budget Amount ($)" required>
-                <textarea id="notes" placeholder="Job Notes / Instructions"></textarea>
+                <input type="text" id="trade" placeholder="Trade (e.g. Carpentry)" required>
+                <input type="number" id="budget" placeholder="Labor Budget ($)" required>
+                <textarea id="notes" placeholder="Job Notes / Access Codes"></textarea>
                 <button type="submit" id="projBtn" class="btn btn-primary">LOG PROJECT & GEN ID</button>
             </form>
         </div>
 
-        <div id="assignmentSection" class="form-section" style="display:none; border-color: var(--accent);">
-            <p style="margin-top:0; font-weight:bold; color: var(--accent);">2. Assign Worker to JOB: <span id="displayJobId"></span></p>
-            <label>Select Active Worker</label>
+        <div id="assignmentSection" class="form-section" style="display:none; border-left: 5px solid var(--accent);">
+            <p style="margin-top:0; font-weight:bold; color: var(--accent);">2. Assign Personnel to JOB: <span id="displayJobId"></span></p>
             <select id="workerSelect">
-                <option value="">Loading Gen Pop...</option>
+                <option value="">Loading Roster...</option>
             </select>
-            <button onclick="dispatchWO()" id="dispatchBtn" class="btn btn-dispatch" style="display:block;">SEND WORK ORDER EMAIL</button>
+            <button onclick="dispatchWO()" id="dispatchBtn" class="btn" style="background: var(--accent); color: white;">SEND WORK ORDER EMAIL</button>
         </div>
 
-        <div id="statusResult" style="text-align:center; font-weight:bold;"></div>
-        <a href="index.html" class="back-link" style="display:block; text-align:center; margin-top:20px; color:#666; text-decoration:none;">← Dashboard</a>
+        <div id="statusResult" style="text-align:center; margin-top:15px; font-weight:bold;"></div>
+        <a href="index.html" style="display:block; text-align:center; margin-top:20px; color:#666; text-decoration:none;">← Return to Command Center</a>
     </div>
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
         let currentGeneratedId = "";
 
-        // 1. Fetch Gen Pop Workers for the Dropdown
-        async function loadWorkers() {
+        // Function to pull Gen Pop (Settings tab)
+        async function loadFullRoster() {
             const res = await fetch(scriptURL + "?action=getDashboard");
             const data = await res.json();
             const select = document.getElementById('workerSelect');
-            select.innerHTML = '<option value="" disabled selected>Select a Worker...</option>';
+            select.innerHTML = '<option value="" disabled selected>Select from Hired Roster...</option>';
             data.activeCrew.forEach(worker => {
-                select.innerHTML += `<option value="${worker.email}">${worker.name} (${worker.tier})</option>`;
+                select.innerHTML += `<option value="${worker.email}">${worker.name} — ${worker.trade} (${worker.tier})</option>`;
             });
         }
 
-        // 2. Register Project & Get ID
         document.getElementById('projectForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('projBtn');
-            btn.innerText = "Generating...";
+            btn.innerText = "Generating ID...";
             btn.disabled = true;
 
             const data = {
@@ -114,93 +80,31 @@ document.getElementById('projectForm').onsubmit = async (e) => {
                 
                 document.getElementById('displayJobId').innerText = currentGeneratedId;
                 document.getElementById('assignmentSection').style.display = 'block';
-                document.getElementById('projectForm').style.opacity = '0.5';
-                document.getElementById('statusResult').innerText = "Project Logged: " + currentGeneratedId;
-                loadWorkers(); // Load dropdown now
-            } catch (err) {
-                alert("Error. Verify Script.");
-            }
+                document.getElementById('step1').style.opacity = '0.5';
+                document.getElementById('statusResult').innerText = "Project Saved: " + currentGeneratedId;
+                
+                await loadFullRoster();
+            } catch (err) { alert("Registration Failed."); }
+            finally { btn.innerText = "LOG PROJECT & GEN ID"; btn.disabled = false; }
         };
 
-        // 3. Dispatch Work Order Email
         async function dispatchWO() {
             const email = document.getElementById('workerSelect').value;
-            if(!email) return alert("Select a worker first!");
+            if(!email) return alert("Select a worker!");
             
             const btn = document.getElementById('dispatchBtn');
-            btn.innerText = "Sending Email...";
+            btn.innerText = "Dispatching...";
             btn.disabled = true;
 
             try {
                 await fetch(scriptURL, {
                     method: 'POST',
-                    body: JSON.stringify({
-                        action: 'assignToRoster',
-                        email: email,
-                        jobId: currentGeneratedId
-                    })
+                    body: JSON.stringify({ action: 'assignToRoster', email: email, jobId: currentGeneratedId })
                 });
-                document.getElementById('statusResult').innerHTML = `<span style="color:var(--accent)">SUCCESS! WO Sent to ${email}</span>`;
-                btn.innerText = "WORK ORDER SENT";
-            } catch (e) {
-                alert("Dispatch failed.");
-            }
+                document.getElementById('statusResult').innerHTML = `<span style="color:var(--accent)">WORK ORDER SENT TO ${email}</span>`;
+                btn.innerText = "WORK ORDER DISPATCHED";
+            } catch (e) { alert("Dispatch Error."); btn.disabled = false; }
         }
     </script>
 </body>
-// This function pulls everyone from the 'Settings' tab (Gen Pop)
-async function loadFullRoster() {
-    try {
-        const res = await fetch(scriptURL + "?action=getDashboard");
-        const data = await res.json();
-        const select = document.getElementById('workerSelect');
-        
-        // Clear the dropdown and add the default prompt
-        select.innerHTML = '<option value="" disabled selected>Select from Hired Roster...</option>';
-        
-        // Loop through all active crew members from 'Settings'
-        data.activeCrew.forEach(worker => {
-            // Display: Name | Trade | Pay Tier
-            select.innerHTML += `<option value="${worker.email}">${worker.name} — ${worker.trade} (${worker.tier})</option>`;
-        });
-    } catch (e) {
-        console.error("Failed to load roster:", e);
-        alert("Error loading workers. Check your connection.");
-    }
-}
-
-// Logic to unlock Step 2 after Step 1 is successful
-document.getElementById('projectForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('projBtn');
-    btn.innerText = "Generating ID...";
-    btn.disabled = true;
-
-    const data = {
-        action: 'registerProject',
-        client: document.getElementById('client').value,
-        address: document.getElementById('address').value,
-        trade: document.getElementById('trade').value,
-        budget: document.getElementById('budget').value,
-        notes: document.getElementById('notes').value
-    };
-
-    try {
-        const response = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(data) });
-        currentGeneratedId = await response.text();
-        
-        // Unlock the Roster Dropdown
-        document.getElementById('displayJobId').innerText = currentGeneratedId;
-        document.getElementById('assignmentSection').style.display = 'block';
-        
-        // Load the full "Gen Pop" list
-        loadFullRoster(); 
-        
-    } catch (err) {
-        alert("ID Generation Failed.");
-    } finally {
-        btn.disabled = false;
-        btn.innerText = "LOG PROJECT & GEN ID";
-    }
-};
 </html>
