@@ -5,24 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Activity Log | Admin</title>
   <link rel="stylesheet" href="../styles.css">
+  <style>
+    .log-item { background: white; padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .log-time { font-size: 0.8rem; color: #666; }
+    .map-btn { background: #3498db; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-size: 0.8rem; }
+  </style>
 </head>
 <body>
-  <div class="container" style="max-width: 800px;">
-    <h2>GPS Activity Audit</h2>
-    <div id="logContent">Loading activity...</div>
+  <div class="container" style="max-width: 900px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>GPS Activity Audit</h2>
+        <a href="index.html" style="text-decoration:none;">← Dashboard</a>
+    </div>
+    <div id="logContent" class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:20px; text-align:center;">Syncing GPS logs...</div>
+    </div>
   </div>
+
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzQT7DP6beojo_8pcOP3VFPcsBhvxI1nUYxbUQvThdnWuMvw8InEogp2TwoKS9RQ_M5/exec';
+    
     async function loadLogs() {
-        const res = await fetch(scriptURL + "?action=getDashboard"); // Uses the getter in Code.gs
-        const data = await res.json();
-        // Simple display logic for the audit trail
-        document.getElementById('logContent').innerHTML = data.applicants.map(a => `
-            <div class="card">
-                <b>${a.name}</b> applied for ${a.trade}<br>
-                Status: ${a.status}
-            </div>
-        `).join('');
+        try {
+            const res = await fetch(scriptURL + "?action=getActivity"); 
+            const data = await res.json();
+            
+            const container = document.getElementById('logContent');
+            if(data.length === 0) {
+                container.innerHTML = '<div style="padding:20px; text-align:center;">No recent activity found.</div>';
+                return;
+            }
+
+            container.innerHTML = data.map(log => `
+                <div class="log-item">
+                    <div>
+                        <div class="log-time">${new Date(log.time).toLocaleString()}</div>
+                        <b>${log.email}</b><br>
+                        <small>Site Activity Verification</small>
+                    </div>
+                    <a href="${log.map}" target="_blank" class="map-btn">📍 VIEW MAP</a>
+                </div>
+            `).join('');
+        } catch (e) {
+            document.getElementById('logContent').innerText = "Error loading activity data.";
+        }
     }
     window.onload = loadLogs;
   </script>
