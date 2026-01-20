@@ -6,11 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Worker Dashboard | Well Done</title>
     <link rel="stylesheet" href="../styles.css">
+    <style>
+        .btn-accept { background: #33B26E; color: white; margin-bottom: 10px; }
+        .btn-decline { background: #e74c3c; color: white; }
+        .response-area { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h2 id="workerGreeting">Loading Assignment...</h2>
+        <h2 id="workerGreeting">Syncing with Dispatch...</h2>
         
+        <div id="workOrderCard" class="card" style="display:none; border-top: 5px solid #f39c12;">
+            <p><strong>NEW WORK ORDER</strong></p>
+            <hr>
+            <p><strong>Job ID:</strong> <span id="woId">---</span></p>
+            <p><strong>Details:</strong> Please review and respond to this assignment.</p>
+            
+            <div class="response-area">
+                <button onclick="respondToJob('Accepted')" class="btn btn-accept">✅ ACCEPT ASSIGNMENT</button>
+                <button onclick="respondToJob('Declined')" class="btn btn-decline">❌ DECLINE</button>
+            </div>
+        </div>
+
         <div id="jobCard" class="card" style="display:none; border-top: 5px solid #33B26E;">
             <p><strong>CURRENT ASSIGNMENT</strong></p>
             <hr>
@@ -19,26 +36,9 @@
             
             <div style="margin-top: 20px; display: grid; gap: 10px;">
                 <button onclick="goToChecklist()" class="btn">📋 OPEN DAILY CHECKLIST</button>
-                <button id="vaultBtn" onclick="" class="btn" style="background:#343E47;">📂 VIEW JOB DOCS (VAULT)</button>
+                <button id="vaultBtn" class="btn" style="background:#343E47;">📂 VIEW JOB DOCS (VAULT)</button>
             </div>
         </div>
-        async function respondToJob(status) {
-  const urlParams = new URLSearchParams(window.location.search);
-  const email = urlParams.get('email');
-  const jobId = document.getElementById('activeJobId').innerText;
-
-  await fetch(scriptURL, {
-    method: 'POST',
-    body: JSON.stringify({
-      action: 'respondToWorkOrder',
-      email: email,
-      jobId: jobId,
-      response: status
-    })
-  });
-  alert("You have " + status + " this work order.");
-  location.reload();
-}
 
         <div id="noJob" class="card" style="display:none; text-align:center;">
             <p>You have no active job assignments at this time.</p>
@@ -58,31 +58,55 @@
             }
 
             try {
-                // Calls the 'getWorkerJob' action we put in Code.gs
                 const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}`);
                 const data = await res.json();
 
-                if (data.jobId && data.jobId !== "error") {
-                    document.getElementById('workerGreeting').innerText = `Hello, ${data.name.split(' ')[0]}!`;
+                document.getElementById('workerGreeting').innerText = `Hello, ${data.name.split(' ')[0]}!`;
+
+                // Logic: Show Work Order if status is "Pending", otherwise show Active Job
+                if (data.jobStatus === "Pending") {
+                    document.getElementById('woId').innerText = data.jobId;
+                    document.getElementById('workOrderCard').style.display = 'block';
+                } else if (data.jobId && data.jobStatus === "Accepted") {
                     document.getElementById('jobIdDisplay').innerText = data.jobId;
                     document.getElementById('tierDisplay').innerText = data.tier;
-                    
-                    // Set the Vault button to open their specific Drive folder
                     document.getElementById('vaultBtn').onclick = () => window.open(data.folder);
-                    
                     document.getElementById('jobCard').style.display = 'block';
                 } else {
-                    document.getElementById('workerGreeting').innerText = "Portal Active";
                     document.getElementById('noJob').style.display = 'block';
                 }
             } catch (err) {
-                console.error(err);
-                document.getElementById('workerGreeting').innerText = "Connection Error";
+                document.getElementById('workerGreeting').innerText = "Portal Active";
+                document.getElementById('noJob').style.display = 'block';
+            }
+        }
+
+        async function respondToJob(response) {
+            const currentJobId = document.getElementById('woId').innerText;
+            const btn = event.target;
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
+            try {
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'respondToWorkOrder',
+                        email: email,
+                        jobId: currentJobId,
+                        response: response
+                    })
+                });
+                alert("Response: " + response + " has been sent to dispatch.");
+                location.reload();
+            } catch (e) {
+                alert("Error sending response.");
+                btn.disabled = false;
             }
         }
 
         function goToChecklist() {
-            window.location.href = `../checklist/index.html?email=${encodeURIComponent(email)}`;
+            window.location.href = `../checklist/index.html?email=${encodeURIComponent(email)}&jobId=${document.getElementById('jobIdDisplay').innerText}`;
         }
 
         window.onload = loadDashboard;
