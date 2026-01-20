@@ -7,42 +7,84 @@
     <title>Worker Dashboard | Well Done</title>
     <link rel="stylesheet" href="../styles.css">
     <style>
-        .btn-accept { background: #33B26E; color: white; margin-bottom: 10px; }
-        .btn-decline { background: #e74c3c; color: white; }
-        .response-area { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+        :root { --industrial: #2c3e50; --caution: #f39c12; --danger: #e74c3c; --success: #33B26E; }
+        
+        /* Safety Gate Styling */
+        .safety-gate { 
+            background: #fffbe6; 
+            border: 2px dashed var(--caution); 
+            padding: 15px; 
+            margin: 15px 0; 
+            text-align: left;
+        }
+        .safety-gate label { 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 10px; 
+            margin-bottom: 10px; 
+            font-size: 0.9rem; 
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .safety-gate input { width: 18px; height: 18px; margin-top: 2px; }
+        
+        .btn-accept { background: var(--success); color: white; margin-bottom: 10px; width: 100%; }
+        .btn-accept:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-decline { background: none; color: #666; border: 1px solid #ccc; width: 100%; margin-top: 10px; }
+        
+        .card { border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2 id="workerGreeting">Syncing with Dispatch...</h2>
+        <h2 id="workerGreeting">Checking System...</h2>
         
-        <div id="workOrderCard" class="card" style="display:none; border-top: 5px solid #f39c12;">
-            <p><strong>NEW WORK ORDER</strong></p>
-            <hr>
-            <p><strong>Job ID:</strong> <span id="woId">---</span></p>
-            <p><strong>Details:</strong> Please review and respond to this assignment.</p>
-            
-            <div class="response-area">
-                <button onclick="respondToJob('Accepted')" class="btn btn-accept">✅ ACCEPT ASSIGNMENT</button>
-                <button onclick="respondToJob('Declined')" class="btn btn-decline">❌ DECLINE</button>
+        <div id="workOrderCard" class="card" style="display:none; border-top: 6px solid var(--caution); padding: 25px;">
+            <div style="text-align: center;">
+                <span style="background: var(--caution); color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.8rem;">ACTION REQUIRED</span>
+                <h3 style="margin: 15px 0 5px 0;">New Work Order</h3>
+                <p style="color: #666; font-size: 0.9rem;">Job ID: <strong id="woId">---</strong></p>
             </div>
+            
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+            <div class="safety-gate">
+                <p style="margin-top: 0; font-weight: bold; color: #856404; font-size: 0.8rem; text-transform: uppercase;">Safety & Policy Acknowledgment</p>
+                
+                <label>
+                    <input type="checkbox" class="safety-check">
+                    <span>I have all required PPE (Hard Hat, High-Vis, Steel-Toes) ready for site.</span>
+                </label>
+                
+                <label>
+                    <input type="checkbox" class="safety-check">
+                    <span>I acknowledge this is an On-Call W-2 shift with no minimum hours guaranteed.</span>
+                </label>
+                
+                <label>
+                    <input type="checkbox" class="safety-check">
+                    <span>I confirm I am fit for duty and will comply with the Drug/Alcohol-Free Policy.</span>
+                </label>
+            </div>
+
+            <button onclick="respondToJob('Accepted')" id="acceptBtn" class="btn btn-accept" disabled>✅ ACCEPT ASSIGNMENT</button>
+            <button onclick="respondToJob('Declined')" class="btn btn-decline">❌ Decline Shift</button>
         </div>
 
-        <div id="jobCard" class="card" style="display:none; border-top: 5px solid #33B26E;">
-            <p><strong>CURRENT ASSIGNMENT</strong></p>
+        <div id="jobCard" class="card" style="display:none; border-top: 6px solid var(--success); padding: 25px;">
+            <p style="text-align:center; font-weight:bold; color: var(--success);">ACTIVE ASSIGNMENT</p>
             <hr>
             <p><strong>Job ID:</strong> <span id="jobIdDisplay">---</span></p>
             <p><strong>Pay Tier:</strong> <span id="tierDisplay">---</span></p>
             
             <div style="margin-top: 20px; display: grid; gap: 10px;">
-                <button onclick="goToChecklist()" class="btn">📋 OPEN DAILY CHECKLIST</button>
+                <button onclick="goToChecklist()" class="btn" style="background: var(--success);">📋 OPEN DAILY CHECKLIST</button>
                 <button id="vaultBtn" class="btn" style="background:#343E47;">📂 VIEW JOB DOCS (VAULT)</button>
             </div>
         </div>
 
-        <div id="noJob" class="card" style="display:none; text-align:center;">
-            <p>You have no active job assignments at this time.</p>
-            <p style="font-size: 0.8rem; color: #666;">Contact dispatch if this is an error.</p>
+        <div id="noJob" class="card" style="display:none; text-align:center; padding: 40px;">
+            <p style="color: #666;">You have no active assignments at this time.</p>
         </div>
     </div>
 
@@ -51,11 +93,17 @@
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('email');
 
-        async function loadDashboard() {
-            if (!email) {
-                window.location.href = 'index.html';
-                return;
+        // Safety Gate Logic: Enable Accept button only when all checked
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('safety-check')) {
+                const checks = document.querySelectorAll('.safety-check');
+                const allChecked = Array.from(checks).every(c => c.checked);
+                document.getElementById('acceptBtn').disabled = !allChecked;
             }
+        });
+
+        async function loadDashboard() {
+            if (!email) { window.location.href = 'index.html'; return; }
 
             try {
                 const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}`);
@@ -63,7 +111,6 @@
 
                 document.getElementById('workerGreeting').innerText = `Hello, ${data.name.split(' ')[0]}!`;
 
-                // Logic: Show Work Order if status is "Pending", otherwise show Active Job
                 if (data.jobStatus === "Pending") {
                     document.getElementById('woId').innerText = data.jobId;
                     document.getElementById('workOrderCard').style.display = 'block';
@@ -76,7 +123,7 @@
                     document.getElementById('noJob').style.display = 'block';
                 }
             } catch (err) {
-                document.getElementById('workerGreeting').innerText = "Portal Active";
+                document.getElementById('workerGreeting').innerText = "Portal Ready";
                 document.getElementById('noJob').style.display = 'block';
             }
         }
@@ -84,7 +131,8 @@
         async function respondToJob(response) {
             const currentJobId = document.getElementById('woId').innerText;
             const btn = event.target;
-            btn.innerText = "Processing...";
+            const originalText = btn.innerText;
+            btn.innerText = "Syncing...";
             btn.disabled = true;
 
             try {
@@ -97,10 +145,10 @@
                         response: response
                     })
                 });
-                alert("Response: " + response + " has been sent to dispatch.");
                 location.reload();
             } catch (e) {
-                alert("Error sending response.");
+                alert("Connection error. Try again.");
+                btn.innerText = originalText;
                 btn.disabled = false;
             }
         }
