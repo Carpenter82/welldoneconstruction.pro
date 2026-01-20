@@ -92,6 +92,18 @@
 
   window.onload = loadDashboard;
 </script>
+  // Render Crew (Updated with Status Check)
+const crewContainer = document.getElementById('crewList');
+crewContainer.innerHTML = data.activeCrew.length ? data.activeCrew.map(c => `
+  <div class="card active-status">
+    <span class="badge ${c.jobStatus === 'Accepted' ? 'badge-hired' : 'badge-new'}">${c.jobStatus || 'No Active Job'}</span>
+    <p><strong>${c.name}</strong><br>${c.trade} | ${c.tier}</p>
+    <div style="display:flex; gap:5px;">
+       <button onclick="window.open('${c.folder}')" style="background: #343E47;">VAULT</button>
+       <button onclick="assignJob('${c.email}')" style="background: var(--primary);">SEND WO</button>
+    </div>
+  </div>
+`).join('') : '<p>No workers in Master Roster.</p>';
 
 </body>
 </html>
