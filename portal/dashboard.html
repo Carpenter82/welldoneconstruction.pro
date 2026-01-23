@@ -3,150 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Seat | Well Done</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <title>Worker Portal | Well Done</title>
     <style>
         :root { 
-            --dial-bg: #121212; 
-            --neon: #33B26E; 
-            --warning: #f1c40f;
-            --glass: rgba(255, 255, 255, 0.05); 
+            --vis-yellow: #FFE000; /* High-visibility safety yellow */
+            --vis-black: #000000;
+            --vis-gray: #333333;
         }
 
         body { 
-            background: #050505; 
-            color: #e0e0e0; 
-            font-family: 'Orbitron', sans-serif; 
+            background: var(--vis-black); 
+            color: white; 
+            font-family: Arial, sans-serif; /* Clean, no-nonsense font */
             margin: 0;
+            padding: 10px;
+        }
+
+        /* BIG CLOCK */
+        .header-bar {
+            background: var(--vis-gray);
             padding: 20px;
-        }
-
-        .dashboard-cluster { 
-            display: grid; 
-            grid-template-columns: 1fr 1.5fr 1fr; 
-            gap: 20px; 
-            max-width: 1400px;
-            margin: 40px auto;
-        }
-
-        .gauge { 
-            background: var(--dial-bg); 
-            border: 2px solid #333; 
-            border-radius: 15px; 
-            padding: 20px; 
             text-align: center;
-            box-shadow: 0 0 15px rgba(51, 178, 110, 0.2), inset 0 0 10px rgba(0,0,0,0.8);
-            position: relative;
+            border-bottom: 5px solid var(--vis-yellow);
+            margin-bottom: 20px;
         }
 
-        .gauge-header {
-            font-size: 0.7rem;
-            color: var(--neon);
-            letter-spacing: 2px;
-            margin-bottom: 15px;
+        #clock { font-size: 2.5rem; font-weight: bold; color: var(--vis-yellow); }
+
+        .dashboard-grid { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 20px; 
+            max-width: 800px;
+            margin: auto;
+        }
+
+        /* LARGE GAUGE BLOCKS */
+        .gauge-block { 
+            background: #1a1a1a;
+            border: 4px solid var(--vis-gray);
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .section-title {
+            background: var(--vis-yellow);
+            color: var(--vis-black);
+            font-weight: 900;
+            font-size: 1.5rem;
+            padding: 10px;
+            margin: -25px -25px 20px -25px;
+            border-radius: 8px 8px 0 0;
             text-transform: uppercase;
-            border-bottom: 1px solid #333;
-            padding-bottom: 5px;
         }
 
-        .mission-brief {
-            text-align: left;
-            font-size: 0.6rem;
-            color: #888;
-            margin-top: 20px;
-            line-height: 1.4;
-            padding: 10px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 5px;
+        /* PROFILE TEXT */
+        .big-text { font-size: 2rem; font-weight: bold; margin: 10px 0; display: block; }
+        .sub-text { font-size: 1.2rem; color: var(--vis-yellow); text-transform: uppercase; }
+
+        /* JOB CARDS - BIG BUTTONS */
+        .job-card { 
+            background: #222; 
+            border: 3px solid var(--vis-yellow);
+            margin-bottom: 20px; 
+            padding: 20px;
+            border-radius: 10px;
         }
 
-        .odometer-container {
-            height: 250px;
-            overflow-y: scroll;
-            scrollbar-width: none;
-            mask-image: linear-gradient(transparent, black 20%, black 80%, transparent);
+        .btn-big {
+            background: var(--vis-yellow);
+            color: var(--vis-black);
+            width: 100%;
+            padding: 25px;
+            font-size: 1.8rem;
+            font-weight: 900;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 15px;
         }
-        .odometer-container::-webkit-scrollbar { display: none; }
 
+        /* ODOMETER / HISTORY */
         .mission-row {
-            padding: 10px;
-            border-bottom: 1px solid #222;
-            font-size: 0.8rem;
+            padding: 15px 0;
+            border-bottom: 2px solid var(--vis-gray);
+            font-size: 1.4rem;
             display: flex;
             justify-content: space-between;
-            color: var(--neon);
         }
 
-        .job-card { 
-            background: var(--glass); 
-            margin-bottom: 12px; 
-            padding: 15px; 
-            border-radius: 8px; 
-            border-left: 3px solid var(--neon);
-            text-align: left;
-        }
+        /* IDLE STATE */
+        .idle-msg { padding: 50px 20px; font-size: 1.5rem; color: #888; text-align: center; }
 
-        .btn-claim {
-            background: transparent;
-            border: 1px solid var(--neon);
-            color: var(--neon);
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Orbitron';
-            font-size: 0.6rem;
-            transition: 0.3s;
-            width: 100%;
-        }
-
-        .btn-claim:hover { background: var(--neon); color: black; }
-
-        .profile-stat { margin: 15px 0; font-size: 0.9rem; }
-        .stat-label { color: #666; font-size: 0.6rem; display: block; }
-
-        @media (max-width: 1100px) { .dashboard-cluster { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <div style="text-align: center; margin-bottom: 10px;">
-        <div style="color: var(--neon); font-size: 0.8rem; letter-spacing: 4px;">WELL DONE CONSTRUCTION</div>
-        <div id="clock" style="font-size: 1.5rem; margin-top: 5px;">00:00:00</div>
+    <div class="header-bar">
+        <div style="font-size: 1.2rem; font-weight: bold; letter-spacing: 2px;">WELL DONE CONSTRUCTION</div>
+        <div id="clock">00:00</div>
     </div>
 
-    <div class="dashboard-cluster">
+    <div class="dashboard-grid">
         
-        <div class="gauge">
-            <div class="gauge-header">System Operator</div>
-            <div class="profile-stat">
-                <span class="stat-label">IDENTIFIER</span>
-                <span id="userName">---</span>
-            </div>
-            <div class="profile-stat">
-                <span class="stat-label">RANK / TIER</span>
-                <span id="userTier" style="color: var(--warning);">---</span>
-            </div>
-            
-            <div class="mission-brief">
-                <strong style="color:var(--warning)">RULES OF ENGAGEMENT:</strong><br>
-                1. 48H to ACCEPT mission drop.<br>
-                2. 72H to CONNECT with client on-site.<br>
-                3. Failure to connect = Tier Downgrade.
-            </div>
-            <button class="btn-claim" style="margin-top: 20px;" onclick="requestEdit()">Request Sync</button>
+        <div class="gauge-block">
+            <div class="section-title">Operator Profile</div>
+            <span class="sub-text">Name:</span>
+            <span id="userName" class="big-text">---</span>
+            <span class="sub-text">Status:</span>
+            <span id="userTier" class="big-text" style="color: var(--vis-yellow);">---</span>
         </div>
 
-        <div class="gauge">
-            <div class="gauge-header">Daily Mission Drop (08:00)</div>
+        <div class="gauge-block">
+            <div class="section-title">Available Missions</div>
             <div id="availableWork">
-                <p style="font-size: 0.7rem; color: #666;">Syncing with dispatch...</p>
+                <p class="idle-msg">SYNCING...</p>
             </div>
         </div>
 
-        <div class="gauge">
-            <div class="gauge-header">Service History</div>
-            <div class="odometer-container" id="historyLog"></div>
-            <div style="margin-top: 10px; font-size: 0.6rem; color: #444;">TOTAL SUCCESSFUL MISSIONS</div>
+        <div class="gauge-block">
+            <div class="section-title">Mission History</div>
+            <div id="historyLog">
+                </div>
         </div>
 
     </div>
@@ -158,90 +137,63 @@
 
         setInterval(() => {
             const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString();
+            document.getElementById('clock').innerText = now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
         }, 1000);
 
-        async function initDashboard() {
+        async function init() {
             if (!email) { window.location.href = 'index.html'; return; }
             
-            // 1. Load Profile
-            try {
-                const profileRes = await fetch(`${scriptURL}?action=getWorkerProfile&email=${encodeURIComponent(email)}`);
-                const profile = await profileRes.json();
-                document.getElementById('userName').innerText = profile.name;
-                document.getElementById('userTier').innerText = profile.tier;
-                document.getElementById('userTrade').innerText = profile.trade;
-            } catch(e) { console.log("Profile Error"); }
+            // 1. Profile Sync
+            const pRes = await fetch(`${scriptURL}?action=getWorkerProfile&email=${encodeURIComponent(email)}`);
+            const p = await pRes.json();
+            document.getElementById('userName').innerText = p.name.toUpperCase();
+            document.getElementById('userTier').innerText = p.tier.toUpperCase();
 
-            // 2. Load Jobs & History
+            // 2. Load Jobs
             loadJobs();
+
+            // 3. Load History
             loadHistory();
         }
 
         async function loadJobs() {
             const container = document.getElementById('availableWork');
-            try {
-                const res = await fetch(`${scriptURL}?action=getAvailableJobs`);
-                const response = await res.json();
+            const res = await fetch(`${scriptURL}?action=getAvailableJobs`);
+            const data = await res.json();
 
-                if (response.status === "idle") {
-                    container.innerHTML = `
-                        <div style="padding: 40px 10px; border: 1px dashed #444; color: #666;">
-                            <div style="font-size: 2rem; margin-bottom:10px;">🌙</div>
-                            <p style="letter-spacing:2px;">SYSTEM IDLE</p>
-                            <small>${response.message}</small>
-                        </div>
-                    `;
-                    return;
-                }
+            if (data.status === "idle") {
+                container.innerHTML = `<div class="idle-msg">SYSTEM IDLE<br><span style="font-size:1rem;">Check back at 08:00 AM</span></div>`;
+                return;
+            }
 
-                const jobs = response.jobs;
-                container.innerHTML = jobs.length ? jobs.map(j => `
-                    <div class="job-card">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <strong>MISSION: ${j.id}</strong>
-                            <span style="color:var(--warning); font-size: 0.55rem; border:1px solid var(--warning); padding:2px 5px;">48H WINDOW</span>
-                        </div>
-                        <div style="font-size: 0.65rem; color: #999; margin: 8px 0;">
-                            LOC: ${j.location} | TRADE: ${j.trade}
-                        </div>
-                        <button class="btn-claim" onclick="claimMission('${j.id}')">ACCEPT MISSION</button>
-                    </div>
-                `).join('') : '<p style="font-size: 0.7rem;">No missions available for this cycle.</p>';
-            } catch(e) { container.innerText = "Connection Error"; }
+            container.innerHTML = data.jobs.length ? data.jobs.map(j => `
+                <div class="job-card">
+                    <div style="font-size: 1.5rem; font-weight: bold;">SITE ID: ${j.id}</div>
+                    <div style="font-size: 1.1rem; margin: 10px 0;">LOCATION: ${j.location}</div>
+                    <button class="btn-big" onclick="claimJob('${j.id}')">ACCEPT JOB</button>
+                </div>
+            `).join('') : '<p class="idle-msg">No Jobs for this cycle.</p>';
         }
 
         async function loadHistory() {
-            try {
-                const res = await fetch(`${scriptURL}?action=getWorkerHistory&email=${encodeURIComponent(email)}`);
-                const history = await res.json();
-                const container = document.getElementById('historyLog');
-                container.innerHTML = history.map(h => `
-                    <div class="mission-row">
-                        <span>${h.date}</span>
-                        <span>ID: ${h.jobId}</span>
-                        <span style="font-size: 0.5rem; color: var(--neon);">SUCCESS</span>
-                    </div>
-                `).join('');
-            } catch(e) { console.log("History Error"); }
+            const res = await fetch(`${scriptURL}?action=getWorkerHistory&email=${encodeURIComponent(email)}`);
+            const history = await res.json();
+            document.getElementById('historyLog').innerHTML = history.map(h => `
+                <div class="mission-row">
+                    <span>${h.date}</span>
+                    <span>ID: ${h.jobId}</span>
+                </div>
+            `).join('');
         }
 
-        async function claimMission(jobId) {
-            if(!confirm(`Accept Mission #${jobId}? Remember: 72H to connect with client.`)) return;
-            await fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ action: 'claimJob', email: email, jobId: jobId })
-            });
-            alert("Mission accepted. Check your email for dispatch details.");
-            loadJobs();
+        async function claimJob(id) {
+            if(!confirm("ARE YOU SURE?")) return;
+            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({action:'claimJob', email:email, jobId:id}) });
+            alert("REQUEST SENT!");
+            location.reload();
         }
 
-        function requestEdit() {
-            window.location.href = `mailto:admin@welldoneconstruction.pro?subject=Profile Edit&body=Worker: ${email}`;
-        }
-
-        window.onload = initDashboard;
+        window.onload = init;
     </script>
 </body>
 </html>
