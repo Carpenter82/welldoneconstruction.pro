@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../styles.css">
     <title>Admin Dashboard | Well Done</title>
     <style>
+        :root { --accent: #ef6c00; --primary: #2e7d32; } /* Fallback variables */
         .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
@@ -38,16 +39,18 @@
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzUgzmGYKw1bgqbpOqExi6M2t6yZYjDS69DcKgDst4i07KEJhoBAZOAWRJv9WUcT42E/exec;
+    // FIXED: Added missing closing quote
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzUgzmGYKw1bgqbpOqExi6M2t6yZYjDS69DcKgDst4i07KEJhoBAZOAWRJv9WUcT42E/exec';
 
     async function loadDashboard() {
         try {
             const response = await fetch(scriptURL + "?action=getDashboard");
+            if (!response.ok) throw new Error('Network response was not ok');
             const data = await response.json();
 
             // Render Applicants
             const appList = document.getElementById('applicantList');
-            appList.innerHTML = data.applicants.length ? data.applicants.map(a => `
+            appList.innerHTML = data.applicants && data.applicants.length ? data.applicants.map(a => `
                 <div class="card">
                     <span class="badge" style="background:#fff3e0; color:#ef6c00;">${a.status}</span>
                     <p style="margin:10px 0 0 0;"><strong>${a.name}</strong></p>
@@ -58,7 +61,7 @@
 
             // Render Hired Crew
             const crewList = document.getElementById('crewList');
-            crewList.innerHTML = data.activeCrew.length ? data.activeCrew.map(c => `
+            crewList.innerHTML = data.activeCrew && data.activeCrew.length ? data.activeCrew.map(c => `
                 <div class="card" style="border-left-color: var(--primary);">
                     <span class="badge" style="background:#e8f5e9; color:#2e7d32;">${c.status}</span>
                     <p style="margin:10px 0 0 0;"><strong>${c.name}</strong></p>
@@ -71,16 +74,28 @@
             `).join('') : '<p>No active crew.</p>';
 
         } catch (err) {
-            document.getElementById('applicantList').innerText = "Sync Error.";
+            console.error(err);
+            document.getElementById('applicantList').innerText = "Sync Error: Check Console";
+            document.getElementById('crewList').innerText = "Sync Error.";
         }
     }
 
     async function hireProcess(email) {
         const tier = prompt("Enter Pay Tier (Tier 1 $20, Tier 2 $25, Tier 3 $30):");
         if(!tier) return;
-        await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'hireWorker', email: email, assignedTier: tier }) });
-        alert("Hired!");
-        loadDashboard();
+        
+        try {
+            // Note: Use text/plain for the content type to avoid CORS "preflight" issues with Apps Script
+            await fetch(scriptURL, { 
+                method: 'POST', 
+                mode: 'no-cors', // Important for Apps Script POST
+                body: JSON.stringify({ action: 'hireWorker', email: email, assignedTier: tier }) 
+            });
+            alert("Hire request sent! Refreshing dashboard...");
+            setTimeout(loadDashboard, 2000); // Small delay to let Apps Script finish processing
+        } catch (err) {
+            alert("Error hiring worker.");
+        }
     }
 
     function sendWorkOrder(email) {
