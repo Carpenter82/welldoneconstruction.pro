@@ -1,140 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worker Dashboard | Well Done</title>
+    <title>Driver Seat | Well Done</title>
     <link rel="stylesheet" href="../styles.css">
     <style>
-        :root { --caution: #f1c40f; --accent: #33B26E; }
-        .safety-gate { background: #fffbe6; border: 2px dashed var(--caution); padding: 15px; margin: 15px 0; border-radius: 8px; }
-        .safety-gate label { display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.9rem; font-weight: 500; text-align: left; }
-        .btn-accept { background: var(--accent); color: white; width: 100%; padding: 15px; border:none; border-radius: 8px; font-weight:bold; cursor:pointer; font-size: 1rem; }
-        .btn-accept:disabled { background: #ccc; cursor: not-allowed; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; border-top: 5px solid var(--accent); }
+        :root { --dial-bg: #1a1a1a; --neon: #33B26E; --glass: rgba(255, 255, 255, 0.1); }
+        body { background: #0b0b0b; color: white; font-family: 'Orbitron', sans-serif; } /* Orbitron gives a tech/car feel */
+        
+        .dashboard-cluster { 
+            display: grid; 
+            grid-template-columns: 1fr 1.5fr 1fr; 
+            gap: 20px; 
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .gauge { 
+            background: var(--dial-bg); 
+            border: 4px solid #333; 
+            border-radius: 50% 50% 10px 10px; 
+            padding: 30px; 
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5), inset 0 0 15px var(--neon);
+            min-height: 350px;
+        }
+
+        .profile-pic { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--neon); margin-bottom: 10px; }
+        
+        .job-card { 
+            background: var(--glass); 
+            margin: 10px 0; 
+            padding: 10px; 
+            border-radius: 5px; 
+            border-left: 4px solid var(--neon);
+            text-align: left;
+            font-size: 0.8rem;
+        }
+
+        .btn-neon { 
+            background: none; 
+            border: 1px solid var(--neon); 
+            color: var(--neon); 
+            padding: 5px 15px; 
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+        }
+        
+        .btn-neon:hover { background: var(--neon); color: black; }
+
+        @media (max-width: 900px) { .dashboard-cluster { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <div class="container" style="max-width: 500px; margin: 0 auto; padding: 20px;">
-        <h2 id="workerGreeting" style="text-align:center;">Syncing...</h2>
 
-        <div id="loading" style="text-align:center; padding: 20px;">
-            <p>Fetching your latest assignment...</p>
+    <h1 style="text-align:center; color: var(--neon); letter-spacing: 5px;">SYSTEM STATUS: ACTIVE</h1>
+
+    <div class="dashboard-cluster">
+        
+        <div class="gauge">
+            <div class="poster-header">OPERATOR</div>
+            <img src="https://via.placeholder.com/80" class="profile-pic" id="userImg">
+            <h3 id="userName">---</h3>
+            <p id="userTier" style="color: var(--neon);">Tier --</p>
+            <p id="userTrade" style="font-size: 0.8rem;">---</p>
+            <button class="btn-neon" onclick="requestEdit()">Request Data Edit</button>
         </div>
 
-        <div id="workOrderCard" class="card" style="display:none; border-top-color: var(--caution);">
-            <div style="text-align: center;">
-                <span style="background: var(--caution); color: black; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.75rem;">ACTION REQUIRED</span>
-                <h3>New Work Order</h3>
-                <p>Job ID: <strong id="woId">---</strong></p>
+        <div class="gauge" style="border-radius: 20px;">
+            <div class="poster-header">OPEN OPPORTUNITIES</div>
+            <div id="availableWork">
+                <p>Scanning for jobs...</p>
+                </div>
+        </div>
+
+        <div class="gauge">
+            <div class="poster-header">MISSION LOG</div>
+            <div id="pastWork" style="overflow-y: auto; max-height: 250px;">
+                <p style="font-size: 0.7rem;">Loading history...</p>
             </div>
-            
-            <div class="safety-gate">
-                <p style="margin-top:0; font-weight:bold; font-size:0.8rem; color:#856404;">SAFETY ACKNOWLEDGMENT</p>
-                <label><input type="checkbox" class="safety-check"> I have all required PPE (Hard Hat/Steel Toes).</label>
-                <label><input type="checkbox" class="safety-check"> I am fit for duty (Drug/Alcohol Free).</label>
-                <label><input type="checkbox" class="safety-check"> I accept this On-Call W-2 shift.</label>
-            </div>
-
-            <button onclick="respondToJob('Accepted')" id="acceptBtn" class="btn-accept" disabled>✅ ACCEPT ASSIGNMENT</button>
-            <button onclick="respondToJob('Declined')" style="width:100%; background:none; border:none; color:#c0392b; margin-top:10px; cursor:pointer; font-weight:bold;">Decline Shift</button>
         </div>
 
-        <div id="jobCard" class="card" style="display:none;">
-            <p style="text-align:center; font-weight:bold; color: var(--accent);">ACTIVE ASSIGNMENT</p>
-            <hr>
-            <p><strong>Job ID:</strong> <span id="jobIdDisplay">---</span></p>
-            <p><strong>Pay Tier:</strong> <span id="tierDisplay">---</span></p>
-            <button onclick="goToChecklist()" class="btn-accept">📋 OPEN DAILY CHECKLIST</button>
-            <button id="vaultBtn" style="width:100%; padding:12px; margin-top:10px; background:#343E47; color:white; border:none; border-radius:8px; cursor:pointer;">📂 VIEW JOB VAULT</button>
-        </div>
-
-        <div id="noJob" style="display:none; text-align:center; padding:40px; color:#666;">
-            <p style="font-size: 1.2rem;">No active assignments found.</p>
-            <p style="font-size: 0.9rem;">Check back later or contact dispatch.</p>
-        </div>
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('email');
+        const scriptURL = 'YOUR_APPS_SCRIPT_URL';
 
-        // SAFETY CHECK LOGIC
-        document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('safety-check')) {
-                const allChecked = Array.from(document.querySelectorAll('.safety-check')).every(c => c.checked);
-                document.getElementById('acceptBtn').disabled = !allChecked;
-            }
-        });
+        function requestEdit() {
+            const subject = encodeURIComponent(`Profile Change Request: ${email}`);
+            const body = encodeURIComponent("I would like to update my information. Here are the changes:");
+            window.location.href = `mailto:admin@welldoneconstruction.pro?subject=${subject}&body=${body}`;
+        }
 
-        async function loadDashboard() {
-            if (!email) { 
-                alert("No email detected. Returning to login.");
-                window.location.href = 'index.html'; 
-                return; 
-            }
+        async function loadCarDashboard() {
+            const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${email}`);
+            const data = await res.json();
             
-            try {
-                const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}`);
-                const data = await res.json();
-                
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('workerGreeting').innerText = `Hello, ${data.name.split(' ')[0]}!`;
+            // Fill Profile
+            document.getElementById('userName').innerText = data.name;
+            document.getElementById('userTier').innerText = data.tier;
+            document.getElementById('userTrade').innerText = data.trade;
 
-                if (data.jobStatus === "Pending") {
-                    document.getElementById('woId').innerText = data.jobId;
-                    document.getElementById('workOrderCard').style.display = 'block';
-                } else if (data.jobId && data.jobStatus === "Accepted") {
-                    document.getElementById('jobIdDisplay').innerText = data.jobId;
-                    document.getElementById('tierDisplay').innerText = data.tier;
-                    document.getElementById('vaultBtn').onclick = () => window.open(data.folder, '_blank');
-                    document.getElementById('jobCard').style.display = 'block';
-                } else {
-                    document.getElementById('noJob').style.display = 'block';
-                }
-            } catch (err) {
-                console.error(err);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('noJob').innerHTML = "<strong>Sync Error.</strong> Please refresh or check connection.";
-                document.getElementById('noJob').style.display = 'block';
-            }
+            // Load Available Work (Example logic)
+            // You would add an action 'getAvailableJobs' to your GS
+            loadAvailableJobs();
+            
+            // Load History
+            loadHistory();
         }
 
-        async function respondToJob(response) {
-            const jobId = document.getElementById('woId').innerText;
-            const btn = document.getElementById('acceptBtn');
-            btn.disabled = true;
-            btn.innerText = "Processing...";
-
-            try {
-                // Using no-cors mode for Apps Script POST compatibility
-                await fetch(scriptURL, { 
-                    method: 'POST', 
-                    mode: 'no-cors',
-                    body: JSON.stringify({ 
-                        action: 'respondToWorkOrder', 
-                        email: email, 
-                        jobId: jobId, 
-                        response: response 
-                    }) 
-                });
-                
-                // Since we can't read the response in no-cors, we assume success after a brief delay
-                setTimeout(() => location.reload(), 1500);
-            } catch (err) {
-                alert("Error sending response.");
-                btn.disabled = false;
-            }
+        async function loadAvailableJobs() {
+            const res = await fetch(`${scriptURL}?action=getAvailableJobs`);
+            const jobs = await res.json();
+            const container = document.getElementById('availableWork');
+            container.innerHTML = jobs.map(j => `
+                <div class="job-card">
+                    <strong>${j.id}</strong> - ${j.trade}<br>
+                    ${j.location}
+                    <button class="btn-neon" style="float:right" onclick="claimJob('${j.id}')">CLAIM</button>
+                </div>
+            `).join('');
         }
 
-        function goToChecklist() {
-            const currentJobId = document.getElementById('jobIdDisplay').innerText;
-            window.location.href = `../checklist/index.html?email=${encodeURIComponent(email)}&jobId=${encodeURIComponent(currentJobId)}`;
+        async function loadHistory() {
+            const res = await fetch(`${scriptURL}?action=getWorkerHistory&email=${email}`);
+            const history = await res.json();
+            const container = document.getElementById('pastWork');
+            container.innerHTML = history.map(h => `
+                <div style="border-bottom: 1px solid #333; padding: 5px; font-size: 0.7rem;">
+                    [${h.date}] ${h.jobId} - COMPLETED
+                </div>
+            `).join('');
         }
 
-        window.onload = loadDashboard;
+        window.onload = loadCarDashboard;
     </script>
 </body>
 </html>
