@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../styles.css">
     <title>Worker Login | Well Done</title>
     <style>
-        /* Ensuring internal consistency with your warehouse-theme */
+        /* Ensuring internal consistency if styles.css isn't loaded */
+        :root {
+            --primary: #2c3e50;
+            --accent: #33B26E;
+            --warning: #c0392b;
+        }
+        
         .login-input {
             width: 100%;
             padding: 15px;
@@ -14,6 +21,7 @@
             border: 2px solid var(--primary);
             font-size: 1rem;
             box-sizing: border-box;
+            border-radius: 4px;
         }
         .login-btn {
             width: 100%;
@@ -25,17 +33,16 @@
             text-transform: uppercase;
             cursor: pointer;
             transition: background 0.2s;
+            border-radius: 4px;
         }
-        .login-btn:hover {
-            background: #34495e;
-        }
-        .info-list {
-            padding-left: 20px;
-            text-align: left;
-        }
-        .info-list li {
-            margin-bottom: 8px;
-        }
+        .login-btn:hover { background: #34495e; }
+        .info-list { padding-left: 20px; text-align: left; }
+        .info-list li { margin-bottom: 8px; }
+        
+        /* Helper classes if not in styles.css */
+        .warehouse-card { background: white; padding: 20px; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 20px; }
+        .poster-header { background: var(--primary); color: white; padding: 10px; font-weight: bold; margin: -20px -20px 20px -20px; border-radius: 6px 6px 0 0; }
+        .warning-stripe { height: 10px; background: repeating-linear-gradient(45deg, #f1c40f, #f1c40f 10px, #000 10px, #000 20px); margin: 10px 0; }
     </style>
 </head>
 <body class="warehouse-theme">
@@ -57,30 +64,38 @@
             <div class="warning-stripe"></div>
             <ul class="info-list" style="font-size: 0.9rem;">
                 <li><strong>NO GUARANTEED HOURS:</strong> Work is assigned on an as-needed basis.</li>
-                <li><strong>AT-WILL:</strong> Employment relationship may be terminated by either party at any time.</li>
+                <li><strong>AT-WILL:</strong> Relationship may be terminated by either party at any time.</li>
                 <li><strong>REPORTING:</strong> All hours must be logged via the portal.</li>
             </ul>
         </div>
 
-        <div class="warehouse-card" style="border-color: #c0392b;">
-            <div class="poster-header" style="background:#c0392b;">ZERO TOLERANCE</div>
+        <div class="warehouse-card" style="border-color: var(--warning);">
+            <div class="poster-header" style="background: var(--warning);">ZERO TOLERANCE</div>
             <p style="text-align:center; font-weight:900; font-size: 0.85rem; letter-spacing: 1px; margin: 10px 0;">
                 SAFETY VIOLATIONS | NO-SHOWS | DRUGS/ALCOHOL
             </p>
-            <div class="warning-stripe" style="background: repeating-linear-gradient(45deg, #000, #000 10px, #c0392b 10px, #c0392b 20px);"></div>
-            <p style="font-size: 0.8rem; text-align: center; color: #c0392b; font-weight: bold;">
+            <div class="warning-stripe" style="background: repeating-linear-gradient(45deg, #000, #000 10px, var(--warning) 10px, var(--warning) 20px);"></div>
+            <p style="font-size: 0.8rem; text-align: center; color: var(--warning); font-weight: bold;">
                 IMMEDIATE TERMINATION FOR NON-COMPLIANCE
             </p>
         </div>
-
     </div>
 
     <script>
+        // Check for pre-existing email in the URL on load
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const emailParam = urlParams.get('email');
+            if (emailParam) {
+                document.getElementById('em').value = emailParam.toLowerCase();
+                // Optionally auto-login if email is present
+                // loginWorker(); 
+            }
+        };
+
         function loginWorker() {
             const emailInput = document.getElementById('em');
             const emailValue = emailInput.value.trim().toLowerCase();
-            
-            // Basic email validation regex
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             
             if (!emailValue || !emailPattern.test(emailValue)) {
@@ -89,7 +104,7 @@
                 return;
             }
             
-            // Redirect to dashboard with email as a URL parameter
+            // Redirect to the actual dashboard
             window.location.href = 'dashboard.html?email=' + encodeURIComponent(emailValue);
         }
     </script>
