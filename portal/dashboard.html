@@ -25,11 +25,10 @@
             display: grid; 
             grid-template-columns: 1fr 1.5fr 1fr; 
             gap: 20px; 
-            max-width: 1300px;
+            max-width: 1400px;
             margin: 40px auto;
         }
 
-        /* Gauge Styling */
         .gauge { 
             background: var(--dial-bg); 
             border: 2px solid #333; 
@@ -38,7 +37,6 @@
             text-align: center;
             box-shadow: 0 0 15px rgba(51, 178, 110, 0.2), inset 0 0 10px rgba(0,0,0,0.8);
             position: relative;
-            overflow: hidden;
         }
 
         .gauge-header {
@@ -51,15 +49,24 @@
             padding-bottom: 5px;
         }
 
-        /* Odometer Effect for Mission Log */
+        .mission-brief {
+            text-align: left;
+            font-size: 0.6rem;
+            color: #888;
+            margin-top: 20px;
+            line-height: 1.4;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+        }
+
         .odometer-container {
             height: 250px;
             overflow-y: scroll;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
             mask-image: linear-gradient(transparent, black 20%, black 80%, transparent);
         }
-
-        .odometer-container::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+        .odometer-container::-webkit-scrollbar { display: none; }
 
         .mission-row {
             padding: 10px;
@@ -70,10 +77,9 @@
             color: var(--neon);
         }
 
-        /* Job Board Cards */
         .job-card { 
             background: var(--glass); 
-            margin-bottom: 10px; 
+            margin-bottom: 12px; 
             padding: 15px; 
             border-radius: 8px; 
             border-left: 3px solid var(--neon);
@@ -90,6 +96,7 @@
             font-family: 'Orbitron';
             font-size: 0.6rem;
             transition: 0.3s;
+            width: 100%;
         }
 
         .btn-claim:hover { background: var(--neon); color: black; }
@@ -97,12 +104,12 @@
         .profile-stat { margin: 15px 0; font-size: 0.9rem; }
         .stat-label { color: #666; font-size: 0.6rem; display: block; }
 
-        @media (max-width: 1000px) { .dashboard-cluster { grid-template-columns: 1fr; } }
+        @media (max-width: 1100px) { .dashboard-cluster { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <div style="text-align: center; margin-bottom: 30px;">
+    <div style="text-align: center; margin-bottom: 10px;">
         <div style="color: var(--neon); font-size: 0.8rem; letter-spacing: 4px;">WELL DONE CONSTRUCTION</div>
         <div id="clock" style="font-size: 1.5rem; margin-top: 5px;">00:00:00</div>
     </div>
@@ -113,31 +120,33 @@
             <div class="gauge-header">System Operator</div>
             <div class="profile-stat">
                 <span class="stat-label">IDENTIFIER</span>
-                <span id="userName" style="font-size: 1.1rem;">---</span>
+                <span id="userName">---</span>
             </div>
             <div class="profile-stat">
                 <span class="stat-label">RANK / TIER</span>
                 <span id="userTier" style="color: var(--warning);">---</span>
             </div>
-            <div class="profile-stat">
-                <span class="stat-label">SPECIALIZATION</span>
-                <span id="userTrade">---</span>
+            
+            <div class="mission-brief">
+                <strong style="color:var(--warning)">RULES OF ENGAGEMENT:</strong><br>
+                1. 48H to ACCEPT mission drop.<br>
+                2. 72H to CONNECT with client on-site.<br>
+                3. Failure to connect = Tier Downgrade.
             </div>
-            <button class="btn-claim" style="margin-top: 20px;" onclick="requestEdit()">Request Profile Sync</button>
+            <button class="btn-claim" style="margin-top: 20px;" onclick="requestEdit()">Request Sync</button>
         </div>
 
         <div class="gauge">
-            <div class="gauge-header">Available Missions</div>
+            <div class="gauge-header">Daily Mission Drop (08:00)</div>
             <div id="availableWork">
-                <p style="font-size: 0.7rem; color: #666;">Scanning local network for open sites...</p>
+                <p style="font-size: 0.7rem; color: #666;">Syncing with dispatch...</p>
             </div>
         </div>
 
         <div class="gauge">
             <div class="gauge-header">Service History</div>
-            <div class="odometer-container" id="historyLog">
-                </div>
-            <div style="margin-top: 10px; font-size: 0.6rem; color: #444;">TOTAL MISSIONS COMPLETED</div>
+            <div class="odometer-container" id="historyLog"></div>
+            <div style="margin-top: 10px; font-size: 0.6rem; color: #444;">TOTAL SUCCESSFUL MISSIONS</div>
         </div>
 
     </div>
@@ -147,7 +156,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('email');
 
-        // Digital Clock
         setInterval(() => {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString();
@@ -157,57 +165,80 @@
             if (!email) { window.location.href = 'index.html'; return; }
             
             // 1. Load Profile
-            const profileRes = await fetch(`${scriptURL}?action=getWorkerProfile&email=${encodeURIComponent(email)}`);
-            const profile = await profileRes.json();
-            document.getElementById('userName').innerText = profile.name;
-            document.getElementById('userTier').innerText = profile.tier;
-            document.getElementById('userTrade').innerText = profile.trade;
+            try {
+                const profileRes = await fetch(`${scriptURL}?action=getWorkerProfile&email=${encodeURIComponent(email)}`);
+                const profile = await profileRes.json();
+                document.getElementById('userName').innerText = profile.name;
+                document.getElementById('userTier').innerText = profile.tier;
+                document.getElementById('userTrade').innerText = profile.trade;
+            } catch(e) { console.log("Profile Error"); }
 
-            // 2. Load Jobs
+            // 2. Load Jobs & History
             loadJobs();
-
-            // 3. Load Odometer History
             loadHistory();
         }
 
         async function loadJobs() {
-            const res = await fetch(`${scriptURL}?action=getAvailableJobs`);
-            const jobs = await res.json();
             const container = document.getElementById('availableWork');
-            container.innerHTML = jobs.length ? jobs.map(j => `
-                <div class="job-card">
-                    <div style="font-size: 0.8rem; font-weight: bold;">SITE: ${j.id}</div>
-                    <div style="font-size: 0.6rem; color: #999;">${j.location} | ${j.trade}</div>
-                    <button class="btn-claim" style="margin-top: 8px;" onclick="claimMission('${j.id}')">REQUEST MISSION</button>
-                </div>
-            `).join('') : '<p style="font-size: 0.7rem;">No open missions available.</p>';
+            try {
+                const res = await fetch(`${scriptURL}?action=getAvailableJobs`);
+                const response = await res.json();
+
+                if (response.status === "idle") {
+                    container.innerHTML = `
+                        <div style="padding: 40px 10px; border: 1px dashed #444; color: #666;">
+                            <div style="font-size: 2rem; margin-bottom:10px;">🌙</div>
+                            <p style="letter-spacing:2px;">SYSTEM IDLE</p>
+                            <small>${response.message}</small>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const jobs = response.jobs;
+                container.innerHTML = jobs.length ? jobs.map(j => `
+                    <div class="job-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <strong>MISSION: ${j.id}</strong>
+                            <span style="color:var(--warning); font-size: 0.55rem; border:1px solid var(--warning); padding:2px 5px;">48H WINDOW</span>
+                        </div>
+                        <div style="font-size: 0.65rem; color: #999; margin: 8px 0;">
+                            LOC: ${j.location} | TRADE: ${j.trade}
+                        </div>
+                        <button class="btn-claim" onclick="claimMission('${j.id}')">ACCEPT MISSION</button>
+                    </div>
+                `).join('') : '<p style="font-size: 0.7rem;">No missions available for this cycle.</p>';
+            } catch(e) { container.innerText = "Connection Error"; }
         }
 
         async function loadHistory() {
-            const res = await fetch(`${scriptURL}?action=getWorkerHistory&email=${encodeURIComponent(email)}`);
-            const history = await res.json();
-            const container = document.getElementById('historyLog');
-            container.innerHTML = history.map(h => `
-                <div class="mission-row">
-                    <span>${h.date}</span>
-                    <span>ID: ${h.jobId}</span>
-                    <span style="font-size: 0.5rem; color: #fff;">SUCCESS</span>
-                </div>
-            `).join('');
+            try {
+                const res = await fetch(`${scriptURL}?action=getWorkerHistory&email=${encodeURIComponent(email)}`);
+                const history = await res.json();
+                const container = document.getElementById('historyLog');
+                container.innerHTML = history.map(h => `
+                    <div class="mission-row">
+                        <span>${h.date}</span>
+                        <span>ID: ${h.jobId}</span>
+                        <span style="font-size: 0.5rem; color: var(--neon);">SUCCESS</span>
+                    </div>
+                `).join('');
+            } catch(e) { console.log("History Error"); }
         }
 
         async function claimMission(jobId) {
-            if(!confirm(`Request assignment to Mission #${jobId}?`)) return;
+            if(!confirm(`Accept Mission #${jobId}? Remember: 72H to connect with client.`)) return;
             await fetch(scriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: JSON.stringify({ action: 'claimJob', email: email, jobId: jobId })
             });
-            alert("Request sent to Dispatch for approval.");
+            alert("Mission accepted. Check your email for dispatch details.");
+            loadJobs();
         }
 
         function requestEdit() {
-            window.location.href = `mailto:admin@welldoneconstruction.pro?subject=Profile Edit Request&body=Worker: ${email}`;
+            window.location.href = `mailto:admin@welldoneconstruction.pro?subject=Profile Edit&body=Worker: ${email}`;
         }
 
         window.onload = initDashboard;
