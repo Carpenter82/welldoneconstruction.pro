@@ -7,19 +7,25 @@
     <title>Worker Dashboard | Well Done</title>
     <link rel="stylesheet" href="../styles.css">
     <style>
+        :root { --caution: #f1c40f; --accent: #33B26E; }
         .safety-gate { background: #fffbe6; border: 2px dashed var(--caution); padding: 15px; margin: 15px 0; border-radius: 8px; }
-        .safety-gate label { display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.9rem; font-weight: 500; }
-        .btn-accept { background: var(--accent); color: white; width: 100%; padding: 15px; border:none; border-radius: 8px; font-weight:bold; cursor:pointer; }
+        .safety-gate label { display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.9rem; font-weight: 500; text-align: left; }
+        .btn-accept { background: var(--accent); color: white; width: 100%; padding: 15px; border:none; border-radius: 8px; font-weight:bold; cursor:pointer; font-size: 1rem; }
         .btn-accept:disabled { background: #ccc; cursor: not-allowed; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; border-top: 5px solid var(--accent); }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" style="max-width: 500px; margin: 0 auto; padding: 20px;">
         <h2 id="workerGreeting" style="text-align:center;">Syncing...</h2>
+
+        <div id="loading" style="text-align:center; padding: 20px;">
+            <p>Fetching your latest assignment...</p>
+        </div>
 
         <div id="workOrderCard" class="card" style="display:none; border-top-color: var(--caution);">
             <div style="text-align: center;">
-                <span style="background: var(--caution); color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.75rem;">ACTION REQUIRED</span>
+                <span style="background: var(--caution); color: black; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.75rem;">ACTION REQUIRED</span>
                 <h3>New Work Order</h3>
                 <p>Job ID: <strong id="woId">---</strong></p>
             </div>
@@ -32,11 +38,12 @@
             </div>
 
             <button onclick="respondToJob('Accepted')" id="acceptBtn" class="btn-accept" disabled>✅ ACCEPT ASSIGNMENT</button>
-            <button onclick="respondToJob('Declined')" style="width:100%; background:none; border:none; color:#666; margin-top:10px; cursor:pointer;">Decline Shift</button>
+            <button onclick="respondToJob('Declined')" style="width:100%; background:none; border:none; color:#c0392b; margin-top:10px; cursor:pointer; font-weight:bold;">Decline Shift</button>
         </div>
 
         <div id="jobCard" class="card" style="display:none;">
             <p style="text-align:center; font-weight:bold; color: var(--accent);">ACTIVE ASSIGNMENT</p>
+            <hr>
             <p><strong>Job ID:</strong> <span id="jobIdDisplay">---</span></p>
             <p><strong>Pay Tier:</strong> <span id="tierDisplay">---</span></p>
             <button onclick="goToChecklist()" class="btn-accept">📋 OPEN DAILY CHECKLIST</button>
@@ -44,7 +51,8 @@
         </div>
 
         <div id="noJob" style="display:none; text-align:center; padding:40px; color:#666;">
-            No active assignments found.
+            <p style="font-size: 1.2rem;">No active assignments found.</p>
+            <p style="font-size: 0.9rem;">Check back later or contact dispatch.</p>
         </div>
     </div>
 
@@ -53,6 +61,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('email');
 
+        // SAFETY CHECK LOGIC
         document.addEventListener('change', function(e) {
             if (e.target.classList.contains('safety-check')) {
                 const allChecked = Array.from(document.querySelectorAll('.safety-check')).every(c => c.checked);
@@ -61,10 +70,17 @@
         });
 
         async function loadDashboard() {
-            if (!email) { window.location.href = 'index.html'; return; }
+            if (!email) { 
+                alert("No email detected. Returning to login.");
+                window.location.href = 'index.html'; 
+                return; 
+            }
+            
             try {
                 const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}`);
                 const data = await res.json();
+                
+                document.getElementById('loading').style.display = 'none';
                 document.getElementById('workerGreeting').innerText = `Hello, ${data.name.split(' ')[0]}!`;
 
                 if (data.jobStatus === "Pending") {
@@ -73,24 +89,49 @@
                 } else if (data.jobId && data.jobStatus === "Accepted") {
                     document.getElementById('jobIdDisplay').innerText = data.jobId;
                     document.getElementById('tierDisplay').innerText = data.tier;
-                    document.getElementById('vaultBtn').onclick = () => window.open(data.folder);
+                    document.getElementById('vaultBtn').onclick = () => window.open(data.folder, '_blank');
                     document.getElementById('jobCard').style.display = 'block';
                 } else {
                     document.getElementById('noJob').style.display = 'block';
                 }
             } catch (err) {
+                console.error(err);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('noJob').innerHTML = "<strong>Sync Error.</strong> Please refresh or check connection.";
                 document.getElementById('noJob').style.display = 'block';
             }
         }
 
         async function respondToJob(response) {
             const jobId = document.getElementById('woId').innerText;
-            await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'respondToWorkOrder', email: email, jobId: jobId, response: response }) });
-            location.reload();
+            const btn = document.getElementById('acceptBtn');
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            try {
+                // Using no-cors mode for Apps Script POST compatibility
+                await fetch(scriptURL, { 
+                    method: 'POST', 
+                    mode: 'no-cors',
+                    body: JSON.stringify({ 
+                        action: 'respondToWorkOrder', 
+                        email: email, 
+                        jobId: jobId, 
+                        response: response 
+                    }) 
+                });
+                
+                // Since we can't read the response in no-cors, we assume success after a brief delay
+                setTimeout(() => location.reload(), 1500);
+            } catch (err) {
+                alert("Error sending response.");
+                btn.disabled = false;
+            }
         }
 
         function goToChecklist() {
-            window.location.href = `../checklist/index.html?email=${encodeURIComponent(email)}&jobId=${document.getElementById('jobIdDisplay').innerText}`;
+            const currentJobId = document.getElementById('jobIdDisplay').innerText;
+            window.location.href = `../checklist/index.html?email=${encodeURIComponent(email)}&jobId=${encodeURIComponent(currentJobId)}`;
         }
 
         window.onload = loadDashboard;
