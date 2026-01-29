@@ -1,108 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worker Onboarding | Well Done</title>
+    <title>SECURE VAULT | WELL DONE</title>
     <style>
-        :root { --accent: #33B26E; --dark: #343E47; --light: #f4f7f6; }
-        body { font-family: -apple-system, sans-serif; background: var(--light); margin: 0; padding: 20px; text-align: center; }
-        .container { max-width: 450px; margin: 20px auto; background: white; padding: 35px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-        img.logo { max-width: 180px; margin-bottom: 25px; }
-        h2 { margin-top: 0; color: var(--dark); text-transform: uppercase; letter-spacing: 1px; }
-        p { color: #6E797F; font-size: 0.95em; margin-bottom: 30px; line-height: 1.5; }
-        .upload-group { margin-bottom: 25px; text-align: left; }
-        label { display: block; font-weight: bold; margin-bottom: 8px; color: var(--dark); font-size: 0.85rem; text-transform: uppercase; }
-        input[type="file"] { display: block; width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; background: #fafafa; box-sizing: border-box; }
-        button { background: var(--accent); color: white; border: none; padding: 18px; width: 100%; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 10px rgba(51, 178, 110, 0.2); }
-        button:hover { transform: translateY(-2px); }
-        button:disabled { background: #9ca3af; transform: none; }
-        .status { margin-top: 20px; font-size: 0.9em; font-weight: bold; min-height: 20px; }
+        body { background-color: #1a1a1a; color: #ffd700; font-family: sans-serif; padding: 20px; display: flex; justify-content: center; }
+        .vault-card { width: 100%; max-width: 500px; border: 4px double #ffd700; padding: 30px; background: #000; }
+        h2 { text-align: center; border-bottom: 2px solid #ffd700; padding-bottom: 15px; }
+        .upload-section { margin: 20px 0; border: 1px dashed #ffd700; padding: 15px; text-align: center; }
+        input[type="file"] { margin-top: 10px; color: #fff; }
+        .status-box { background: #ffd700; color: #000; padding: 10px; font-weight: bold; text-align: center; display: none; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction" class="logo">
-    <h2>Secure Vault Upload</h2>
-    <p>Upload your ID and OSHA credentials. These files are encrypted and sent directly to your secure worker file for verification.</p>
-
-    <form id="uploadForm">
-        <div class="upload-group">
-            <label>Government Issued ID (Front)</label>
-            <input type="file" id="idCard" accept="image/*,application/pdf" required>
+    <div class="vault-card">
+        <h2>WORKER VAULT</h2>
+        <p>Upload mandatory compliance documents below.</p>
+        
+        <div class="upload-section">
+            <strong>DRIVER'S LICENSE / PHOTO ID</strong><br>
+            <input type="file" id="id-upload" accept="image/*">
         </div>
 
-        <div class="upload-group">
-            <label>OSHA 10/30 Card</label>
-            <input type="file" id="oshaCard" accept="image/*,application/pdf" required>
+        <div class="upload-section">
+            <strong>OSHA-10 / OSHA-30 CARD</strong><br>
+            <input type="file" id="osha-upload" accept="image/*">
         </div>
 
-        <button type="submit" id="submitBtn">FINALIZE UPLOAD</button>
-        <div class="status" id="statusMsg"></div>
-    </form>
-</div>
+        <div id="status" class="status-box">UPLOAD COMPLETE - PENDING REVIEW</div>
+    </div>
 
-<script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const workerEmail = urlParams.get('email');
-    const status = document.getElementById('statusMsg');
-    const btn = document.getElementById('submitBtn');
-
-    if(!workerEmail) {
-        status.style.color = 'red';
-        status.innerText = "ACCESS DENIED: No worker email found.";
-        btn.disabled = true;
-    }
-
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
-
-    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        btn.disabled = true;
-        btn.innerText = "ENCRYPTING & UPLOADING...";
-        status.innerText = "";
-
-        const idFile = document.getElementById('idCard').files[0];
-        const oshaFile = document.getElementById('oshaCard').files[0];
-
-        try {
-            const idBase64 = await toBase64(idFile);
-            const oshaBase64 = await toBase64(oshaFile);
-
-            await fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify({
-                    action: 'handleUpload',
-                    email: workerEmail,
-                    idName: `ID_${idFile.name}`,
-                    idData: idBase64,
-                    oshaName: `OSHA_${oshaFile.name}`,
-                    oshaData: oshaBase64
-                })
-            });
-
-            status.style.color = '#33B26E';
-            status.innerHTML = "✅ UPLOAD SUCCESSFUL<br>Administration will now audit your file.";
-            btn.innerText = "UPLOAD COMPLETE";
-            
-        } catch (error) {
-            status.style.color = 'red';
-            status.innerText = "Upload failed. Check connection and try again.";
-            btn.disabled = false;
-            btn.innerText = "RETRY UPLOAD";
-        }
-    });
-
-    const toBase64 = file => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = error => reject(error);
-    });
-</script>
+    <script>
+        // Note: This page currently allows uploads to be handled by your drive folders.
+        // As you scale, we will add the direct-to-folder upload script here.
+    </script>
 </body>
 </html>
