@@ -1,12 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Completion | Well Done</title>
+    <style>
+        :root { --primary: #343E47; --accent: #33B26E; --bg: #f4f7f6; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: var(--primary); text-transform: uppercase; margin-top: 0; }
+        .job-tag { background: var(--primary); color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
+        
+        .checklist { margin: 25px 0; }
+        .item { display: flex; align-items: center; gap: 15px; background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #edf2f7; cursor: pointer; }
+        .item input { transform: scale(1.5); }
+        
+        .photo-upload { border: 2px dashed #cbd5e0; padding: 30px; text-align: center; border-radius: 8px; margin-bottom: 25px; background: #fff; cursor: pointer; }
+        #preview { max-width: 100%; border-radius: 8px; margin-top: 15px; display: none; }
+        
+        .btn-submit { background: var(--accent); color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-submit:disabled { background: #cbd5e0; }
+        #statusMsg { text-align: center; margin-top: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div style="text-align:center; margin-bottom: 20px;">
+        <span class="job-tag" id="jobDisplay">LOADING JOB...</span>
+    </div>
+    <h2>Mission Completion</h2>
+    <p style="text-align:center; font-size: 0.9rem; color: #666;">Verify site status to finalize this work order.</p>
+
+    <div class="checklist">
+        <label class="item"><input type="checkbox" class="task"> Work area is clean of debris</label>
+        <label class="item"><input type="checkbox" class="task"> Final photos taken for client</label>
+        <label class="item"><input type="checkbox" class="task"> Tools accounted for and secured</label>
+        <label class="item"><input type="checkbox" class="task"> Customer signature obtained (if present)</label>
+    </div>
+
+    <div class="photo-upload" onclick="document.getElementById('sitePhoto').click()">
+        <span id="uploadText">📷 TAKE COMPLETION PHOTO</span>
+        <input type="file" id="sitePhoto" accept="image/*" capture="camera" style="display:none;">
+        <img id="preview">
+    </div>
+
+    <button id="submitBtn" class="btn-submit" onclick="submitChecklist()">SUBMIT & VERIFY SITE</button>
+    <div id="statusMsg"></div>
+</div>
+
 <script>
   const urlParams = new URLSearchParams(window.location.search);
   const email = urlParams.get('email');
   const jobId = urlParams.get('jobId') || "N/A";
   
-  document.getElementById('jobDisplay').innerText = `Current Job: #${jobId}`;
+  document.getElementById('jobDisplay').innerText = `CURRENT MISSION: #${jobId}`;
 
-  // Ensure this matches your latest deployment URL
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
 
   document.getElementById('sitePhoto').onchange = function(e) {
     const reader = new FileReader();
@@ -27,11 +78,11 @@
     const msg = document.getElementById('statusMsg');
 
     if (!allChecked || !photoFile) {
-      alert("Mandatory: Check all boxes and take a photo before leaving.");
+      alert("MANDATORY: Check all boxes and capture a site photo.");
       return;
     }
 
-    btn.innerText = "UPDATING DISPATCH...";
+    btn.innerText = "AUTHENTICATING SITE DATA...";
     btn.disabled = true;
 
     navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -39,7 +90,6 @@
       reader.onload = async function() {
         const base64Data = reader.result.split(',')[1];
         
-        // FIXED: action must be 'logGPS' and type 'completion' to match your Apps Script
         const payload = {
           action: 'logGPS',
           type: 'completion',
@@ -52,7 +102,6 @@
         };
 
         try {
-          // Use mode: 'no-cors' to avoid browser blocks
           await fetch(scriptURL, { 
             method: 'POST', 
             mode: 'no-cors', 
@@ -60,23 +109,25 @@
           });
           
           msg.style.color = "green";
-          msg.innerText = "✓ Site Verified! Redirecting...";
+          msg.innerText = "✓ MISSION COMPLETE. REDIRECTING...";
           
           setTimeout(() => {
             window.location.href = `../portal/dashboard.html?email=${encodeURIComponent(email)}`;
           }, 2000);
 
         } catch (err) {
-          alert("Network error. Please try again.");
+          alert("Network error. Try again.");
           btn.disabled = false;
-          btn.innerText = "SUBMIT & VERIFY GPS";
+          btn.innerText = "SUBMIT & VERIFY SITE";
         }
       };
       reader.readAsDataURL(photoFile);
     }, (err) => {
-      alert("GPS Permission Denied. You must enable location to verify completion.");
+      alert("GPS REQUIRED: You must enable location to verify site completion.");
       btn.disabled = false;
-      btn.innerText = "SUBMIT & VERIFY GPS";
+      btn.innerText = "SUBMIT & VERIFY SITE";
     }, { enableHighAccuracy: true });
   }
 </script>
+</body>
+</html>
