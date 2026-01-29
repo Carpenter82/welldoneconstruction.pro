@@ -1,24 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Application | Well Done</title>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; color: #343E47; }
-        .form-card { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
-        button { background: #33B26E; color: white; font-weight: bold; border: none; cursor: pointer; }
-        h2 { text-align: center; color: #343E47; }
+        body { font-family: -apple-system, sans-serif; background: #f4f7f6; padding: 20px; color: #343E47; }
+        .form-card { max-width: 500px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 1rem; }
+        button { background: #33B26E; color: white; font-weight: bold; border: none; cursor: pointer; margin-top: 20px; transition: background 0.3s; }
+        button:hover { background: #28a061; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        h2 { text-align: center; color: #343E47; margin-top: 0; text-transform: uppercase; letter-spacing: 1px; }
+        label { font-size: 0.85rem; font-weight: bold; color: #6E797F; margin-left: 2px; }
     </style>
 </head>
 <body>
     <div class="form-card" id="mainCard">
         <h2>Worker Application</h2>
         <form id="appForm">
-            <input type="text" name="fullName" placeholder="Full Name" required>
-            <input type="email" name="email" placeholder="Email Address" required>
-            <input type="tel" name="phone" placeholder="Phone Number" required>
+            <label>FULL NAME</label>
+            <input type="text" name="fullName" placeholder="John Doe" required>
+            
+            <label>EMAIL ADDRESS</label>
+            <input type="email" name="email" placeholder="email@example.com" required>
+            
+            <label>PHONE NUMBER</label>
+            <input type="tel" name="phone" placeholder="775-555-0123" required>
+            
+            <label>PRIMARY TRADE</label>
             <select name="trade" required>
                 <option value="">Select Primary Trade</option>
                 <option value="Carpentry">Carpentry</option>
@@ -27,7 +38,17 @@
                 <option value="Painting">Painting</option>
                 <option value="General Labor">General Labor</option>
             </select>
-            <button type="submit" id="submitBtn">Submit Application</button>
+
+            <label>YEARS OF EXPERIENCE</label>
+            <input type="number" name="yearsExp" placeholder="e.g. 5" min="0" required>
+
+            <label>DO YOU HAVE YOUR OWN TOOLS?</label>
+            <select name="tools" required>
+                <option value="YES">Yes, I have basic tools for my trade</option>
+                <option value="NO">No, I do not have tools</option>
+            </select>
+
+            <button type="submit" id="submitBtn">SUBMIT APPLICATION</button>
         </form>
     </div>
 
@@ -38,13 +59,12 @@
         form.addEventListener('submit', e => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            btn.innerText = "Processing...";
+            btn.innerText = "PROCESSING REGISTRATION...";
             btn.disabled = true;
 
             const formData = new FormData(form);
-            const nameParts = formData.get('fullName').split(' ');
+            const nameParts = formData.get('fullName').trim().split(' ');
             
-            // This is the payload your Apps Script is looking for
             const payload = {
                 action: 'intake',
                 firstName: nameParts[0] || "",
@@ -52,29 +72,26 @@
                 email: formData.get('email'),
                 phone: formData.get('phone'),
                 trade: formData.get('trade'),
-                experience: "New Web Lead",
-                pay: "Pending",
-                tools: "Yes"
+                yearsExp: formData.get('yearsExp'),
+                tools: formData.get('tools')
             };
 
             fetch(scriptURL, {
                 method: 'POST',
-                mode: 'no-cors', // Critical for Google Apps Script
-                cache: 'no-cache',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify(payload)
             }).then(() => {
-                // Show success UI
                 document.getElementById('mainCard').innerHTML = `
                     <div style="text-align:center; padding: 20px;">
-                        <div style="font-size: 3rem;">✅</div>
-                        <h2 style="color: #33B26E;">Application Sent!</h2>
-                        <p>We have received your info. Check your email shortly for next steps.</p>
-                        <a href="index.html" style="color: #343E47; font-weight: bold; text-decoration: none;">Return Home</a>
+                        <div style="font-size: 4rem; margin-bottom:10px;">✅</div>
+                        <h2 style="color: #33B26E;">Application Received</h2>
+                        <p>Your profile has been logged. <strong>Check your email</strong> (including spam) for the legal agreement link.</p>
+                        <a href="index.html" style="display:inline-block; margin-top:20px; color: #343E47; font-weight: bold; text-decoration: none; border-bottom: 2px solid #343E47;">Return Home</a>
                     </div>`;
             }).catch(err => {
-                alert("Error submitting. Please try again.");
-                btn.innerText = "Submit Application";
+                alert("Connection error. Please check your internet and try again.");
+                btn.innerText = "SUBMIT APPLICATION";
                 btn.disabled = false;
             });
         });
