@@ -91,8 +91,8 @@
 </div>
 
 <script>
-  // Script URL for your Google Apps Script Deployment
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
+  // ✅ UPDATED: Points to your NEW Script URL (ending in ...YKd/exec)
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
 
   document.getElementById('appForm').onsubmit = async (e) => {
     e.preventDefault();
@@ -121,7 +121,7 @@
         body: JSON.stringify(payload)
       });
       
-      // REDIRECT FIX: Point to Thank You instead of Onboarding
+      // Redirect to Thank You
       window.location.href = '../thank-you.html';
 
     } catch (err) {
