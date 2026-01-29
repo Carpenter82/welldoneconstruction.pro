@@ -1,133 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site Completion | Well Done</title>
+    <title>Mission Complete | Well Done</title>
+    <link rel="stylesheet" href="../styles.css">
     <style>
-        :root { --primary: #343E47; --accent: #33B26E; --bg: #f4f7f6; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 15px; }
-        .container { max-width: 500px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: var(--primary); text-transform: uppercase; margin-top: 0; }
-        .job-tag { background: var(--primary); color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
-        
-        .checklist { margin: 25px 0; }
-        .item { display: flex; align-items: center; gap: 15px; background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #edf2f7; cursor: pointer; }
-        .item input { transform: scale(1.5); }
-        
-        .photo-upload { border: 2px dashed #cbd5e0; padding: 30px; text-align: center; border-radius: 8px; margin-bottom: 25px; background: #fff; cursor: pointer; }
-        #preview { max-width: 100%; border-radius: 8px; margin-top: 15px; display: none; }
-        
-        .btn-submit { background: var(--accent); color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .btn-submit:disabled { background: #cbd5e0; }
-        #statusMsg { text-align: center; margin-top: 15px; font-weight: bold; }
+        .camera-btn {
+            background: #222;
+            border: 2px dashed var(--primary);
+            color: var(--primary);
+            padding: 40px;
+            width: 100%;
+            margin-bottom: 20px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        #preview { width: 100%; display: none; border: 2px solid var(--primary); margin-bottom: 20px; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h2>Job Completion</h2>
+        <p style="color:#888;">Upload proof of work to clock out.</p>
 
-<div class="container">
-    <div style="text-align:center; margin-bottom: 20px;">
-        <span class="job-tag" id="jobDisplay">LOADING JOB...</span>
-    </div>
-    <h2>Mission Completion</h2>
-    <p style="text-align:center; font-size: 0.9rem; color: #666;">Verify site status to finalize this work order.</p>
+        <label class="camera-btn">
+            📷 TAP TO TAKE PHOTO
+            <input type="file" id="sitePhoto" accept="image/*" capture="environment" style="display:none;">
+        </label>
+        <img id="preview" alt="Site Photo">
 
-    <div class="checklist">
-        <label class="item"><input type="checkbox" class="task"> Work area is clean of debris</label>
-        <label class="item"><input type="checkbox" class="task"> Final photos taken for client</label>
-        <label class="item"><input type="checkbox" class="task"> Tools accounted for and secured</label>
-        <label class="item"><input type="checkbox" class="task"> Customer signature obtained (if present)</label>
-    </div>
+        <div id="gpsStatus" style="font-size: 0.8rem; color: #666; margin-bottom: 20px;">
+            Waiting for GPS...
+        </div>
 
-    <div class="photo-upload" onclick="document.getElementById('sitePhoto').click()">
-        <span id="uploadText">📷 TAKE COMPLETION PHOTO</span>
-        <input type="file" id="sitePhoto" accept="image/*" capture="camera" style="display:none;">
-        <img id="preview">
+        <button id="finishBtn" disabled>SUBMIT & CLOCK OUT</button>
+        <div id="status" class="status-msg"></div>
     </div>
 
-    <button id="submitBtn" class="btn-submit" onclick="submitChecklist()">SUBMIT & VERIFY SITE</button>
-    <div id="statusMsg"></div>
-</div>
+    <script>
+        // *** CONFIGURATION ***
+        const API_URL = "YOUR_SCRIPT_URL_HERE"; // PASTE YOUR GOOGLE SCRIPT URL
 
-<script>
-  const urlParams = new URLSearchParams(window.location.search);
-  const email = urlParams.get('email');
-  const jobId = urlParams.get('jobId') || "N/A";
-  
-  document.getElementById('jobDisplay').innerText = `CURRENT MISSION: #${jobId}`;
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+        const jobId = urlParams.get('jobId');
 
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
-
-  document.getElementById('sitePhoto').onchange = function(e) {
-    const reader = new FileReader();
-    reader.onload = function() {
-      const preview = document.getElementById('preview');
-      preview.src = reader.result;
-      preview.style.display = 'block';
-      document.getElementById('uploadText').innerText = "✅ PHOTO READY";
-    }
-    if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
-  };
-
-  async function submitChecklist() {
-    const tasks = document.querySelectorAll('.task');
-    const allChecked = Array.from(tasks).every(t => t.checked);
-    const photoFile = document.getElementById('sitePhoto').files[0];
-    const btn = document.getElementById('submitBtn');
-    const msg = document.getElementById('statusMsg');
-
-    if (!allChecked || !photoFile) {
-      alert("MANDATORY: Check all boxes and capture a site photo.");
-      return;
-    }
-
-    btn.innerText = "AUTHENTICATING SITE DATA...";
-    btn.disabled = true;
-
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      const reader = new FileReader();
-      reader.onload = async function() {
-        const base64Data = reader.result.split(',')[1];
-        
-        const payload = {
-          action: 'logGPS',
-          type: 'completion',
-          email: email,
-          jobId: jobId,
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          fileData: base64Data,
-          fileName: `Completion_${jobId}_${email.split('@')[0]}.jpg`
-        };
-
-        try {
-          await fetch(scriptURL, { 
-            method: 'POST', 
-            mode: 'no-cors', 
-            body: JSON.stringify(payload) 
-          });
-          
-          msg.style.color = "green";
-          msg.innerText = "✓ MISSION COMPLETE. REDIRECTING...";
-          
-          setTimeout(() => {
-            window.location.href = `../portal/dashboard.html?email=${encodeURIComponent(email)}`;
-          }, 2000);
-
-        } catch (err) {
-          alert("Network error. Try again.");
-          btn.disabled = false;
-          btn.innerText = "SUBMIT & VERIFY SITE";
+        if(!email || !jobId) {
+            alert("Error: Missing Job Data.");
+            window.location.href = "../worker/";
         }
-      };
-      reader.readAsDataURL(photoFile);
-    }, (err) => {
-      alert("GPS REQUIRED: You must enable location to verify site completion.");
-      btn.disabled = false;
-      btn.innerText = "SUBMIT & VERIFY SITE";
-    }, { enableHighAccuracy: true });
-  }
-</script>
+
+        let gpsData = null;
+        let photoBase64 = null;
+
+        // 1. GET GPS IMMEDIATELY
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    gpsData = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                    document.getElementById('gpsStatus').textContent = "✅ GPS Locked: " + gpsData.lat.toFixed(4);
+                    checkReady();
+                },
+                (err) => {
+                    document.getElementById('gpsStatus').textContent = "⚠️ GPS Error: " + err.message;
+                    document.getElementById('gpsStatus').style.color = "red";
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            document.getElementById('gpsStatus').textContent = "❌ GPS Not Supported";
+        }
+
+        // 2. HANDLE PHOTO
+        document.getElementById('sitePhoto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    document.getElementById('preview').src = evt.target.result;
+                    document.getElementById('preview').style.display = "block";
+                    photoBase64 = evt.target.result.split(',')[1]; // Clean Base64
+                    checkReady();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function checkReady() {
+            if(gpsData && photoBase64) {
+                document.getElementById('finishBtn').disabled = false;
+                document.getElementById('finishBtn').style.backgroundColor = "var(--primary)";
+            }
+        }
+
+        // 3. SUBMIT
+        document.getElementById('finishBtn').addEventListener('click', () => {
+            const btn = document.getElementById('finishBtn');
+            const status = document.getElementById('status');
+            
+            btn.textContent = "Uploading Evidence...";
+            btn.disabled = true;
+
+            const payload = {
+                action: "logGPS",
+                type: "completion",
+                email: email,
+                jobId: jobId,
+                lat: gpsData.lat,
+                lng: gpsData.lng,
+                photo: photoBase64
+            };
+
+            fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(payload)
+            }).then(() => {
+                status.textContent = "Work Logged. Redirecting...";
+                setTimeout(() => {
+                    // Send them back to the dashboard (which will now show 'Standby')
+                    window.location.href = `../worker/dashboard.html?email=${encodeURIComponent(email)}`;
+                }, 2000);
+            }).catch(err => {
+                status.textContent = "Error: " + err;
+                btn.disabled = false;
+            });
+        });
+    </script>
 </body>
 </html>
