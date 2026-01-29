@@ -1,141 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../styles.css">
     <title>Admin Dashboard | Well Done</title>
+    <link rel="stylesheet" href="../styles.css">
     <style>
-        :root { --accent: #ef6c00; --primary: #2e7d32; --gusto: #e55c5c; }
-        .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-        @media (max-width: 800px) { .split-grid { grid-template-columns: 1fr; } }
-        
-        .btn-action { border:none; padding:5px 10px; border-radius:4px; cursor:pointer; color:white; font-size: 12px; margin-right:5px; margin-top:5px; }
-        .info-row { font-size: 13px; color: #444; margin: 5px 0; }
+        body { font-family: sans-serif; padding: 20px; background: #f4f7f6; }
+        .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid #ef6c00; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .btn-action { padding: 5px 10px; cursor: pointer; color: white; border: none; border-radius: 4px; margin-right: 5px; }
+        h3 { border-bottom: 2px solid #ccc; padding-bottom: 5px; }
     </style>
 </head>
 <body>
 
-<div class="container" style="max-width: 1000px; margin: 0 auto; padding: 20px;">
-    <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2>Admin Command Center</h2>
-        <div>
-            <a href="activity.html" class="btn" style="background:#343E47; padding: 10px 15px; text-decoration: none; color: white; border-radius: 5px;">Activity</a>
-        </div>
-    </header>
+    <h2>Admin Command Center</h2>
+    <div id="statusMsg" style="background: yellow; padding: 10px; margin-bottom: 20px; border: 1px solid orange;">
+        Attempting Connection...
+    </div>
 
-    <div class="split-grid">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
         <section>
-            <h3 style="border-bottom: 2px solid var(--accent); padding-bottom: 10px;">Applicants (Intake)</h3>
-            <div id="applicantList">Loading Applicants...</div>
+            <h3>Applicants (Intake)</h3>
+            <div id="applicantList">Loading...</div>
         </section>
 
         <section>
-            <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Active Roster</h3>
-            <div id="crewList">Loading Roster...</div>
+            <h3>Active Roster</h3>
+            <div id="crewList">Loading...</div>
         </section>
     </div>
-</div>
 
 <script>
-    // ✅ UPDATED: This is your correct URL
+    // ⚠️ PASTE YOUR URL HERE AGAIN TO BE SAFE
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
 
     async function loadDashboard() {
+        const msg = document.getElementById('statusMsg');
+        
         try {
+            console.log("Fetching from:", scriptURL);
             const response = await fetch(scriptURL + "?action=getDashboard");
-            if (!response.ok) throw new Error('Network response was not ok');
-            const data = await response.json();
-
-            // --- RENDER APPLICANTS ---
-            const appList = document.getElementById('applicantList');
-            if (data.applicants && data.applicants.length) {
-                appList.innerHTML = data.applicants.map(a => {
-                    let buttons = '';
-                    let badgeColor = '#fff3e0'; 
-
-                    if (a.status === 'NEW') {
-                        buttons = `<button onclick="startOnboarding('${a.email}')" class="btn-action" style="background:var(--accent);">Send Paperwork</button>`;
-                    } else if (a.status === 'PROCESSING') {
-                        badgeColor = '#e3f2fd'; 
-                        buttons = `
-                            <button onclick="finalizeHire('${a.email}')" class="btn-action" style="background:var(--primary);">Finalize Hire</button>
-                            <span style="font-size:11px; color:#666; margin-left:5px;">(Check Drive)</span>
-                        `;
-                    }
-
-                    return `
-                    <div class="card">
-                        <div style="display:flex; justify-content:space-between;">
-                             <span class="badge" style="background:${badgeColor}; color:#333;">${a.status}</span>
-                        </div>
-                        <p style="margin:10px 0 0 0; font-size:1.1em;"><strong>${a.name}</strong></p>
-                        <p class="info-row">🔧 ${a.trade} | ⏳ ${a.exp} Yrs Exp</p>
-                        <p class="info-row">📞 <a href="tel:${a.phone}">${a.phone}</a></p>
-                        <p class="info-row">📧 ${a.email}</p>
-                        <div style="margin-top:10px;">${buttons}</div>
-                    </div>`;
-                }).join('');
-            } else {
-                appList.innerHTML = '<p>No applicants.</p>';
+            
+            if (!response.ok) {
+                throw new Error(`HTTP Error: ${response.status}`);
             }
 
-            // --- RENDER ACTIVE CREW ---
+            const data = await response.json();
+            
+            // Connection Success
+            msg.style.background = "#d4edda";
+            msg.style.borderColor = "#c3e6cb";
+            msg.innerHTML = "✅ <strong>Connected!</strong> System Online.";
+            
+            // RENDER APPLICANTS
+            const appList = document.getElementById('applicantList');
+            if (data.applicants && data.applicants.length) {
+                appList.innerHTML = data.applicants.map(a => `
+                    <div class="card">
+                        <strong>${a.name}</strong> (${a.status})<br>
+                        ${a.trade} | ${a.phone}<br>
+                        <button onclick="startOnboarding('${a.email}')" class="btn-action" style="background:#ef6c00;">Send Paperwork</button>
+                    </div>
+                `).join('');
+            } else {
+                appList.innerHTML = "No new applicants.";
+            }
+
+            // RENDER CREW
             const crewList = document.getElementById('crewList');
             if (data.activeCrew && data.activeCrew.length) {
-                crewList.innerHTML = data.activeCrew.map(c => {
-                    // Default to Gusto Login if no link provided
-                    const gustoTarget = (c.gustoLink && c.gustoLink.length > 5) 
-                        ? c.gustoLink 
-                        : "https://app.gusto.com/login";
-
-                    return `
-                    <div class="card" style="border-left-color: var(--primary);">
-                        <p style="margin:0;"><strong>${c.name}</strong></p>
-                        <p style="font-size:12px; color:#666;">${c.trade} | ${c.tier}</p>
-                        <div style="margin-top:10px;">
-                            <button onclick="window.open('${c.folder}')" class="btn-action" style="background:#343E47;">Vault</button>
-                            <button onclick="window.location.href='project.html?prefillEmail=${encodeURIComponent(c.email)}'" class="btn-action" style="background:var(--primary);">Assign</button>
-                            <button onclick="window.open('${gustoTarget}')" class="btn-action" style="background:var(--gusto);">Payroll</button>
-                        </div>
-                    </div>`;
-                }).join('');
+                crewList.innerHTML = data.activeCrew.map(c => `
+                    <div class="card" style="border-left-color: #2e7d32;">
+                        <strong>${c.name}</strong><br>
+                        ${c.trade} | ${c.tier}<br>
+                        <button onclick="window.open('${c.folder}')" class="btn-action" style="background:#333;">Vault</button>
+                        <button onclick="window.location.href='project.html?prefillEmail=${encodeURIComponent(c.email)}'" class="btn-action" style="background:#2e7d32;">Assign</button>
+                    </div>
+                `).join('');
             } else {
-                crewList.innerHTML = '<p>No active crew.</p>';
+                crewList.innerHTML = "No active crew.";
             }
 
         } catch (err) {
             console.error(err);
-            document.getElementById('applicantList').innerText = "Error loading data. Check Permissions.";
+            msg.style.background = "#f8d7da";
+            msg.style.borderColor = "#f5c6cb";
+            msg.innerHTML = "❌ <strong>Connection Failed:</strong> " + err.message + "<br>Check 'Who has access' in Apps Script deployment.";
         }
     }
 
     async function startOnboarding(email) {
-        if(!confirm("Send contract/upload links to " + email + "?")) return;
-        try {
-            await fetch(scriptURL, { 
-                method: 'POST', mode: 'no-cors', 
-                body: JSON.stringify({ action: 'startOnboarding', email: email }) 
-            });
-            alert("Paperwork sent!");
-            setTimeout(loadDashboard, 2000);
-        } catch (err) { alert("Error sending paperwork."); }
-    }
-
-    async function finalizeHire(email) {
-        const tier = prompt("Enter Pay Tier (Tier 1, Tier 2, Tier 3):");
-        if(!tier) return;
-        try {
-            await fetch(scriptURL, { 
-                method: 'POST', mode: 'no-cors', 
-                body: JSON.stringify({ action: 'finalizeHire', email: email, assignedTier: tier }) 
-            });
-            alert("Worker Activated!");
-            setTimeout(loadDashboard, 2000);
-        } catch (err) { alert("Error activating worker."); }
+        if(!confirm("Send paperwork to " + email + "?")) return;
+        await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'startOnboarding', email: email }) });
+        alert("Sent!");
     }
 
     window.onload = loadDashboard;
