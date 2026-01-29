@@ -22,8 +22,8 @@
     <button onclick="uploadFiles()" id="upBtn">Sync to Drive</button>
   </div>
   <script>
-    // Points to your active ...M5/exec URL
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzQT7DP6beojo_8pcOP3VFPcsBhvxI1nUYxbUQvThdnWuMvw8InEogp2TwoKS9RQ_M5/exec';
+    // ✅ UPDATED: Points to your NEW Script URL (ending in ...YKd/exec)
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
     
     const toBase64 = (f) => new Promise(res => { 
         const r = new FileReader(); 
@@ -52,9 +52,11 @@
         };
 
         try {
-            // Fetch without 'no-cors' for reliability
+            // Using no-cors mode is safer for client-side uploads to Apps Script to avoid CORS errors, 
+            // though it makes error handling slightly opaque.
             await fetch(scriptURL, { 
                 method: 'POST', 
+                mode: 'no-cors',
                 body: JSON.stringify(payload) 
             });
             
