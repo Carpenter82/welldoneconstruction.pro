@@ -6,32 +6,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Join Well Done Construction LLC</title>
   <style>
-    :root { --primary: #343E47; --accent: #33B26E; --bg: #f8f9fa; --text-muted: #6E797F; }
-    body { font-family: sans-serif; margin: 0; background: var(--bg); color: var(--primary); text-align: center; }
-    header { padding: 40px; }
-    .hero-img { max-width: 250px; }
-    h1 { font-size: 2.5rem; text-transform: uppercase; }
-    .cta-button { 
-      display: inline-block; background: var(--accent); color: white; 
-      padding: 20px 40px; font-weight: bold; text-decoration: none; 
-      border-radius: 8px; margin-top: 20px; font-size: 1.2rem;
+    :root { 
+      --primary: #343E47; 
+      --accent: #33B26E; 
+      --bg: #f8f9fa; 
+      --text-muted: #6E797F; 
     }
-    nav { position: fixed; bottom: 0; width: 100%; background: var(--primary); padding: 15px; display: flex; justify-content: center; gap: 20px; }
-    .nav-link { color: #ccc; text-decoration: none; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; }
-    .active { color: white; border-bottom: 2px solid var(--accent); }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      margin: 0; 
+      background: var(--bg); 
+      color: var(--primary); 
+      text-align: center; 
+      line-height: 1.6;
+    }
+    header { padding: 60px 20px 20px; }
+    .hero-img { max-width: 280px; width: 100%; height: auto; }
+    
+    main { padding: 20px; max-width: 600px; margin: 0 auto; }
+    h1 { font-size: 2.8rem; text-transform: uppercase; letter-spacing: -1px; margin-bottom: 10px; }
+    p { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 30px; }
+    
+    .cta-button { 
+      display: inline-block; 
+      background: var(--accent); 
+      color: white; 
+      padding: 22px 50px; 
+      font-weight: 800; 
+      text-decoration: none; 
+      border-radius: 8px; 
+      font-size: 1.3rem;
+      box-shadow: 0 4px 15px rgba(51, 178, 110, 0.3);
+      transition: transform 0.2s ease;
+    }
+    .cta-button:hover { transform: scale(1.05); }
+
+    /* Bottom Navigation - The functional anchor */
+    nav { 
+      position: fixed; 
+      bottom: 0; 
+      width: 100%; 
+      background: var(--primary); 
+      padding: 20px 0; 
+      display: flex; 
+      justify-content: center; 
+      gap: 30px; 
+      box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+    }
+    .nav-link { 
+      color: #adb5bd; 
+      text-decoration: none; 
+      font-weight: 700; 
+      font-size: 0.85rem; 
+      text-transform: uppercase; 
+      letter-spacing: 1px;
+    }
+    .nav-link.active { color: white; border-bottom: 3px solid var(--accent); padding-bottom: 5px; }
   </style>
 </head>
 <body>
-  <header><img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" class="hero-img"></header>
+
+  <header>
+    <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Logo" class="hero-img">
+  </header>
+
   <main>
-    <h1>Build with the Best</h1>
-    <p>We need skilled tradespeople for steady work in Washoe County.</p>
+    <h1>Build Your Career</h1>
+    <p>On-call remodeling and maintenance opportunities for skilled trades in Washoe County.</p>
+    
     <a href="application.html" class="cta-button">START APPLICATION</a>
   </main>
+
   <nav>
     <a href="index.html" class="nav-link active">Home</a>
     <a href="application.html" class="nav-link">Apply</a>
     <a href="portal.html" class="nav-link">Worker Portal</a>
   </nav>
+
 </body>
 </html>
