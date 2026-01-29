@@ -41,7 +41,7 @@
 </div>
 
 <script>
-    // ✅ ENSURE THIS IS YOUR NEW URL
+    // ✅ ENSURE THIS IS YOUR NEW URL ending in ...YKd/exec
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
 
     async function loadDashboard() {
@@ -54,25 +54,16 @@
             const appList = document.getElementById('applicantList');
             if (data.applicants && data.applicants.length) {
                 appList.innerHTML = data.applicants.map(a => {
-                    // Logic to show different buttons based on Status
                     let buttons = '';
-                    let badgeColor = '#fff3e0'; // Orangeish for NEW
+                    let badgeColor = '#fff3e0'; 
 
                     if (a.status === 'NEW') {
-                        // Step 1: Send Paperwork
                         buttons = `<button onclick="startOnboarding('${a.email}')" class="btn-action" style="background:var(--accent);">Send Paperwork</button>`;
                     } else if (a.status === 'PROCESSING') {
-                        badgeColor = '#e3f2fd'; // Blueish for PROCESSING
-                        // Step 2: Verify & Finalize
-                        // Note: We need the Folder URL. The script didn't pass it for applicants, 
-                        // so we can't deep link to the specific folder easily yet without an extra call,
-                        // BUT we can deep link to the parent folder or just allow Finalize.
-                        // Ideally, we'd update getDashboard to pass folderURL for applicants too.
-                        // For now, let's assume you check Drive manually or we add 'folder' to applicant object.
-                        
+                        badgeColor = '#e3f2fd'; 
                         buttons = `
                             <button onclick="finalizeHire('${a.email}')" class="btn-action" style="background:var(--primary);">Finalize Hire</button>
-                            <span style="font-size:11px; color:#666; margin-left:5px;">(Check Drive for Docs)</span>
+                            <span style="font-size:11px; color:#666; margin-left:5px;">(Check Drive)</span>
                         `;
                     }
 
@@ -96,9 +87,12 @@
             const crewList = document.getElementById('crewList');
             if (data.activeCrew && data.activeCrew.length) {
                 crewList.innerHTML = data.activeCrew.map(c => {
-                    const gustoBtn = c.gustoLink 
-                        ? `<button onclick="window.open('${c.gustoLink}')" class="btn-action" style="background:var(--gusto);">Payroll</button>` : '';
                     
+                    // GUSTO LOGIC: Use specific link if provided, else default to login
+                    const gustoTarget = (c.gustoLink && c.gustoLink.length > 5) 
+                        ? c.gustoLink 
+                        : "https://app.gusto.com/login";
+
                     return `
                     <div class="card" style="border-left-color: var(--primary);">
                         <p style="margin:0;"><strong>${c.name}</strong></p>
@@ -106,7 +100,7 @@
                         <div style="margin-top:10px;">
                             <button onclick="window.open('${c.folder}')" class="btn-action" style="background:#343E47;">Vault</button>
                             <button onclick="window.location.href='project.html?prefillEmail=${encodeURIComponent(c.email)}'" class="btn-action" style="background:var(--primary);">Assign</button>
-                            ${gustoBtn}
+                            <button onclick="window.open('${gustoTarget}')" class="btn-action" style="background:var(--gusto);">Payroll</button>
                         </div>
                     </div>`;
                 }).join('');
@@ -120,30 +114,24 @@
         }
     }
 
-    // Step 1: Send Links
     async function startOnboarding(email) {
-        if(!confirm("Create folder and send contract/upload links to " + email + "?")) return;
-        
+        if(!confirm("Send contract/upload links to " + email + "?")) return;
         try {
             await fetch(scriptURL, { 
-                method: 'POST', 
-                mode: 'no-cors', 
+                method: 'POST', mode: 'no-cors', 
                 body: JSON.stringify({ action: 'startOnboarding', email: email }) 
             });
-            alert("Paperwork sent! Status updated to PROCESSING.");
+            alert("Paperwork sent!");
             setTimeout(loadDashboard, 2000);
         } catch (err) { alert("Error sending paperwork."); }
     }
 
-    // Step 2: Finalize
     async function finalizeHire(email) {
-        const tier = prompt("Docs Verified? Enter Pay Tier to Activate (Tier 1 $20, Tier 2 $25, Tier 3 $30):");
+        const tier = prompt("Enter Pay Tier (Tier 1, Tier 2, Tier 3):");
         if(!tier) return;
-        
         try {
             await fetch(scriptURL, { 
-                method: 'POST', 
-                mode: 'no-cors', 
+                method: 'POST', mode: 'no-cors', 
                 body: JSON.stringify({ action: 'finalizeHire', email: email, assignedTier: tier }) 
             });
             alert("Worker Activated!");
