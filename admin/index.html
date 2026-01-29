@@ -1,56 +1,127 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="../styles.css">
-    <title>Well Done Admin</title>
+    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Command | Well Done Construction</title>
     <style>
+        :root { --primary: #343E47; --accent: #33B26E; --warning: #f39c12; --bg: #f4f7f6; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; color: var(--primary); }
+        
+        .header { background: var(--primary); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { height: 40px; }
+        
         .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; padding: 20px; }
-        .col { background: #eee; padding: 10px; border-radius: 8px; min-height: 80vh; }
-        .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 5px solid #ffa500; }
-        .active-card { border-left-color: #2e7d32; }
+        .col { background: #ebedef; padding: 15px; border-radius: 12px; min-height: 85vh; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        h3 { text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-top: 0; }
+        
+        .card { background: white; padding: 15px; margin-bottom: 12px; border-radius: 8px; border-left: 5px solid var(--warning); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .card.signed { border-left-color: #3498db; }
+        .card.active { border-left-color: var(--accent); }
+        
+        .card strong { display: block; font-size: 1.1rem; margin-bottom: 5px; }
+        .details { font-size: 0.85rem; color: #6E797F; line-height: 1.4; margin-bottom: 10px; }
+        
+        button { width: 100%; padding: 10px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; transition: 0.2s; }
+        .btn-hire { background: var(--primary); color: white; }
+        .btn-view { background: #eee; color: var(--primary); margin-bottom: 5px; }
+        button:hover { opacity: 0.8; }
     </style>
 </head>
 <body>
+
+    <div class="header">
+        <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" class="logo">
+        <div style="font-weight: bold;">ADMINISTRATION PORTAL</div>
+    </div>
+
     <div class="grid">
-        <div class="col"><h3>1. Applicants</h3><div id="list1"></div></div>
-        <div class="col"><h3>2. Full Crew (Inactive)</h3><div id="list2"></div></div>
-        <div class="col"><h3>3. Active List</h3><div id="list3"></div></div>
+        <div class="col">
+            <h3>1. Applicant Audit</h3>
+            <div id="list1">Loading Applicants...</div>
+        </div>
+
+        <div class="col">
+            <h3>2. Crew List (Inactive)</h3>
+            <div id="list2">Loading Crew...</div>
+        </div>
+
+        <div class="col">
+            <h3>3. Active Roster</h3>
+            <div id="list3">Loading Roster...</div>
+        </div>
     </div>
 
     <script>
-        const scriptURL = 'YOUR_DEPLOYED_URL_HERE'; // <--- PASTE YOUR URL HERE
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
 
-        async function load() {
-            const res = await fetch(scriptURL + "?action=getDashboard");
-            const data = await res.json();
+        async function loadDashboard() {
+            try {
+                const res = await fetch(scriptURL + "?action=getDashboard");
+                const data = await res.json();
+                
+                // 1. Applicants
+                document.getElementById('list1').innerHTML = data.applicants.map(a => `
+                    <div class="card ${a.status === 'SIGNED' ? 'signed' : ''}">
+                        <strong>${a.firstName} ${a.lastName}</strong>
+                        <div class="details">
+                            Trade: ${a.trade}<br>
+                            Status: <b>${a.status}</b>
+                        </div>
+                        <button class="btn-view" onclick="window.open('https://drive.google.com/drive/u/0/my-drive')">Verify Folder</button>
+                        <button class="btn-hire" onclick="finalizeHire('${a.email}')">Finalize Hire</button>
+                    </div>
+                `).join('') || "No new applicants.";
+
+                // 2 & 3. Split the Crew List
+                const inactive = data.activeCrew.filter(c => c.status !== 'Active');
+                const active = data.activeCrew.filter(c => c.status === 'Active');
+
+                document.getElementById('list2').innerHTML = inactive.map(c => `
+                    <div class="card">
+                        <strong>${c.name}</strong>
+                        <div class="details">
+                            Tier: ${c.tier}<br>
+                            Status: ${c.status}
+                        </div>
+                        <button class="btn-view" onclick="window.open('${c.folder}')">Docs</button>
+                    </div>
+                `).join('') || "No inactive crew.";
+
+                document.getElementById('list3').innerHTML = active.map(c => `
+                    <div class="card active">
+                        <strong>${c.name}</strong>
+                        <div class="details">
+                            Mission: <b>${c.jobId || 'Unknown'}</b><br>
+                            Tier: ${c.tier}
+                        </div>
+                        <button class="btn-view" onclick="window.open('${c.folder}')">Live Job Photos</button>
+                    </div>
+                `).join('') || "No active missions.";
+
+            } catch (e) {
+                console.error(e);
+                alert("Error loading dashboard data.");
+            }
+        }
+
+        async function finalizeHire(email) {
+            const tier = prompt("Assign Permanent Pay Tier (e.g., Tier 2 Skilled):");
+            if (!tier) return;
             
-            // Render List 1
-            document.getElementById('list1').innerHTML = data.applicants.map(a => `
-                <div class="card"><strong>${a.name}</strong><br>${a.trade}<br>
-                <button onclick="hire('${a.email}')">Hire (Inactive)</button></div>
-            `).join('');
-
-            // Render List 2 & 3
-            const inactive = data.activeCrew.filter(c => c.status !== 'Active');
-            const active = data.activeCrew.filter(c => c.status === 'Active');
-
-            document.getElementById('list2').innerHTML = inactive.map(c => `
-                <div class="card"><strong>${c.name}</strong><br>${c.tier}<br>
-                <button onclick="location.href='project.html?prefillEmail=${c.email}'">Offer Work Order</button></div>
-            `).join('');
-
-            document.getElementById('list3').innerHTML = active.map(c => `
-                <div class="card active-card"><strong>${c.name}</strong><br>ON MISSION</div>
-            `).join('');
+            document.body.style.opacity = "0.5";
+            await fetch(scriptURL, { 
+                method: 'POST', 
+                mode: 'no-cors',
+                body: JSON.stringify({ action: 'finalizeHire', email: email, assignedTier: tier }) 
+            });
+            
+            alert("Worker moved to Crew List. Add them to Gusto now.");
+            location.reload();
         }
 
-        async function hire(email) {
-            const tier = prompt("Assign Pay Tier:");
-            if(!tier) return;
-            await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: 'finalizeHire', email, assignedTier: tier }) });
-            load();
-        }
-        window.onload = load;
+        window.onload = loadDashboard;
     </script>
 </body>
 </html>
