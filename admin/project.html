@@ -4,41 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dispatch Work Order | Well Done</title>
-    <link rel="stylesheet" href="styles.css">
     <style>
-        body { background-color: #f4f7f6; font-family: -apple-system, sans-serif; padding: 20px; }
+        body { background-color: #f4f7f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { color: #2e7d32; border-bottom: 2px solid #ef6c00; padding-bottom: 10px; }
+        h2 { color: #2e7d32; border-bottom: 2px solid #ef6c00; padding-bottom: 10px; margin-top: 0; }
         label { display: block; margin-top: 15px; font-weight: bold; color: #333; }
-        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .btn-submit { background-color: #ef6c00; color: white; border: none; padding: 15px; width: 100%; margin-top: 25px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+        .grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-submit { background-color: #ef6c00; color: white; border: none; padding: 15px; width: 100%; margin-top: 25px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: background 0.3s; }
         .btn-submit:hover { background-color: #d84315; }
-        .readonly-field { background-color: #e0e0e0; color: #555; }
+        .btn-submit:disabled { background-color: #ccc; cursor: not-allowed; }
+        .readonly-field { background-color: #eeeeee; color: #555; cursor: not-allowed; }
+        .cancel-link { display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: none; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Dispatch Work Order</h2>
-    <p>Assigning work to: <strong id="displayEmail">...</strong></p>
+    <p>Assigning work to: <strong id="displayEmail">Loading...</strong></p>
 
     <form id="dispatchForm">
         <input type="hidden" id="workerEmail">
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-           <div>
+        <div class="grid-row">
+            <div>
                 <label>Job ID</label>
-                <input type="text" id="jobId" value="(Auto-Generated)" class="readonly-field" readonly>
+                <input type="text" id="jobId" class="readonly-field" readonly>
+            </div>
+            <div>
+                <label>Target Budget ($)</label>
+                <input type="number" id="budget" placeholder="e.g. 500">
             </div>
         </div>
 
         <label>Client Name</label>
-        <input type="text" id="clientName" required>
+        <input type="text" id="clientName" placeholder="Full Name" required>
 
         <label>Street Address / Location</label>
         <input type="text" id="address" placeholder="123 Main St, Reno, NV" required>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div class="grid-row">
             <div>
                 <label>Trade Assigned</label>
                 <select id="trade">
@@ -53,40 +59,48 @@
             </div>
             <div>
                 <label>Source (Lead)</label>
-                <input type="text" id="source" placeholder="e.g. Thumbtack, Referral">
+                <input type="text" id="source" placeholder="e.g. Thumbtack">
             </div>
         </div>
 
         <label>Scope of Work / Notes</label>
-        <textarea id="notes" rows="4" placeholder="Describe the mission..."></textarea>
+        <textarea id="notes" rows="4" placeholder="Describe the mission details..."></textarea>
 
         <button type="button" onclick="submitWorkOrder()" class="btn-submit" id="submitBtn">DISPATCH & EMAIL WORKER</button>
-        <button type="button" onclick="history.back()" style="background:none; border:none; color:#666; width:100%; margin-top:10px; cursor:pointer;">Cancel</button>
+        <a href="javascript:history.back()" class="cancel-link">Cancel and Go Back</a>
     </form>
 </div>
 
 <script>
-    // ✅ NEW SCRIPT URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
 
-    // 1. Grab Email from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const email = urlParams.get('prefillEmail');
-    
-    if(email) {
-        document.getElementById('workerEmail').value = email;
-        document.getElementById('displayEmail').innerText = email;
-    } else {
-        alert("No worker selected. Returning to dashboard.");
-        window.location.href = 'admin/index.html';
-    }
+    // 1. Setup Email and Job ID on Load
+    window.onload = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('prefillEmail');
+        
+        if(email) {
+            document.getElementById('workerEmail').value = email;
+            document.getElementById('displayEmail').innerText = email;
+        } else {
+            alert("No worker selected. Returning to dashboard.");
+            window.location.href = 'admin/index.html';
+        }
 
-    // 2. Generate Auto Job ID (Optional Helper)
-    document.getElementById('jobId').value = "JOB-" + Math.floor(Math.random() * 10000);
+        // Generate Job ID
+        document.getElementById('jobId').value = "JOB-" + Math.floor(1000 + Math.random() * 9000);
+    };
 
-    // 3. Submit Logic
+    // 2. Submit Logic
     async function submitWorkOrder() {
         const btn = document.getElementById('submitBtn');
+        
+        // Basic Validation
+        if(!document.getElementById('clientName').value || !document.getElementById('address').value) {
+            alert("Please fill in Client Name and Address.");
+            return;
+        }
+
         btn.disabled = true;
         btn.innerText = "Dispatching...";
 
@@ -97,22 +111,27 @@
             client: document.getElementById('clientName').value,
             address: document.getElementById('address').value,
             trade: document.getElementById('trade').value,
-            budget: document.getElementById('budget').value,
+            budget: document.getElementById('budget').value || "N/A", // Added Budget fallback
             source: document.getElementById('source').value,
             notes: document.getElementById('notes').value
         };
 
         try {
+            // Note: 'no-cors' will always result in an "opaque" response (success even if it fails)
+            // but it is often necessary for Google Apps Script.
             await fetch(scriptURL, {
                 method: 'POST',
-                mode: 'no-cors',
+                mode: 'no-cors', 
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
 
             alert("Work Order Sent! Worker has been emailed.");
             window.location.href = 'admin/index.html';
         } catch (e) {
-            alert("Error sending order.");
+            console.error(e);
+            alert("Error sending order. Check console.");
             btn.disabled = false;
             btn.innerText = "DISPATCH & EMAIL WORKER";
         }
