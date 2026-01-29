@@ -44,10 +44,10 @@
         <h4>3. PERFORMANCE STANDARDS</h4>
         <p>Employee is expected to perform all work in a professional and competent manner. Failure to correct substandard work or unsafe practices are grounds for immediate termination.</p>
 
-        <h4>8. SAFETY & OSHA COMPLIANCE</h4>
+        <h4>4. SAFETY & OSHA COMPLIANCE</h4>
         <p>Employee must comply with all job site safety rules. OSHA-10 certification is required. Proper personal protective equipment (PPE) must be used at all times.</p>
 
-        <h4>10. CONFIDENTIALITY & PROTECTION</h4>
+        <h4>5. CONFIDENTIALITY & PROTECTION</h4>
         <p>Employee may not solicit Company clients for personal work or use Company contacts for personal gain. These obligations survive termination of employment.</p>
 
         <div class="signature-footer">
@@ -80,7 +80,9 @@
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
+    // ✅ UPDATED: Points to your NEW Script URL (ending in ...YKd/exec)
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
+    
     const urlParams = new URLSearchParams(window.location.search);
     const userEmail = urlParams.get('email');
 
@@ -120,7 +122,8 @@
             });
 
             alert("Agreement Signed Successfully!");
-            window.location.href = `https://welldoneconstruction.pro/intake/index.html?email=${encodeURIComponent(userEmail)}`;
+            // ✅ UPDATED: Redirects to 'onboarding.html' instead of 'intake/index.html'
+            window.location.href = `https://welldoneconstruction.pro/onboarding.html?email=${encodeURIComponent(userEmail)}`;
             
         } catch (e) {
             alert("Error saving. Please try again.");
