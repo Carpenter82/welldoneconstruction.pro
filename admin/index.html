@@ -42,7 +42,8 @@
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzUgzmGYKw1bgqbpOqExi6M2t6yZYjDS69DcKgDst4i07KEJhoBAZOAWRJv9WUcT42E/exec';
+    // ✅ CRITICAL FIX: Updated to your NEW Web App URL (The one ending in 'YKd/exec')
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
 
     async function loadDashboard() {
         try {
@@ -61,7 +62,7 @@
                 </div>
             `).join('') : '<p>No new applicants.</p>';
 
-            // Render Hired Crew (UPDATED FOR GUSTO)
+            // Render Hired Crew
             const crewList = document.getElementById('crewList');
             
             crewList.innerHTML = data.activeCrew && data.activeCrew.length ? data.activeCrew.map(c => {
@@ -103,8 +104,8 @@
                 mode: 'no-cors', 
                 body: JSON.stringify({ action: 'hireWorker', email: email, assignedTier: tier }) 
             });
-            alert("Hire request sent! Refreshing dashboard...");
-            setTimeout(loadDashboard, 2000); 
+            alert("Hire request sent! Profile PDF is being created...");
+            setTimeout(loadDashboard, 3000); // Increased wait time to 3s to allow PDF generation
         } catch (err) {
             alert("Error hiring worker.");
         }
