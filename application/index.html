@@ -13,10 +13,10 @@
     </style>
 </head>
 <body>
-    <div class="form-card">
+    <div class="form-card" id="mainCard">
         <h2>Worker Application</h2>
         <form id="appForm">
-            <input type="text" name="name" placeholder="Full Name" required>
+            <input type="text" name="fullName" placeholder="Full Name" required>
             <input type="email" name="email" placeholder="Email Address" required>
             <input type="tel" name="phone" placeholder="Phone Number" required>
             <select name="trade" required>
@@ -29,7 +29,6 @@
             </select>
             <button type="submit" id="submitBtn">Submit Application</button>
         </form>
-        <div id="responseMsg" style="display:none; text-align:center; margin-top:20px; color: #33B26E; font-weight:bold;"></div>
     </div>
 
     <script>
@@ -38,16 +37,46 @@
         
         form.addEventListener('submit', e => {
             e.preventDefault();
-            document.getElementById('submitBtn').innerText = "Sending...";
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
+            const formData = new FormData(form);
+            const nameParts = formData.get('fullName').split(' ');
             
-            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-                .then(response => {
-                    document.getElementById('appForm').style.display = 'none';
-                    const msg = document.getElementById('responseMsg');
-                    msg.style.display = 'block';
-                    msg.innerText = "Application Received! We will contact you soon.";
-                })
-                .catch(error => console.error('Error!', error.message));
+            // This is the payload your Apps Script is looking for
+            const payload = {
+                action: 'intake',
+                firstName: nameParts[0] || "",
+                lastName: nameParts.slice(1).join(' ') || "Worker",
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                trade: formData.get('trade'),
+                experience: "New Web Lead",
+                pay: "Pending",
+                tools: "Yes"
+            };
+
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors', // Critical for Google Apps Script
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                // Show success UI
+                document.getElementById('mainCard').innerHTML = `
+                    <div style="text-align:center; padding: 20px;">
+                        <div style="font-size: 3rem;">✅</div>
+                        <h2 style="color: #33B26E;">Application Sent!</h2>
+                        <p>We have received your info. Check your email shortly for next steps.</p>
+                        <a href="index.html" style="color: #343E47; font-weight: bold; text-decoration: none;">Return Home</a>
+                    </div>`;
+            }).catch(err => {
+                alert("Error submitting. Please try again.");
+                btn.innerText = "Submit Application";
+                btn.disabled = false;
+            });
         });
     </script>
 </body>
