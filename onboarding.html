@@ -3,37 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SECURE VAULT | WELL DONE</title>
-    <style>
-        body { background-color: #1a1a1a; color: #ffd700; font-family: sans-serif; padding: 20px; display: flex; justify-content: center; }
-        .vault-card { width: 100%; max-width: 500px; border: 4px double #ffd700; padding: 30px; background: #000; }
-        h2 { text-align: center; border-bottom: 2px solid #ffd700; padding-bottom: 15px; }
-        .upload-section { margin: 20px 0; border: 1px dashed #ffd700; padding: 15px; text-align: center; }
-        input[type="file"] { margin-top: 10px; color: #fff; }
-        .status-box { background: #ffd700; color: #000; padding: 10px; font-weight: bold; text-align: center; display: none; }
+    <title>UPLOAD DOCUMENTS | WELL DONE</title>
+    <link rel="stylesheet" href="styles.css"> <style>
+        /* Override specific styles for this page */
+        body { text-align: center; }
+        
+        .upload-zone {
+            background: #222;
+            border: 2px dashed #444;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .upload-zone.active { border-color: var(--primary); background: #2a2a2a; }
+
+        .upload-icon { font-size: 2rem; color: #666; margin-bottom: 10px; }
+        
+        /* Hidden real input */
+        input[type="file"] { display: none; }
+
+        /* Custom Label acts as button */
+        .custom-upload-btn {
+            background: #444;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 150px;
+            margin-top: 10px;
+            display: none; /* Hidden until file selected */
+            border: 1px solid var(--primary);
+        }
+
+        .file-name { color: var(--primary); font-size: 0.8rem; margin-top: 5px; }
     </style>
 </head>
 <body>
-    <div class="vault-card">
-        <h2>WORKER VAULT</h2>
-        <p>Upload mandatory compliance documents below.</p>
+
+    <div class="container">
+        <div class="logo">WELL <span>DONE</span></div>
+        <h2>Final Step: ID Verification</h2>
+        <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 20px;">
+            Please upload a clear photo of your Valid ID and Safety/OSHA Card.
+        </p>
+
+        <form id="docForm">
+            
+            <div class="upload-zone" id="zone-id">
+                <div class="upload-icon">🪪</div>
+                <div style="font-weight:bold;">GOVERNMENT ID</div>
+                <div style="font-size:0.8rem; color:#888;">Driver's License or Passport</div>
+                
+                <label for="file-id" class="custom-upload-btn">Choose Photo</label>
+                <input type="file" id="file-id" accept="image/*" required>
+                
+                <div id="name-id" class="file-name"></div>
+                <img id="preview-id" class="preview-img">
+            </div>
+
+            <div class="upload-zone" id="zone-osha">
+                <div class="upload-icon">⛑️</div>
+                <div style="font-weight:bold;">OSHA / SAFETY CARD</div>
+                <div style="font-size:0.8rem; color:#888;">OSHA 10, OSHA 30, or SST</div>
+                
+                <label for="file-osha" class="custom-upload-btn">Choose Photo</label>
+                <input type="file" id="file-osha" accept="image/*">
+                
+                <div id="name-osha" class="file-name"></div>
+                <img id="preview-osha" class="preview-img">
+            </div>
+
+            <button type="submit" id="submitBtn">FINISH ONBOARDING</button>
+        </form>
         
-        <div class="upload-section">
-            <strong>DRIVER'S LICENSE / PHOTO ID</strong><br>
-            <input type="file" id="id-upload" accept="image/*">
-        </div>
-
-        <div class="upload-section">
-            <strong>OSHA-10 / OSHA-30 CARD</strong><br>
-            <input type="file" id="osha-upload" accept="image/*">
-        </div>
-
-        <div id="status" class="status-box">UPLOAD COMPLETE - PENDING REVIEW</div>
+        <div id="status" class="status-msg"></div>
     </div>
 
     <script>
-        // Note: This page currently allows uploads to be handled by your drive folders.
-        // As you scale, we will add the direct-to-folder upload script here.
+        // *** CONFIGURATION ***
+        const API_URL = "https://script.google.com/macros/s/AKfycbzL7I6U1-k6iKNo6-p_0S-k7oF8_TwoKS9RQ_M5/exec"; 
+
+        // 1. Get Identity from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+
+        if (!email) {
+            alert("Session Error. Redirecting to start.");
+            window.location.href = "/application/";
+        }
+
+        // 2. File Reader Logic (Handles the preview & Base64 conversion)
+        function setupUploader(inputId, previewId, nameId) {
+            document.getElementById(inputId).addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    document.getElementById(nameId).textContent = file.name;
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const img = document.getElementById(previewId);
+                        img.src = e.target.result;
+                        img.style.display = "block";
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        setupUploader('file-id', 'preview-id', 'name-id');
+        setupUploader('file-osha', 'preview-osha', 'name-osha');
+
+        // 3. Submit Logic
+        document.getElementById('docForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const status = document.getElementById('status');
+            
+            // Validate that at least ID is present
+            const idFile = document.getElementById('file-id').files[0];
+            const oshaFile = document.getElementById('file-osha').files[0];
+
+            if (!idFile) {
+                alert("You must upload a Government ID.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = "Uploading Securely...";
+
+            // We need to read files as Base64 text to send to Google Script
+            // This helper function wraps the FileReader in a Promise
+            const readFile = (file) => {
+                return new Promise((resolve, reject) => {
+                    if (!file) resolve(null); // Return null if no file (e.g. no OSHA card)
+                    const reader = new FileReader();
+                    reader.onload = () => resolve({
+                        name: file.name,
+                        data: reader.result.split(',')[1] // Remove "data:image..." prefix
+                    });
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                });
+            };
+
+            // Process both files
+            Promise.all([readFile(idFile), readFile(oshaFile)])
+            .then(results => {
+                const idData = results[0];
+                const oshaData = results[1];
+
+                const payload = {
+                    action: "saveDocuments", // New Action for your Script
+                    email: email,
+                    idFile: idData,
+                    oshaFile: oshaData
+                };
+
+                return fetch(API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify(payload)
+                });
+            })
+            .then(() => {
+                status.textContent = "Documents Uploaded. Welcome to the team!";
+                setTimeout(() => {
+                    // Redirect to the Worker Portal
+                    window.location.href = `/worker/?email=${encodeURIComponent(email)}`;
+                }, 2000);
+            })
+            .catch(err => {
+                console.error(err);
+                status.textContent = "Upload Failed. File size might be too large (Max 5MB).";
+                btn.disabled = false;
+                btn.textContent = "Try Again";
+            });
+        });
     </script>
 </body>
 </html>
