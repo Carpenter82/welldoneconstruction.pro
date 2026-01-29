@@ -79,3 +79,16 @@ body.warehouse-theme {
     /* Use negative margin if you want it to touch the card edges */
     margin: 0 -25px 20px -25px; 
 }
+.btn-gusto {
+  background-color: #0a8080; /* A teal color, or use #d93c3c for red */
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.btn-gusto:hover {
+  background-color: #066666;
+}
