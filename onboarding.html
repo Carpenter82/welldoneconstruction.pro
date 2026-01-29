@@ -1,74 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Onboarding | Well Done</title>
-  <link rel="stylesheet" href="styles.css">
+    <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Onboarding | Well Done</title>
+    <style>
+        :root { --accent: #ef6c00; --dark: #333; --light: #f4f4f4; }
+        body { font-family: sans-serif; background: var(--light); margin: 0; padding: 20px; text-align: center; }
+        
+        .container { max-width: 400px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        img.logo { max-width: 180px; margin-bottom: 20px; }
+        
+        h2 { margin-top: 0; color: var(--dark); }
+        p { color: #666; font-size: 0.9em; margin-bottom: 25px; }
+
+        .upload-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: var(--dark); }
+        input[type="file"] { display: block; width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: #fafafa; }
+        
+        button { background: var(--accent); color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        button:hover { background: #d86000; }
+        button:disabled { background: #ccc; }
+
+        .status { margin-top: 15px; font-size: 0.9em; color: var(--accent); font-weight: bold; min-height: 20px; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Step 2: Compliance Docs</h2>
-    <p>Upload your ID and OSHA card to secure your profile.</p>
-    <input type="email" id="email" placeholder="Confirm Email Address" required>
-    
-    <label>Driver's License (Front)</label>
-    <input type="file" id="dl" accept="image/*" capture="camera">
-    
-    <label>OSHA 10/30 Card</label>
-    <input type="file" id="osha" accept="image/*" capture="camera">
-    
-    <button onclick="uploadFiles()" id="upBtn">Sync to Drive</button>
-  </div>
-  <script>
-    // ✅ UPDATED: Points to your NEW Script URL (ending in ...YKd/exec)
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
-    
-    const toBase64 = (f) => new Promise(res => { 
-        const r = new FileReader(); 
-        r.onload = () => res(r.result.split(',')[1]); 
-        r.readAsDataURL(f); 
-    });
-    
-    async function uploadFiles() {
-        const em = document.getElementById('email').value;
-        const dlFile = document.getElementById('dl').files[0];
-        const oshaFile = document.getElementById('osha').files[0];
-        
-        if(!em || !dlFile || !oshaFile) return alert("All fields required");
-        
-        const btn = document.getElementById('upBtn');
-        btn.disabled = true; 
-        btn.innerText = "Syncing Docs...";
 
-        const payload = { 
-            action: 'onboard', // Aligned with Code.gs 'onboard'
-            email: em, 
-            files: [ 
-                {data: await toBase64(dlFile), name: 'DL.jpg', folder: '1. Permits'}, 
-                {data: await toBase64(oshaFile), name: 'OSHA.jpg', folder: '5. Misc'} 
-            ] 
-        };
+<div class="container">
+    <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction" class="logo">
+    
+    <h2>Secure Vault Upload</h2>
+    <p>Please upload your compliance documents to finalize your active status. These go directly into your worker file.</p>
+
+    <form id="uploadForm">
+        <input type="hidden" id="workerEmail" name="workerEmail">
+
+        <div class="upload-group">
+            <label for="idCard">Driver's License / ID</label>
+            <input type="file" id="idCard" accept="image/*,application/pdf" required>
+        </div>
+
+        <div class="upload-group">
+            <label for="oshaCard">OSHA 10/30 Card</label>
+            <input type="file" id="oshaCard" accept="image/*,application/pdf" required>
+        </div>
+
+        <button type="submit" id="submitBtn">Upload to Vault</button>
+        <div class="status" id="statusMsg"></div>
+    </form>
+</div>
+
+<script>
+    // 1. Get Worker Email from URL (e.g., onboarding.html?email=worker@example.com)
+    const urlParams = new URLSearchParams(window.location.search);
+    const workerEmail = urlParams.get('email');
+    if(workerEmail) {
+        document.getElementById('workerEmail').value = workerEmail;
+    } else {
+        document.getElementById('statusMsg').innerText = "Error: No worker email identified.";
+        document.getElementById('submitBtn').disabled = true;
+    }
+
+    // 2. Handle Form Submission
+    const form = document.getElementById('uploadForm');
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec'; // SAME URL AS ADMIN
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const status = document.getElementById('statusMsg');
+        
+        btn.disabled = true;
+        btn.innerText = "Uploading... (This may take a moment)";
+        status.innerText = "";
+
+        const idFile = document.getElementById('idCard').files[0];
+        const oshaFile = document.getElementById('oshaCard').files[0];
 
         try {
-            // Using no-cors mode is safer for client-side uploads to Apps Script to avoid CORS errors, 
-            // though it makes error handling slightly opaque.
-            await fetch(scriptURL, { 
-                method: 'POST', 
+            // Convert files to Base64
+            const idBase64 = await toBase64(idFile);
+            const oshaBase64 = await toBase64(oshaFile);
+
+            // Send to Google Apps Script
+            const response = await fetch(scriptURL, {
+                method: 'POST',
                 mode: 'no-cors',
-                body: JSON.stringify(payload) 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'handleUpload',
+                    email: workerEmail,
+                    idName: idFile.name,
+                    idData: idBase64,
+                    oshaName: oshaFile.name,
+                    oshaData: oshaBase64
+                })
             });
+
+            status.style.color = 'green';
+            status.innerText = "Upload Complete! You are now ready for verification.";
+            btn.innerText = "Done";
             
-            alert("Documents Secured!"); 
-            // Redirect to the portal dashboard
-            window.location.href = "portal/index.html?email=" + encodeURIComponent(em);
-        } catch(e) { 
-            alert("Upload failed. Check your connection."); 
-            btn.disabled = false; 
-            btn.innerText = "Sync to Drive";
+        } catch (error) {
+            console.error('Error!', error.message);
+            status.style.color = 'red';
+            status.innerText = "Upload failed. Please try again.";
+            btn.disabled = false;
+            btn.innerText = "Upload to Vault";
         }
-    }
-  </script>
+    });
+
+    const toBase64 = file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+    });
+</script>
+
 </body>
 </html>
