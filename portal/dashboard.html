@@ -3,96 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worker Dashboard | Well Done</title>
+    <title>Worker Portal | Well Done</title>
     <link rel="stylesheet" href="../styles.css">
     <style>
         :root { --high-vis: #f1c40f; --dark: #000; --active: #33B26E; }
         body { background: #1a1a1a; color: white; font-family: sans-serif; padding: 15px; margin: 0; }
-        .header { background: var(--high-vis); color: var(--dark); padding: 15px; font-weight: 900; text-align: center; letter-spacing: 1px; margin: -15px -15px 20px -15px; }
-        .mission-card { background: var(--dark); border: 4px solid var(--high-vis); padding: 20px; border-radius: 8px; margin-bottom: 20px; display: none; }
-        .idle-msg { text-align: center; padding: 50px 20px; color: #666; font-style: italic; }
-        .btn-mission { background: var(--high-vis); color: var(--dark); border: none; padding: 20px; width: 100%; font-size: 1.2rem; font-weight: 900; cursor: pointer; border-radius: 4px; margin-top: 15px; }
-        .job-label { color: var(--high-vis); font-size: 0.8rem; text-transform: uppercase; margin-top: 10px; }
-        .job-data { font-size: 1.3rem; font-weight: bold; margin-bottom: 15px; }
-        .warning-stripe { height: 10px; background: repeating-linear-gradient(45deg, var(--high-vis), var(--high-vis) 10px, var(--dark) 10px, var(--dark) 20px); margin: 15px 0; }
+        
+        .header { background: var(--high-vis); color: var(--dark); padding: 15px; font-weight: 900; text-align: center; border-bottom: 4px solid #000; }
+        
+        .mission-card { background: #000; border: 4px solid var(--high-vis); padding: 20px; border-radius: 8px; margin-top: 20px; }
+        
+        .pay-banner { background: var(--high-vis); color: var(--dark); font-size: 2rem; font-weight: 900; text-align: center; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        
+        .label { color: var(--high-vis); font-size: 0.75rem; text-transform: uppercase; margin-top: 15px; font-weight: bold; }
+        .data { font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        
+        .btn-claim { background: var(--high-vis); color: var(--dark); border: none; padding: 20px; width: 100%; font-size: 1.4rem; font-weight: 900; cursor: pointer; border-radius: 4px; margin-top: 25px; transition: transform 0.1s; }
+        .btn-claim:active { transform: scale(0.98); }
+        
+        .idle-msg { text-align: center; padding: 60px 20px; color: #888; font-style: italic; }
+        .warning-stripes { height: 12px; background: repeating-linear-gradient(45deg, var(--high-vis), var(--high-vis) 10px, #000 10px, #000 20px); }
     </style>
 </head>
 <body>
 
-    <div class="header">WELL DONE CONSTRUCTION | FIELD OPERATIONS</div>
+    <div class="header">FIELD OPERATIONS DASHBOARD</div>
+    <div class="warning-stripes"></div>
 
-    <div id="loading" style="text-align:center; padding: 40px;">SECURE CONNECTION ESTABLISHING...</div>
+    <div id="loading" style="text-align:center; margin-top: 50px;">AUTHENTICATING...</div>
 
     <div id="idleState" class="idle-msg" style="display:none;">
-        <p>Current Status: <strong>IDLE</strong></p>
-        <p>No active missions assigned to your email at this time. Check back at 08:00 AM.</p>
+        <p>STATUS: <strong>INACTIVE / ON-CALL</strong></p>
+        <p>No missions have been offered to your email at this time.</p>
     </div>
 
-    <div id="missionState" class="mission-card">
-        <div class="warning-stripe"></div>
-        <h2 style="margin:0; color:var(--high-vis);">ACTIVE MISSION</h2>
-        
-        <div class="job-label">Job ID</div>
-        <div id="jobId" class="job-data">---</div>
+    <div id="missionState" style="display:none;">
+        <div class="mission-card">
+            <h2 style="margin:0; text-align:center;">NEW MISSION OFFER</h2>
+            
+            <div class="label">Total Mission Pay (Lump Sum)</div>
+            <div id="missionPay" class="pay-banner">$0.00</div>
 
-        <div class="job-label">Client</div>
-        <div id="client" class="job-data">---</div>
+            <div class="label">Job ID</div>
+            <div id="jobId" class="data">---</div>
 
-        <div class="job-label">Address / Location</div>
-        <div id="address" class="job-data" style="color:#fff; text-decoration: underline;">---</div>
+            <div class="label">Location</div>
+            <div id="address" class="data">---</div>
 
-        <div class="job-label">Scope of Work</div>
-        <div id="notes" style="background:#222; padding:10px; border-radius:4px; font-size: 0.9rem;">---</div>
+            <div class="label">Mission Scope</div>
+            <div id="notes" style="background:#222; padding:10px; border-radius:4px; margin-top:5px; font-size:0.9rem;">---</div>
 
-        <button id="actionBtn" class="btn-mission" onclick="startChecklist()">CLAIM MISSION & START CHECKLIST</button>
+            <button id="claimBtn" class="btn-claim" onclick="acceptWork()">CLAIM MISSION</button>
+            <p style="font-size: 10px; text-align: center; margin-top: 15px; color: #888;">By claiming, you agree to the lump sum pay and activate your status.</p>
+        </div>
     </div>
 
 <script>
-    // ✅ MUST MATCH YOUR DEPLOYMENT URL
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
+    // ✅ PASTE YOUR WEB APP URL HERE
+    const scriptURL = 'YOUR_DEPLOYED_URL_HERE'; 
 
     const urlParams = new URLSearchParams(window.location.search);
     const email = urlParams.get('email');
 
     if (!email) {
-        alert("Authentication Error: No email found.");
+        alert("Session Expired. Please Log In.");
         window.location.href = "index.html";
     }
 
-    async function checkJobStatus() {
+    async function getJob() {
         try {
-            const response = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}`);
-            const data = await response.json();
+            const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}`);
+            const data = await res.json();
             
             document.getElementById('loading').style.display = 'none';
 
             if (data.jobStatus === "Offered" || data.jobStatus === "Active") {
                 document.getElementById('missionState').style.display = 'block';
                 document.getElementById('jobId').innerText = data.jobId;
-                document.getElementById('client').innerText = data.client;
                 document.getElementById('address').innerText = data.address;
-                document.getElementById('notes').innerText = data.notes || "No additional notes provided.";
+                document.getElementById('missionPay').innerText = `$${data.pay}`;
+                document.getElementById('notes').innerText = data.notes || "Standard Procedure.";
                 
-                // If already active, change button text
                 if (data.jobStatus === "Active") {
-                    document.getElementById('actionBtn').innerText = "OPEN ACTIVE CHECKLIST";
+                    document.getElementById('claimBtn').innerText = "RESUME MISSION";
+                    document.getElementById('claimBtn').style.background = "#33B26E";
+                    document.getElementById('claimBtn').style.color = "#fff";
                 }
             } else {
                 document.getElementById('idleState').style.display = 'block';
             }
-        } catch (err) {
-            document.getElementById('loading').innerText = "CONNECTION TIMEOUT. RETRYING...";
-            console.error(err);
+        } catch (e) {
+            document.getElementById('loading').innerText = "CONNECTION ERROR. REFRESH PAGE.";
         }
     }
 
-    function startChecklist() {
+    async function acceptWork() {
+        const btn = document.getElementById('claimBtn');
         const jobId = document.getElementById('jobId').innerText;
-        // Redirects to your checklist folder
+        
+        if(btn.innerText === "RESUME MISSION") {
+            goToChecklist(jobId);
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "ACTIVATING...";
+
+        try {
+            // This POST triggers the Code.gs to flip them to "Active"
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    action: 'acceptMission',
+                    email: email,
+                    jobId: jobId
+                })
+            });
+
+            alert("MISSION CLAIMED. YOUR STATUS IS NOW ACTIVE.");
+            goToChecklist(jobId);
+        } catch (e) {
+            alert("Network error. Try again.");
+            btn.disabled = false;
+        }
+    }
+
+    function goToChecklist(jobId) {
         window.location.href = `../checklist/index.html?email=${encodeURIComponent(email)}&jobId=${encodeURIComponent(jobId)}`;
     }
 
-    window.onload = checkJobStatus;
+    window.onload = getJob;
 </script>
 </body>
 </html>
