@@ -1,164 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dispatch Work | Well Done</title>
+    <title>Dispatch Work Order | Well Done</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
-        :root { --primary: #2c3e50; --accent: #33B26E; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f7f6; margin: 0; }
-        .container { max-width: 600px; margin: 30px auto; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .form-section { border: 1px solid #eee; padding: 20px; border-radius: 8px; margin-bottom: 20px; background: #fafafa; transition: opacity 0.3s; }
-        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 1rem; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:disabled { background: #95a5a6; }
-        .btn-dispatch { background: var(--accent); color: white; }
-        #statusResult { text-align:center; margin-top:15px; font-weight:bold; min-height: 1.2em; }
+        body { background-color: #f4f7f6; font-family: -apple-system, sans-serif; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #2e7d32; border-bottom: 2px solid #ef6c00; padding-bottom: 10px; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #333; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-submit { background-color: #ef6c00; color: white; border: none; padding: 15px; width: 100%; margin-top: 25px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .btn-submit:hover { background-color: #d84315; }
+        .readonly-field { background-color: #e0e0e0; color: #555; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2 style="text-align: center; color: var(--primary);">Work Order Dispatch</h2>
-        
-        <div class="form-section" id="step1">
-            <p style="margin-top:0; font-weight:bold;">1. Register Project Data</p>
-            <form id="projectForm">
-                <input type="text" id="client" placeholder="Client Name" required>
-                <input type="text" id="address" placeholder="Site Address" required>
-                <input type="text" id="trade" placeholder="Trade (e.g. Carpentry)" required>
-                <input type="number" id="budget" placeholder="Labor Budget ($)" required>
-                <textarea id="notes" placeholder="Job Notes / Access Codes"></textarea>
-                <button type="submit" id="projBtn" class="btn btn-primary">LOG PROJECT & GEN ID</button>
-            </form>
+
+<div class="container">
+    <h2>Dispatch Work Order</h2>
+    <p>Assigning work to: <strong id="displayEmail">...</strong></p>
+
+    <form id="dispatchForm">
+        <input type="hidden" id="workerEmail">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div>
+                <label>Job ID (Unique)</label>
+                <input type="text" id="jobId" placeholder="e.g. 26-104" required>
+            </div>
+            <div>
+                <label>Budget / Rate</label>
+                <input type="text" id="budget" placeholder="$500 or $25/hr">
+            </div>
         </div>
 
-        <div id="assignmentSection" class="form-section" style="display:none; border-left: 5px solid var(--accent);">
-            <p style="margin-top:0; font-weight:bold; color: var(--accent);">2. Assign Personnel to JOB: <span id="displayJobId"></span></p>
-            <select id="workerSelect">
-                <option value="">Loading Roster...</option>
-            </select>
-            <button onclick="dispatchWO()" id="dispatchBtn" class="btn btn-dispatch">SEND WORK ORDER EMAIL</button>
+        <label>Client Name</label>
+        <input type="text" id="clientName" required>
+
+        <label>Street Address / Location</label>
+        <input type="text" id="address" placeholder="123 Main St, Reno, NV" required>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div>
+                <label>Trade Assigned</label>
+                <select id="trade">
+                    <option>General Labor</option>
+                    <option>Carpentry</option>
+                    <option>Drywall</option>
+                    <option>Painting</option>
+                    <option>Plumbing</option>
+                    <option>Electrical</option>
+                    <option>Maintenance</option>
+                </select>
+            </div>
+            <div>
+                <label>Source (Lead)</label>
+                <input type="text" id="source" placeholder="e.g. Thumbtack, Referral">
+            </div>
         </div>
 
-        <div id="statusResult"></div>
-        <a href="index.html" style="display:block; text-align:center; margin-top:20px; color:#666; text-decoration:none; font-size: 0.9rem;">← Return to Command Center</a>
-    </div>
+        <label>Scope of Work / Notes</label>
+        <textarea id="notes" rows="4" placeholder="Describe the mission..."></textarea>
 
-    <script>
-        // Use the same script URL from your previous fix
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyN1uUGRDmEYax-dyv5VB5xpzYGfKdQ8by-uMq82eBBUFjk3ETj9juCd9ax6E5IzWMt/exec';
-        let currentGeneratedId = "";
+        <button type="button" onclick="submitWorkOrder()" class="btn-submit" id="submitBtn">DISPATCH & EMAIL WORKER</button>
+        <button type="button" onclick="history.back()" style="background:none; border:none; color:#666; width:100%; margin-top:10px; cursor:pointer;">Cancel</button>
+    </form>
+</div>
 
-        // Check for pre-filled email in the URL (e.g., project.html?prefillEmail=test@test.com)
-        const urlParams = new URLSearchParams(window.location.search);
-        const prefillEmail = urlParams.get('prefillEmail');
+<script>
+    // ✅ NEW SCRIPT URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
 
-        async function loadFullRoster() {
-            try {
-                const res = await fetch(scriptURL + "?action=getDashboard");
-                const data = await res.json();
-                const select = document.getElementById('workerSelect');
-                select.innerHTML = '<option value="" disabled selected>Select from Hired Roster...</option>';
-                
-                if (data.activeCrew && data.activeCrew.length > 0) {
-                    data.activeCrew.forEach(worker => {
-                        const opt = document.createElement('option');
-                        opt.value = worker.email;
-                        opt.textContent = `${worker.name} — ${worker.trade} (${worker.tier})`;
-                        
-                        // Apply prefill if it matches
-                        if (prefillEmail && worker.email === prefillEmail) {
-                            opt.selected = true;
-                        }
-                        
-                        select.appendChild(opt);
-                    });
-                } else {
-                    select.innerHTML = '<option value="">No workers found</option>';
-                }
-            } catch (err) {
-                console.error("Roster load error:", err);
-                document.getElementById('workerSelect').innerHTML = '<option value="">Error loading roster</option>';
-            }
-        }
+    // 1. Grab Email from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get('prefillEmail');
+    
+    if(email) {
+        document.getElementById('workerEmail').value = email;
+        document.getElementById('displayEmail').innerText = email;
+    } else {
+        alert("No worker selected. Returning to dashboard.");
+        window.location.href = 'admin/index.html';
+    }
 
-        document.getElementById('projectForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('projBtn');
-            const status = document.getElementById('statusResult');
-            
-            btn.innerText = "Generating ID...";
-            btn.disabled = true;
+    // 2. Generate Auto Job ID (Optional Helper)
+    document.getElementById('jobId').value = "JOB-" + Math.floor(Math.random() * 10000);
 
-            const params = new URLSearchParams();
-            params.append('action', 'registerProject');
-            params.append('client', document.getElementById('client').value);
-            params.append('address', document.getElementById('address').value);
-            params.append('trade', document.getElementById('trade').value);
-            params.append('budget', document.getElementById('budget').value);
-            params.append('notes', document.getElementById('notes').value);
+    // 3. Submit Logic
+    async function submitWorkOrder() {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerText = "Dispatching...";
 
-            try {
-                // We use redirect: "follow" to ensure we get the text generated by the script
-                const response = await fetch(scriptURL, { 
-                    method: 'POST', 
-                    body: params,
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                });
-                
-                const result = await response.text();
-                
-                if (result.startsWith("WD-")) {
-                    currentGeneratedId = result;
-                    document.getElementById('displayJobId').innerText = currentGeneratedId;
-                    document.getElementById('assignmentSection').style.display = 'block';
-                    document.getElementById('step1').style.opacity = '0.5';
-                    status.innerHTML = `<span style="color:var(--primary)">Project Saved: ${currentGeneratedId}</span>`;
-                    await loadFullRoster();
-                } else {
-                    throw new Error("Invalid ID returned: " + result);
-                }
-                
-            } catch (err) { 
-                console.error(err);
-                alert("Registration Failed. Make sure the script is deployed correctly."); 
-            } finally { 
-                btn.innerText = "LOG PROJECT & GEN ID"; 
-                btn.disabled = false; 
-            }
+        const payload = {
+            action: 'dispatchJob',
+            email: document.getElementById('workerEmail').value,
+            jobId: document.getElementById('jobId').value,
+            client: document.getElementById('clientName').value,
+            address: document.getElementById('address').value,
+            trade: document.getElementById('trade').value,
+            budget: document.getElementById('budget').value,
+            source: document.getElementById('source').value,
+            notes: document.getElementById('notes').value
         };
 
-        async function dispatchWO() {
-            const email = document.getElementById('workerSelect').value;
-            if(!email) return alert("Select a worker!");
-            
-            const btn = document.getElementById('dispatchBtn');
-            const status = document.getElementById('statusResult');
-            
-            btn.innerText = "Dispatching...";
-            btn.disabled = true;
+        try {
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(payload)
+            });
 
-            const params = new URLSearchParams();
-            params.append('action', 'assignToRoster');
-            params.append('email', email);
-            params.append('jobId', currentGeneratedId);
-
-            try {
-                await fetch(scriptURL, {
-                    method: 'POST',
-                    body: params,
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                });
-                status.innerHTML = `<span style="color:var(--accent)">WORK ORDER SENT TO ${email}</span>`;
-                btn.innerText = "WORK ORDER DISPATCHED";
-            } catch (e) { 
-                alert("Dispatch Error."); 
-                btn.disabled = false; 
-                btn.innerText = "SEND WORK ORDER EMAIL";
-            }
+            alert("Work Order Sent! Worker has been emailed.");
+            window.location.href = 'admin/index.html';
+        } catch (e) {
+            alert("Error sending order.");
+            btn.disabled = false;
+            btn.innerText = "DISPATCH & EMAIL WORKER";
         }
-    </script>
+    }
+</script>
 </body>
 </html>
