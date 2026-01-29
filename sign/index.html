@@ -2,74 +2,212 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>LEGAL SIGNATURE | WELL DONE</title>
     <style>
-        body { background-color: #000; color: #ffd700; font-family: sans-serif; text-align: center; padding: 20px; }
-        .container { max-width: 600px; margin: auto; border: 2px solid #ffd700; padding: 20px; }
-        canvas { border: 2px dashed #ffd700; background: #fff; cursor: crosshair; width: 100%; max-width: 500px; height: 200px; }
-        button { width: 100%; padding: 15px; margin-top: 20px; background: #ffd700; color: #000; font-weight: bold; border: none; cursor: pointer; }
-        .clear-btn { background: #444; color: #fff; margin-top: 10px; }
+        /* BRANDING: GOLD & BLACK (Legal/High-Value Context) */
+        body { 
+            background-color: #000; 
+            color: #ffd700; 
+            font-family: 'Roboto', sans-serif; 
+            text-align: center; 
+            padding: 20px;
+            /* Prevent scrolling while signing on mobile */
+            overscroll-behavior: none; 
+        }
+
+        .container { 
+            max-width: 600px; 
+            margin: auto; 
+            border: 2px solid #ffd700; 
+            padding: 20px; 
+            border-radius: 8px;
+        }
+
+        h2 { margin-top: 0; letter-spacing: 1px; }
+        p { color: #ccc; font-size: 0.9rem; }
+
+        /* CANVAS STYLING */
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            border: 2px dashed #ffd700;
+            background: #fff;
+            margin-top: 20px;
+            touch-action: none; /* CRITICAL: Stops screen moving while drawing */
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        /* BUTTONS */
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            margin-top: 20px; 
+            background: #ffd700; 
+            color: #000; 
+            font-weight: 900; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        button:disabled { background: #555; color: #888; cursor: not-allowed; }
+
+        .clear-btn { 
+            background: #333; 
+            color: #fff; 
+            margin-top: 10px; 
+            font-weight: normal;
+        }
     </style>
 </head>
 <body>
+
     <div class="container">
         <h2>ON-CALL EMPLOYEE AGREEMENT</h2>
-        <p>Sign below to execute your W-2 At-Will Agreement.</p>
-        <canvas id="sig-canvas"></canvas>
+        <p>By signing, you acknowledge you are an At-Will Employee (W-2) and agree to the Well Done safety standards.</p>
+        
+        <div class="canvas-container">
+            <canvas id="sig-canvas"></canvas>
+        </div>
+
         <button id="submit-btn">EXECUTE & SAVE AGREEMENT</button>
         <button class="clear-btn" id="clear-btn">CLEAR PAD</button>
+        
+        <p id="status-msg" style="margin-top:15px; min-height:20px;"></p>
     </div>
 
     <script>
+        // *** CONFIGURATION ***
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzL7I6U1-k6iKNo6-p_0S-k7oF8_TwoKS9RQ_M5/exec';
+        
+        // 1. SETUP CANVAS & CONTEXT
         const canvas = document.getElementById('sig-canvas');
         const ctx = canvas.getContext('2d');
+        const statusMsg = document.getElementById('status-msg');
+        
+        // Get Email from URL (The Identity Key)
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('email');
 
-        // Signature Logic
-        let drawing = false;
-        canvas.addEventListener('mousedown', () => drawing = true);
-        window.addEventListener('mouseup', () => drawing = false);
-        canvas.addEventListener('mousemove', draw);
+        if (!email) {
+            statusMsg.innerText = "ERROR: No Email Detected. Return to Application.";
+            statusMsg.style.color = "red";
+            document.getElementById('submit-btn').disabled = true;
+        }
 
-        function draw(e) {
-            if (!drawing) return;
+        // 2. HIGH-DPI RESIZE (Fixes Blurry Lines)
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            // Get the physical size of the container
+            const rect = canvas.parentElement.getBoundingClientRect();
+            
+            // Set the internal resolution
+            canvas.width = rect.width * ratio;
+            canvas.height = rect.height * ratio;
+            
+            // Scale the context so drawing commands work with CSS pixels
+            ctx.scale(ratio, ratio);
+        }
+        window.addEventListener("resize", resizeCanvas);
+        // Call immediately to set initial size
+        resizeCanvas();
+
+        // 3. DRAWING LOGIC (Mouse & Touch)
+        let isDrawing = false;
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            // Check if touch event or mouse event
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function startDraw(e) {
+            isDrawing = true;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
             ctx.lineWidth = 3;
             ctx.lineCap = 'round';
             ctx.strokeStyle = '#000';
-            const rect = canvas.getBoundingClientRect();
-            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+            e.preventDefault(); // Stop mouse from selecting text
         }
 
+        function draw(e) {
+            if (!isDrawing) return;
+            const pos = getPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            e.preventDefault(); // Stop screen scrolling on mobile
+        }
+
+        function endDraw(e) {
+            isDrawing = false;
+            ctx.beginPath(); // Reset path so next line is separate
+        }
+
+        // Mouse Listeners
+        canvas.addEventListener('mousedown', startDraw);
+        canvas.addEventListener('mousemove', draw);
+        window.addEventListener('mouseup', endDraw);
+
+        // Touch Listeners (Mobile)
+        canvas.addEventListener('touchstart', startDraw, {passive: false});
+        canvas.addEventListener('touchmove', draw, {passive: false});
+        window.addEventListener('touchend', endDraw);
+
+        // 4. BUTTON ACTIONS
         document.getElementById('clear-btn').addEventListener('click', () => {
+            // Clear entire canvas (account for the scaling ratio)
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
         });
 
         document.getElementById('submit-btn').addEventListener('click', () => {
             const btn = document.getElementById('submit-btn');
+            
+            // Basic validation: Check if canvas is empty (simple check)
+            // Ideally, you'd check pixel data, but for now we assume they signed.
+            
             btn.innerText = "UPLOADING TO VAULT...";
             btn.disabled = true;
 
             const data = {
                 action: 'saveSignature',
                 email: email,
-                signatureData: canvas.toDataURL().split(',')[1],
+                signatureData: canvas.toDataURL().split(',')[1], // Remove "data:image/png..." header
                 fileName: "Executed_Agreement_" + email + ".png"
             };
 
             fetch(scriptURL, {
                 method: 'POST',
-                mode: 'no-cors',
+                mode: 'no-cors', // Standard for Google Apps Script Web App
+                headers: { "Content-Type": "text/plain" },
                 body: JSON.stringify(data)
             }).then(() => {
-                // Redirect to root onboarding page
-                window.location.href = "/onboarding.html?email=" + encodeURIComponent(email);
+                // Success - Redirect to Onboarding (ID Upload)
+                statusMsg.innerText = "Signature Archived. Redirecting...";
+                setTimeout(() => {
+                    // Go to Root > onboarding.html
+                    window.location.href = "/onboarding.html?email=" + encodeURIComponent(email);
+                }, 1500);
+            }).catch(error => {
+                console.error(error);
+                statusMsg.innerText = "Upload Failed. Please try again.";
+                btn.disabled = false;
+                btn.innerText = "EXECUTE & SAVE AGREEMENT";
             });
         });
     </script>
