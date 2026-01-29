@@ -3,100 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Well Done</title>
-    <link rel="stylesheet" href="../styles.css">
+    <title>Application | Well Done</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f7f6; }
-        .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid #ef6c00; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .btn-action { padding: 5px 10px; cursor: pointer; color: white; border: none; border-radius: 4px; margin-right: 5px; }
-        h3 { border-bottom: 2px solid #ccc; padding-bottom: 5px; }
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; color: #343E47; }
+        .form-card { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background: #33B26E; color: white; font-weight: bold; border: none; cursor: pointer; }
+        h2 { text-align: center; color: #343E47; }
     </style>
 </head>
 <body>
-
-    <h2>Admin Command Center</h2>
-    <div id="statusMsg" style="background: yellow; padding: 10px; margin-bottom: 20px; border: 1px solid orange;">
-        Attempting Connection...
+    <div class="form-card">
+        <h2>Worker Application</h2>
+        <form id="appForm">
+            <input type="text" name="name" placeholder="Full Name" required>
+            <input type="email" name="email" placeholder="Email Address" required>
+            <input type="tel" name="phone" placeholder="Phone Number" required>
+            <select name="trade" required>
+                <option value="">Select Primary Trade</option>
+                <option value="Carpentry">Carpentry</option>
+                <option value="Plumbing">Plumbing</option>
+                <option value="Electrical">Electrical</option>
+                <option value="Painting">Painting</option>
+                <option value="General Labor">General Labor</option>
+            </select>
+            <button type="submit" id="submitBtn">Submit Application</button>
+        </form>
+        <div id="responseMsg" style="display:none; text-align:center; margin-top:20px; color: #33B26E; font-weight:bold;"></div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-        <section>
-            <h3>Applicants (Intake)</h3>
-            <div id="applicantList">Loading...</div>
-        </section>
-
-        <section>
-            <h3>Active Roster</h3>
-            <div id="crewList">Loading...</div>
-        </section>
-    </div>
-
-<script>
-    // ⚠️ PASTE YOUR URL HERE AGAIN TO BE SAFE
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
-
-    async function loadDashboard() {
-        const msg = document.getElementById('statusMsg');
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
+        const form = document.getElementById('appForm');
         
-        try {
-            console.log("Fetching from:", scriptURL);
-            const response = await fetch(scriptURL + "?action=getDashboard");
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            document.getElementById('submitBtn').innerText = "Sending...";
             
-            if (!response.ok) {
-                throw new Error(`HTTP Error: ${response.status}`);
-            }
-
-            const data = await response.json();
-            
-            // Connection Success
-            msg.style.background = "#d4edda";
-            msg.style.borderColor = "#c3e6cb";
-            msg.innerHTML = "✅ <strong>Connected!</strong> System Online.";
-            
-            // RENDER APPLICANTS
-            const appList = document.getElementById('applicantList');
-            if (data.applicants && data.applicants.length) {
-                appList.innerHTML = data.applicants.map(a => `
-                    <div class="card">
-                        <strong>${a.name}</strong> (${a.status})<br>
-                        ${a.trade} | ${a.phone}<br>
-                        <button onclick="startOnboarding('${a.email}')" class="btn-action" style="background:#ef6c00;">Send Paperwork</button>
-                    </div>
-                `).join('');
-            } else {
-                appList.innerHTML = "No new applicants.";
-            }
-
-            // RENDER CREW
-            const crewList = document.getElementById('crewList');
-            if (data.activeCrew && data.activeCrew.length) {
-                crewList.innerHTML = data.activeCrew.map(c => `
-                    <div class="card" style="border-left-color: #2e7d32;">
-                        <strong>${c.name}</strong><br>
-                        ${c.trade} | ${c.tier}<br>
-                        <button onclick="window.open('${c.folder}')" class="btn-action" style="background:#333;">Vault</button>
-                        <button onclick="window.location.href='project.html?prefillEmail=${encodeURIComponent(c.email)}'" class="btn-action" style="background:#2e7d32;">Assign</button>
-                    </div>
-                `).join('');
-            } else {
-                crewList.innerHTML = "No active crew.";
-            }
-
-        } catch (err) {
-            console.error(err);
-            msg.style.background = "#f8d7da";
-            msg.style.borderColor = "#f5c6cb";
-            msg.innerHTML = "❌ <strong>Connection Failed:</strong> " + err.message + "<br>Check 'Who has access' in Apps Script deployment.";
-        }
-    }
-
-    async function startOnboarding(email) {
-        if(!confirm("Send paperwork to " + email + "?")) return;
-        await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'startOnboarding', email: email }) });
-        alert("Sent!");
-    }
-
-    window.onload = loadDashboard;
-</script>
+            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+                .then(response => {
+                    document.getElementById('appForm').style.display = 'none';
+                    const msg = document.getElementById('responseMsg');
+                    msg.style.display = 'block';
+                    msg.innerText = "Application Received! We will contact you soon.";
+                })
+                .catch(error => console.error('Error!', error.message));
+        });
+    </script>
 </body>
 </html>
