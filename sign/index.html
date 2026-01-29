@@ -1,42 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Agreement | Well Done Construction</title>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <style>
-        :root { --primary: #2c3e50; --accent: #33B26E; --bg: #f4f7f6; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: #333; line-height: 1.5; padding: 20px; }
-        .container { max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        :root { --primary: #343E47; --accent: #33B26E; --bg: #f4f7f6; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: #333; line-height: 1.5; padding: 20px; margin: 0; }
+        .container { max-width: 750px; margin: 20px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
         
         .contract-box { 
-            height: 400px; overflow-y: scroll; border: 1px solid #ddd; padding: 20px; 
-            background: #fff; margin-bottom: 20px; font-size: 0.9rem; border-radius: 8px;
+            height: 450px; overflow-y: scroll; border: 1px solid #e5e7eb; padding: 25px; 
+            background: #fff; margin-bottom: 25px; font-size: 0.95rem; border-radius: 8px;
+            color: #4b5563;
         }
+        .contract-box h3 { color: var(--primary); text-transform: uppercase; border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; }
+        .contract-box h4 { color: var(--primary); margin-top: 25px; }
 
-        .sig-section { display: none; margin-top: 20px; border-top: 2px solid #eee; padding-top: 20px; }
-        canvas { border: 1px solid #ccc; background: #fff; width: 100%; border-radius: 8px; cursor: crosshair; }
+        .sig-section { display: none; margin-top: 30px; border-top: 2px solid #f3f4f6; padding-top: 30px; }
+        canvas { border: 2px solid #d1d5db; background: #fff; width: 100%; border-radius: 8px; cursor: crosshair; touch-action: none; }
         
-        .btn { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        .btn-primary { background: var(--primary); color: white; margin-top: 15px; }
+        .btn { width: 100%; padding: 18px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; }
+        .btn-primary { background: var(--primary); color: white; margin-top: 15px; box-shadow: 0 4px 12px rgba(52, 62, 71, 0.2); }
+        .btn-primary:hover { background: #1a252f; transform: translateY(-2px); }
+        .btn-primary:disabled { background: #9ca3af; transform: none; }
         
-        .checkbox-area { background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .checkbox-area { background: #f0fdf4; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #dcfce7; }
         
-        .signature-footer { margin-top: 40px; display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px solid #333; padding-top: 20px; }
+        .signature-footer { margin-top: 40px; display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px solid #343E47; padding-top: 25px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="text-align: center; color: var(--primary);">On-Call Employee Agreement</h2>
+    <div style="text-align: center; margin-bottom: 30px;">
+        <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done" style="max-width: 200px;">
+        <h2 style="color: var(--primary); margin-top: 15px; text-transform: uppercase; letter-spacing: -1px;">On-Call Employee Agreement</h2>
+    </div>
     
     <div class="contract-box" id="contract">
         <h3>ON-CALL EMPLOYEE AGREEMENT (W-2 | At-Will)</h3>
         <p>This Agreement is entered into by and between <strong>Well Done Construction LLC</strong> and the undersigned <strong>Employee</strong>.</p>
         
         <h4>1. EMPLOYMENT STATUS</h4>
-        <p>Employee is hired as a W-2, at-will, on-call employee. No minimum hours are guaranteed. Work is offered on an as-needed basis and may be accepted or declined by the Employee. Employment may be terminated by either party at any time, with or without cause or notice, in accordance with applicable law.</p>
+        <p>Employee is hired as a W-2, at-will, on-call employee. No minimum hours are guaranteed. Work is offered on an as-needed basis and may be accepted or declined by the Employee. Employment may be terminated by either party at any time, with or without cause or notice.</p>
 
         <h4>2. SCOPE OF WORK</h4>
         <p>Employee may be assigned duties including general carpentry and construction labor, repairs, site documentation, and photographs. Employee may NOT provide pricing, modify the scope of work without authorization, or pull permits.</p>
@@ -52,35 +61,34 @@
 
         <div class="signature-footer">
             <div style="flex: 1;">
-                <p style="margin: 0; font-size: 0.8rem; text-transform: uppercase; color: #666;">Employee Signature</p>
-                <div id="display-sig" style="font-style: italic; color: #2c3e50; padding: 10px 0;">[Digital Signature Captured Below]</div>
+                <p style="margin: 0; font-size: 0.75rem; text-transform: uppercase; color: #6b7280; font-weight: bold;">Employee Signature</p>
+                <div id="display-sig" style="font-style: italic; color: #343E47; padding: 15px 0; font-weight: bold;">[Digital Signature Captured Below]</div>
             </div>
 
             <div style="flex: 1; text-align: right;">
-                <p style="margin: 0; font-size: 0.8rem; text-transform: uppercase; color: #666;">Well Done Construction LLC</p>
-                <img src="https://welldoneconstruction.pro/assets/well_done_signature-removebg-preview.png" alt="Authorized Signature" style="width: 220px; height: auto; margin-left: auto; display: block;">
-                <p style="margin: 0; font-weight: bold; font-size: 1rem;">Date: 01/01/<span id="currentYear"></span></p>
+                <p style="margin: 0; font-size: 0.75rem; text-transform: uppercase; color: #6b7280; font-weight: bold;">Authorized Representative</p>
+                <img src="https://welldoneconstruction.pro/assets/well_done_signature-removebg-preview.png" alt="Signature" style="width: 200px; height: auto; margin-left: auto; display: block; filter: grayscale(100%); opacity: 0.8;">
+                <p style="margin: 0; font-weight: bold; font-size: 0.95rem; color: var(--primary);">Date: 01/01/<span id="currentYear"></span></p>
             </div>
         </div>
     </div>
 
     <div class="checkbox-area">
-        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-            <input type="checkbox" id="consent" style="transform: scale(1.5);">
-            <strong>I have read the agreement and accept all terms.</strong>
+        <label style="display: flex; align-items: center; gap: 15px; cursor: pointer; color: var(--primary);">
+            <input type="checkbox" id="consent" style="transform: scale(1.6);">
+            <strong style="font-size: 1rem;">I have read the agreement and accept all terms and conditions.</strong>
         </label>
     </div>
 
     <div id="sig-area" class="sig-section">
-        <p><strong>Please Sign Below:</strong></p>
+        <p style="color: var(--primary); font-weight: bold; margin-bottom: 10px;">PLEASE SIGN MANUALLY BELOW:</p>
         <canvas id="canvas" width="600" height="250"></canvas>
-        <button onclick="saveContract()" class="btn btn-primary">EXECUTE AGREEMENT & CONTINUE</button>
-        <button onclick="pad.clear()" style="background:none; border:none; color:grey; margin-top:10px; cursor:pointer;">Clear Signature</button>
+        <button onclick="saveContract()" class="btn btn-primary" id="execBtn">EXECUTE AGREEMENT & CONTINUE</button>
+        <button onclick="pad.clear()" style="background:none; border:none; color:#9ca3af; margin-top:15px; cursor:pointer; font-weight:bold; font-size:0.85rem; text-transform:uppercase;">Clear Signature</button>
     </div>
 </div>
 
 <script>
-    // ✅ UPDATED: Points to your NEW Script URL (ending in ...YKd/exec)
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
     
     const urlParams = new URLSearchParams(window.location.search);
@@ -89,10 +97,8 @@
     const canvas = document.getElementById('canvas');
     const pad = new SignaturePad(canvas);
 
-    // Auto-update the year
     document.getElementById('currentYear').innerText = new Date().getFullYear();
 
-    // Show Signature Pad only when checkbox is checked
     document.getElementById('consent').addEventListener('change', function() {
         document.getElementById('sig-area').style.display = this.checked ? 'block' : 'none';
         if(this.checked) {
@@ -101,32 +107,32 @@
     });
 
     async function saveContract() {
-        if (pad.isEmpty()) return alert("Please sign the agreement.");
-        if (!userEmail) return alert("Error: No email found. Please use the link sent to your email.");
+        if (pad.isEmpty()) return alert("Please provide a signature to continue.");
+        if (!userEmail) return alert("System Error: Email identity missing. Use the link from your email.");
 
         const sigData = pad.toDataURL().split(',')[1];
-        const btn = document.querySelector('.btn-primary');
-        btn.innerText = "Processing Legal Execution...";
+        const btn = document.getElementById('execBtn');
+        btn.innerText = "AUTHENTICATING LEGAL EXECUTION...";
         btn.disabled = true;
 
         try {
             await fetch(scriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify({
                     action: 'saveSignature',
                     email: userEmail,
                     signatureData: sigData,
-                    fileName: `Signed_Agreement_${userEmail}_${Date.now()}.png`
+                    fileName: `Agreement_Execution_${userEmail.split('@')[0]}.png`
                 })
             });
 
-            alert("Agreement Signed Successfully!");
-            // ✅ UPDATED: Redirects to 'onboarding.html' instead of 'intake/index.html'
-            window.location.href = `https://welldoneconstruction.pro/onboarding.html?email=${encodeURIComponent(userEmail)}`;
+            // Redirect to Secure Vault (onboarding.html)
+            window.location.href = `onboarding.html?email=${encodeURIComponent(userEmail)}`;
             
         } catch (e) {
-            alert("Error saving. Please try again.");
+            alert("Network error. Please try again.");
             btn.disabled = false;
             btn.innerText = "EXECUTE AGREEMENT & CONTINUE";
         }
