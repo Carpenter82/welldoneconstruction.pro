@@ -7,11 +7,14 @@
     <link rel="stylesheet" href="../styles.css">
     <title>Admin Dashboard | Well Done</title>
     <style>
-        :root { --accent: #ef6c00; --primary: #2e7d32; } /* Fallback variables */
+        :root { --accent: #ef6c00; --primary: #2e7d32; --gusto: #e55c5c; }
         .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
         @media (max-width: 800px) { .split-grid { grid-template-columns: 1fr; } }
+        
+        /* New Button Styles */
+        .btn-action { border:none; padding:5px 10px; border-radius:4px; cursor:pointer; color:white; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -39,7 +42,6 @@
 </div>
 
 <script>
-    // FIXED: Added missing closing quote
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzUgzmGYKw1bgqbpOqExi6M2t6yZYjDS69DcKgDst4i07KEJhoBAZOAWRJv9WUcT42E/exec';
 
     async function loadDashboard() {
@@ -55,23 +57,34 @@
                     <span class="badge" style="background:#fff3e0; color:#ef6c00;">${a.status}</span>
                     <p style="margin:10px 0 0 0;"><strong>${a.name}</strong></p>
                     <p style="font-size:12px; color:#666;">${a.trade}</p>
-                    <button onclick="hireProcess('${a.email}')" style="margin-top:10px; background:var(--accent); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Approve/Hire</button>
+                    <button onclick="hireProcess('${a.email}')" class="btn-action" style="margin-top:10px; background:var(--accent);">Approve/Hire</button>
                 </div>
             `).join('') : '<p>No new applicants.</p>';
 
-            // Render Hired Crew
+            // Render Hired Crew (UPDATED FOR GUSTO)
             const crewList = document.getElementById('crewList');
-            crewList.innerHTML = data.activeCrew && data.activeCrew.length ? data.activeCrew.map(c => `
+            
+            crewList.innerHTML = data.activeCrew && data.activeCrew.length ? data.activeCrew.map(c => {
+                // Check if Gusto link exists in the data
+                const gustoBtn = c.gustoLink 
+                    ? `<button onclick="window.open('${c.gustoLink}')" class="btn-action" style="background:var(--gusto);">Payroll</button>`
+                    : '';
+
+                return `
                 <div class="card" style="border-left-color: var(--primary);">
-                    <span class="badge" style="background:#e8f5e9; color:#2e7d32;">${c.status}</span>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="badge" style="background:#e8f5e9; color:#2e7d32;">${c.status}</span>
+                        <span style="height:10px; width:10px; background-color:${c.status === 'Active' ? '#4CAF50' : '#ccc'}; border-radius:50%; display:inline-block;"></span>
+                    </div>
                     <p style="margin:10px 0 0 0;"><strong>${c.name}</strong></p>
                     <p style="font-size:12px; color:#666;">${c.trade} | ${c.tier}</p>
-                    <div style="margin-top:10px; display:flex; gap:5px;">
-                        <button onclick="window.open('${c.folder}')" style="background:#343E47; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Vault</button>
-                        <button onclick="sendWorkOrder('${c.email}')" style="background:var(--primary); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Send WO</button>
-                    </div>
+                    
+                    <div style="margin-top:10px; display:flex; gap:5px; flex-wrap:wrap;">
+                        <button onclick="window.open('${c.folder}')" class="btn-action" style="background:#343E47;">Vault</button>
+                        <button onclick="sendWorkOrder('${c.email}')" class="btn-action" style="background:var(--primary);">Send WO</button>
+                        ${gustoBtn} </div>
                 </div>
-            `).join('') : '<p>No active crew.</p>';
+            `}).join('') : '<p>No active crew.</p>';
 
         } catch (err) {
             console.error(err);
@@ -85,14 +98,13 @@
         if(!tier) return;
         
         try {
-            // Note: Use text/plain for the content type to avoid CORS "preflight" issues with Apps Script
             await fetch(scriptURL, { 
                 method: 'POST', 
-                mode: 'no-cors', // Important for Apps Script POST
+                mode: 'no-cors', 
                 body: JSON.stringify({ action: 'hireWorker', email: email, assignedTier: tier }) 
             });
             alert("Hire request sent! Refreshing dashboard...");
-            setTimeout(loadDashboard, 2000); // Small delay to let Apps Script finish processing
+            setTimeout(loadDashboard, 2000); 
         } catch (err) {
             alert("Error hiring worker.");
         }
