@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Worker Portal | Well Done</title>
-    <link rel="stylesheet" href="../styles.css">
     <style>
         :root { --high-vis: #f1c40f; --dark: #000; --active: #33B26E; }
-        body { background: #1a1a1a; color: white; font-family: sans-serif; padding: 15px; margin: 0; }
+        body { background: #1a1a1a; color: white; font-family: -apple-system, sans-serif; padding: 0; margin: 0; }
         
-        .header { background: var(--high-vis); color: var(--dark); padding: 15px; font-weight: 900; text-align: center; border-bottom: 4px solid #000; }
+        .header { background: var(--high-vis); color: var(--dark); padding: 20px; font-weight: 900; text-align: center; border-bottom: 4px solid #000; letter-spacing: 1px; }
         
-        .mission-card { background: #000; border: 4px solid var(--high-vis); padding: 20px; border-radius: 8px; margin-top: 20px; }
+        .container { padding: 15px; max-width: 500px; margin: 0 auto; }
+        .mission-card { background: #000; border: 4px solid var(--high-vis); padding: 25px; border-radius: 12px; margin-top: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
-        .pay-banner { background: var(--high-vis); color: var(--dark); font-size: 2rem; font-weight: 900; text-align: center; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .pay-banner { background: var(--high-vis); color: var(--dark); font-size: 2.2rem; font-weight: 900; text-align: center; padding: 15px; margin: 15px 0; border-radius: 4px; }
         
-        .label { color: var(--high-vis); font-size: 0.75rem; text-transform: uppercase; margin-top: 15px; font-weight: bold; }
-        .data { font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .label { color: var(--high-vis); font-size: 0.8rem; text-transform: uppercase; margin-top: 20px; font-weight: 900; border-left: 3px solid var(--high-vis); padding-left: 10px; }
+        .data { font-size: 1.3rem; padding: 10px 0; font-weight: bold; }
         
-        .btn-claim { background: var(--high-vis); color: var(--dark); border: none; padding: 20px; width: 100%; font-size: 1.4rem; font-weight: 900; cursor: pointer; border-radius: 4px; margin-top: 25px; transition: transform 0.1s; }
-        .btn-claim:active { transform: scale(0.98); }
+        .btn-claim { background: var(--high-vis); color: var(--dark); border: none; padding: 22px; width: 100%; font-size: 1.5rem; font-weight: 900; cursor: pointer; border-radius: 8px; margin-top: 30px; transition: all 0.1s; text-transform: uppercase; }
+        .btn-claim:active { transform: scale(0.96); }
+        .btn-claim:disabled { background: #444; color: #888; }
         
-        .idle-msg { text-align: center; padding: 60px 20px; color: #888; font-style: italic; }
-        .warning-stripes { height: 12px; background: repeating-linear-gradient(45deg, var(--high-vis), var(--high-vis) 10px, #000 10px, #000 20px); }
+        .idle-msg { text-align: center; padding: 80px 20px; }
+        .idle-msg strong { color: var(--high-vis); font-size: 1.4rem; display: block; margin-bottom: 10px; }
+        .warning-stripes { height: 15px; background: repeating-linear-gradient(45deg, var(--high-vis), var(--high-vis) 20px, #000 20px, #000 40px); }
     </style>
 </head>
 <body>
@@ -30,43 +33,44 @@
     <div class="header">FIELD OPERATIONS DASHBOARD</div>
     <div class="warning-stripes"></div>
 
-    <div id="loading" style="text-align:center; margin-top: 50px;">AUTHENTICATING...</div>
+    <div class="container">
+        <div id="loading" style="text-align:center; margin-top: 50px; font-weight: bold; color: var(--high-vis);">[ ENCRYPTED AUTHENTICATION IN PROGRESS ]</div>
 
-    <div id="idleState" class="idle-msg" style="display:none;">
-        <p>STATUS: <strong>INACTIVE / ON-CALL</strong></p>
-        <p>No missions have been offered to your email at this time.</p>
-    </div>
+        <div id="idleState" class="idle-msg" style="display:none;">
+            <strong>STATUS: ON-CALL (INACTIVE)</strong>
+            <p style="color: #aaa;">The ancestry engine has no open missions assigned to your ID at this time. Stay tuned for dispatch notifications.</p>
+        </div>
 
-    <div id="missionState" style="display:none;">
-        <div class="mission-card">
-            <h2 style="margin:0; text-align:center;">NEW MISSION OFFER</h2>
-            
-            <div class="label">Total Mission Pay (Lump Sum)</div>
-            <div id="missionPay" class="pay-banner">$0.00</div>
+        <div id="missionState" style="display:none;">
+            <div class="mission-card">
+                <h2 style="margin:0; text-align:center; color: var(--high-vis); text-transform: uppercase;">Mission Offer Detected</h2>
+                
+                <div class="label">Total Mission Pay (W-2 Lump Sum)</div>
+                <div id="missionPay" class="pay-banner">$0.00</div>
 
-            <div class="label">Job ID</div>
-            <div id="jobId" class="data">---</div>
+                <div class="label">Ancestry Job ID</div>
+                <div id="jobId" class="data">---</div>
 
-            <div class="label">Location</div>
-            <div id="address" class="data">---</div>
+                <div class="label">Site Address</div>
+                <div id="address" class="data">---</div>
 
-            <div class="label">Mission Scope</div>
-            <div id="notes" style="background:#222; padding:10px; border-radius:4px; margin-top:5px; font-size:0.9rem;">---</div>
+                <div class="label">Mission Scope</div>
+                <div id="notes" style="background:#111; padding:15px; border-radius:4px; margin-top:10px; font-size:0.95rem; border: 1px solid #333; line-height: 1.4;">---</div>
 
-            <button id="claimBtn" class="btn-claim" onclick="acceptWork()">CLAIM MISSION</button>
-            <p style="font-size: 10px; text-align: center; margin-top: 15px; color: #888;">By claiming, you agree to the lump sum pay and activate your status.</p>
+                <button id="claimBtn" class="btn-claim" onclick="acceptWork()">CLAIM MISSION</button>
+                <p style="font-size: 11px; text-align: center; margin-top: 20px; color: #666; font-weight: bold;">OFFICIAL DISPATCH: Claiming activates W-2 status and site liability.</p>
+            </div>
         </div>
     </div>
 
 <script>
-    // ✅ PASTE YOUR WEB APP URL HERE
-    const scriptURL = 'YOUR_DEPLOYED_URL_HERE'; 
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec'; 
 
     const urlParams = new URLSearchParams(window.location.search);
     const email = urlParams.get('email');
 
     if (!email) {
-        alert("Session Expired. Please Log In.");
+        alert("CRITICAL ERROR: No Email Identity Found.");
         window.location.href = "index.html";
     }
 
@@ -82,18 +86,19 @@
                 document.getElementById('jobId').innerText = data.jobId;
                 document.getElementById('address').innerText = data.address;
                 document.getElementById('missionPay').innerText = `$${data.pay}`;
-                document.getElementById('notes').innerText = data.notes || "Standard Procedure.";
+                document.getElementById('notes').innerText = data.notes || "Follow standard site documentation procedures.";
                 
                 if (data.jobStatus === "Active") {
-                    document.getElementById('claimBtn').innerText = "RESUME MISSION";
-                    document.getElementById('claimBtn').style.background = "#33B26E";
-                    document.getElementById('claimBtn').style.color = "#fff";
+                    const btn = document.getElementById('claimBtn');
+                    btn.innerText = "RESUME ACTIVE MISSION";
+                    btn.style.background = "var(--active)";
+                    btn.style.color = "#fff";
                 }
             } else {
                 document.getElementById('idleState').style.display = 'block';
             }
         } catch (e) {
-            document.getElementById('loading').innerText = "CONNECTION ERROR. REFRESH PAGE.";
+            document.getElementById('loading').innerText = "DATA SYNC ERROR. REFRESH APP.";
         }
     }
 
@@ -101,16 +106,15 @@
         const btn = document.getElementById('claimBtn');
         const jobId = document.getElementById('jobId').innerText;
         
-        if(btn.innerText === "RESUME MISSION") {
+        if(btn.innerText === "RESUME ACTIVE MISSION") {
             goToChecklist(jobId);
             return;
         }
 
         btn.disabled = true;
-        btn.innerText = "ACTIVATING...";
+        btn.innerText = "ACTIVATING W-2 STATUS...";
 
         try {
-            // This POST triggers the Code.gs to flip them to "Active"
             await fetch(scriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -121,11 +125,12 @@
                 })
             });
 
-            alert("MISSION CLAIMED. YOUR STATUS IS NOW ACTIVE.");
+            alert("MISSION CLAIMED. SYSTEM IS NOW TRACKING SITE ACTIVITY.");
             goToChecklist(jobId);
         } catch (e) {
-            alert("Network error. Try again.");
+            alert("Sync failed. Check connection.");
             btn.disabled = false;
+            btn.innerText = "CLAIM MISSION";
         }
     }
 
