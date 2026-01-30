@@ -11,7 +11,8 @@
         
         /* Layout */
         .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1200px; margin: auto; }
-        @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        .full-width { grid-column: span 2; }
+        @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
         
         /* Cards */
         .card { background: var(--white); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
@@ -28,12 +29,18 @@
         .btn-main:hover { background: #2c353d; }
         .btn-success { background: var(--accent); }
         .btn-success:hover { background: #28965a; }
+        .btn-danger { background: var(--danger); padding: 8px 12px; font-size: 0.8rem; width: auto; }
         
         /* Dispatch Tabs */
         .tab-container { display: flex; margin-bottom: 20px; background: #eee; border-radius: 6px; padding: 4px; }
         .tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; border-radius: 4px; font-weight: 600; font-size: 0.9rem; }
         .tab.active { background: white; shadow: 0 2px 5px rgba(0,0,0,0.1); color: var(--accent); }
         
+        /* Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; font-size: 0.75rem; color: #888; text-transform: uppercase; padding-bottom: 10px; border-bottom: 2px solid #eee; }
+        td { padding: 12px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+
         .hidden { display: none; }
     </style>
 </head>
@@ -115,12 +122,35 @@
                     Post to Open Board
                 </button>
             </div>
-
         </div>
+
+        <div class="card full-width">
+            <h2>3. Active Mission Control</h2>
+            <p class="card-sub">Monitor active dispatches and mark as complete to reset worker status.</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Job ID</th>
+                        <th>Worker</th>
+                        <th>Trade/Note</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="activeTable">
+                    <tr><td colspan="5" style="text-align:center; padding:20px;">Loading Active Missions...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
+
+        // --- INIT ---
+        window.onload = loadDashboardData;
 
         // --- UI LOGIC ---
         function switchTab(mode) {
@@ -137,6 +167,55 @@
         }
 
         // --- API CALLS ---
+
+        async function loadDashboardData() {
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=getAdminDashboard`);
+                const data = await res.json();
+                
+                // Populate Jobs Datalist
+                const jobList = document.getElementById('activeJobsList');
+                jobList.innerHTML = '';
+                data.jobs.forEach(j => {
+                    const opt = document.createElement('option');
+                    opt.value = j.id;
+                    opt.innerText = `${j.address} (${j.client})`;
+                    jobList.appendChild(opt);
+                });
+
+                // Populate Crew Datalist
+                const crewList = document.getElementById('crewList');
+                crewList.innerHTML = '';
+                data.crew.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.email;
+                    opt.innerText = `${c.name} - ${c.trade}`;
+                    crewList.appendChild(opt);
+                });
+
+                // Populate Active Table
+                const table = document.getElementById('activeTable');
+                table.innerHTML = '';
+                if(data.active.length === 0) {
+                    table.innerHTML = '<tr><td colspan="5" style="text-align:center;">No Active Missions</td></tr>';
+                } else {
+                    data.active.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><strong>${row.id}</strong></td>
+                            <td>${row.worker}</td>
+                            <td>${row.note}</td>
+                            <td><span style="color:var(--accent); font-weight:bold;">${row.status}</span></td>
+                            <td><button class="btn-main btn-danger" onclick="markComplete('${row.id}', '${row.worker}')">MARK COMPLETE</button></td>
+                        `;
+                        table.appendChild(tr);
+                    });
+                }
+
+            } catch(e) {
+                console.error(e);
+            }
+        }
 
         async function submitProject() {
             const btn = document.getElementById('btnSaveProject');
@@ -191,6 +270,30 @@
             sendData(payload, btn, "Post to Open Board");
         }
 
+        async function markComplete(jobId, workerEmail) {
+            if(!confirm(`Mark Job ${jobId} as COMPLETE? This will reset ${workerEmail} to Available.`)) return;
+            
+            const btn = event.target;
+            btn.innerText = "...";
+            btn.disabled = true;
+
+            const payload = {
+                action: 'markJobComplete',
+                jobId: jobId,
+                email: workerEmail
+            };
+
+            try {
+                await fetch(SCRIPT_URL, { 
+                    method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) 
+                });
+                alert("Job Closed. Worker Status Reset.");
+                loadDashboardData(); // Refresh table
+            } catch(e) {
+                alert("Error closing job.");
+            }
+        }
+
         // --- GENERIC SENDER ---
         async function sendData(data, btnElement, originalText) {
             try {
@@ -200,7 +303,7 @@
                     body: JSON.stringify(data) 
                 });
                 alert("Action Successful!");
-                // Optional: Clear forms here
+                loadDashboardData(); // Refresh lists
             } catch (e) {
                 console.error(e);
                 alert("Error connecting to Master Engine.");
@@ -208,12 +311,6 @@
                 btnElement.disabled = false;
                 btnElement.innerText = originalText;
             }
-        }
-
-        // Pre-fill logic if URL params exist (Legacy support)
-        const urlParams = new URLSearchParams(window.location.search);
-        if(urlParams.get('prefillEmail')) {
-            document.getElementById('workerEmail').value = urlParams.get('prefillEmail');
         }
     </script>
 </body>
