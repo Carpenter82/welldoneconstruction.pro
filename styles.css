@@ -1,94 +1,168 @@
-/* --- GLOBAL PROFESSIONAL THEME --- */
+/* =========================================
+   1. THE PALETTE (INDUSTRIAL STANDARD)
+   ========================================= */
 :root {
-    --primary: #2c3e50;
-    --accent: #33B26E;
-    --caution: #f39c12;
-    --danger: #e74c3c;
-    --bg-light: #f4f7f6;
-    --stripe-yellow: #f1c40f;
+    /* Core Structure */
+    --primary-slate: #2c3e50;  /* Dark Blue-Grey (Headers) */
+    --industrial-dark: #1a1a1a; /* Background Body */
+    --card-white: #ffffff;      /* Content Areas */
+    
+    /* Action Signals */
+    --safety-orange: #e67e22;   /* Primary Actions (Submit/Enter) */
+    --hazard-yellow: #f1c40f;   /* Warnings / Open Jobs */
+    --stop-red: #c0392b;        /* Danger / Decline / Zero Tolerance */
+    --go-green: #27ae60;        /* Success / Active / Paid */
+    
+    /* Structural */
+    --border-thick: 2px solid #2c3e50;
+    --border-alert: 3px solid #c0392b;
 }
 
-* {
-    box-sizing: border-box; /* Prevents padding from affecting element width */
-}
-
+/* =========================================
+   2. BASE TERMINAL (RESET)
+   ========================================= */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--bg-light);
+    background-color: var(--industrial-dark);
+    font-family: 'Helvetica Neue', Arial, sans-serif; /* Clean, Standard */
     margin: 0;
-    padding: 0;
-    color: var(--primary);
-    line-height: 1.6;
+    padding: 20px;
+    color: #000;
+    -webkit-font-smoothing: antialiased;
 }
 
-.container { 
-    max-width: 600px; 
-    margin: 0 auto; 
-    padding: 20px; 
-    width: 100%;
-}
-
-/* Dashboard Card Style */
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    margin-bottom: 20px;
-    border-top: 5px solid var(--accent);
-}
-
-/* --- WAREHOUSE THEME (Industrial/Login Look) --- */
-body.warehouse-theme { 
-    background-color: #dfe6e9; 
-    padding: 10px; 
-}
-
-/* Combined card logic for the Warehouse version */
-.warehouse-theme .warehouse-card {
-    background: #fff;
-    border: 4px solid var(--primary);
-    padding: 25px;
-    box-shadow: 8px 8px 0px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-    position: relative;
-    border-radius: 0; /* Industrial looks better with sharp corners */
-}
-
-.warehouse-theme .poster-header {
-    background: var(--primary);
-    color: white;
-    text-align: center;
-    padding: 15px;
-    font-weight: 800;
+h1, h2, h3 {
     text-transform: uppercase;
     letter-spacing: 1px;
-    /* Aligns header to the very top edges of the bordered card */
-    margin: -25px -25px 25px -25px; 
+    margin: 0;
+    font-weight: 900;
 }
 
-.warehouse-theme .warning-stripe {
-    height: 18px;
+/* =========================================
+   3. THE WAREHOUSE CARD (CONTAINERS)
+   ========================================= */
+.card {
+    background: var(--card-white);
+    border: var(--border-thick);
+    border-radius: 4px; /* Slight rounding, mostly sharp */
+    margin-bottom: 20px;
+    overflow: hidden; /* Contains the header bars */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+/* The Color-Coded Headers */
+.status-bar {
+    padding: 12px 15px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: var(--border-thick);
+}
+.status-bar.green { background-color: var(--go-green); }
+.status-bar.yellow { background-color: var(--hazard-yellow); color: black; }
+.status-bar.grey { background-color: var(--primary-slate); }
+.status-bar.red { background-color: var(--stop-red); }
+
+/* =========================================
+   4. FIELD INPUTS & BUTTONS (LARGE TARGETS)
+   ========================================= */
+/* Inputs designed for mobile */
+input[type="text"], 
+input[type="email"], 
+select, 
+textarea {
+    width: 100%;
+    height: 55px; /* Big hit area */
+    padding: 10px 15px;
+    font-size: 18px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Keeps padding inside width */
+    margin-bottom: 15px;
+    background: #fdfdfd;
+}
+
+input:focus {
+    border-color: var(--safety-orange);
+    outline: none;
+}
+
+/* Buttons designed for authority */
+.btn {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: filter 0.2s;
+}
+
+.btn:active { transform: scale(0.98); } /* Click feedback */
+
+.btn-primary { background-color: var(--safety-orange); color: white; }
+.btn-success { background-color: var(--go-green); color: white; }
+.btn-danger  { background-color: var(--stop-red); color: white; }
+.btn-neutral { background-color: #95a5a6; color: white; }
+
+/* =========================================
+   5. UTILITY: THE SAFETY BOARD ELEMENTS
+   ========================================= */
+/* The Hazard Stripe Pattern */
+.hazard-stripe {
+    height: 12px;
+    width: 100%;
     background: repeating-linear-gradient(
-        45deg, 
-        #000, 
-        #000 15px, 
-        var(--stripe-yellow) 15px, 
-        var(--stripe-yellow) 30px
+        45deg,
+        #000,
+        #000 10px,
+        var(--hazard-yellow) 10px,
+        var(--hazard-yellow) 20px
     );
-    /* Use negative margin if you want it to touch the card edges */
-    margin: 0 -25px 20px -25px; 
-}
-.btn-gusto {
-  background-color: #0a8080; /* A teal color, or use #d93c3c for red */
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 12px;
+    border-bottom: var(--border-thick);
 }
 
-.btn-gusto:hover {
-  background-color: #066666;
+/* The Checklist Toggles (Yes/No) */
+.toggle-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.toggle-btn {
+    flex: 1;
+    padding: 15px;
+    background: #eee;
+    border: 2px solid #ccc;
+    font-weight: bold;
+    color: #777;
+}
+.toggle-btn.active-yes {
+    background: var(--go-green);
+    color: white;
+    border-color: #1e8449;
+}
+.toggle-btn.active-no {
+    background: var(--stop-red);
+    color: white;
+    border-color: #922b21;
+}
+
+/* Data Lists (Dashboard) */
+.job-row {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.job-id {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    background: #eee;
+    padding: 4px 8px;
+    border-radius: 3px;
 }
