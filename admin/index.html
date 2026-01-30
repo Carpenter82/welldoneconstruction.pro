@@ -74,7 +74,8 @@
             
             <div id="view-applicants">
                 <div id="loader" style="text-align:center; padding:20px;">Loading Application Data...</div>
-                <div id="applicantList"></div> </div>
+                <div id="applicantList"></div> 
+            </div>
 
             <div id="view-crew" class="hidden">
                 <div class="card" style="border-left-color: var(--primary);">
@@ -87,7 +88,8 @@
                                 <th>Notes / Rap Sheet</th>
                             </tr>
                         </thead>
-                        <tbody id="crewTable"></tbody> </table>
+                        <tbody id="crewTable"></tbody> 
+                    </table>
                 </div>
             </div>
 
@@ -95,13 +97,12 @@
     </div>
 
     <script>
-        // UPDATED DEPLOYMENT v135
-        const API_URL = "https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec";
+        // *** UPDATED V139 URL ***
+        const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
         
         // --- 1. AUTHENTICATION ---
         function authenticate() {
             const pass = document.getElementById('adminPass').value;
-            // Simple front-gate. Real security happens on backend tokens if needed.
             if(pass === "WellDone2025") { 
                 document.getElementById('securityGate').style.display = 'none';
                 document.getElementById('app').classList.remove('hidden');
@@ -136,7 +137,7 @@
                 document.getElementById('loader').style.display = 'none';
             } catch (e) {
                 console.error(e);
-                document.getElementById('loader').innerText = "Error connecting to Database.";
+                document.getElementById('loader').innerText = "Error connecting to Database (v139). Check Sheet Tabs.";
             }
         }
 
@@ -144,7 +145,7 @@
             const container = document.getElementById('applicantList');
             container.innerHTML = "";
 
-            if(list.length === 0) container.innerHTML = "<p>No new applications pending.</p>";
+            if(!list || list.length === 0) container.innerHTML = "<p style='text-align:center;color:#888;'>No new applications found. (Check Sheet for 'NEW' status)</p>";
 
             list.forEach(app => {
                 const card = document.createElement('div');
@@ -176,6 +177,8 @@
             const tbody = document.getElementById('crewTable');
             tbody.innerHTML = "";
 
+            if(!list) return;
+
             list.forEach(c => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -183,10 +186,10 @@
                         <strong>${c.name}</strong><br>
                         <a href="mailto:${c.email}" style="color:#888;font-size:0.8rem;">${c.email}</a>
                     </td>
-                    <td>${c.tier}<br><span class="tag">${c.trade}</span></td>
+                    <td>${c.tier || "Standard"}<br><span class="tag">${c.trade}</span></td>
                     <td><button class="btn btn-folder" style="padding:5px;" onclick="window.open('${c.folderUrl}', '_blank')">Audit</button></td>
                     <td>
-                        <input type="text" class="input-notes" value="${c.notes}" 
+                        <input type="text" class="input-notes" value="${c.notes || ""}" 
                         onchange="updateNote('${c.email}', this.value)" placeholder="Add Rap Sheet notes...">
                     </td>
                 `;
