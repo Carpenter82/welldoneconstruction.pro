@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPLOAD DOCUMENTS | WELL DONE</title>
-    <link rel="stylesheet" href="styles.css"> 
+    <title>Upload Credentials | Well Done</title>
     <style>
-        /* Override specific styles for this page */
-        body { text-align: center; background-color: #1a1a1a; color: #fff; font-family: sans-serif; }
+        body { text-align: center; background-color: #1a1a1a; color: #fff; font-family: -apple-system, sans-serif; padding: 20px; }
         
-        .container { max-width: 500px; margin: 0 auto; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; }
         
         .logo { font-size: 1.5rem; font-weight: bold; margin-bottom: 20px; letter-spacing: 2px; }
         .logo span { color: #e67e22; }
@@ -23,8 +21,6 @@
             position: relative;
         }
 
-        .upload-zone.active { border-color: #e67e22; background: #2a2a2a; }
-
         .upload-icon { font-size: 2rem; color: #666; margin-bottom: 10px; }
         
         /* Hidden real input */
@@ -34,22 +30,25 @@
         .custom-upload-btn {
             background: #444;
             color: white;
-            padding: 8px 15px;
+            padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
             display: inline-block;
             margin-top: 10px;
             font-size: 0.9rem;
             transition: background 0.3s;
+            text-transform: uppercase;
+            font-weight: bold;
         }
         .custom-upload-btn:hover { background: #555; }
 
         .preview-img {
             max-width: 100%;
             max-height: 150px;
-            margin-top: 10px;
+            margin-top: 15px;
             display: none; /* Hidden until file selected */
             border: 1px solid #e67e22;
+            border-radius: 4px;
         }
 
         .file-name { color: #e67e22; font-size: 0.8rem; margin-top: 5px; }
@@ -65,19 +64,20 @@
             border-radius: 4px;
             cursor: pointer;
             text-transform: uppercase;
+            margin-top: 10px;
         }
         #submitBtn:disabled { background-color: #555; cursor: not-allowed; }
         
-        .status-msg { margin-top: 20px; font-weight: bold; min-height: 24px; }
+        .status-msg { margin-top: 20px; font-weight: bold; min-height: 24px; color: #ccc; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="logo">WELL <span>DONE</span></div>
-        <h2>Final Step: ID Verification</h2>
-        <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 20px;">
-            Please upload a clear photo of your Valid ID and Safety/OSHA Card.
+        <h2>Credential Upload</h2>
+        <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 30px;">
+            Please upload clear photos of your required documents.
         </p>
 
         <form id="docForm">
@@ -106,15 +106,15 @@
                 <img id="preview-osha" class="preview-img">
             </div>
 
-            <button type="submit" id="submitBtn">FINISH ONBOARDING</button>
+            <button type="submit" id="submitBtn">Submit Documents</button>
         </form>
         
         <div id="status" class="status-msg"></div>
     </div>
 
     <script>
-        // *** CONFIGURATION: UPDATED TO V134 ***
-        const API_URL = "https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec"; 
+        // UPDATED DEPLOYMENT ID (v138)
+        const API_URL = "https://script.google.com/macros/s/AKfycbwtLjTRDPDe7aPXO7eKVLjPQgDe6pv8fhcpAKZU2ba8QkhnyQEk985yfnoe34nDGdrb/exec"; 
 
         // 1. Get Identity from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -122,23 +122,21 @@
 
         if (!email) {
             alert("Session Error. Redirecting to start.");
-            window.location.href = "/apply/index.html";
+            window.location.href = "../index.html";
         }
 
-        // 2. File Reader Logic (Handles the preview & Base64 conversion)
+        // 2. File Reader Logic
         function setupUploader(inputId, previewId, nameId) {
             document.getElementById(inputId).addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
                     document.getElementById(nameId).textContent = file.name;
                     const reader = new FileReader();
-                    
                     reader.onload = function(e) {
                         const img = document.getElementById(previewId);
                         img.src = e.target.result;
                         img.style.display = "block";
                     };
-                    
                     reader.readAsDataURL(file);
                 }
             });
@@ -153,29 +151,23 @@
             const btn = document.getElementById('submitBtn');
             const status = document.getElementById('status');
             
-            // Validate that at least ID is present
             const idFile = document.getElementById('file-id').files[0];
             const oshaFile = document.getElementById('file-osha').files[0];
 
-            if (!idFile) {
-                alert("You must upload a Government ID.");
-                return;
-            }
+            if (!idFile) return alert("You must upload a Government ID.");
 
             btn.disabled = true;
-            btn.textContent = "Uploading Securely...";
+            btn.textContent = "ENCRYPTING & UPLOADING...";
 
-            // We need to read files as Base64 text to send to Google Script
-            // This helper function wraps the FileReader in a Promise
+            // Helper to read file as Base64
             const readFile = (file) => {
-                return new Promise((resolve, reject) => {
-                    if (!file) resolve(null); // Return null if no file (e.g. no OSHA card)
+                return new Promise((resolve) => {
+                    if (!file) resolve(null); 
                     const reader = new FileReader();
                     reader.onload = () => resolve({
                         name: file.name,
-                        data: reader.result.split(',')[1] // Remove "data:image..." prefix
+                        data: reader.result.split(',')[1] 
                     });
-                    reader.onerror = error => reject(error);
                     reader.readAsDataURL(file);
                 });
             };
@@ -183,37 +175,32 @@
             // Process both files
             Promise.all([readFile(idFile), readFile(oshaFile)])
             .then(results => {
-                const idData = results[0];
-                const oshaData = results[1];
-
                 const payload = {
                     action: "saveDocuments",
                     email: email,
-                    idFile: idData,
-                    oshaFile: oshaData
+                    idFile: results[0],
+                    oshaFile: results[1]
                 };
 
                 return fetch(API_URL, {
                     method: "POST",
                     mode: "no-cors",
-                    headers: { "Content-Type": "text/plain" },
                     body: JSON.stringify(payload)
                 });
             })
             .then(() => {
-                status.textContent = "Documents Uploaded. Welcome to the team!";
-                status.style.color = "#27ae60";
+                status.textContent = "Documents Received. Processing Payroll...";
+                status.style.color = "#2ecc71";
+                
                 setTimeout(() => {
-                    // Redirect to the Portal Login
-                    window.location.href = `/portal/index.html?email=${encodeURIComponent(email)}`;
+                    alert("Onboarding Complete! Please check your email for Gusto payroll setup.");
+                    window.location.href = "../portal/index.html?email=" + encodeURIComponent(email);
                 }, 2000);
             })
             .catch(err => {
                 console.error(err);
-                status.textContent = "Upload Failed. File size might be too large (Max 5MB).";
-                status.style.color = "#c0392b";
+                status.textContent = "Upload Failed. Try smaller photos.";
                 btn.disabled = false;
-                btn.textContent = "Try Again";
             });
         });
     </script>
