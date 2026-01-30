@@ -4,97 +4,152 @@
     <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application | Well Done</title>
+    <title>Join the Crew | Well Done Construction</title>
     <style>
         body { font-family: -apple-system, sans-serif; background: #f4f7f6; padding: 20px; color: #343E47; }
         .form-card { max-width: 500px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 1rem; }
-        button { background: #33B26E; color: white; font-weight: bold; border: none; cursor: pointer; margin-top: 20px; transition: background 0.3s; }
-        button:hover { background: #28a061; }
-        button:disabled { background: #9ca3af; cursor: not-allowed; }
         h2 { text-align: center; color: #343E47; margin-top: 0; text-transform: uppercase; letter-spacing: 1px; }
-        label { font-size: 0.85rem; font-weight: bold; color: #6E797F; margin-left: 2px; }
+        label { font-size: 0.85rem; font-weight: bold; color: #6E797F; display: block; margin-top: 15px; margin-bottom: 5px; }
+        input, select, button { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 1rem; }
+        button { background: #33B26E; color: white; font-weight: bold; border: none; cursor: pointer; margin-top: 30px; transition: background 0.3s; }
+        button:hover { background: #28a061; }
+        button:disabled { background: #9ca3af; cursor: wait; }
+        .file-upload { border: 2px dashed #ccc; padding: 20px; text-align: center; cursor: pointer; border-radius: 6px; margin-top: 5px; }
+        .checkbox-group { display: flex; align-items: flex-start; margin-top: 20px; }
+        .checkbox-group input { width: 20px; margin-right: 10px; margin-top: 2px; }
+        .checkbox-group label { margin: 0; font-weight: normal; font-size: 0.9rem; color: #333; }
     </style>
 </head>
 <body>
-    <div class="form-card" id="mainCard">
+
+    <div class="form-card">
         <h2>Worker Application</h2>
         <form id="appForm">
-            <label>FULL NAME</label>
-            <input type="text" name="fullName" placeholder="John Doe" required>
             
-            <label>EMAIL ADDRESS</label>
-            <input type="email" name="email" placeholder="email@example.com" required>
+            <label>First Name</label>
+            <input type="text" id="fname" placeholder="John" required>
             
-            <label>PHONE NUMBER</label>
-            <input type="tel" name="phone" placeholder="775-555-0123" required>
+            <label>Last Name</label>
+            <input type="text" id="lname" placeholder="Doe" required>
             
-            <label>PRIMARY TRADE</label>
-            <select name="trade" required>
-                <option value="">Select Primary Trade</option>
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="email@example.com" required>
+            
+            <label>Phone Number</label>
+            <input type="tel" id="phone" placeholder="775-555-0123" required>
+            
+            <label>Primary Trade</label>
+            <select id="trade" required>
+                <option value="">Select Trade...</option>
+                <option value="General Labor">General Labor</option>
                 <option value="Carpentry">Carpentry</option>
                 <option value="Plumbing">Plumbing</option>
                 <option value="Electrical">Electrical</option>
                 <option value="Painting">Painting</option>
-                <option value="General Labor">General Labor</option>
             </select>
 
-            <label>YEARS OF EXPERIENCE</label>
-            <input type="number" name="yearsExp" placeholder="e.g. 5" min="0" required>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <div>
+                    <label>Experience (Yrs)</label>
+                    <input type="number" id="exp" placeholder="0" required>
+                </div>
+                <div>
+                    <label>Desired Pay ($/hr)</label>
+                    <input type="number" id="pay" placeholder="25" required>
+                </div>
+            </div>
 
-            <label>DO YOU HAVE YOUR OWN TOOLS?</label>
-            <select name="tools" required>
-                <option value="YES">Yes, I have basic tools for my trade</option>
-                <option value="NO">No, I do not have tools</option>
+            <label>Tools?</label>
+            <select id="tools" required>
+                <option value="Basic Hand Tools">Yes, Basic Hand Tools</option>
+                <option value="No Tools">No Tools</option>
+                <option value="Full Kit">Full Professional Kit</option>
             </select>
+
+            <label>Resume (Optional)</label>
+            <div class="file-upload" onclick="document.getElementById('resume').click()">
+                <span id="fileName">Click to Upload PDF or Image</span>
+                <input type="file" id="resume" hidden accept=".pdf, .jpg, .png, .doc, .docx" onchange="updateFileName()">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="consent" required>
+                <label>I certify that the information provided is true and I consent to a background check if required.</label>
+            </div>
 
             <button type="submit" id="submitBtn">SUBMIT APPLICATION</button>
         </form>
     </div>
 
     <script>
-        // UPDATED DEPLOYMENT ID: Version 134
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
-        const form = document.getElementById('appForm');
-        
-        form.addEventListener('submit', e => {
+        // Use the API URL from your latest deployment (v138)
+        const API_URL = "https://script.google.com/macros/s/AKfycbwtLjTRDPDe7aPXO7eKVLjPQgDe6pv8fhcpAKZU2ba8QkhnyQEk985yfnoe34nDGdrb/exec";
+
+        function updateFileName() {
+            const file = document.getElementById('resume').files[0];
+            if(file) document.getElementById('fileName').innerText = "📄 " + file.name;
+        }
+
+        document.getElementById('appForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            btn.innerText = "PROCESSING REGISTRATION...";
             btn.disabled = true;
+            btn.innerText = "GENERATING PDF & SUBMITTING...";
 
-            const formData = new FormData(form);
-            const nameParts = formData.get('fullName').trim().split(' ');
+            // 1. Handle File Upload (Convert to Base64)
+            const fileInput = document.getElementById('resume');
+            let fileData = { hasFile: false };
             
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const base64 = await toBase64(file);
+                fileData = {
+                    hasFile: true,
+                    filename: file.name,
+                    mimeType: file.type,
+                    base64: base64.split(',')[1] // Remove 'data:application/pdf;base64,' prefix
+                };
+            }
+
+            // 2. Build Payload
             const payload = {
-                action: 'intake',
-                firstName: nameParts[0] || "",
-                lastName: nameParts.slice(1).join(' ') || "Worker",
-                email: formData.get('email'),
-                phone: formData.get('phone'),
-                trade: formData.get('trade'),
-                yearsExp: formData.get('yearsExp'),
-                tools: formData.get('tools')
+                action: 'submitApplication',
+                fname: document.getElementById('fname').value,
+                lname: document.getElementById('lname').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                trade: document.getElementById('trade').value,
+                exp: document.getElementById('exp').value,
+                pay: document.getElementById('pay').value,
+                tools: document.getElementById('tools').value,
+                consent: document.getElementById('consent').checked,
+                resume: fileData
             };
 
-            fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify(payload)
-            }).then(() => {
-                document.getElementById('mainCard').innerHTML = `
-                    <div style="text-align:center; padding: 20px;">
-                        <div style="font-size: 4rem; margin-bottom:10px;">✅</div>
-                        <h2 style="color: #33B26E;">Application Received</h2>
-                        <p>Your profile has been logged. <strong>Check your email</strong> (including spam) for the legal agreement link.</p>
-                        <a href="index.html" style="display:inline-block; margin-top:20px; color: #343E47; font-weight: bold; text-decoration: none; border-bottom: 2px solid #343E47;">Return Home</a>
-                    </div>`;
-            }).catch(err => {
-                alert("Connection error. Please check your internet and try again.");
-                btn.innerText = "SUBMIT APPLICATION";
+            // 3. Send to Backend
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(payload)
+                });
+                
+                // 4. Hard Stop Redirect
+                window.location.href = "thank-you.html";
+                
+            } catch (err) {
+                console.error(err);
+                alert("Error submitting application. Please try again.");
                 btn.disabled = false;
-            });
+                btn.innerText = "SUBMIT APPLICATION";
+            }
+        });
+
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
         });
     </script>
 </body>
