@@ -12,9 +12,10 @@
         .header { background: var(--primary); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
         .logo { height: 40px; }
         
-        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; padding: 20px; }
-        .col { background: #ebedef; padding: 15px; border-radius: 12px; min-height: 85vh; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
-        h3 { text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-top: 0; }
+        /* Updated Grid to 2x2 for better layout with 4 items */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .col { background: #ebedef; padding: 20px; border-radius: 12px; min-height: 400px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        h3 { text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-top: 0; display: flex; justify-content: space-between; }
         
         .card { background: white; padding: 15px; margin-bottom: 12px; border-radius: 8px; border-left: 5px solid var(--warning); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .card.signed { border-left-color: #3498db; }
@@ -26,7 +27,10 @@
         button { width: 100%; padding: 10px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; transition: 0.2s; }
         .btn-hire { background: var(--primary); color: white; }
         .btn-view { background: #eee; color: var(--primary); margin-bottom: 5px; }
-        button:hover { opacity: 0.8; }
+        .btn-link { background: var(--primary); color: white; text-decoration: none; display: block; padding: 15px; text-align: center; border-radius: 6px; margin-top: 15px; }
+        button:hover, .btn-link:hover { opacity: 0.8; }
+        
+        .nav-link { font-size: 0.75rem; text-decoration: none; color: #666; }
     </style>
 </head>
 <body>
@@ -43,13 +47,20 @@
         </div>
 
         <div class="col">
-            <h3>2. Crew List (Inactive)</h3>
-            <div id="list2">Loading Crew...</div>
+            <h3>2. Active Roster (Crew)</h3>
+            <div id="list3">Loading Roster...</div>
         </div>
 
         <div class="col">
-            <h3>3. Active Roster</h3>
-            <div id="list3">Loading Roster...</div>
+            <h3>3. Activity Logs <a href="activity.html" class="nav-link">VIEW FULL LOG &rarr;</a></h3>
+            <p style="font-size: 0.85rem; color: #666;">Recent GPS & Photo Uploads</p>
+            <a href="activity.html" class="btn-link">OPEN GPS ACTIVITY AUDIT</a>
+        </div>
+
+        <div class="col">
+            <h3>4. Project Ledger <a href="project.html" class="nav-link">VIEW ALL &rarr;</a></h3>
+            <p style="font-size: 0.85rem; color: #666;">Master list of all active Ancestry IDs.</p>
+            <a href="project.html" class="btn-link" style="background: var(--accent);">OPEN PROJECT MASTER LIST</a>
         </div>
     </div>
 
@@ -59,8 +70,6 @@
 
         async function loadDashboard() {
             try {
-                // Note: Ensure your Google Script has a doGet() or handles this action in doPost with a payload
-                // Since we are fetching, this effectively sends a GET request.
                 const res = await fetch(scriptURL + "?action=getAdminDashboard"); 
                 const data = await res.json();
                 
@@ -77,35 +86,24 @@
                     </div>
                 `).join('') || "No new applicants.";
 
-                // 2 & 3. Split the Crew List
-                const inactive = data.activeCrew.filter(c => c.status !== 'Active');
-                const active = data.activeCrew.filter(c => c.status === 'Active');
-
-                document.getElementById('list2').innerHTML = inactive.map(c => `
-                    <div class="card">
-                        <strong>${c.name}</strong>
-                        <div class="details">
-                            Tier: ${c.tier}<br>
-                            Status: ${c.status}
-                        </div>
-                        <button class="btn-view" onclick="window.open('${c.folder}')">Docs</button>
-                    </div>
-                `).join('') || "No inactive crew.";
-
+                // 2. Active Roster (Combined View)
+                const active = data.activeCrew;
                 document.getElementById('list3').innerHTML = active.map(c => `
-                    <div class="card active">
+                    <div class="card ${c.status === 'Active' ? 'active' : ''}">
                         <strong>${c.name}</strong>
                         <div class="details">
-                            Mission: <b>${c.jobId || 'Unknown'}</b><br>
-                            Tier: ${c.tier}
+                            Status: <b>${c.status}</b><br>
+                            Mission: ${c.jobId || 'Standby'}
                         </div>
-                        <button class="btn-view" onclick="window.open('${c.folder}')">Live Job Photos</button>
+                        ${c.status === 'Active' ? 
+                          `<button class="btn-view" onclick="window.open('${c.folder}')">Live Job Photos</button>` : 
+                          `<button class="btn-hire" onclick="location.href='dispatch.html?prefillEmail=${c.email}'">Dispatch Mission</button>`
+                        }
                     </div>
-                `).join('') || "No active missions.";
+                `).join('') || "No crew members found.";
 
             } catch (e) {
                 console.error(e);
-                // Placeholder for visual testing if API fails
                 document.getElementById('list1').innerHTML = "<i>System Standby...</i>";
             }
         }
