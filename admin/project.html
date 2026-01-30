@@ -42,9 +42,16 @@
         td { padding: 12px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
 
         .hidden { display: none; }
+        
+        /* Nav Link */
+        .nav-link { text-decoration: none; font-size: 0.9rem; color: #3498db; font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
 <body>
+
+    <div style="max-width:1200px; margin:0 auto 20px auto;">
+        <a href="index.html" class="nav-link">⬅ Back to Personnel Hub</a>
+    </div>
 
     <div class="dashboard-grid">
         
@@ -147,7 +154,8 @@
     </div>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
+        // *** CRITICAL: UPDATED TO V139 URL ***
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec';
 
         // --- INIT ---
         window.onload = loadDashboardData;
@@ -176,27 +184,31 @@
                 // Populate Jobs Datalist
                 const jobList = document.getElementById('activeJobsList');
                 jobList.innerHTML = '';
-                data.jobs.forEach(j => {
-                    const opt = document.createElement('option');
-                    opt.value = j.id;
-                    opt.innerText = `${j.address} (${j.client})`;
-                    jobList.appendChild(opt);
-                });
+                if(data.jobs) {
+                    data.jobs.forEach(j => {
+                        const opt = document.createElement('option');
+                        opt.value = j.id;
+                        opt.innerText = `${j.address} (${j.client})`;
+                        jobList.appendChild(opt);
+                    });
+                }
 
                 // Populate Crew Datalist
                 const crewList = document.getElementById('crewList');
                 crewList.innerHTML = '';
-                data.crew.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c.email;
-                    opt.innerText = `${c.name} - ${c.trade}`;
-                    crewList.appendChild(opt);
-                });
+                if(data.crew) {
+                    data.crew.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.email;
+                        opt.innerText = `${c.name} - ${c.trade}`;
+                        crewList.appendChild(opt);
+                    });
+                }
 
                 // Populate Active Table
                 const table = document.getElementById('activeTable');
                 table.innerHTML = '';
-                if(data.active.length === 0) {
+                if(!data.active || data.active.length === 0) {
                     table.innerHTML = '<tr><td colspan="5" style="text-align:center;">No Active Missions</td></tr>';
                 } else {
                     data.active.forEach(row => {
