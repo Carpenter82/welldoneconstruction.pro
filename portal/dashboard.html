@@ -64,6 +64,7 @@
     </div>
 
 <script>
+    // UPDATED DEPLOYMENT ID: Version 134
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec'; 
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -76,6 +77,7 @@
 
     async function getJob() {
         try {
+            // Note: Requires backend update to handle 'getWorkerJob'
             const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}`);
             const data = await res.json();
             
@@ -99,6 +101,7 @@
             }
         } catch (e) {
             document.getElementById('loading').innerText = "DATA SYNC ERROR. REFRESH APP.";
+            console.error(e);
         }
     }
 
