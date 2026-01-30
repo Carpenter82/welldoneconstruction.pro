@@ -4,126 +4,201 @@
     <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executive Command | Well Done Construction</title>
+    <title>Master Dashboard | Well Done ERP</title>
     <style>
-        :root { --primary: #343E47; --accent: #33B26E; --warning: #f39c12; --bg: #f4f7f6; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; color: var(--primary); }
+        :root { --primary: #343E47; --accent: #33B26E; --bg: #f4f7f6; --white: #ffffff; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; color: var(--primary); }
         
-        .header { background: var(--primary); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { height: 40px; }
+        /* HEADER */
+        header { background: var(--primary); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
+        nav a { color: #cfd8dc; text-decoration: none; margin-left: 20px; font-size: 0.9rem; font-weight: 500; }
+        nav a:hover, nav a.active { color: var(--accent); }
+
+        /* MAIN LAYOUT */
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        @media (max-width: 800px) { .container { grid-template-columns: 1fr; } }
         
-        /* Updated Grid to 2x2 for better layout with 4 items */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
-        .col { background: #ebedef; padding: 20px; border-radius: 12px; min-height: 400px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
-        h3 { text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-top: 0; display: flex; justify-content: space-between; }
+        /* CARDS */
+        .card { background: var(--white); padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        h2 { border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; font-size: 1.1rem; text-transform: uppercase; }
         
-        .card { background: white; padding: 15px; margin-bottom: 12px; border-radius: 8px; border-left: 5px solid var(--warning); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .card.signed { border-left-color: #3498db; }
-        .card.active { border-left-color: var(--accent); }
+        /* FORMS */
+        label { display: block; font-weight: bold; margin-top: 15px; margin-bottom: 5px; font-size: 0.8rem; color: #7f8c8d; text-transform: uppercase; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #dfe6e9; border-radius: 4px; box-sizing: border-box; font-size: 1rem; }
         
-        .card strong { display: block; font-size: 1.1rem; margin-bottom: 5px; }
-        .details { font-size: 0.85rem; color: #6E797F; line-height: 1.4; margin-bottom: 10px; }
-        
-        button { width: 100%; padding: 10px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; transition: 0.2s; }
-        .btn-hire { background: var(--primary); color: white; }
-        .btn-view { background: #eee; color: var(--primary); margin-bottom: 5px; }
-        .btn-link { background: var(--primary); color: white; text-decoration: none; display: block; padding: 15px; text-align: center; border-radius: 6px; margin-top: 15px; }
-        button:hover, .btn-link:hover { opacity: 0.8; }
-        
-        .nav-link { font-size: 0.75rem; text-decoration: none; color: #666; }
+        /* BUTTONS */
+        .btn { width: 100%; padding: 15px; margin-top: 20px; background: var(--primary); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .btn:hover { background: #2c3e50; }
+        .btn-green { background: var(--accent); }
+        .btn-green:hover { background: #27ae60; }
+
+        /* TABS */
+        .tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #ddd; }
+        .tab { padding: 10px 20px; cursor: pointer; font-weight: bold; color: #7f8c8d; }
+        .tab.active { border-bottom: 3px solid var(--accent); color: var(--primary); }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" class="logo">
-        <div style="font-weight: bold;">ADMINISTRATION PORTAL</div>
-    </div>
+    <header>
+        <h1>Well Done ERP <span style="font-size:0.8em; opacity:0.7;">v13.0</span></h1>
+        <nav>
+            <a href="index.html" class="active">DASHBOARD</a>
+            <a href="crew.html">CREW LIST</a> <a href="map.html">LIVE MAP</a>   </nav>
+    </header>
 
-    <div class="grid">
-        <div class="col">
-            <h3>1. Applicant Audit</h3>
-            <div id="list1">Loading Applicants...</div>
+    <div class="container">
+        
+        <div class="card">
+            <h2>1. New Project Entry</h2>
+            <p style="font-size:0.9rem; color:#888;">Create ancestry record in ProjectLog.</p>
+            
+            <label>Client Name</label>
+            <input type="text" id="client" placeholder="e.g. John Doe">
+            
+            <label>Street Address (Generates ID)</label>
+            <input type="text" id="address" placeholder="e.g. 123 Brown St">
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div>
+                    <label>Budget ($)</label>
+                    <input type="number" id="budget" placeholder="0.00">
+                </div>
+                <div>
+                    <label>Source</label>
+                    <select id="source">
+                        <option>Referral</option>
+                        <option>Website</option>
+                        <option>Repeat</option>
+                    </select>
+                </div>
+            </div>
+            
+            <label>Project Scope / Notes</label>
+            <textarea id="notes" rows="3"></textarea>
+            
+            <button class="btn" id="btnSave" onclick="saveProject()">Create Project Record</button>
         </div>
 
-        <div class="col">
-            <h3>2. Active Roster (Crew)</h3>
-            <div id="list3">Loading Roster...</div>
+        <div class="card">
+            <h2>2. Dispatch Center</h2>
+            <p style="font-size:0.9rem; color:#888;">Assign tasks to workers.</p>
+            
+            <label>Select Job ID</label>
+            <input type="text" id="dispatchId" placeholder="Type Job ID or Address...">
+
+            <div class="tabs" style="margin-top:20px;">
+                <div class="tab active" onclick="setTab('direct')">Direct Request</div>
+                <div class="tab" onclick="setTab('board')">Open Board</div>
+            </div>
+
+            <div id="panel-direct">
+                <label>Worker Email</label>
+                <input type="email" id="workerEmail" placeholder="worker@gmail.com">
+                
+                <label>Manual Trade Note</label>
+                <textarea id="directNote" rows="2" placeholder="Instructions for this worker..."></textarea>
+                
+                <button class="btn" id="btnDirect" onclick="sendDirect()">Send "Yes/No" Email</button>
+            </div>
+
+            <div id="panel-board" class="hidden">
+                <label>Board Description</label>
+                <textarea id="boardNote" rows="2" placeholder="Description for public board..."></textarea>
+                
+                <label>Rate ($)</label>
+                <input type="text" id="boardPay" placeholder="Standard Rate">
+                
+                <button class="btn btn-green" id="btnBoard" onclick="postBoard()">Post to Open Board</button>
+            </div>
         </div>
 
-        <div class="col">
-            <h3>3. Activity Logs <a href="activity.html" class="nav-link">VIEW FULL LOG &rarr;</a></h3>
-            <p style="font-size: 0.85rem; color: #666;">Recent GPS & Photo Uploads</p>
-            <a href="activity.html" class="btn-link">OPEN GPS ACTIVITY AUDIT</a>
-        </div>
-
-        <div class="col">
-            <h3>4. Project Ledger <a href="project.html" class="nav-link">VIEW ALL &rarr;</a></h3>
-            <p style="font-size: 0.85rem; color: #666;">Master list of all active Ancestry IDs.</p>
-            <a href="project.html" class="btn-link" style="background: var(--accent);">OPEN PROJECT MASTER LIST</a>
-        </div>
     </div>
 
     <script>
-        // UPDATED DEPLOYMENT ID: Version 134
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
+        // MASTER ENGINE API URL
+        const API_URL = "https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec";
 
-        async function loadDashboard() {
-            try {
-                const res = await fetch(scriptURL + "?action=getAdminDashboard"); 
-                const data = await res.json();
-                
-                // 1. Applicants
-                document.getElementById('list1').innerHTML = data.applicants.map(a => `
-                    <div class="card ${a.status === 'SIGNED' ? 'signed' : ''}">
-                        <strong>${a.firstName} ${a.lastName}</strong>
-                        <div class="details">
-                            Trade: ${a.trade}<br>
-                            Status: <b>${a.status}</b>
-                        </div>
-                        <button class="btn-view" onclick="window.open('${a.folderUrl || 'https://drive.google.com/drive/u/0/my-drive'}')">Verify Folder</button>
-                        <button class="btn-hire" onclick="finalizeHire('${a.email}')">Finalize Hire</button>
-                    </div>
-                `).join('') || "No new applicants.";
-
-                // 2. Active Roster (Combined View)
-                const active = data.activeCrew;
-                document.getElementById('list3').innerHTML = active.map(c => `
-                    <div class="card ${c.status === 'Active' ? 'active' : ''}">
-                        <strong>${c.name}</strong>
-                        <div class="details">
-                            Status: <b>${c.status}</b><br>
-                            Mission: ${c.jobId || 'Standby'}
-                        </div>
-                        ${c.status === 'Active' ? 
-                          `<button class="btn-view" onclick="window.open('${c.folder}')">Live Job Photos</button>` : 
-                          `<button class="btn-hire" onclick="location.href='dispatch.html?prefillEmail=${c.email}'">Dispatch Mission</button>`
-                        }
-                    </div>
-                `).join('') || "No crew members found.";
-
-            } catch (e) {
-                console.error(e);
-                document.getElementById('list1').innerHTML = "<i>System Standby...</i>";
+        // TAB LOGIC
+        function setTab(mode) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab')[mode === 'direct' ? 0 : 1].classList.add('active');
+            
+            if(mode === 'direct') {
+                document.getElementById('panel-direct').classList.remove('hidden');
+                document.getElementById('panel-board').classList.add('hidden');
+            } else {
+                document.getElementById('panel-direct').classList.add('hidden');
+                document.getElementById('panel-board').classList.remove('hidden');
             }
         }
 
-        async function finalizeHire(email) {
-            const tier = prompt("Assign Permanent Pay Tier (e.g., Tier 2 Skilled):");
-            if (!tier) return;
+        // 1. SAVE PROJECT
+        async function saveProject() {
+            const btn = document.getElementById('btnSave');
+            btn.disabled = true; btn.innerText = "Saving...";
             
-            document.body.style.opacity = "0.5";
-            await fetch(scriptURL, { 
-                method: 'POST', 
-                mode: 'no-cors',
-                body: JSON.stringify({ action: 'finalizeHire', email: email, assignedTier: tier }) 
-            });
+            const payload = {
+                action: "createProjectLog",
+                client: document.getElementById('client').value,
+                address: document.getElementById('address').value,
+                budget: document.getElementById('budget').value,
+                source: document.getElementById('source').value,
+                notes: document.getElementById('notes').value
+            };
             
-            alert("Worker moved to Crew List. Add them to Gusto now.");
-            location.reload();
+            await sendData(payload);
+            btn.disabled = false; btn.innerText = "Create Project Record";
         }
 
-        window.onload = loadDashboard;
+        // 2. SEND DIRECT
+        async function sendDirect() {
+            const btn = document.getElementById('btnDirect');
+            btn.disabled = true; btn.innerText = "Dispatching...";
+            
+            const payload = {
+                action: "dispatchDirect",
+                jobId: document.getElementById('dispatchId').value,
+                email: document.getElementById('workerEmail').value,
+                note: document.getElementById('directNote').value
+            };
+            
+            await sendData(payload);
+            btn.disabled = false; btn.innerText = "Send 'Yes/No' Email";
+        }
+
+        // 3. POST BOARD
+        async function postBoard() {
+            const btn = document.getElementById('btnBoard');
+            btn.disabled = true; btn.innerText = "Posting...";
+            
+            const payload = {
+                action: "postToOpenBoard",
+                jobId: document.getElementById('dispatchId').value,
+                note: document.getElementById('boardNote').value,
+                pay: document.getElementById('boardPay').value
+            };
+            
+            await sendData(payload);
+            btn.disabled = false; btn.innerText = "Post to Open Board";
+        }
+
+        // GENERIC SENDER
+        async function sendData(data) {
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(data)
+                });
+                alert("Success! Action recorded in Master Engine.");
+            } catch (err) {
+                alert("Error connecting to server.");
+                console.error(err);
+            }
+        }
     </script>
 </body>
 </html>
