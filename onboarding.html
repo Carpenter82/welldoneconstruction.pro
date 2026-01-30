@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPLOAD DOCUMENTS | WELL DONE</title>
-    <link rel="stylesheet" href="styles.css"> <style>
+    <link rel="stylesheet" href="styles.css"> 
+    <style>
         /* Override specific styles for this page */
-        body { text-align: center; }
+        body { text-align: center; background-color: #1a1a1a; color: #fff; font-family: sans-serif; }
         
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; }
+        
+        .logo { font-size: 1.5rem; font-weight: bold; margin-bottom: 20px; letter-spacing: 2px; }
+        .logo span { color: #e67e22; }
+
         .upload-zone {
             background: #222;
             border: 2px dashed #444;
@@ -17,7 +23,7 @@
             position: relative;
         }
 
-        .upload-zone.active { border-color: var(--primary); background: #2a2a2a; }
+        .upload-zone.active { border-color: #e67e22; background: #2a2a2a; }
 
         .upload-icon { font-size: 2rem; color: #666; margin-bottom: 10px; }
         
@@ -34,17 +40,35 @@
             display: inline-block;
             margin-top: 10px;
             font-size: 0.9rem;
+            transition: background 0.3s;
         }
+        .custom-upload-btn:hover { background: #555; }
 
         .preview-img {
             max-width: 100%;
             max-height: 150px;
             margin-top: 10px;
             display: none; /* Hidden until file selected */
-            border: 1px solid var(--primary);
+            border: 1px solid #e67e22;
         }
 
-        .file-name { color: var(--primary); font-size: 0.8rem; margin-top: 5px; }
+        .file-name { color: #e67e22; font-size: 0.8rem; margin-top: 5px; }
+
+        #submitBtn {
+            width: 100%;
+            padding: 15px;
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        #submitBtn:disabled { background-color: #555; cursor: not-allowed; }
+        
+        .status-msg { margin-top: 20px; font-weight: bold; min-height: 24px; }
     </style>
 </head>
 <body>
@@ -89,8 +113,8 @@
     </div>
 
     <script>
-        // *** CONFIGURATION ***
-        const API_URL = "https://script.google.com/macros/s/AKfycbzL7I6U1-k6iKNo6-p_0S-k7oF8_TwoKS9RQ_M5/exec"; 
+        // *** CONFIGURATION: UPDATED TO V134 ***
+        const API_URL = "https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec"; 
 
         // 1. Get Identity from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -98,7 +122,7 @@
 
         if (!email) {
             alert("Session Error. Redirecting to start.");
-            window.location.href = "/application/";
+            window.location.href = "/apply/index.html";
         }
 
         // 2. File Reader Logic (Handles the preview & Base64 conversion)
@@ -163,7 +187,7 @@
                 const oshaData = results[1];
 
                 const payload = {
-                    action: "saveDocuments", // New Action for your Script
+                    action: "saveDocuments",
                     email: email,
                     idFile: idData,
                     oshaFile: oshaData
@@ -178,14 +202,16 @@
             })
             .then(() => {
                 status.textContent = "Documents Uploaded. Welcome to the team!";
+                status.style.color = "#27ae60";
                 setTimeout(() => {
-                    // Redirect to the Worker Portal
-                    window.location.href = `/worker/?email=${encodeURIComponent(email)}`;
+                    // Redirect to the Portal Login
+                    window.location.href = `/portal/index.html?email=${encodeURIComponent(email)}`;
                 }, 2000);
             })
             .catch(err => {
                 console.error(err);
                 status.textContent = "Upload Failed. File size might be too large (Max 5MB).";
+                status.style.color = "#c0392b";
                 btn.disabled = false;
                 btn.textContent = "Try Again";
             });
