@@ -15,8 +15,12 @@
             margin-bottom: 20px;
             cursor: pointer;
             border-radius: 8px;
+            display: block;
+            text-align: center;
+            box-sizing: border-box;
+            font-weight: bold;
         }
-        #preview { width: 100%; display: none; border: 2px solid var(--primary); margin-bottom: 20px; }
+        #preview { width: 100%; display: none; border: 2px solid var(--primary); margin-bottom: 20px; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -30,7 +34,7 @@
         </label>
         <img id="preview" alt="Site Photo">
 
-        <div id="gpsStatus" style="font-size: 0.8rem; color: #666; margin-bottom: 20px;">
+        <div id="gpsStatus" style="font-size: 0.8rem; color: #666; margin-bottom: 20px; text-align: center;">
             Waiting for GPS...
         </div>
 
@@ -39,8 +43,8 @@
     </div>
 
     <script>
-        // *** CONFIGURATION ***
-        const API_URL = "YOUR_SCRIPT_URL_HERE"; // PASTE YOUR GOOGLE SCRIPT URL
+        // UPDATED DEPLOYMENT ID: Version 134
+        const API_URL = "https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec";
 
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('email');
@@ -48,7 +52,7 @@
 
         if(!email || !jobId) {
             alert("Error: Missing Job Data.");
-            window.location.href = "../worker/";
+            window.location.href = "../portal/dashboard.html";
         }
 
         let gpsData = null;
@@ -59,7 +63,9 @@
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
                     gpsData = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    document.getElementById('gpsStatus').textContent = "✅ GPS Locked: " + gpsData.lat.toFixed(4);
+                    const gpsText = document.getElementById('gpsStatus');
+                    gpsText.textContent = "✅ GPS Locked: " + gpsData.lat.toFixed(4);
+                    gpsText.style.color = "var(--active)"; // Green if defined in CSS, else relies on inherited
                     checkReady();
                 },
                 (err) => {
@@ -78,8 +84,9 @@
             if(file) {
                 const reader = new FileReader();
                 reader.onload = function(evt) {
-                    document.getElementById('preview').src = evt.target.result;
-                    document.getElementById('preview').style.display = "block";
+                    const img = document.getElementById('preview');
+                    img.src = evt.target.result;
+                    img.style.display = "block";
                     photoBase64 = evt.target.result.split(',')[1]; // Clean Base64
                     checkReady();
                 };
@@ -89,8 +96,9 @@
 
         function checkReady() {
             if(gpsData && photoBase64) {
-                document.getElementById('finishBtn').disabled = false;
-                document.getElementById('finishBtn').style.backgroundColor = "var(--primary)";
+                const btn = document.getElementById('finishBtn');
+                btn.disabled = false;
+                btn.style.backgroundColor = "var(--primary)";
             }
         }
 
@@ -109,7 +117,9 @@
                 jobId: jobId,
                 lat: gpsData.lat,
                 lng: gpsData.lng,
-                photo: photoBase64
+                photo: photoBase64,
+                // Add default filename for the script
+                filename: `COMPLETION_${jobId}_${Date.now()}.jpg` 
             };
 
             fetch(API_URL, {
@@ -121,7 +131,7 @@
                 status.textContent = "Work Logged. Redirecting...";
                 setTimeout(() => {
                     // Send them back to the dashboard (which will now show 'Standby')
-                    window.location.href = `../worker/dashboard.html?email=${encodeURIComponent(email)}`;
+                    window.location.href = `../portal/dashboard.html?email=${encodeURIComponent(email)}`;
                 }, 2000);
             }).catch(err => {
                 status.textContent = "Error: " + err;
