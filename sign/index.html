@@ -86,8 +86,8 @@
     </div>
 
     <script>
-        // *** CONFIGURATION ***
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzL7I6U1-k6iKNo6-p_0S-k7oF8_TwoKS9RQ_M5/exec';
+        // *** CONFIGURATION: UPDATED TO V134 ***
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
         
         // 1. SETUP CANVAS & CONTEXT
         const canvas = document.getElementById('sig-canvas');
@@ -201,7 +201,7 @@
                 statusMsg.innerText = "Signature Archived. Redirecting...";
                 setTimeout(() => {
                     // Go to Root > onboarding.html
-                    window.location.href = "/onboarding.html?email=" + encodeURIComponent(email);
+                    window.location.href = "../onboarding.html?email=" + encodeURIComponent(email);
                 }, 1500);
             }).catch(error => {
                 console.error(error);
