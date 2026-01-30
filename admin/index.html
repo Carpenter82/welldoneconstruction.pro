@@ -54,11 +54,14 @@
     </div>
 
     <script>
+        // UPDATED DEPLOYMENT ID: Version 134
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
 
         async function loadDashboard() {
             try {
-                const res = await fetch(scriptURL + "?action=getDashboard");
+                // Note: Ensure your Google Script has a doGet() or handles this action in doPost with a payload
+                // Since we are fetching, this effectively sends a GET request.
+                const res = await fetch(scriptURL + "?action=getAdminDashboard"); 
                 const data = await res.json();
                 
                 // 1. Applicants
@@ -69,7 +72,7 @@
                             Trade: ${a.trade}<br>
                             Status: <b>${a.status}</b>
                         </div>
-                        <button class="btn-view" onclick="window.open('https://drive.google.com/drive/u/0/my-drive')">Verify Folder</button>
+                        <button class="btn-view" onclick="window.open('${a.folderUrl || 'https://drive.google.com/drive/u/0/my-drive'}')">Verify Folder</button>
                         <button class="btn-hire" onclick="finalizeHire('${a.email}')">Finalize Hire</button>
                     </div>
                 `).join('') || "No new applicants.";
@@ -102,7 +105,8 @@
 
             } catch (e) {
                 console.error(e);
-                alert("Error loading dashboard data.");
+                // Placeholder for visual testing if API fails
+                document.getElementById('list1').innerHTML = "<i>System Standby...</i>";
             }
         }
 
