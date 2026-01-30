@@ -36,10 +36,18 @@
     </div>
 
     <script>
+        // UPDATED DEPLOYMENT ID: Version 134
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
+        
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('prefillEmail');
-        document.getElementById('workerEmail').innerText = email;
+        
+        if (email) {
+            document.getElementById('workerEmail').innerText = email;
+        } else {
+            alert("No worker selected. Returning to Dashboard.");
+            window.location.href = "index.html";
+        }
 
         async function sendOffer() {
             const btn = document.getElementById('btn');
@@ -64,11 +72,14 @@
                     mode: 'no-cors',
                     body: JSON.stringify(payload) 
                 });
+                
                 alert("Mission Dispatched. Worker notified.");
                 window.location.href = "index.html"; // Returns to Admin Dashboard
             } catch (e) {
+                console.error(e);
                 alert("Error dispatching. Check connection.");
                 btn.disabled = false;
+                btn.innerText = "SEND OFFICIAL OFFER";
             }
         }
     </script>
