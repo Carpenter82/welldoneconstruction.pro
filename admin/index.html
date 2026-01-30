@@ -50,6 +50,19 @@
         .input-notes { width: 100%; border: 1px solid #ddd; padding: 8px; border-radius: 4px; }
     </style>
 </head>
+    <header>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <h1>Personnel Hub</h1>
+                <a href="project.html" style="background:#f1c40f; color:black; padding:8px 15px; text-decoration:none; font-weight:bold; font-size:0.8rem; border-radius:4px;">
+                    GO TO DISPATCH ➔
+                </a>
+            </div>
+            
+            <div class="nav-tabs">
+                <div class="nav-btn active" onclick="switchTab('applicants')">APPLICANTS</div>
+                <div class="nav-btn" onclick="switchTab('crew')">ACTIVE CREW</div>
+            </div>
+        </header>
 <body>
 
     <div id="securityGate">
