@@ -1,29 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WELL DONE CONSTRUCTION | ERP</title>
+    <title>Well Done Construction | Field Operations</title>
     <style>
-        body { background-color: #1a1a1a; color: #ffd700; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
-        .container { border: 4px solid #ffd700; padding: 40px; background-color: #000; box-shadow: 10px 10px 0px #ffd700; }
-        h1 { font-size: 2.5em; margin-bottom: 10px; border-bottom: 2px solid #ffd700; padding-bottom: 10px; }
-        p { letter-spacing: 3px; font-weight: bold; margin-bottom: 30px; }
-        .btn-main { background-color: #ffd700; color: #000; border: none; padding: 15px 30px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin: 10px; width: 250px; transition: 0.3s; text-transform: uppercase; }
-        .btn-main:hover { background-color: #fff; transform: scale(1.05); }
+        :root {
+            --primary: #343E47;   /* Slate - Structural */
+            --accent: #33B26E;    /* Green - Go/Active */
+            --bg-dark: #4b5563;   /* Dark Grey Background */
+            --border: #dee2e6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: var(--bg-dark); /* Darker Grey Background */
+        }
+
+        /* HEADER */
+        header {
+            background: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid var(--primary);
+        }
+
+        .logo {
+            max-width: 180px; 
+            width: 100%;
+            height: auto;
+        }
+
+        /* MAIN CONTENT - THE SPLIT */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            /* Ensures cards stretch to equal height */
+            align-items: stretch; 
+            gap: 30px;
+            padding: 60px 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 8px;
+            padding: 40px 30px;
+            text-align: center;
+            flex: 1;
+            min-width: 300px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            
+            /* Logic to align buttons at bottom */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .action-card:hover { transform: translateY(-3px); }
+
+        .card-content {
+            margin-bottom: 30px;
+        }
+
+        h2 { 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin-top: 0; 
+            font-size: 1.5rem; 
+            color: var(--primary);
+        }
+        
+        p { 
+            color: #6c757d; 
+            line-height: 1.5; 
+            margin: 0;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 4px;
+            letter-spacing: 1px;
+            box-sizing: border-box; /* Ensures padding doesn't break width */
+        }
+
+        /* Apply Button */
+        .btn-apply {
+            background-color: var(--primary);
+            color: white;
+            border: 2px solid var(--primary);
+        }
+        .btn-apply:hover { background-color: #233040; }
+
+        /* Portal Button */
+        .btn-portal {
+            background-color: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        .btn-portal:hover { background-color: #ebedef; }
+
+
+        /* FOOTER - "THE BOOKS" */
+        footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 40px 20px;
+            border-top: 1px solid #5d6d7e;
+        }
+
+        .footer-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .books-header {
+            border-bottom: 1px solid #5d6d7e;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .book-item h3 {
+            color: var(--accent);
+            font-size: 1rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .book-item p {
+            color: #bdc3c7;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        .book-item strong { color: white; }
+
+        .copyright {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.75rem;
+            color: #5d6d7e;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>WELL DONE CONSTRUCTION</h1>
-        <p>SERVERLESS FIELD OPERATIONS</p>
-        <div class="main-nav">
-            <button class="btn-main" onclick="window.location.href='/application/index.html'">Apply Now</button><br>
-            <button class="btn-main" onclick="window.location.href='/portal/index.html'">Worker Login</button>
+
+    <header>
+        <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction" class="logo">
+    </header>
+
+    <div class="main-container">
+        
+        <div class="action-card">
+            <div class="card-content">
+                <h2>Join The Crew</h2>
+                <p>We are currently accepting applications for skilled tradesmen. W-2 ON-Call Status.</p>
+            </div>
+            <a href="apply/index.html" class="btn btn-apply">Submit Application</a>
         </div>
-        <footer style="margin-top: 30px; font-size: 0.8em; color: #888;">
-            <p>Nevada C-3 Licensed | Washoe County</p>
-        </footer>
+
+        <div class="action-card">
+            <div class="card-content">
+                <h2>Active Roster</h2>
+                <p>Authorized access for active field staff.</p>
+            </div>
+            <a href="portal/index.html" class="btn btn-portal">Worker Portal Login</a>
+        </div>
+
     </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="books-header">Company Standards & Protocols ("The Books")</div>
+            
+            <div class="books-grid">
+                <div class="book-item">
+                    <h3>1. Trade Specialization</h3>
+                    <p>We hire specialists and generalists. Whether you are Framing, Electrical, Plumbing, or Finish, you can be expected to perform within many trade classes and grow. General Labor supports the trades; they do not replace them.</p>
+                </div>
+
+                <div class="book-item">
+                    <h3>2. Tier Eligibility</h3>
+                    <p>Pay is project-based. Although we will try to match you with the best fit, be prepared to be dispatched in an array combining many trades. <strong>Tier 1</strong> (Support) requires reliability. <strong>Tier 2</strong> (Skilled) requires tool ownership and autonomy. <strong>Tier 3</strong> (Lead) requires OSHA credentials.</p>
+                </div>
+
+                <div class="book-item">
+                    <h3>3. Field Expectations</h3>
+                    <p>Zero tolerance for safety violations, substance use, or no-shows. All hours will be compensated for based on skill level for project only. Location data and visual proof of work must be logged via the Portal.</p>
+                </div>
+            </div>
+
+            <div class="copyright">
+                &copy; 2026 Well Done Construction LLC. All Rights Reserved. Authorized Personnel Only.
+            </div>
+        </div>
+    </footer>
+
 </body>
 </html>
