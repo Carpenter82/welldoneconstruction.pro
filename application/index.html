@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join the Crew | Well Done Construction</title>
@@ -14,7 +13,6 @@
         button { background: #33B26E; color: white; font-weight: bold; border: none; cursor: pointer; margin-top: 30px; transition: background 0.3s; }
         button:hover { background: #28a061; }
         button:disabled { background: #9ca3af; cursor: wait; }
-        .file-upload { border: 2px dashed #ccc; padding: 20px; text-align: center; cursor: pointer; border-radius: 6px; margin-top: 5px; }
         .checkbox-group { display: flex; align-items: flex-start; margin-top: 20px; }
         .checkbox-group input { width: 20px; margin-right: 10px; margin-top: 2px; }
         .checkbox-group label { margin: 0; font-weight: normal; font-size: 0.9rem; color: #333; }
@@ -25,7 +23,6 @@
     <div class="form-card">
         <h2>Worker Application</h2>
         <form id="appForm">
-            
             <label>First Name</label>
             <input type="text" id="fname" placeholder="John" required>
             
@@ -40,24 +37,17 @@
             
             <label>Primary Trade</label>
             <select id="trade" required>
-                <option value="">Select Trade...</option>
                 <option value="General Labor">General Labor</option>
                 <option value="Carpentry">Carpentry</option>
                 <option value="Plumbing">Plumbing</option>
                 <option value="Electrical">Electrical</option>
-                <option value="Painting">Painting</option>
             </select>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                <div>
-                    <label>Experience (Yrs)</label>
-                    <input type="number" id="exp" placeholder="0" required>
-                </div>
-                <div>
-                    <label>Desired Pay ($/hr)</label>
-                    <input type="number" id="pay" placeholder="25" required>
-                </div>
-            </div>
+            <label>Experience (Years)</label>
+            <input type="number" id="exp" placeholder="5" required>
+            
+            <label>Desired Pay ($/hr)</label>
+            <input type="number" id="pay" placeholder="25" required>
 
             <label>Tools?</label>
             <select id="tools" required>
@@ -66,15 +56,9 @@
                 <option value="Full Kit">Full Professional Kit</option>
             </select>
 
-            <label>Resume (Optional)</label>
-            <div class="file-upload" onclick="document.getElementById('resume').click()">
-                <span id="fileName">Click to Upload PDF or Image</span>
-                <input type="file" id="resume" hidden accept=".pdf, .jpg, .png, .doc, .docx" onchange="updateFileName()">
-            </div>
-
             <div class="checkbox-group">
                 <input type="checkbox" id="consent" required>
-                <label>I certify that the information provided is true and I consent to a background check if required.</label>
+                <label>I certify that this info is true.</label>
             </div>
 
             <button type="submit" id="submitBtn">SUBMIT APPLICATION</button>
@@ -82,36 +66,15 @@
     </div>
 
     <script>
-        // Use the API URL from your latest deployment (v138)
+        // *** THE V138 LINK IS PRE-FILLED HERE ***
         const API_URL = "https://script.google.com/macros/s/AKfycbwtLjTRDPDe7aPXO7eKVLjPQgDe6pv8fhcpAKZU2ba8QkhnyQEk985yfnoe34nDGdrb/exec";
-
-        function updateFileName() {
-            const file = document.getElementById('resume').files[0];
-            if(file) document.getElementById('fileName').innerText = "📄 " + file.name;
-        }
 
         document.getElementById('appForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerText = "GENERATING PDF & SUBMITTING...";
+            btn.innerText = "SENDING TO ADMIN...";
 
-            // 1. Handle File Upload (Convert to Base64)
-            const fileInput = document.getElementById('resume');
-            let fileData = { hasFile: false };
-            
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                const base64 = await toBase64(file);
-                fileData = {
-                    hasFile: true,
-                    filename: file.name,
-                    mimeType: file.type,
-                    base64: base64.split(',')[1] // Remove 'data:application/pdf;base64,' prefix
-                };
-            }
-
-            // 2. Build Payload
             const payload = {
                 action: 'submitApplication',
                 fname: document.getElementById('fname').value,
@@ -121,12 +84,9 @@
                 trade: document.getElementById('trade').value,
                 exp: document.getElementById('exp').value,
                 pay: document.getElementById('pay').value,
-                tools: document.getElementById('tools').value,
-                consent: document.getElementById('consent').checked,
-                resume: fileData
+                tools: document.getElementById('tools').value
             };
 
-            // 3. Send to Backend
             try {
                 await fetch(API_URL, {
                     method: 'POST',
@@ -134,22 +94,14 @@
                     body: JSON.stringify(payload)
                 });
                 
-                // 4. Hard Stop Redirect
-                window.location.href = "thank-you.html";
+                alert("Application Sent! Now check your Admin Hub.");
+                window.location.href = "../thank-you.html";
                 
             } catch (err) {
                 console.error(err);
-                alert("Error submitting application. Please try again.");
+                alert("Error connecting.");
                 btn.disabled = false;
-                btn.innerText = "SUBMIT APPLICATION";
             }
-        });
-
-        const toBase64 = file => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
         });
     </script>
 </body>
