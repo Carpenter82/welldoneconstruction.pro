@@ -205,15 +205,36 @@
 
         // --- 3. ACTIONS ---
 
-        async function triggerAction(actionName, email) {
-            if(!confirm(`Confirm Action: ${actionName} for ${email}?`)) return;
+       async function triggerAction(actionName, email) {
+            let msg = `Confirm Action: ${actionName} for ${email}?`;
+            if (actionName === 'sendAgreement') {
+                msg = `Confirm: Initialize Onboarding for ${email}?\n\nThis will:\n1. Create Google Drive Folders\n2. Send Master Agreement Email`;
+            }
+
+            if(!confirm(msg)) return;
             
-            await fetch(API_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ action: actionName, email: email })
-            });
-            alert("System Command Sent.");
+            // UI Feedback
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "PROCESSING...";
+            btn.disabled = true;
+
+            try {
+                // We use 'no-cors' here for speed since we don't strictly need the return value for this button
+                // But if you want to be sure it finished, we can use the standard fetch
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    body: JSON.stringify({ action: actionName, email: email })
+                });
+                
+                alert("Success: Folders Created & Email Sent.");
+                btn.innerText = "SENT ✅";
+            } catch (e) {
+                alert("Error sending command.");
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
         }
 
         async function hireWorker(email, name, trade, pay) {
