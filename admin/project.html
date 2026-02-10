@@ -55,49 +55,41 @@
 
     <div class="dashboard-grid">
         
-       <div class="card">
-    <h3>1. New Project Entry</h3>
-    
-    <label>Client Name</label>
-    <input type="text" id="projClient" placeholder="Client Name">
+        <div class="card">
+            <h2>1. New Project Entry</h2>
+            <p class="card-sub">Create ancestry records in ProjectLog.</p>
+            
+            <label>Client Name</label>
+            <input type="text" id="projClient" placeholder="Client Name">
 
-    <label>Street Address</label>
-    <input type="text" id="projAddress" placeholder="123 Main St">
+            <label>Street Address (Generates Job ID)</label>
+            <input type="text" id="projAddress" placeholder="123 Main St">
 
-    <label>Est. Budget ($)</label>
-    <input type="number" id="projBudget" placeholder="5000">
+            <label>Est. Budget ($)</label>
+            <input type="number" id="projBudget" placeholder="5000">
 
-    <label>Trade Needed</label>
-    <select id="projTrade">
-        <option value="General Labor">General Labor</option>
-        <option value="Carpentry">Carpentry</option>
-        <option value="Plumbing">Plumbing</option>
-        <option value="Electrical">Electrical</option>
-        <option value="Flooring">Flooring</option>
-        <option value="Painting">Painting</option>
-        <option value="HVAC">HVAC</option>
-    </select>
+            <label>Trade Needed</label>
+            <select id="projTrade">
+                <option value="General Labor">General Labor</option>
+                <option value="Carpentry">Carpentry</option>
+                <option value="Plumbing">Plumbing</option>
+                <option value="Electrical">Electrical</option>
+                <option value="Flooring">Flooring</option>
+                <option value="Painting">Painting</option>
+                <option value="HVAC">HVAC</option>
+            </select>
 
-    <label>Lead Source</label>
-    <select id="projSource">
-        <option value="Referral">Referral</option>
-        <option value="Website">Website</option>
-        <option value="Repeat Client">Repeat Client</option>
-    </select>
+            <label>Lead Source</label>
+            <select id="projSource">
+                <option value="Referral">Referral</option>
+                <option value="Website">Website</option>
+                <option value="Repeat Client">Repeat Client</option>
+            </select>
 
-    <label>Project Notes / Scope</label>
-    <textarea id="projNotes" placeholder="Scope of work..."></textarea>
+            <label>Project Notes / Scope</label>
+            <textarea id="projNotes" placeholder="Scope of work..."></textarea>
 
-    <button onclick="createProject()">SAVE TO DATABASE</button>
-</div>
-
-                <label>Project Notes / Scope</label>
-                <textarea id="projectNotes" rows="3" placeholder="Initial scope of work..."></textarea>
-
-                <button type="button" class="btn-main" onclick="submitProject()" id="btnSaveProject">
-                    Save to Database
-                </button>
-            </form>
+            <button class="btn-main" onclick="createProject()" id="btnSaveProject">SAVE TO DATABASE</button>
         </div>
 
         <div class="card">
@@ -118,7 +110,7 @@
                 <label>Select Worker</label>
                 <input type="email" id="workerEmail" placeholder="Search Crew Email..." list="crewList">
                 <datalist id="crewList">
-                    </datalist>
+                     </datalist>
 
                 <label>Manual Trade Note</label>
                 <textarea id="directNote" rows="3" placeholder="Specific instructions for this worker..."></textarea>
@@ -191,14 +183,15 @@
                 const res = await fetch(`${SCRIPT_URL}?action=getAdminDashboard`);
                 const data = await res.json();
                 
-                // Populate Jobs Datalist
+                // Populate Jobs Datalist (WITH TRADE INFO)
                 const jobList = document.getElementById('activeJobsList');
                 jobList.innerHTML = '';
                 if(data.jobs) {
                     data.jobs.forEach(j => {
                         const opt = document.createElement('option');
                         opt.value = j.id;
-                        opt.innerText = `${j.address} (${j.client})`;
+                        // Shows: "123 Main St (Client) - [Plumbing]"
+                        opt.innerText = `${j.address} (${j.client}) - [${j.trade || 'General'}]`;
                         jobList.appendChild(opt);
                     });
                 }
@@ -239,20 +232,24 @@
             }
         }
 
-        async function submitProject() {
+        // --- UPDATED: CREATE PROJECT (Replaces old submitProject) ---
+        async function createProject() {
             const btn = document.getElementById('btnSaveProject');
-            btn.disabled = true; btn.innerText = "Generating Ancestry ID...";
+            btn.disabled = true; 
+            btn.innerText = "Generating Ancestry ID...";
 
             const payload = {
                 action: 'createProjectLog',
-                client: document.getElementById('clientName').value,
-                address: document.getElementById('streetAddress').value,
-                budget: document.getElementById('budget').value,
-                source: document.getElementById('source').value,
-                notes: document.getElementById('projectNotes').value
+                client: document.getElementById('projClient').value,
+                address: document.getElementById('projAddress').value,
+                budget: document.getElementById('projBudget').value,
+                trade: document.getElementById('projTrade').value, // Matches new Dropdown
+                source: document.getElementById('projSource').value,
+                notes: document.getElementById('projNotes').value
             };
 
-            sendData(payload, btn, "Save to Database");
+            // Call the generic sender, but reset button text to "Save"
+            await sendData(payload, btn, "SAVE TO DATABASE");
         }
 
         async function sendDirectRequest() {
@@ -325,6 +322,14 @@
                     body: JSON.stringify(data) 
                 });
                 alert("Action Successful!");
+                
+                // Clear inputs if it was a project creation
+                if(data.action === 'createProjectLog') {
+                    document.getElementById('projClient').value = '';
+                    document.getElementById('projAddress').value = '';
+                    document.getElementById('projNotes').value = '';
+                }
+
                 loadDashboardData(); // Refresh lists
             } catch (e) {
                 console.error(e);
