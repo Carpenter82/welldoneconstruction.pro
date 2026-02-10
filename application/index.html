@@ -10,9 +10,14 @@
         h2 { text-align: center; color: #343E47; margin-top: 0; text-transform: uppercase; letter-spacing: 1px; }
         label { font-size: 0.85rem; font-weight: bold; color: #6E797F; display: block; margin-top: 15px; margin-bottom: 5px; }
         input, select, button { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 1rem; }
+        
+        /* Specific styling for file input */
+        input[type="file"] { padding: 10px; background: #fafafa; border: 1px dashed #ccc; }
+
         button { background: #33B26E; color: white; font-weight: bold; border: none; cursor: pointer; margin-top: 30px; transition: background 0.3s; }
         button:hover { background: #28a061; }
         button:disabled { background: #9ca3af; cursor: wait; }
+        
         .checkbox-group { display: flex; align-items: flex-start; margin-top: 20px; }
         .checkbox-group input { width: 20px; margin-right: 10px; margin-top: 2px; }
         .checkbox-group label { margin: 0; font-weight: normal; font-size: 0.9rem; color: #333; }
@@ -59,6 +64,9 @@
                 <option value="Full Kit">Full Professional Kit</option>
             </select>
 
+            <label>Upload Resume (PDF Only)</label>
+            <input type="file" id="resume" accept="application/pdf">
+
             <div class="checkbox-group">
                 <input type="checkbox" id="consent" required>
                 <label>I certify that this info is true.</label>
@@ -70,13 +78,30 @@
 
     <script>
         // *** THE V138 LINK IS PRE-FILLED HERE ***
-       const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";;
+        const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
 
         document.getElementById('appForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerText = "SENDING TO ADMIN...";
+            btn.innerText = "UPLOADING & SENDING...";
+
+            // 1. Get the file (if attached)
+            const fileInput = document.getElementById('resume');
+            const file = fileInput.files[0];
+            let base64File = "";
+
+            // 2. Convert file to Base64 string if it exists
+            if (file) {
+                try {
+                    base64File = await toBase64(file);
+                } catch (err) {
+                    alert("Error reading file");
+                    console.error(err);
+                    btn.disabled = false;
+                    return;
+                }
+            }
 
             const payload = {
                 action: 'submitApplication',
@@ -87,7 +112,8 @@
                 trade: document.getElementById('trade').value,
                 exp: document.getElementById('exp').value,
                 pay: document.getElementById('pay').value,
-                tools: document.getElementById('tools').value
+                tools: document.getElementById('tools').value,
+                resumeBase64: base64File // <--- Sends the file data here
             };
 
             try {
@@ -98,13 +124,22 @@
                 });
                 
                 alert("Application Sent! Check Email Shortly.");
-                window.location.href = "../thank-you.html";
+                window.location.href = "../thank-you.html"; // Ensure this page exists!
                 
             } catch (err) {
                 console.error(err);
                 alert("Error connecting.");
                 btn.disabled = false;
+                btn.innerText = "SUBMIT APPLICATION";
             }
+        });
+
+        // Helper function to turn file into text string
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
         });
     </script>
 </body>
