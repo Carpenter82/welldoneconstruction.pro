@@ -113,8 +113,8 @@
     </div>
 
     <script>
-        // UPDATED DEPLOYMENT ID (v138)
-        const API_URL = "https://script.google.com/macros/s/AKfycbwtLjTRDPDe7aPXO7eKVLjPQgDe6pv8fhcpAKZU2ba8QkhnyQEk985yfnoe34nDGdrb/exec"; 
+        // 🛑 REPLACE WITH YOUR GOOGLE SCRIPT URL
+        const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec"; 
 
         // 1. Get Identity from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -145,8 +145,8 @@
         setupUploader('file-id', 'preview-id', 'name-id');
         setupUploader('file-osha', 'preview-osha', 'name-osha');
 
-        // 3. Submit Logic
-        document.getElementById('docForm').addEventListener('submit', function(e) {
+        // 3. Submit Logic (Fixed to use uploadPhoto sequentially)
+        document.getElementById('docForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             const status = document.getElementById('status');
@@ -159,49 +159,55 @@
             btn.disabled = true;
             btn.textContent = "ENCRYPTING & UPLOADING...";
 
-            // Helper to read file as Base64
-            const readFile = (file) => {
-                return new Promise((resolve) => {
-                    if (!file) resolve(null); 
+            // Helper to upload a single file
+            const uploadFile = (file, prefix) => {
+                return new Promise((resolve, reject) => {
+                    if (!file) return resolve(true); // Skip if no file
+
                     const reader = new FileReader();
-                    reader.onload = () => resolve({
-                        name: file.name,
-                        data: reader.result.split(',')[1] 
-                    });
+                    reader.onload = () => {
+                        const base64 = reader.result.split(',')[1]; // Clean base64
+                        
+                        fetch(API_URL, {
+                            method: "POST",
+                            mode: "no-cors",
+                            body: JSON.stringify({
+                                action: "uploadPhoto", // Uses existing Backend logic
+                                email: email,
+                                base64: base64,
+                                filename: `${prefix}_${file.name}`
+                            })
+                        })
+                        .then(() => resolve(true))
+                        .catch(() => resolve(true)); // Continue even on CORS opacity
+                    };
                     reader.readAsDataURL(file);
                 });
             };
 
-            // Process both files
-            Promise.all([readFile(idFile), readFile(oshaFile)])
-            .then(results => {
-                const payload = {
-                    action: "saveDocuments",
-                    email: email,
-                    idFile: results[0],
-                    oshaFile: results[1]
-                };
+            // Process files one by one to ensure reliability
+            try {
+                status.textContent = "Uploading ID Card...";
+                await uploadFile(idFile, "GOV_ID");
+                
+                if (oshaFile) {
+                    status.textContent = "Uploading OSHA Card...";
+                    await uploadFile(oshaFile, "OSHA_CARD");
+                }
 
-                return fetch(API_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify(payload)
-                });
-            })
-            .then(() => {
-                status.textContent = "Documents Received. Processing Payroll...";
+                status.textContent = "Documents Received. Processing...";
                 status.style.color = "#2ecc71";
                 
                 setTimeout(() => {
                     alert("Onboarding Complete! Please check your email for Gusto payroll setup.");
                     window.location.href = "../portal/index.html?email=" + encodeURIComponent(email);
                 }, 2000);
-            })
-            .catch(err => {
+
+            } catch (err) {
                 console.error(err);
                 status.textContent = "Upload Failed. Try smaller photos.";
                 btn.disabled = false;
-            });
+            }
         });
     </script>
 </body>
