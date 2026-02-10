@@ -4,269 +4,214 @@
     <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personnel & Compliance | Well Done ERP</title>
+    <title>Admin Dashboard | Well Done ERP</title>
     <style>
-        :root { --primary: #343E47; --accent: #33B26E; --bg: #f4f7f6; --white: #ffffff; --danger: #e74c3c; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; color: var(--primary); }
-
-        /* SECURITY GATE OVERLAY */
-        #securityGate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); display: flex; align-items: center; justify-content: center; z-index: 999; }
-        .login-box { background: white; padding: 40px; border-radius: 8px; text-align: center; width: 300px; }
-        .login-box input { width: 100%; padding: 15px; margin: 15px 0; border: 1px solid #ccc; box-sizing: border-box; }
-
-        /* HEADER & NAV */
-        header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        header h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-tabs { display: flex; gap: 20px; }
-        .nav-btn { cursor: pointer; padding: 8px 15px; border-radius: 4px; font-weight: bold; font-size: 0.85rem; color: #aaa; }
-        .nav-btn.active { background: var(--accent); color: white; }
-
-        /* MAIN CONTAINER */
-        .container { max-width: 1000px; margin: 30px auto; padding: 0 15px; }
-        .hidden { display: none; }
-
-        /* APPLICANT CARDS */
-        .card { background: white; border-left: 5px solid var(--accent); padding: 20px; margin-bottom: 20px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .card-header h3 { margin: 0; font-size: 1.2rem; }
-        .tag { background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        :root { --primary: #343E47; --accent: #33B26E; --bg: #f4f7f6; --white: #ffffff; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); padding: 20px; color: var(--primary); margin: 0; }
         
-        .data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        .data-point label { font-size: 0.7rem; color: #888; text-transform: uppercase; display: block; font-weight: bold; }
-        .data-point span { font-size: 1rem; font-weight: 500; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; max-width: 1200px; margin: 0 auto 20px auto; }
+        .btn { padding: 10px 20px; background: #3498db; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 0.9rem; }
+        .btn:hover { background: #2980b9; }
 
-        /* ACTION BAR */
-        .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .btn { padding: 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 0.8rem; text-transform: uppercase; }
-        .btn-agreement { background: #3498db; }
-        .btn-onboard { background: #f1c40f; color: black; }
-        .btn-hire { background: var(--accent); }
-        .btn-folder { background: #bdc3c7; color: #333; grid-column: span 3; margin-bottom: 10px; }
+        .card { background: var(--white); padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px auto; }
+        h2 { margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; text-transform: uppercase; font-size: 1.1rem; letter-spacing: 0.5px; }
 
-        /* ACTIVE ROSTER TABLE */
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
-        th { background: #eee; text-align: left; padding: 15px; font-size: 0.8rem; text-transform: uppercase; color: #666; }
-        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.95rem; }
-        .input-notes { width: 100%; border: 1px solid #ddd; padding: 8px; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; color: #888; font-size: 0.75rem; text-transform: uppercase; padding-bottom: 10px; border-bottom: 2px solid #eee; }
+        td { padding: 12px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; vertical-align: middle; }
+
+        /* Dropdown Styling for Role/Compliance */
+        select.editable {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fafafa;
+            font-size: 0.85rem;
+            cursor: pointer;
+            width: 100%;
+            max-width: 150px;
+        }
+        select.editable:focus { border-color: var(--accent); outline: none; background: #fff; }
+
+        /* Status Badges */
+        .tag { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block;}
+        .tag-new { background: #e6f7ff; color: #1890ff; }
+        .tag-hired { background: #f6ffed; color: #52c41a; }
+        
+        /* Links */
+        a.folder-link { color: #3498db; text-decoration: none; font-weight: 500; }
+        a.folder-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
-    <div id="securityGate">
-        <div class="login-box">
-            <h2 style="color:var(--primary); margin-top:0;">SECURE LOGIN</h2>
-            <p style="font-size:0.8rem; color:#888;">Enter Admin Token</p>
-            <input type="password" id="adminPass" placeholder="******">
-            <button class="btn btn-hire" style="width:100%;" onclick="authenticate()">ACCESS HUB</button>
+    <div class="header">
+        <h1>Well Done Admin</h1>
+        <div>
+            <a href="project.html" class="btn">➜ Project Command</a>
         </div>
     </div>
 
-    <div id="app" class="hidden">
-        
-        <header>
-            <div style="display:flex; align-items:center; gap:15px;">
-                <h1>Personnel Hub</h1>
-                <a href="project.html" style="background:#f1c40f; color:black; padding:8px 15px; text-decoration:none; font-weight:bold; font-size:0.8rem; border-radius:4px;">
-                    GO TO DISPATCH ➔
-                </a>
-            </div>
-            
-            <div class="nav-tabs">
-                <div class="nav-btn active" onclick="switchTab('applicants')">APPLICANTS</div>
-                <div class="nav-btn" onclick="switchTab('crew')">ACTIVE CREW</div>
-            </div>
-        </header>
+    <div class="card">
+        <h2>New Applicants</h2>
+        <table id="appTable">
+            <thead>
+                <tr>
+                    <th>Name / Email</th>
+                    <th>Trade Request</th>
+                    <th>Exp / Pay</th>
+                    <th>Tools</th>
+                    <th>Resume</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="6" style="text-align:center; padding:20px;">Loading Applicants...</td></tr>
+            </tbody>
+        </table>
+    </div>
 
-        <div class="container">
-            
-            <div id="view-applicants">
-                <div id="loader" style="text-align:center; padding:20px;">Loading Application Data...</div>
-                <div id="applicantList"></div> 
-            </div>
-
-            <div id="view-crew" class="hidden">
-                <div class="card" style="border-left-color: var(--primary);">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Name / Email</th>
-                                <th>Role</th>
-                                <th>Compliance</th>
-                                <th>Notes / Rap Sheet</th>
-                            </tr>
-                        </thead>
-                        <tbody id="crewTable"></tbody> 
-                    </table>
-                </div>
-            </div>
-
-        </div>
+    <div class="card">
+        <h2>Active Crew List</h2>
+        <table id="crewTable">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Name</th>
+                    <th style="width: 20%;">Email</th>
+                    <th style="width: 15%;">Role (Trade)</th>
+                    <th style="width: 15%;">Compliance (Tier)</th>
+                    <th style="width: 10%;">Rap Sheet</th>
+                    <th style="width: 25%;">Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="6" style="text-align:center; padding:20px;">Loading Crew...</td></tr>
+            </tbody>
+        </table>
     </div>
 
     <script>
+        // *** ENSURE THIS MATCHES YOUR LATEST DEPLOYMENT ***
         const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
-        
-        // --- 1. AUTHENTICATION ---
-        function authenticate() {
-            const pass = document.getElementById('adminPass').value;
-            if(pass === "WellDone2025") { 
-                document.getElementById('securityGate').style.display = 'none';
-                document.getElementById('app').classList.remove('hidden');
-                loadData();
-            } else {
-                alert("Unauthorized Access.");
-            }
-        }
 
-        function switchTab(view) {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.nav-btn')[view === 'applicants' ? 0 : 1].classList.add('active');
-            
-            if(view === 'applicants') {
-                document.getElementById('view-applicants').classList.remove('hidden');
-                document.getElementById('view-crew').classList.add('hidden');
-            } else {
-                document.getElementById('view-applicants').classList.add('hidden');
-                document.getElementById('view-crew').classList.remove('hidden');
-            }
-        }
+        window.onload = loadData;
 
-        // --- 2. DATA FETCHING ---
         async function loadData() {
             try {
-                // Fetch Applicants
+                // We reuse the existing action 'getPersonnelData'
                 const res = await fetch(`${API_URL}?action=getPersonnelData`);
                 const data = await res.json();
-                
                 renderApplicants(data.applicants);
                 renderCrew(data.crew);
-                document.getElementById('loader').style.display = 'none';
-            } catch (e) {
-                console.error(e);
-                document.getElementById('loader').innerText = "Error connecting to Database (v139). Check Sheet Tabs.";
+            } catch (err) {
+                console.error(err);
+                alert("Error loading data from system.");
             }
         }
 
+        // --- RENDER APPLICANTS ---
         function renderApplicants(list) {
-            const container = document.getElementById('applicantList');
-            container.innerHTML = "";
-
-            if(!list || list.length === 0) container.innerHTML = "<p style='text-align:center;color:#888;'>No new applications found. (Check Sheet for 'NEW' status)</p>";
+            const table = document.querySelector("#appTable tbody");
+            table.innerHTML = "";
+            if(!list || list.length === 0) { table.innerHTML = "<tr><td colspan='6' style='text-align:center;'>No new applicants.</td></tr>"; return; }
 
             list.forEach(app => {
-                const card = document.createElement('div');
-                card.className = "card";
-                card.innerHTML = `
-                    <div class="card-header">
-                        <h3>${app.fname} ${app.lname}</h3>
-                        <span class="tag">${app.trade}</span>
-                    </div>
-                    <div class="data-grid">
-                        <div class="data-point"><label>Experience</label><span>${app.exp} Yrs</span></div>
-                        <div class="data-point"><label>Desired Pay</label><span>$${app.pay}</span></div>
-                        <div class="data-point"><label>Tools</label><span>${app.tools}</span></div>
-                    </div>
-                    
-                    <button class="btn btn-folder" onclick="window.open('${app.folderUrl}', '_blank')">📂 Open Drive Folder (Audit Files)</button>
-
-                    <div class="actions">
-                        <button class="btn btn-agreement" onclick="triggerAction('sendAgreement', '${app.email}')">Send Master Agree</button>
-                        <button class="btn btn-onboard" onclick="triggerAction('requestOnboarding', '${app.email}')">Req. Onboarding</button>
-                        <button class="btn btn-hire" onclick="hireWorker('${app.email}', '${app.fname} ${app.lname}', '${app.trade}', '${app.pay}')">HIRE (Active)</button>
-                    </div>
-                `;
-                container.appendChild(card);
+                const row = `
+                    <tr>
+                        <td><strong>${app.fname} ${app.lname}</strong><br><span style="color:#888; font-size:0.8rem;">${app.email}</span></td>
+                        <td><span class="tag tag-new">${app.trade}</span></td>
+                        <td>${app.exp} yrs / $${app.pay}</td>
+                        <td>${app.tools}</td>
+                        <td>${app.resumeUrl ? `<a href="${app.resumeUrl}" target="_blank" class="folder-link">📄 View PDF</a>` : "N/A"}</td>
+                        <td>
+                            <button onclick="hireWorker('${app.email}', '${app.fname} ${app.lname}', '${app.trade}')" style="background:var(--accent); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">HIRE</button>
+                        </td>
+                    </tr>`;
+                table.innerHTML += row;
             });
         }
 
+        // --- RENDER CREW (WITH DROPDOWNS) ---
         function renderCrew(list) {
-            const tbody = document.getElementById('crewTable');
-            tbody.innerHTML = "";
-
-            if(!list) return;
+            const table = document.querySelector("#crewTable tbody");
+            table.innerHTML = "";
+            
+            if(!list || list.length === 0) { table.innerHTML = "<tr><td colspan='6' style='text-align:center;'>No active crew found.</td></tr>"; return; }
 
             list.forEach(c => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>
-                        <strong>${c.name}</strong><br>
-                        <a href="mailto:${c.email}" style="color:#888;font-size:0.8rem;">${c.email}</a>
-                    </td>
-                    <td>${c.tier || "Standard"}<br><span class="tag">${c.trade}</span></td>
-                    <td><button class="btn btn-folder" style="padding:5px;" onclick="window.open('${c.folderUrl}', '_blank')">Audit</button></td>
-                    <td>
-                        <input type="text" class="input-notes" value="${c.notes || ""}" 
-                        onchange="updateNote('${c.email}', this.value)" placeholder="Add Rap Sheet notes...">
-                    </td>
-                `;
-                tbody.appendChild(tr);
+                const row = `
+                    <tr>
+                        <td><strong>${c.name}</strong></td>
+                        <td>${c.email}</td>
+                        
+                        <td>
+                            <select class="editable" onchange="updateWorker('${c.email}', 'trade', this.value)">
+                                <option value="General Labor" ${c.trade === 'General Labor' ? 'selected' : ''}>General Labor</option>
+                                <option value="Carpentry" ${c.trade === 'Carpentry' ? 'selected' : ''}>Carpentry</option>
+                                <option value="Plumbing" ${c.trade === 'Plumbing' ? 'selected' : ''}>Plumbing</option>
+                                <option value="Electrical" ${c.trade === 'Electrical' ? 'selected' : ''}>Electrical</option>
+                                <option value="Flooring" ${c.trade === 'Flooring' ? 'selected' : ''}>Flooring</option>
+                                <option value="Painting" ${c.trade === 'Painting' ? 'selected' : ''}>Painting</option>
+                                <option value="HVAC" ${c.trade === 'HVAC' ? 'selected' : ''}>HVAC</option>
+                            </select>
+                        </td>
+
+                        <td>
+                            <select class="editable" onchange="updateWorker('${c.email}', 'tier', this.value)">
+                                <option value="T1 - Entry" ${c.tier === 'T1 - Entry' ? 'selected' : ''}>Tier 1 ($20-25)</option>
+                                <option value="T2 - Skilled" ${c.tier === 'T2 - Skilled' ? 'selected' : ''}>Tier 2 ($26-35)</option>
+                                <option value="T3 - Lead" ${c.tier === 'T3 - Lead' ? 'selected' : ''}>Tier 3 ($36+)</option>
+                            </select>
+                        </td>
+
+                        <td><a href="${c.folderUrl}" target="_blank" class="folder-link">📂 Open Folder</a></td>
+                        
+                        <td><span style="font-size:0.85rem; color:#555;">${c.notes || '--'}</span></td>
+                    </tr>`;
+                table.innerHTML += row;
             });
         }
 
-        // --- 3. ACTIONS ---
-
-       async function triggerAction(actionName, email) {
-            let msg = `Confirm Action: ${actionName} for ${email}?`;
-            if (actionName === 'sendAgreement') {
-                msg = `Confirm: Initialize Onboarding for ${email}?\n\nThis will:\n1. Create Google Drive Folders\n2. Send Master Agreement Email`;
-            }
-
-            if(!confirm(msg)) return;
+        // --- AUTO-SAVE LOGIC ---
+        async function updateWorker(email, type, value) {
+            // This sends the data to the backend immediately when you change the dropdown
+            console.log(`Saving ${type} for ${email}...`);
             
-            // UI Feedback
-            const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = "PROCESSING...";
-            btn.disabled = true;
+            const payload = {
+                action: 'updateCrewDetails',
+                email: email
+            };
+            
+            if(type === 'trade') payload.trade = value;
+            if(type === 'tier') payload.tier = value;
 
             try {
-                // We use 'no-cors' here for speed since we don't strictly need the return value for this button
-                // But if you want to be sure it finished, we can use the standard fetch
                 await fetch(API_URL, {
                     method: 'POST',
-                    mode: 'no-cors', 
-                    body: JSON.stringify({ action: actionName, email: email })
+                    mode: 'no-cors',
+                    body: JSON.stringify(payload)
                 });
-                
-                alert("Success: Folders Created & Email Sent.");
-                btn.innerText = "SENT ✅";
-            } catch (e) {
-                alert("Error sending command.");
-                btn.innerText = originalText;
-                btn.disabled = false;
+                // Note: We don't alert() on success to keep it smooth, but you can check console logs
+            } catch(e) {
+                alert("Error saving change. Check internet connection.");
             }
         }
 
-        async function hireWorker(email, name, trade, pay) {
-            if(!confirm(`FINAL STEP: Hire ${name} as W2 Employee?`)) return;
-
-            const btn = event.target;
-            btn.innerText = "PROCESSING...";
-            btn.disabled = true;
-
+        async function hireWorker(email, name, trade) {
+            if(!confirm(`Hire ${name}? This will create their folder and send the Welcome Email.`)) return;
+            
+            // Disable button visually (optional, but good practice)
+            
             await fetch(API_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                body: JSON.stringify({ 
-                    action: "hireWorker", 
-                    email: email,
-                    name: name,
-                    trade: trade,
-                    pay: pay
-                })
+                body: JSON.stringify({ action: 'hireWorker', email: email, name: name, trade: trade })
             });
-            alert("Worker Hired. Moved to Crew List.");
-            loadData(); // Refresh lists
+            
+            alert("Worker Hired! Reloading list...");
+            loadData();
         }
-
-        async function updateNote(email, note) {
-            await fetch(API_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ action: "updateCrewNote", email: email, note: note })
-            });
-        }
-
     </script>
+
 </body>
 </html>
