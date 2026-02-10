@@ -9,47 +9,44 @@
         :root { --primary: #343E47; --accent: #33B26E; --bg: #f4f7f6; --white: #ffffff; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); padding: 20px; color: var(--primary); margin: 0; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; max-width: 1200px; margin: 0 auto 20px auto; }
-        .btn { padding: 10px 20px; background: #3498db; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 0.9rem; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; max-width: 1400px; margin: 0 auto 20px auto; }
+        .btn { padding: 10px 20px; background: #3498db; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; }
         .btn:hover { background: #2980b9; }
 
-        .card { background: var(--white); padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px auto; }
-        h2 { margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; text-transform: uppercase; font-size: 1.1rem; letter-spacing: 0.5px; }
+        .card { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; max-width: 1400px; margin: 0 auto 20px auto; }
+        h2 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1.1rem; color: #444; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; color: #888; font-size: 0.75rem; text-transform: uppercase; padding-bottom: 10px; border-bottom: 2px solid #eee; }
-        td { padding: 12px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; vertical-align: middle; }
+        /* TABLE STYLES */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+        th { text-align: left; color: #888; font-size: 0.75rem; text-transform: uppercase; padding: 10px 8px; border-bottom: 2px solid #eee; background: #fafafa; }
+        td { padding: 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        tr:hover { background-color: #f9f9f9; }
 
-        /* Dropdown Styling for Role/Compliance */
+        /* EDITABLE INPUTS */
         select.editable {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: #fafafa;
-            font-size: 0.85rem;
-            cursor: pointer;
-            width: 100%;
-            max-width: 150px;
+            padding: 6px; border: 1px solid #ddd; border-radius: 4px;
+            background: #fff; width: 100%; font-size: 0.85rem; cursor: pointer;
         }
-        select.editable:focus { border-color: var(--accent); outline: none; background: #fff; }
-
-        /* Status Badges */
-        .tag { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block;}
-        .tag-new { background: #e6f7ff; color: #1890ff; }
-        .tag-hired { background: #f6ffed; color: #52c41a; }
+        select.editable:focus { border-color: var(--accent); outline: none; }
         
-        /* Links */
-        a.folder-link { color: #3498db; text-decoration: none; font-weight: 500; }
+        input.editable-note {
+            width: 100%; padding: 6px; border: 1px solid transparent; 
+            background: transparent; font-size: 0.9rem; color: #555;
+        }
+        input.editable-note:focus { border: 1px solid var(--accent); background: #fff; outline: none; border-radius: 4px; }
+
+        /* TAGS & LINKS */
+        .tag { padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .tag-new { background: #e6f7ff; color: #1890ff; }
+        a.folder-link { color: #3498db; text-decoration: none; font-weight: 600; font-size: 0.85rem; }
         a.folder-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>Well Done Admin</h1>
-        <div>
-            <a href="project.html" class="btn">➜ Project Command</a>
-        </div>
+        <h1>Admin Hub</h1>
+        <div><a href="project.html" class="btn">➜ Project Command</a></div>
     </div>
 
     <div class="card">
@@ -57,17 +54,15 @@
         <table id="appTable">
             <thead>
                 <tr>
-                    <th>Name / Email</th>
-                    <th>Trade Request</th>
-                    <th>Exp / Pay</th>
-                    <th>Tools</th>
-                    <th>Resume</th>
-                    <th>Action</th>
+                    <th width="20%">Name</th>
+                    <th width="20%">Contact</th>
+                    <th width="15%">Trade</th>
+                    <th width="15%">Exp / Pay</th>
+                    <th width="10%">Resume</th>
+                    <th width="20%">Action</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr><td colspan="6" style="text-align:center; padding:20px;">Loading Applicants...</td></tr>
-            </tbody>
+            <tbody><tr><td colspan="6" align="center">Loading...</td></tr></tbody>
         </table>
     </div>
 
@@ -76,73 +71,67 @@
         <table id="crewTable">
             <thead>
                 <tr>
-                    <th style="width: 15%;">Name</th>
-                    <th style="width: 20%;">Email</th>
-                    <th style="width: 15%;">Role (Trade)</th>
-                    <th style="width: 15%;">Compliance (Tier)</th>
-                    <th style="width: 10%;">Rap Sheet</th>
-                    <th style="width: 25%;">Notes</th>
+                    <th width="15%">Name</th>
+                    <th width="20%">Phone / Email</th>
+                    <th width="15%">Trade</th>
+                    <th width="15%">Pay Tier</th>
+                    <th width="10%">Rap Sheet</th>
+                    <th width="25%">Notes</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr><td colspan="6" style="text-align:center; padding:20px;">Loading Crew...</td></tr>
-            </tbody>
+            <tbody><tr><td colspan="6" align="center">Loading...</td></tr></tbody>
         </table>
     </div>
 
     <script>
-        // *** ENSURE THIS MATCHES YOUR LATEST DEPLOYMENT ***
+        // *** REPLACE WITH YOUR DEPLOYMENT URL ***
         const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
 
         window.onload = loadData;
 
         async function loadData() {
             try {
-                // We reuse the existing action 'getPersonnelData'
                 const res = await fetch(`${API_URL}?action=getPersonnelData`);
                 const data = await res.json();
                 renderApplicants(data.applicants);
                 renderCrew(data.crew);
-            } catch (err) {
-                console.error(err);
-                alert("Error loading data from system.");
-            }
+            } catch (err) { console.error(err); alert("Error loading data."); }
         }
 
-        // --- RENDER APPLICANTS ---
         function renderApplicants(list) {
             const table = document.querySelector("#appTable tbody");
             table.innerHTML = "";
-            if(!list || list.length === 0) { table.innerHTML = "<tr><td colspan='6' style='text-align:center;'>No new applicants.</td></tr>"; return; }
+            if(!list || list.length === 0) { table.innerHTML = "<tr><td colspan='6' align='center'>No new applicants.</td></tr>"; return; }
 
             list.forEach(app => {
                 const row = `
                     <tr>
-                        <td><strong>${app.fname} ${app.lname}</strong><br><span style="color:#888; font-size:0.8rem;">${app.email}</span></td>
+                        <td><strong>${app.fname} ${app.lname}</strong></td>
+                        <td>${app.email}</td>
                         <td><span class="tag tag-new">${app.trade}</span></td>
                         <td>${app.exp} yrs / $${app.pay}</td>
-                        <td>${app.tools}</td>
-                        <td>${app.resumeUrl ? `<a href="${app.resumeUrl}" target="_blank" class="folder-link">📄 View PDF</a>` : "N/A"}</td>
+                        <td>${app.resumeUrl ? `<a href="${app.resumeUrl}" target="_blank" class="folder-link">📄 PDF</a>` : "--"}</td>
                         <td>
-                            <button onclick="hireWorker('${app.email}', '${app.fname} ${app.lname}', '${app.trade}')" style="background:var(--accent); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">HIRE</button>
+                            <button onclick="hireWorker('${app.email}', '${app.fname} ${app.lname}', '${app.trade}')" style="background:var(--accent); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">HIRE</button>
                         </td>
                     </tr>`;
                 table.innerHTML += row;
             });
         }
 
-        // --- RENDER CREW (WITH DROPDOWNS) ---
         function renderCrew(list) {
             const table = document.querySelector("#crewTable tbody");
             table.innerHTML = "";
-            
-            if(!list || list.length === 0) { table.innerHTML = "<tr><td colspan='6' style='text-align:center;'>No active crew found.</td></tr>"; return; }
+            if(!list || list.length === 0) { table.innerHTML = "<tr><td colspan='6' align='center'>No active crew.</td></tr>"; return; }
 
             list.forEach(c => {
                 const row = `
                     <tr>
-                        <td><strong>${c.name}</strong></td>
-                        <td>${c.email}</td>
+                        <td style="font-weight:600;">${c.name}</td>
+                        <td>
+                            <div>${c.phone || "--"}</div>
+                            <div style="font-size:0.8rem; color:#888;">${c.email}</div>
+                        </td>
                         
                         <td>
                             <select class="editable" onchange="updateWorker('${c.email}', 'trade', this.value)">
@@ -158,57 +147,50 @@
 
                         <td>
                             <select class="editable" onchange="updateWorker('${c.email}', 'tier', this.value)">
-                                <option value="T1 - Entry" ${c.tier === 'T1 - Entry' ? 'selected' : ''}>Tier 1 ($20-25)</option>
-                                <option value="T2 - Skilled" ${c.tier === 'T2 - Skilled' ? 'selected' : ''}>Tier 2 ($26-35)</option>
-                                <option value="T3 - Lead" ${c.tier === 'T3 - Lead' ? 'selected' : ''}>Tier 3 ($36+)</option>
+                                <option value="" ${!c.tier ? 'selected' : ''}>-- Select --</option>
+                                <option value="T1 - Entry" ${c.tier === 'T1 - Entry' ? 'selected' : ''}>T1 ($20-25)</option>
+                                <option value="T2 - Skilled" ${c.tier === 'T2 - Skilled' ? 'selected' : ''}>T2 ($26-35)</option>
+                                <option value="T3 - Lead" ${c.tier === 'T3 - Lead' ? 'selected' : ''}>T3 ($36+)</option>
                             </select>
                         </td>
 
-                        <td><a href="${c.folderUrl}" target="_blank" class="folder-link">📂 Open Folder</a></td>
+                        <td><a href="${c.folderUrl}" target="_blank" class="folder-link">📂 Folder</a></td>
                         
-                        <td><span style="font-size:0.85rem; color:#555;">${c.notes || '--'}</span></td>
+                        <td>
+                            <input type="text" class="editable-note" 
+                                   value="${c.notes || ''}" 
+                                   placeholder="Add note..." 
+                                   onchange="saveNote('${c.email}', this.value)">
+                        </td>
                     </tr>`;
                 table.innerHTML += row;
             });
         }
 
-        // --- AUTO-SAVE LOGIC ---
         async function updateWorker(email, type, value) {
-            // This sends the data to the backend immediately when you change the dropdown
-            console.log(`Saving ${type} for ${email}...`);
-            
-            const payload = {
-                action: 'updateCrewDetails',
-                email: email
-            };
-            
+            console.log(`Saving ${type}...`);
+            const payload = { action: 'updateCrewDetails', email: email };
             if(type === 'trade') payload.trade = value;
             if(type === 'tier') payload.tier = value;
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        }
 
-            try {
-                await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(payload)
-                });
-                // Note: We don't alert() on success to keep it smooth, but you can check console logs
-            } catch(e) {
-                alert("Error saving change. Check internet connection.");
-            }
+        async function saveNote(email, note) {
+            console.log(`Saving note...`);
+            await fetch(API_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify({ action: 'updateCrewNote', email: email, note: note }) 
+            });
         }
 
         async function hireWorker(email, name, trade) {
-            if(!confirm(`Hire ${name}? This will create their folder and send the Welcome Email.`)) return;
-            
-            // Disable button visually (optional, but good practice)
-            
+            if(!confirm(`Hire ${name}?`)) return;
             await fetch(API_URL, {
-                method: 'POST',
-                mode: 'no-cors',
+                method: 'POST', mode: 'no-cors',
                 body: JSON.stringify({ action: 'hireWorker', email: email, name: name, trade: trade })
             });
-            
-            alert("Worker Hired! Reloading list...");
+            alert("Hired!");
             loadData();
         }
     </script>
