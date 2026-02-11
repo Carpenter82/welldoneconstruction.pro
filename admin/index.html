@@ -80,21 +80,32 @@
         <table id="crewTable">
             <thead>
                 <tr>
-                    <th width="15%">Name</th>
-                    <th width="20%">Phone / Email</th>
+                    <th width="20%">Name / Contact</th>
                     <th width="15%">Trade</th>
                     <th width="15%">Pay Tier</th>
-                    <th width="10%">Rap Sheet</th>
-                    <th width="25%">Notes</th>
+                    <th width="35%">Notes</th>
+                    <th width="15%" style="text-align: center;">Folder</th>
                 </tr>
             </thead>
-            <tbody><tr><td colspan="6" align="center">Loading...</td></tr></tbody>
+            <tbody id="crew-table-body">
+                <tr><td colspan="5" align="center">Loading...</td></tr>
+            </tbody>
         </table>
     </div>
 
     <script>
         // *** REPLACE WITH YOUR DEPLOYMENT URL ***
         const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
+
+        // --- CONSTANTS FOR DROPDOWNS ---
+        const TRADE_OPTIONS = [
+            "General Labor", "Carpentry", "Plumbing", "Electrical", 
+            "Flooring", "Painting", "HVAC"
+        ];
+
+        const TIER_OPTIONS = [
+            "T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"
+        ];
 
         window.onload = loadData;
 
@@ -132,51 +143,93 @@
             });
         }
 
-        function renderCrew(list) {
-            const table = document.querySelector("#crewTable tbody");
-            table.innerHTML = "";
-            if(!list || list.length === 0) { table.innerHTML = "<tr><td colspan='6' align='center'>No active crew.</td></tr>"; return; }
+        // --- FIXED CREW RENDERER ---
+        function renderCrew(crewData) {
+            const tbody = document.getElementById('crew-table-body');
+            tbody.innerHTML = ''; // Clear existing rows
 
-            list.forEach(c => {
-                const row = `
-                    <tr>
-                        <td style="font-weight:600;">${c.name}</td>
-                        <td>
-                            <div>${c.phone || "--"}</div>
-                            <div style="font-size:0.8rem; color:#888;">${c.email}</div>
-                        </td>
-                        
-                        <td>
-                            <select class="editable" onchange="updateWorker('${c.email}', 'trade', this.value)">
-                                <option value="General Labor" ${c.trade === 'General Labor' ? 'selected' : ''}>General Labor</option>
-                                <option value="Carpentry" ${c.trade === 'Carpentry' ? 'selected' : ''}>Carpentry</option>
-                                <option value="Plumbing" ${c.trade === 'Plumbing' ? 'selected' : ''}>Plumbing</option>
-                                <option value="Electrical" ${c.trade === 'Electrical' ? 'selected' : ''}>Electrical</option>
-                                <option value="Flooring" ${c.trade === 'Flooring' ? 'selected' : ''}>Flooring</option>
-                                <option value="Painting" ${c.trade === 'Painting' ? 'selected' : ''}>Painting</option>
-                                <option value="HVAC" ${c.trade === 'HVAC' ? 'selected' : ''}>HVAC</option>
-                            </select>
-                        </td>
+            if(!crewData || crewData.length === 0) { 
+                tbody.innerHTML = "<tr><td colspan='5' align='center'>No active crew.</td></tr>"; 
+                return; 
+            }
 
-                        <td>
-                            <select class="editable" onchange="updateWorker('${c.email}', 'tier', this.value)">
-                                <option value="" ${!c.tier ? 'selected' : ''}>-- Select --</option>
-                                <option value="T1 - Entry" ${c.tier === 'T1 - Entry' ? 'selected' : ''}>T1 ($20-25)</option>
-                                <option value="T2 - Skilled" ${c.tier === 'T2 - Skilled' ? 'selected' : ''}>T2 ($26-35)</option>
-                                <option value="T3 - Lead" ${c.tier === 'T3 - Lead' ? 'selected' : ''}>T3 ($36+)</option>
-                            </select>
-                        </td>
+            crewData.forEach(worker => {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = "1px solid #eee";
 
-                        <td><a href="${c.folderUrl}" target="_blank" class="folder-link">📂 Folder</a></td>
-                        
-                        <td>
-                            <input type="text" class="editable-note" 
-                                   value="${c.notes || ''}" 
-                                   placeholder="Add note..." 
-                                   onchange="saveNote('${c.email}', this.value)">
-                        </td>
-                    </tr>`;
-                table.innerHTML += row;
+                // 1. NAME & CONTACT
+                tr.innerHTML = `
+                    <td style="padding: 12px;">
+                        <div style="font-weight:bold; color:#2c3e50;">${worker.name}</div>
+                        <div style="font-size:0.85rem; color:#7f8c8d;">${worker.email}</div>
+                        <div style="font-size:0.85rem; color:#7f8c8d;">${worker.phone || "No Phone"}</div>
+                    </td>
+                `;
+
+                // 2. TRADE DROPDOWN
+                const tradeTd = document.createElement('td');
+                const tradeSelect = document.createElement('select');
+                tradeSelect.className = "editable";
+                
+                // Add Default Option
+                const defaultTradeOpt = document.createElement('option');
+                defaultTradeOpt.text = "-- Select --";
+                defaultTradeOpt.value = "";
+                tradeSelect.appendChild(defaultTradeOpt);
+
+                TRADE_OPTIONS.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.text = opt;
+                    if (opt === worker.trade) option.selected = true;
+                    tradeSelect.appendChild(option);
+                });
+
+                tradeSelect.onchange = () => updateWorker(worker.email, 'trade', tradeSelect.value);
+                tradeTd.appendChild(tradeSelect);
+                tr.appendChild(tradeTd);
+
+                // 3. PAY TIER DROPDOWN
+                const tierTd = document.createElement('td');
+                const tierSelect = document.createElement('select');
+                tierSelect.className = "editable";
+
+                // Add Default Option
+                const defaultTierOpt = document.createElement('option');
+                defaultTierOpt.text = "-- Select --";
+                defaultTierOpt.value = "";
+                tierSelect.appendChild(defaultTierOpt);
+
+                TIER_OPTIONS.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.text = opt;
+                    if (opt === worker.tier) option.selected = true;
+                    tierSelect.appendChild(option);
+                });
+
+                tierSelect.onchange = () => updateWorker(worker.email, 'tier', tierSelect.value);
+                tierTd.appendChild(tierSelect);
+                tr.appendChild(tierTd);
+
+                // 4. NOTES
+                tr.innerHTML += `
+                    <td style="padding: 12px;">
+                        <input type="text" class="editable-note"
+                               value="${worker.notes || ''}" 
+                               onblur="saveNote('${worker.email}', this.value)"
+                               placeholder="Add Note...">
+                    </td>
+                `;
+
+                // 5. FOLDER LINK
+                tr.innerHTML += `
+                    <td style="padding: 12px; text-align: center;">
+                         ${worker.folderUrl ? `<a href="${worker.folderUrl}" target="_blank" style="text-decoration:none; font-size:1.2rem;">📂</a>` : "🚫"}
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
             });
         }
 
@@ -209,19 +262,27 @@
                 body: JSON.stringify({ action: 'hireWorker', email: email, name: name, trade: trade })
             });
             alert("Hired! Worker moved to Crew List.");
-            loadData();
+            // Slight delay to allow backend to process before reloading
+            setTimeout(loadData, 1500);
         }
 
         async function updateWorker(email, type, value) {
-            console.log(`Saving ${type}...`);
+            console.log(`Saving ${type} for ${email}...`);
             const payload = { action: 'updateCrewDetails', email: email };
+            
+            // Allow empty values to be sent
             if(type === 'trade') payload.trade = value;
             if(type === 'tier') payload.tier = value;
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            
+            await fetch(API_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify(payload) 
+            });
         }
 
         async function saveNote(email, note) {
-            console.log(`Saving note...`);
+            console.log(`Saving note for ${email}...`);
             await fetch(API_URL, { 
                 method: 'POST', 
                 mode: 'no-cors', 
