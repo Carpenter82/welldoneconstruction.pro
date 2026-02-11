@@ -112,8 +112,8 @@
         <div id="status" class="status-msg"></div>
     </div>
 
-    <script>
-        // 🛑 REPLACE WITH YOUR GOOGLE SCRIPT URL
+   <script>
+        // 🛑 IMPORTANT: Update this with your NEW Web App URL from the v13.7 deployment
         const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec"; 
 
         // 1. Get Identity from URL
@@ -127,7 +127,10 @@
 
         // 2. File Reader Logic
         function setupUploader(inputId, previewId, nameId) {
-            document.getElementById(inputId).addEventListener('change', function(e) {
+            const inputElement = document.getElementById(inputId);
+            if(!inputElement) return; // Guard clause
+
+            inputElement.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
                     document.getElementById(nameId).textContent = file.name;
@@ -145,7 +148,7 @@
         setupUploader('file-id', 'preview-id', 'name-id');
         setupUploader('file-osha', 'preview-osha', 'name-osha');
 
-        // 3. Submit Logic (Fixed to use uploadPhoto sequentially)
+        // 3. Submit Logic
         document.getElementById('docForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
@@ -166,26 +169,30 @@
 
                     const reader = new FileReader();
                     reader.onload = () => {
-                        const base64 = reader.result.split(',')[1]; // Clean base64
+                        // Handle potential issues with "base64," prefix stripping
+                        let base64 = reader.result;
+                        if(base64.includes("base64,")) {
+                            base64 = base64.split("base64,")[1];
+                        }
                         
                         fetch(API_URL, {
                             method: "POST",
-                            mode: "no-cors",
+                            mode: "no-cors", // Note: This allows upload but swallows success response
                             body: JSON.stringify({
-                                action: "uploadPhoto", // Uses existing Backend logic
+                                action: "uploadPhoto", 
                                 email: email,
                                 base64: base64,
                                 filename: `${prefix}_${file.name}`
                             })
                         })
                         .then(() => resolve(true))
-                        .catch(() => resolve(true)); // Continue even on CORS opacity
+                        .catch(() => resolve(true)); 
                     };
                     reader.readAsDataURL(file);
                 });
             };
 
-            // Process files one by one to ensure reliability
+            // Process files
             try {
                 status.textContent = "Uploading ID Card...";
                 await uploadFile(idFile, "GOV_ID");
@@ -195,13 +202,13 @@
                     await uploadFile(oshaFile, "OSHA_CARD");
                 }
 
-                status.textContent = "Documents Received. Processing...";
+                status.textContent = "Documents Received. Finalizing...";
                 status.style.color = "#2ecc71";
                 
+                // 🛑 THIS IS THE CRITICAL CHANGE FOR REDIRECTION
                 setTimeout(() => {
-                    alert("Onboarding Complete! Please check your email for the payroll setup.");
-                    window.location.href = "../portal/index.html?email=" + encodeURIComponent(email);
-                }, 2000);
+                    window.location.href = "verification-pending.html";
+                }, 1500);
 
             } catch (err) {
                 console.error(err);
@@ -210,5 +217,3 @@
             }
         });
     </script>
-</body>
-</html>
