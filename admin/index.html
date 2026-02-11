@@ -40,6 +40,15 @@
         .tag-new { background: #e6f7ff; color: #1890ff; }
         a.folder-link { color: #3498db; text-decoration: none; font-weight: 600; font-size: 0.85rem; }
         a.folder-link:hover { text-decoration: underline; }
+
+        /* ACTION BUTTONS */
+        .action-group { display: flex; gap: 5px; }
+        .btn-sm { border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: white; font-size: 0.8rem; }
+        .btn-sign { background: #f39c12; } /* Orange for Contracts */
+        .btn-docs { background: #8e44ad; } /* Purple for Onboarding */
+        .btn-hire { background: #27ae60; } /* Green for Hire */
+        .btn-sm:hover { opacity: 0.9; }
+
     </style>
 </head>
 <body>
@@ -56,10 +65,10 @@
                 <tr>
                     <th width="20%">Name</th>
                     <th width="20%">Contact</th>
-                    <th width="15%">Trade</th>
+                    <th width="10%">Trade</th>
                     <th width="15%">Exp / Pay</th>
                     <th width="10%">Resume</th>
-                    <th width="20%">Action</th>
+                    <th width="25%">Actions (Sign -> Docs -> Hire)</th>
                 </tr>
             </thead>
             <tbody><tr><td colspan="6" align="center">Loading...</td></tr></tbody>
@@ -112,7 +121,11 @@
                         <td>${app.exp} yrs / $${app.pay}</td>
                         <td>${app.resumeUrl ? `<a href="${app.resumeUrl}" target="_blank" class="folder-link">📄 PDF</a>` : "--"}</td>
                         <td>
-                            <button onclick="hireWorker('${app.email}', '${app.fname} ${app.lname}', '${app.trade}')" style="background:var(--accent); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">HIRE</button>
+                            <div class="action-group">
+                                <button class="btn-sm btn-sign" onclick="sendContract('${app.email}')" title="Send Master Agreement">📄 Sign</button>
+                                <button class="btn-sm btn-docs" onclick="reqOnboarding('${app.email}')" title="Request ID/OSHA">🆔 Docs</button>
+                                <button class="btn-sm btn-hire" onclick="hireWorker('${app.email}', '${app.fname} ${app.lname}', '${app.trade}')" title="Finalize Hire">✅ Hire</button>
+                            </div>
                         </td>
                     </tr>`;
                 table.innerHTML += row;
@@ -167,6 +180,38 @@
             });
         }
 
+        // --- BACKEND CONNECTIONS ---
+
+        async function sendContract(email) {
+            if(!confirm(`Send Master Agreement to ${email}?`)) return;
+            alert("Sending Agreement...");
+            await fetch(API_URL, {
+                method: 'POST', mode: 'no-cors',
+                body: JSON.stringify({ action: 'sendAgreement', email: email })
+            });
+            alert("Agreement Sent!");
+        }
+
+        async function reqOnboarding(email) {
+            if(!confirm(`Request ID & OSHA cards from ${email}?`)) return;
+            alert("Sending Request...");
+            await fetch(API_URL, {
+                method: 'POST', mode: 'no-cors',
+                body: JSON.stringify({ action: 'requestOnboarding', email: email })
+            });
+            alert("Request Sent!");
+        }
+
+        async function hireWorker(email, name, trade) {
+            if(!confirm(`Finalize Hiring for ${name}?`)) return;
+            await fetch(API_URL, {
+                method: 'POST', mode: 'no-cors',
+                body: JSON.stringify({ action: 'hireWorker', email: email, name: name, trade: trade })
+            });
+            alert("Hired! Worker moved to Crew List.");
+            loadData();
+        }
+
         async function updateWorker(email, type, value) {
             console.log(`Saving ${type}...`);
             const payload = { action: 'updateCrewDetails', email: email };
@@ -182,16 +227,6 @@
                 mode: 'no-cors', 
                 body: JSON.stringify({ action: 'updateCrewNote', email: email, note: note }) 
             });
-        }
-
-        async function hireWorker(email, name, trade) {
-            if(!confirm(`Hire ${name}?`)) return;
-            await fetch(API_URL, {
-                method: 'POST', mode: 'no-cors',
-                body: JSON.stringify({ action: 'hireWorker', email: email, name: name, trade: trade })
-            });
-            alert("Hired!");
-            loadData();
         }
     </script>
 
