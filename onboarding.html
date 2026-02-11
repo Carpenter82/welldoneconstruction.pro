@@ -113,107 +113,107 @@
     </div>
 
    <script>
-        // 🛑 IMPORTANT: Update this with your NEW Web App URL from the v13.7 deployment
-        const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec"; 
+    // ✅ I have inserted your specific API URL here:
+    const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec"; 
 
-        // 1. Get Identity from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const email = urlParams.get('email');
+    // 1. Get Identity from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get('email');
 
-        if (!email) {
-            alert("Session Error. Redirecting to start.");
-            window.location.href = "../index.html";
-        }
+    if (!email) {
+        alert("Session Error. Redirecting to start.");
+        window.location.href = "../index.html";
+    }
 
-        // 2. File Reader Logic
-        function setupUploader(inputId, previewId, nameId) {
-            const inputElement = document.getElementById(inputId);
-            if(!inputElement) return; // Guard clause
+    // 2. File Reader Logic
+    function setupUploader(inputId, previewId, nameId) {
+        const inputElement = document.getElementById(inputId);
+        if(!inputElement) return; 
 
-            inputElement.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    document.getElementById(nameId).textContent = file.name;
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const img = document.getElementById(previewId);
-                        img.src = e.target.result;
-                        img.style.display = "block";
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-
-        setupUploader('file-id', 'preview-id', 'name-id');
-        setupUploader('file-osha', 'preview-osha', 'name-osha');
-
-        // 3. Submit Logic
-        document.getElementById('docForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            const status = document.getElementById('status');
-            
-            const idFile = document.getElementById('file-id').files[0];
-            const oshaFile = document.getElementById('file-osha').files[0];
-
-            if (!idFile) return alert("You must upload a Government ID.");
-
-            btn.disabled = true;
-            btn.textContent = "ENCRYPTING & UPLOADING...";
-
-            // Helper to upload a single file
-            const uploadFile = (file, prefix) => {
-                return new Promise((resolve, reject) => {
-                    if (!file) return resolve(true); // Skip if no file
-
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        // Handle potential issues with "base64," prefix stripping
-                        let base64 = reader.result;
-                        if(base64.includes("base64,")) {
-                            base64 = base64.split("base64,")[1];
-                        }
-                        
-                        fetch(API_URL, {
-                            method: "POST",
-                            mode: "no-cors", // Note: This allows upload but swallows success response
-                            body: JSON.stringify({
-                                action: "uploadPhoto", 
-                                email: email,
-                                base64: base64,
-                                filename: `${prefix}_${file.name}`
-                            })
-                        })
-                        .then(() => resolve(true))
-                        .catch(() => resolve(true)); 
-                    };
-                    reader.readAsDataURL(file);
-                });
-            };
-
-            // Process files
-            try {
-                status.textContent = "Uploading ID Card...";
-                await uploadFile(idFile, "GOV_ID");
-                
-                if (oshaFile) {
-                    status.textContent = "Uploading OSHA Card...";
-                    await uploadFile(oshaFile, "OSHA_CARD");
-                }
-
-                status.textContent = "Documents Received. Finalizing...";
-                status.style.color = "#2ecc71";
-                
-                // 🛑 THIS IS THE CRITICAL CHANGE FOR REDIRECTION
-                setTimeout(() => {
-                    window.location.href = "verification-pending.html";
-                }, 1500);
-
-            } catch (err) {
-                console.error(err);
-                status.textContent = "Upload Failed. Try smaller photos.";
-                btn.disabled = false;
+        inputElement.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById(nameId).textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById(previewId);
+                    img.src = e.target.result;
+                    img.style.display = "block";
+                };
+                reader.readAsDataURL(file);
             }
         });
-    </script>
+    }
+
+    setupUploader('file-id', 'preview-id', 'name-id');
+    setupUploader('file-osha', 'preview-osha', 'name-osha');
+
+    // 3. Submit Logic
+    document.getElementById('docForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const status = document.getElementById('status');
+        
+        const idFile = document.getElementById('file-id').files[0];
+        const oshaFile = document.getElementById('file-osha').files[0];
+
+        if (!idFile) return alert("You must upload a Government ID.");
+
+        btn.disabled = true;
+        btn.textContent = "ENCRYPTING & UPLOADING...";
+
+        // Helper to upload a single file
+        const uploadFile = (file, prefix) => {
+            return new Promise((resolve, reject) => {
+                if (!file) return resolve(true); // Skip if no file
+
+                const reader = new FileReader();
+                reader.onload = () => {
+                    let base64 = reader.result;
+                    // Clean the Base64 string for Google Apps Script
+                    if(base64.includes("base64,")) {
+                        base64 = base64.split("base64,")[1];
+                    }
+                    
+                    fetch(API_URL, {
+                        method: "POST",
+                        mode: "no-cors", 
+                        body: JSON.stringify({
+                            action: "uploadPhoto", 
+                            email: email,
+                            base64: base64,
+                            filename: `${prefix}_${file.name}`
+                        })
+                    })
+                    .then(() => resolve(true))
+                    .catch(() => resolve(true)); 
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+
+        // Process files
+        try {
+            status.textContent = "Uploading ID Card...";
+            await uploadFile(idFile, "GOV_ID");
+            
+            if (oshaFile) {
+                status.textContent = "Uploading OSHA Card...";
+                await uploadFile(oshaFile, "OSHA_CARD");
+            }
+
+            status.textContent = "Documents Received. Finalizing...";
+            status.style.color = "#2ecc71";
+            
+            // 🛑 Redirects to the new "Pending" page after 1.5 seconds
+            setTimeout(() => {
+                window.location.href = "verification-pending.html";
+            }, 1500);
+
+        } catch (err) {
+            console.error(err);
+            status.textContent = "Upload Failed. Try smaller photos.";
+            btn.disabled = false;
+        }
+    });
+</script>
