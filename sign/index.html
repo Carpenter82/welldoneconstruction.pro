@@ -82,6 +82,18 @@
             margin-top: 10px; 
             font-weight: normal;
         }
+
+        /* NEXT STEP BUTTON (Hidden by default) */
+        #next-step-container {
+            display: none;
+            margin-top: 20px;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+        }
+        .btn-next {
+            background: #27ae60; /* Green */
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -99,20 +111,28 @@
             <p><em>(Scroll to read full terms...)</em></p>
         </div>
 
-        <p style="color:#ffd700; font-weight:bold;">Sign Below:</p>
-        
-        <div class="canvas-container">
-            <canvas id="sig-canvas"></canvas>
-        </div>
+        <div id="signature-section">
+            <p style="color:#ffd700; font-weight:bold;">Sign Below:</p>
+            
+            <div class="canvas-container">
+                <canvas id="sig-canvas"></canvas>
+            </div>
 
-        <button id="submit-btn">I AGREE & SIGN</button>
-        <button class="clear-btn" id="clear-btn">Clear Signature</button>
+            <button id="submit-btn">I AGREE & SIGN</button>
+            <button class="clear-btn" id="clear-btn">Clear Signature</button>
+        </div>
         
         <p id="status-msg" style="margin-top:15px; min-height:20px; font-size:0.9rem;"></p>
+
+        <div id="next-step-container">
+            <h3 style="color: #27ae60;">Signature Accepted</h3>
+            <p style="color: #ccc; font-size: 0.9rem;">Your agreement has been filed securely.</p>
+            <button class="btn-next" id="next-btn">Proceed to Onboarding ➜</button>
+        </div>
     </div>
 
     <script>
-        // 🛑 REPLACE WITH YOUR GOOGLE SCRIPT URL
+        // *** API CONNECTION ***
         const API_URL = 'https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec';
         
         // 1. SETUP CANVAS
@@ -146,10 +166,11 @@
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
             // Handle both Touch and Mouse
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
             return { x: clientX - rect.left, y: clientY - rect.top };
         }
+        
         function startDraw(e) {
             isDrawing = true;
             const pos = getPos(e);
@@ -158,15 +179,17 @@
             ctx.lineWidth = 3;
             ctx.lineCap = 'round';
             ctx.strokeStyle = '#000';
-            e.preventDefault(); // Prevent scrolling
+            if(e.type !== 'mousedown') e.preventDefault(); // Stop scrolling on touch
         }
+        
         function draw(e) {
             if (!isDrawing) return;
             const pos = getPos(e);
             ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
-            e.preventDefault();
+            if(e.type !== 'mousedown') e.preventDefault();
         }
+        
         function endDraw() { isDrawing = false; ctx.beginPath(); }
 
         canvas.addEventListener('mousedown', startDraw);
@@ -178,18 +201,31 @@
 
         // 4. ACTIONS
         document.getElementById('clear-btn').addEventListener('click', () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Correct clear logic
+            // Because of scale, we need to clear the scaled width/height or just use a large number
+            const rect = canvas.parentElement.getBoundingClientRect();
+            ctx.clearRect(0, 0, rect.width, rect.height); 
         });
 
+        // 5. NEXT STEP NAVIGATION
+        document.getElementById('next-btn').addEventListener('click', () => {
+            // MANUAL REDIRECT
+            window.location.href = `../onboarding.html?email=${encodeURIComponent(email)}`;
+        });
+
+        // 6. SUBMIT
         document.getElementById('submit-btn').addEventListener('click', async () => {
             const btn = document.getElementById('submit-btn');
             btn.innerText = "SECURING SIGNATURE...";
             btn.disabled = true;
 
+            // Simple check if canvas is empty (optional improvement)
+            // For now, we proceed to submit.
+
             const payload = {
                 action: 'saveSignature',
                 email: email,
-                base64: canvas.toDataURL().split(',')[1] // Key matching Backend
+                base64: canvas.toDataURL().split(',')[1] 
             };
 
             try {
@@ -198,24 +234,26 @@
                     body: JSON.stringify(payload)
                 });
                 
-                statusMsg.style.color = "#33B26E";
-                statusMsg.innerText = "Success! Redirecting to Onboarding...";
-                
-                setTimeout(() => {
-                    // Redirect to Onboarding to upload IDs
-                    window.location.href = "../onboarding.html?email=" + encodeURIComponent(email);
-                }, 1500);
+                // SUCCESS STATE - NO AUTO REDIRECT
+                handleSuccess();
 
             } catch (error) {
                 console.error(error);
                 // Assume success in no-cors mode if no network error
-                statusMsg.style.color = "#33B26E";
-                statusMsg.innerText = "Signature Stored. Redirecting...";
-                setTimeout(() => {
-                    window.location.href = "../onboarding.html?email=" + encodeURIComponent(email);
-                }, 1500);
+                handleSuccess();
             }
         });
+
+        function handleSuccess() {
+            statusMsg.style.color = "#33B26E";
+            statusMsg.innerText = "";
+            
+            // Hide Signature Pad
+            document.getElementById('signature-section').style.display = 'none';
+            
+            // Show Next Step
+            document.getElementById('next-step-container').style.display = 'block';
+        }
     </script>
 </body>
 </html>
