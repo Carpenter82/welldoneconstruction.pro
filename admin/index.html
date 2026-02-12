@@ -35,20 +35,23 @@
         }
         input.editable-note:focus { border: 1px solid var(--accent); background: #fff; outline: none; border-radius: 4px; }
 
-        /* TAGS & LINKS */
-        .tag { padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
-        .tag-new { background: #e6f7ff; color: #1890ff; }
-        a.folder-link { color: #3498db; text-decoration: none; font-weight: 600; font-size: 0.85rem; }
-        a.folder-link:hover { text-decoration: underline; }
+        /* SAVE STATUS INDICATOR */
+        .save-status { font-size: 0.75rem; margin-left: 5px; font-weight: bold; display: none; }
+        .status-saving { color: #f39c12; display: inline; }
+        .status-saved { color: #27ae60; display: inline; }
 
         /* ACTION BUTTONS */
         .action-group { display: flex; gap: 5px; }
         .btn-sm { border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: white; font-size: 0.8rem; }
-        .btn-sign { background: #f39c12; } /* Orange for Contracts */
-        .btn-docs { background: #8e44ad; } /* Purple for Onboarding */
-        .btn-hire { background: #27ae60; } /* Green for Hire */
+        .btn-sign { background: #f39c12; }
+        .btn-docs { background: #8e44ad; }
+        .btn-hire { background: #27ae60; }
         .btn-sm:hover { opacity: 0.9; }
 
+        /* TAGS */
+        .tag { padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .tag-new { background: #e6f7ff; color: #1890ff; }
+        a.folder-link { color: #3498db; text-decoration: none; font-weight: 600; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -97,21 +100,14 @@
         // *** REPLACE WITH YOUR DEPLOYMENT URL ***
         const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
 
-        // --- CONSTANTS FOR DROPDOWNS ---
-        const TRADE_OPTIONS = [
-            "General Labor", "Carpentry", "Plumbing", "Electrical", 
-            "Flooring", "Painting", "HVAC"
-        ];
-
-        const TIER_OPTIONS = [
-            "T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"
-        ];
+        const TRADE_OPTIONS = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
+        const TIER_OPTIONS = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
 
         window.onload = loadData;
 
         async function loadData() {
             try {
-                // FORCE FRESH RELOAD (Fixes Caching)
+                // Adds timestamp to prevent caching old data
                 const res = await fetch(`${API_URL}?action=getPersonnelData&nocache=${Date.now()}`);
                 const data = await res.json();
                 renderApplicants(data.applicants);
@@ -134,9 +130,9 @@
                         <td>${app.resumeUrl ? `<a href="${app.resumeUrl}" target="_blank" class="folder-link">📄 PDF</a>` : "--"}</td>
                         <td>
                             <div class="action-group">
-                                <button class="btn-sm btn-sign" onclick="sendContract('${app.email}')" title="Send Master Agreement">📄 Sign</button>
-                                <button class="btn-sm btn-docs" onclick="reqOnboarding('${app.email}')" title="Request ID/OSHA">🆔 Docs</button>
-                                <button class="btn-sm btn-hire" onclick="hireWorker('${app.email}', '${app.fname} ${app.lname}', '${app.trade}')" title="Finalize Hire">✅ Hire</button>
+                                <button class="btn-sm btn-sign" onclick="sendContract('${app.email}')">📄 Sign</button>
+                                <button class="btn-sm btn-docs" onclick="reqOnboarding('${app.email}')">🆔 Docs</button>
+                                <button class="btn-sm btn-hire" onclick="hireWorker('${app.email}', '${app.fname} ${app.lname}', '${app.trade}')">✅ Hire</button>
                             </div>
                         </td>
                     </tr>`;
@@ -144,7 +140,6 @@
             });
         }
 
-        // --- FIXED CREW RENDERER (Solves the "Toggle Reset" issue) ---
         function renderCrew(crewData) {
             const tbody = document.getElementById('crew-table-body');
             tbody.innerHTML = ''; 
@@ -158,7 +153,9 @@
                 const tr = document.createElement('tr');
                 tr.style.borderBottom = "1px solid #eee";
 
-                // 1. NAME & CONTACT
+                // Unique ID for status indicators
+                const safeEmail = worker.email.replace(/[^a-zA-Z0-9]/g, '');
+
                 tr.innerHTML = `
                     <td style="padding: 12px;">
                         <div style="font-weight:bold; color:#2c3e50;">${worker.name}</div>
@@ -167,57 +164,65 @@
                     </td>
                 `;
 
-                // 2. TRADE DROPDOWN
+                // --- TRADE COLUMN (Col D) ---
                 const tradeTd = document.createElement('td');
+                const tradeStatus = document.createElement('span');
+                tradeStatus.id = `status-trade-${safeEmail}`;
+                tradeStatus.className = "save-status";
+                
                 const tradeSelect = document.createElement('select');
                 tradeSelect.className = "editable";
-                
-                const defaultTradeOpt = document.createElement('option');
-                defaultTradeOpt.text = "-- Select --";
-                defaultTradeOpt.value = "";
-                tradeSelect.appendChild(defaultTradeOpt);
+                const defaultTrade = document.createElement('option');
+                defaultTrade.text = "-- Select --"; 
+                defaultTrade.value = "";
+                tradeSelect.appendChild(defaultTrade);
 
                 TRADE_OPTIONS.forEach(opt => {
                     const option = document.createElement('option');
                     option.value = opt;
                     option.text = opt;
-                    // FIX: Ignore invisible spaces
-                    if (worker.trade && String(worker.trade).trim() === opt.trim()) {
+                    // SAFE MATCHING: Trims spaces and ignores case
+                    if (worker.trade && String(worker.trade).trim().toLowerCase() === opt.trim().toLowerCase()) {
                         option.selected = true;
                     }
                     tradeSelect.appendChild(option);
                 });
 
-                tradeSelect.onchange = () => updateWorker(worker.email, 'trade', tradeSelect.value);
+                tradeSelect.onchange = () => updateWorker(worker.email, 'trade', tradeSelect.value, `status-trade-${safeEmail}`);
                 tradeTd.appendChild(tradeSelect);
+                tradeTd.appendChild(tradeStatus);
                 tr.appendChild(tradeTd);
 
-                // 3. PAY TIER DROPDOWN
+                // --- TIER COLUMN (Col E) ---
                 const tierTd = document.createElement('td');
+                const tierStatus = document.createElement('span');
+                tierStatus.id = `status-tier-${safeEmail}`;
+                tierStatus.className = "save-status";
+
                 const tierSelect = document.createElement('select');
                 tierSelect.className = "editable";
-
-                const defaultTierOpt = document.createElement('option');
-                defaultTierOpt.text = "-- Select --";
-                defaultTierOpt.value = "";
-                tierSelect.appendChild(defaultTierOpt);
+                const defaultTier = document.createElement('option');
+                defaultTier.text = "-- Select --"; 
+                defaultTier.value = "";
+                tierSelect.appendChild(defaultTier);
 
                 TIER_OPTIONS.forEach(opt => {
                     const option = document.createElement('option');
                     option.value = opt;
                     option.text = opt;
-                    // FIX: Ignore invisible spaces
-                    if (worker.tier && String(worker.tier).trim() === opt.trim()) {
+                    // SAFE MATCHING
+                    if (worker.tier && String(worker.tier).trim().toLowerCase() === opt.trim().toLowerCase()) {
                         option.selected = true;
                     }
                     tierSelect.appendChild(option);
                 });
 
-                tierSelect.onchange = () => updateWorker(worker.email, 'tier', tierSelect.value);
+                tierSelect.onchange = () => updateWorker(worker.email, 'tier', tierSelect.value, `status-tier-${safeEmail}`);
                 tierTd.appendChild(tierSelect);
+                tierTd.appendChild(tierStatus);
                 tr.appendChild(tierTd);
 
-                // 4. NOTES & FOLDER
+                // --- NOTES & FOLDER ---
                 tr.innerHTML += `
                     <td style="padding: 12px;">
                         <input type="text" class="editable-note"
@@ -234,26 +239,40 @@
             });
         }
 
-        // --- BACKEND CONNECTIONS ---
+        // --- API FUNCTIONS ---
 
-        async function sendContract(email) {
-            if(!confirm(`Send Master Agreement to ${email}?`)) return;
-            alert("Sending Agreement...");
-            await fetch(API_URL, {
-                method: 'POST', mode: 'no-cors',
-                body: JSON.stringify({ action: 'sendAgreement', email: email })
+        async function updateWorker(email, type, value, statusId) {
+            // 1. Show "Saving..."
+            const statusEl = document.getElementById(statusId);
+            if(statusEl) {
+                statusEl.innerText = "Saving...";
+                statusEl.className = "save-status status-saving";
+            }
+
+            const payload = { action: 'updateCrewDetails', email: email };
+            if(type === 'trade') payload.trade = value;
+            if(type === 'tier') payload.tier = value;
+            
+            await fetch(API_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify(payload) 
             });
-            alert("Agreement Sent!");
+
+            // 2. Show "Saved!"
+            if(statusEl) {
+                statusEl.innerText = "Saved!";
+                statusEl.className = "save-status status-saved";
+                setTimeout(() => { statusEl.innerText = ""; }, 3000); // Hide after 3 seconds
+            }
         }
 
-        async function reqOnboarding(email) {
-            if(!confirm(`Request ID & OSHA cards from ${email}?`)) return;
-            alert("Sending Request...");
-            await fetch(API_URL, {
-                method: 'POST', mode: 'no-cors',
-                body: JSON.stringify({ action: 'requestOnboarding', email: email })
+        async function saveNote(email, note) {
+            await fetch(API_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify({ action: 'updateCrewNote', email: email, note: note }) 
             });
-            alert("Request Sent!");
         }
 
         async function hireWorker(email, name, trade) {
@@ -266,27 +285,16 @@
             setTimeout(loadData, 1500);
         }
 
-        async function updateWorker(email, type, value) {
-            console.log(`Saving ${type} for ${email}...`);
-            const payload = { action: 'updateCrewDetails', email: email };
-            
-            if(type === 'trade') payload.trade = value;
-            if(type === 'tier') payload.tier = value;
-            
-            await fetch(API_URL, { 
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: JSON.stringify(payload) 
-            });
+        async function sendContract(email) {
+            if(!confirm(`Send Master Agreement to ${email}?`)) return;
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'sendAgreement', email: email }) });
+            alert("Agreement Sent!");
         }
 
-        async function saveNote(email, note) {
-            console.log(`Saving note for ${email}...`);
-            await fetch(API_URL, { 
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: JSON.stringify({ action: 'updateCrewNote', email: email, note: note }) 
-            });
+        async function reqOnboarding(email) {
+            if(!confirm(`Request ID & OSHA cards from ${email}?`)) return;
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'requestOnboarding', email: email }) });
+            alert("Request Sent!");
         }
     </script>
 
