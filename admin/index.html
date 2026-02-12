@@ -143,10 +143,103 @@
             });
         }
 
-        // --- FIXED CREW RENDERER ---
-        function renderCrew(crewData) {
-            const tbody = document.getElementById('crew-table-body');
-            tbody.innerHTML = ''; // Clear existing rows
+        // REPLACE YOUR OLD renderCrew FUNCTION WITH THIS:
+function renderCrew(crewData) {
+    const tbody = document.getElementById('crew-table-body');
+    tbody.innerHTML = ''; 
+
+    // Safety check: Is the list empty?
+    if(!crewData || crewData.length === 0) { 
+        tbody.innerHTML = "<tr><td colspan='5' align='center'>No active crew.</td></tr>"; 
+        return; 
+    }
+
+    crewData.forEach(worker => {
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = "1px solid #eee";
+
+        // 1. NAME & CONTACT
+        tr.innerHTML = `
+            <td style="padding: 12px;">
+                <div style="font-weight:bold; color:#2c3e50;">${worker.name}</div>
+                <div style="font-size:0.85rem; color:#7f8c8d;">${worker.email}</div>
+                <div style="font-size:0.85rem; color:#7f8c8d;">${worker.phone || "No Phone"}</div>
+            </td>
+        `;
+
+        // 2. TRADE DROPDOWN (This controls Column D)
+        const tradeTd = document.createElement('td');
+        const tradeSelect = document.createElement('select');
+        tradeSelect.className = "editable";
+        
+        // Add "-- Select --" as a backup
+        const defaultTradeOpt = document.createElement('option');
+        defaultTradeOpt.text = "-- Select --";
+        defaultTradeOpt.value = "";
+        tradeSelect.appendChild(defaultTradeOpt);
+
+        TRADE_OPTIONS.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt;
+            option.text = opt;
+            
+            // --- THE FIX ---
+            // This forces the box to select "Carpentry" if the sheet says "Carpentry"
+            // We use .trim() to ignore any invisible accidental spaces
+            if (worker.trade && String(worker.trade).trim() === opt.trim()) {
+                option.selected = true;
+            }
+            tradeSelect.appendChild(option);
+        });
+
+        // This sends the change (e.g., "Electrical") to the sheet
+        tradeSelect.onchange = () => updateWorker(worker.email, 'trade', tradeSelect.value);
+        tradeTd.appendChild(tradeSelect);
+        tr.appendChild(tradeTd);
+
+        // 3. PAY TIER DROPDOWN (This controls Column E)
+        const tierTd = document.createElement('td');
+        const tierSelect = document.createElement('select');
+        tierSelect.className = "editable";
+
+        const defaultTierOpt = document.createElement('option');
+        defaultTierOpt.text = "-- Select --";
+        defaultTierOpt.value = "";
+        tierSelect.appendChild(defaultTierOpt);
+
+        TIER_OPTIONS.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt;
+            option.text = opt;
+            
+            // --- THE FIX ---
+            if (worker.tier && String(worker.tier).trim() === opt.trim()) {
+                option.selected = true;
+            }
+            tierSelect.appendChild(option);
+        });
+
+        // This sends the change to the sheet
+        tierSelect.onchange = () => updateWorker(worker.email, 'tier', tierSelect.value);
+        tierTd.appendChild(tierSelect);
+        tr.appendChild(tierTd);
+
+        // 4. NOTES & FOLDER
+        tr.innerHTML += `
+            <td style="padding: 12px;">
+                <input type="text" class="editable-note"
+                       value="${worker.notes || ''}" 
+                       onblur="saveNote('${worker.email}', this.value)"
+                       placeholder="Add Note...">
+            </td>
+            <td style="padding: 12px; text-align: center;">
+                 ${worker.folderUrl ? `<a href="${worker.folderUrl}" target="_blank" style="text-decoration:none; font-size:1.2rem;">📂</a>` : "🚫"}
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}
 
             if(!crewData || crewData.length === 0) { 
                 tbody.innerHTML = "<tr><td colspan='5' align='center'>No active crew.</td></tr>"; 
