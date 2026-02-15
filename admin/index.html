@@ -19,6 +19,7 @@
         .save-status { font-size: 0.75rem; margin-left: 5px; font-weight: bold; }
         .status-saving { color: #f39c12; }
         .status-saved { color: #27ae60; }
+        .error-msg { color: #e74c3c; font-weight: bold; text-align: center; padding: 20px; }
     </style>
 </head>
 <body>
@@ -41,24 +42,36 @@
                 </tr>
             </thead>
             <tbody id="crew-table-body">
-                <tr><td colspan="5" align="center">Loading...</td></tr>
+                <tr><td colspan="5" align="center">Loading Data...</td></tr>
             </tbody>
         </table>
     </div>
 
     <script>
+        // ✅ YOUR DEPLOYMENT URL IS SET HERE:
         const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
+        
         const TRADE_OPTIONS = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
         const TIER_OPTIONS = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
 
         window.onload = loadData;
 
         async function loadData() {
+            const tbody = document.getElementById('crew-table-body');
             try {
+                // nocache prevents the browser from showing old data
                 const res = await fetch(`${API_URL}?action=getPersonnelData&nocache=${Date.now()}`);
                 const data = await res.json();
-                renderCrew(data.crew);
-            } catch (err) { console.error(err); }
+                
+                if (data.crew && data.crew.length > 0) {
+                    renderCrew(data.crew);
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" align="center">No crew members found in database.</td></tr>';
+                }
+            } catch (err) { 
+                console.error(err); 
+                tbody.innerHTML = `<tr><td colspan="5" align="center" class="error-msg">Error connecting to database.<br>Please check that your Google Sheet is accessible.</td></tr>`;
+            }
         }
 
         function renderCrew(crewData) {
@@ -67,6 +80,7 @@
 
             crewData.forEach(worker => {
                 const tr = document.createElement('tr');
+                // Create a safe ID string from email to use for status indicators
                 const safeEmail = worker.email.replace(/[^a-zA-Z0-9]/g, '');
 
                 tr.innerHTML = `
@@ -76,7 +90,7 @@
                     </td>
                 `;
 
-                // Trade Dropdown
+                // --- Trade Dropdown ---
                 const tradeTd = document.createElement('td');
                 const tSelect = document.createElement('select');
                 tSelect.className = "editable";
@@ -95,7 +109,7 @@
                 tradeTd.appendChild(tStatus);
                 tr.appendChild(tradeTd);
 
-                // Tier Dropdown
+                // --- Tier Dropdown ---
                 const tierTd = document.createElement('td');
                 const pSelect = document.createElement('select');
                 pSelect.className = "editable";
@@ -114,7 +128,8 @@
                 tierTd.appendChild(pStatus);
                 tr.appendChild(tierTd);
 
-                tr.innerHTML += `<td>${worker.notes || ''}</td><td align="center"><a href="${worker.folderUrl}" target="_blank">📂</a></td>`;
+                // --- Notes & Folder ---
+                tr.innerHTML += `<td>${worker.notes || ''}</td><td align="center"><a href="${worker.folderUrl}" target="_blank" style="text-decoration:none;">📂</a></td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -125,13 +140,26 @@
             statusEl.className = "save-status status-saving";
 
             const payload = { action: 'updateCrewDetails', email: email };
-            payload[type] = value;
+            payload[type] = value; 
 
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            
-            statusEl.innerText = "Saved!";
-            statusEl.className = "save-status status-saved";
-            setTimeout(() => { statusEl.innerText = ""; }, 2000);
+            // We use 'no-cors' mode to avoid CORS errors, but this means we can't read the response.
+            // We assume success if the request sends without network failure.
+            try {
+                await fetch(API_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload) 
+                });
+                
+                statusEl.innerText = "Saved!";
+                statusEl.className = "save-status status-saved";
+                setTimeout(() => { statusEl.innerText = ""; }, 2000);
+            } catch (e) {
+                statusEl.innerText = "Error";
+                statusEl.style.color = "red";
+                console.error(e);
+            }
         }
     </script>
 </body>
