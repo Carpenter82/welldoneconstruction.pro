@@ -50,7 +50,7 @@
 <body>
 
     <div style="max-width:1200px; margin:0 auto 20px auto;">
-        <a href="index.html" class="nav-link">⬅ Back to Personnel Hub</a>
+        <a href="admin.html" class="nav-link">⬅ Back to Personnel Hub</a>
     </div>
 
     <div class="dashboard-grid">
@@ -110,7 +110,7 @@
                 <label>Select Worker</label>
                 <input type="email" id="workerEmail" placeholder="Search Crew Email..." list="crewList">
                 <datalist id="crewList">
-                     </datalist>
+                      </datalist>
 
                 <label>Manual Trade Note</label>
                 <textarea id="directNote" rows="3" placeholder="Specific instructions for this worker..."></textarea>
@@ -156,7 +156,7 @@
     </div>
 
     <script>
-        // *** CRITICAL: UPDATED TO V139 URL ***
+        // *** UPDATED TO MATCH YOUR DEPLOYMENT ***
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec';
 
         // --- INIT ---
@@ -180,17 +180,16 @@
 
         async function loadDashboardData() {
             try {
-                const res = await fetch(`${SCRIPT_URL}?action=getAdminDashboard`);
+                const res = await fetch(`${SCRIPT_URL}?action=getAdminDashboard&nocache=${Date.now()}`);
                 const data = await res.json();
                 
-                // Populate Jobs Datalist (WITH TRADE INFO)
+                // Populate Jobs Datalist
                 const jobList = document.getElementById('activeJobsList');
                 jobList.innerHTML = '';
                 if(data.jobs) {
                     data.jobs.forEach(j => {
                         const opt = document.createElement('option');
                         opt.value = j.id;
-                        // Shows: "123 Main St (Client) - [Plumbing]"
                         opt.innerText = `${j.address} (${j.client}) - [${j.trade || 'General'}]`;
                         jobList.appendChild(opt);
                     });
@@ -232,7 +231,6 @@
             }
         }
 
-        // --- UPDATED: CREATE PROJECT (Replaces old submitProject) ---
         async function createProject() {
             const btn = document.getElementById('btnSaveProject');
             btn.disabled = true; 
@@ -243,12 +241,11 @@
                 client: document.getElementById('projClient').value,
                 address: document.getElementById('projAddress').value,
                 budget: document.getElementById('projBudget').value,
-                trade: document.getElementById('projTrade').value, // Matches new Dropdown
+                trade: document.getElementById('projTrade').value,
                 source: document.getElementById('projSource').value,
                 notes: document.getElementById('projNotes').value
             };
 
-            // Call the generic sender, but reset button text to "Save"
             await sendData(payload, btn, "SAVE TO DATABASE");
         }
 
@@ -302,23 +299,28 @@
                 email: workerEmail
             };
 
+            // Using sendData logic manually here to handle refresh
             try {
                 await fetch(SCRIPT_URL, { 
-                    method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'text/plain' }, // FIXED
+                    body: JSON.stringify(payload) 
                 });
                 alert("Job Closed. Worker Status Reset.");
-                loadDashboardData(); // Refresh table
+                loadDashboardData(); 
             } catch(e) {
                 alert("Error closing job.");
             }
         }
 
-        // --- GENERIC SENDER ---
+        // --- GENERIC SENDER (NOW FIXED) ---
         async function sendData(data, btnElement, originalText) {
             try {
                 await fetch(SCRIPT_URL, { 
                     method: 'POST', 
                     mode: 'no-cors', 
+                    headers: { 'Content-Type': 'text/plain' }, // <--- THIS WAS THE MISSING LINK
                     body: JSON.stringify(data) 
                 });
                 alert("Action Successful!");
@@ -330,7 +332,7 @@
                     document.getElementById('projNotes').value = '';
                 }
 
-                loadDashboardData(); // Refresh lists
+                loadDashboardData(); 
             } catch (e) {
                 console.error(e);
                 alert("Error connecting to Master Engine.");
