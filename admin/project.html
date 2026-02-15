@@ -92,7 +92,7 @@
             <button class="btn-main" onclick="createProject()" id="btnSaveProject">SAVE TO DATABASE</button>
         </div>
 
-<div class="card">
+        <div class="card">
             <h2>2. Dispatch Center</h2>
             <p class="card-sub">Search, Select, and Deploy resources.</p>
 
@@ -182,16 +182,21 @@
                 const res = await fetch(`${SCRIPT_URL}?action=getAdminDashboard&nocache=${Date.now()}`);
                 const data = await res.json();
                 
-                // Populate Jobs Datalist
-                const jobList = document.getElementById('activeJobsList');
-                jobList.innerHTML = '';
-                if(data.jobs) {
-                    data.jobs.forEach(j => {
-                        const opt = document.createElement('option');
-                        opt.value = j.id;
-                        opt.innerText = `${j.address} (${j.client}) - [${j.trade || 'General'}]`;
-                        jobList.appendChild(opt);
-                    });
+                // --- POPULATE JOBS DROPDOWN ---
+                const jobSelect = document.getElementById('dispatchJobId');
+                if (jobSelect) {
+                    jobSelect.innerHTML = '<option value="" disabled selected>-- Select an Active Job --</option>';
+                    
+                    if(data.jobs && data.jobs.length > 0) {
+                        data.jobs.forEach(j => {
+                            const opt = document.createElement('option');
+                            opt.value = j.id; 
+                            opt.innerText = `[${j.id}] ${j.address} (${j.client})`;
+                            jobSelect.appendChild(opt);
+                        });
+                    } else {
+                        jobSelect.innerHTML = '<option value="" disabled selected>No Active Jobs Found</option>';
+                    }
                 }
 
                 // Populate Crew Datalist
@@ -303,7 +308,7 @@
                 await fetch(SCRIPT_URL, { 
                     method: 'POST', 
                     mode: 'no-cors', 
-                    headers: { 'Content-Type': 'text/plain' }, // FIXED
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify(payload) 
                 });
                 alert("Job Closed. Worker Status Reset.");
@@ -313,13 +318,13 @@
             }
         }
 
-        // --- GENERIC SENDER (NOW FIXED) ---
+        // --- GENERIC SENDER ---
         async function sendData(data, btnElement, originalText) {
             try {
                 await fetch(SCRIPT_URL, { 
                     method: 'POST', 
                     mode: 'no-cors', 
-                    headers: { 'Content-Type': 'text/plain' }, // <--- THIS WAS THE MISSING LINK
+                    headers: { 'Content-Type': 'text/plain' }, 
                     body: JSON.stringify(data) 
                 });
                 alert("Action Successful!");
