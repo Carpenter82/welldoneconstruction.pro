@@ -4,29 +4,39 @@
     <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Well Done ERP</title>
+    <title>Admin Hub | Well Done ERP</title>
     <style>
         :root { --primary: #343E47; --accent: #33B26E; --bg: #f4f7f6; --white: #ffffff; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); padding: 20px; color: var(--primary); margin: 0; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; max-width: 1400px; margin: 0 auto 20px auto; }
-        .btn { padding: 10px 20px; background: #3498db; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; }
-        .card { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; max-width: 1400px; margin: 0 auto 20px auto; }
-        h2 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1.1rem; color: #444; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-        th { text-align: left; color: #888; font-size: 0.75rem; text-transform: uppercase; padding: 10px 8px; border-bottom: 2px solid #eee; background: #fafafa; }
-        td { padding: 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
-        select.editable { padding: 6px; border: 1px solid #ddd; border-radius: 4px; background: #fff; width: 100%; font-size: 0.85rem; cursor: pointer; }
-        .save-status { font-size: 0.75rem; margin-left: 5px; font-weight: bold; }
-        .status-saving { color: #f39c12; }
-        .status-saved { color: #27ae60; }
-        .error-msg { color: #e74c3c; font-weight: bold; text-align: center; padding: 20px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); padding: 20px; color: var(--primary); }
+        .header { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 20px auto; }
+        .card { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 1400px; margin: 0 auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95rem; }
+        th { text-align: left; color: #888; font-size: 0.8rem; text-transform: uppercase; padding: 12px 8px; border-bottom: 2px solid #eee; background: #fafafa; }
+        td { padding: 10px 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        
+        /* Dropdowns */
+        select.editable { padding: 8px; border: 1px solid #ccc; border-radius: 4px; background: #fff; width: 100%; font-size: 0.9rem; }
+        
+        /* The Update Button */
+        .btn-update {
+            background-color: #3498db; color: white; border: none; padding: 8px 16px;
+            border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+        .btn-update:hover { background-color: #2980b9; }
+        .btn-update:active { transform: translateY(1px); }
+
+        /* Status Text */
+        .status-msg { margin-left: 10px; font-size: 0.85rem; font-weight: bold; }
+        .text-success { color: #27ae60; }
+        .text-error { color: #e74c3c; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1>Admin Hub</h1>
-        <div><a href="project.html" class="btn">➜ Project Command</a></div>
+        <a href="project.html" style="text-decoration:none; color:#3498db; font-weight:bold;">➜ Project Command</a>
     </div>
 
     <div class="card">
@@ -34,23 +44,24 @@
         <table id="crewTable">
             <thead>
                 <tr>
-                    <th width="25%">Name / Contact</th>
+                    <th width="20%">Name / Contact</th>
                     <th width="20%">Trade</th>
                     <th width="20%">Pay Tier</th>
                     <th width="25%">Notes</th>
-                    <th width="10%">Folder</th>
+                    <th width="5%">Docs</th>
+                    <th width="10%">Action</th> 
                 </tr>
             </thead>
             <tbody id="crew-table-body">
-                <tr><td colspan="5" align="center">Loading Data...</td></tr>
+                <tr><td colspan="6" align="center">Loading Data...</td></tr>
             </tbody>
         </table>
     </div>
 
     <script>
-        // ✅ YOUR DEPLOYMENT URL IS SET HERE:
+        // ⬇️ KEEP THIS URL unless you do a "New Deployment" ⬇️
         const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
-        
+
         const TRADE_OPTIONS = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
         const TIER_OPTIONS = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
 
@@ -59,18 +70,18 @@
         async function loadData() {
             const tbody = document.getElementById('crew-table-body');
             try {
-                // nocache prevents the browser from showing old data
+                // Fetch data with a cache buster
                 const res = await fetch(`${API_URL}?action=getPersonnelData&nocache=${Date.now()}`);
                 const data = await res.json();
                 
                 if (data.crew && data.crew.length > 0) {
                     renderCrew(data.crew);
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="5" align="center">No crew members found in database.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" align="center">No crew members found.</td></tr>';
                 }
-            } catch (err) { 
-                console.error(err); 
-                tbody.innerHTML = `<tr><td colspan="5" align="center" class="error-msg">Error connecting to database.<br>Please check that your Google Sheet is accessible.</td></tr>`;
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="6" align="center" style="color:red;"><b>Connection Error.</b><br>Could not load data.</td></tr>`;
             }
         }
 
@@ -78,87 +89,112 @@
             const tbody = document.getElementById('crew-table-body');
             tbody.innerHTML = ''; 
 
-            crewData.forEach(worker => {
+            crewData.forEach((worker, index) => {
                 const tr = document.createElement('tr');
-                // Create a safe ID string from email to use for status indicators
-                const safeEmail = worker.email.replace(/[^a-zA-Z0-9]/g, '');
+                // Use a clean index-based ID for elements
+                const rowId = `row-${index}`;
+                const safeEmail = worker.email; // We will pass this to the save function
 
                 tr.innerHTML = `
                     <td>
                         <b>${worker.name}</b><br>
-                        <small>${worker.email}</small>
+                        <small style="color:#666;">${worker.email}</small>
                     </td>
                 `;
 
-                // --- Trade Dropdown ---
+                // 1. Trade Dropdown
                 const tradeTd = document.createElement('td');
                 const tSelect = document.createElement('select');
+                tSelect.id = `trade-${index}`;
                 tSelect.className = "editable";
                 TRADE_OPTIONS.forEach(opt => {
                     const o = document.createElement('option');
-                    o.value = o.text = opt;
+                    o.value = opt;
+                    o.text = opt;
                     if (worker.trade && worker.trade.trim().toLowerCase() === opt.toLowerCase()) o.selected = true;
                     tSelect.appendChild(o);
                 });
-                const tStatus = document.createElement('span');
-                tStatus.id = `t-${safeEmail}`;
-                tStatus.className = "save-status";
-                
-                tSelect.onchange = () => updateBackend(worker.email, 'trade', tSelect.value, tStatus.id);
                 tradeTd.appendChild(tSelect);
-                tradeTd.appendChild(tStatus);
                 tr.appendChild(tradeTd);
 
-                // --- Tier Dropdown ---
+                // 2. Tier Dropdown
                 const tierTd = document.createElement('td');
                 const pSelect = document.createElement('select');
+                pSelect.id = `tier-${index}`;
                 pSelect.className = "editable";
                 TIER_OPTIONS.forEach(opt => {
                     const o = document.createElement('option');
-                    o.value = o.text = opt;
+                    o.value = opt;
+                    o.text = opt;
                     if (worker.tier && worker.tier.trim().toLowerCase() === opt.toLowerCase()) o.selected = true;
                     pSelect.appendChild(o);
                 });
-                const pStatus = document.createElement('span');
-                pStatus.id = `p-${safeEmail}`;
-                pStatus.className = "save-status";
-
-                pSelect.onchange = () => updateBackend(worker.email, 'tier', pSelect.value, pStatus.id);
                 tierTd.appendChild(pSelect);
-                tierTd.appendChild(pStatus);
                 tr.appendChild(tierTd);
 
-                // --- Notes & Folder ---
-                tr.innerHTML += `<td>${worker.notes || ''}</td><td align="center"><a href="${worker.folderUrl}" target="_blank" style="text-decoration:none;">📂</a></td>`;
+                // 3. Notes & Link
+                tr.innerHTML += `
+                    <td>${worker.notes || ''}</td>
+                    <td align="center"><a href="${worker.folderUrl}" target="_blank" style="text-decoration:none; font-size:1.2rem;">📂</a></td>
+                `;
+
+                // 4. Action Button (The "Send" Button)
+                const actionTd = document.createElement('td');
+                actionTd.innerHTML = `
+                    <button class="btn-update" onclick="saveRow('${safeEmail}', ${index})">Update</button>
+                    <span id="status-${index}" class="status-msg"></span>
+                `;
+                tr.appendChild(actionTd);
+
                 tbody.appendChild(tr);
             });
         }
 
-        async function updateBackend(email, type, value, statusId) {
-            const statusEl = document.getElementById(statusId);
+        async function saveRow(email, index) {
+            const tradeVal = document.getElementById(`trade-${index}`).value;
+            const tierVal = document.getElementById(`tier-${index}`).value;
+            const statusEl = document.getElementById(`status-${index}`);
+            const btn = document.querySelector(`button[onclick="saveRow('${email}', ${index})"]`);
+
+            // UI Feedback
             statusEl.innerText = "Saving...";
-            statusEl.className = "save-status status-saving";
+            statusEl.className = "status-msg"; // Reset color
+            btn.disabled = true;
+            btn.innerText = "...";
 
-            const payload = { action: 'updateCrewDetails', email: email };
-            payload[type] = value; 
+            const payload = { 
+                action: 'updateCrewDetails', 
+                email: email,
+                trade: tradeVal,
+                tier: tierVal
+            };
 
-            // We use 'no-cors' mode to avoid CORS errors, but this means we can't read the response.
-            // We assume success if the request sends without network failure.
             try {
+                // We use 'text/plain' to force the data through without CORS blocking
                 await fetch(API_URL, { 
                     method: 'POST', 
                     mode: 'no-cors', 
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify(payload) 
                 });
                 
+                // Success State
                 statusEl.innerText = "Saved!";
-                statusEl.className = "save-status status-saved";
-                setTimeout(() => { statusEl.innerText = ""; }, 2000);
+                statusEl.classList.add("text-success");
+                
+                // Reset Button
+                setTimeout(() => { 
+                    statusEl.innerText = ""; 
+                    btn.disabled = false;
+                    btn.innerText = "Update";
+                }, 2000);
+
             } catch (e) {
-                statusEl.innerText = "Error";
-                statusEl.style.color = "red";
                 console.error(e);
+                statusEl.innerText = "Failed";
+                statusEl.classList.add("text-error");
+                btn.disabled = false;
+                btn.innerText = "Update";
             }
         }
     </script>
