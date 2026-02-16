@@ -1,1 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personnel Hub | Well Done ERP</title>
+    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
+    <style>
+        :root { --primary: #343E47; --accent: #33B26E; --bg: #f4f7f6; --white: #ffffff; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); padding: 20px; color: var(--primary); }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 20px auto; }
+        .card { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 1400px; margin: 0 auto 30px auto; }
+        
+        h2 { border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; color: var(--primary); font-size: 1.4rem; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95rem; }
+        th { text-align: left; color: #888; font-size: 0.8rem; text-transform: uppercase; padding: 12px 8px; border-bottom: 2px solid #eee; background: #fafafa; }
+        td { padding: 10px 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        
+        /* Buttons */
+        .btn { padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 0.75rem; margin-right: 4px; text-transform: uppercase; }
+        .btn-hire { background: var(--accent); } 
+        .btn-hire:hover { background: #28965a; }
+        .btn-contract { background: #3498db; }
+        .btn-contract:hover { background: #2980b9; }
+        .btn-blur { background: #e67e22; }
+        .btn-blur:hover { background: #d35400; }
+        .btn-update { background: #3498db; }
+        
+        select.editable { padding: 8px; border: 1px solid #ccc; border-radius: 4px; background: #fff; width: 100%; font-size: 0.9rem; }
+        .status-msg { margin-left: 10px; font-size: 0.85rem; font-weight: bold; }
+    </style>
+</head>
+<body>
 
+    <div class="header">
+        <h1>Personnel Hub</h1>
+        <a href="project.html" style="text-decoration:none; color:#3498db; font-weight:bold; border: 2px solid #3498db; padding: 10px; border-radius: 5px;">➜ GO TO PROJECT COMMAND</a>
+    </div>
+
+    <div class="card">
+        <h2>1. New Applicants (Inbox)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th width="20%">Name / Contact</th>
+                    <th width="20%">Trade / Exp</th>
+                    <th width="20%">Req. Pay / Tools</th>
+                    <th width="10%">Resume</th>
+                    <th width="30%">Actions</th> </tr>
+            </thead>
+            <tbody id="app-table-body">
+                <tr><td colspan="5" align="center">Loading Applications...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>2. Master Crew List</h2>
+        <table id="crewTable">
+            <thead>
+                <tr>
+                    <th width="20%">Name / Contact</th>
+                    <th width="20%">Trade Assignment</th>
+                    <th width="20%">Pay Tier</th>
+                    <th width="20%">Notes</th>
+                    <th width="5%">Docs</th>
+                    <th width="15%">Action</th> 
+                </tr>
+            </thead>
+            <tbody id="crew-table-body">
+                <tr><td colspan="6" align="center">Loading Crew Database...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
+        const TRADE_OPTIONS = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
+        const TIER_OPTIONS = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
+
+        window.onload = loadData;
+
+        async function loadData() {
+            try {
+                const res = await fetch(`${API_URL}?action=getPersonnelData&nocache=${Date.now()}`);
+                const data = await res.json();
+                
+                // RENDER APPLICANTS
+                const appBody = document.getElementById('app-table-body');
+                appBody.innerHTML = '';
+                if (data.applicants && data.applicants.length > 0) {
+                    data.applicants.forEach(app => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><b>${app.fname} ${app.lname}</b><br><small>${app.email}</small></td>
+                            <td>${app.trade}<br><small>${app.exp} yrs exp</small></td>
+                            <td>$${app.pay}/hr<br><small>${app.tools}</small></td>
+                            <td>${app.resumeUrl ? `<a href="${app.resumeUrl}" target="_blank" style="background:#eee; padding:5px; border-radius:4px; text-decoration:none;">📄 PDF</a>` : 'None'}</td>
+                            <td>
+                                <button class="btn btn-contract" onclick="sendContract('${app.email}')">📄 CONTRACT</button>
+                                <button class="btn btn-hire" onclick="processHire('${app.email}', '${app.fname} ${app.lname}', '${app.trade}')">✅ HIRE</button>
+                                <button class="btn btn-blur" onclick="requestDocs('${app.email}')">📷 RE-UPLOAD</button>
+                            </td>
+                        `;
+                        appBody.appendChild(tr);
+                    });
+                } else {
+                    appBody.innerHTML = '<tr><td colspan="5" align="center" style="padding:20px; color:#aaa;">No Pending Applications</td></tr>';
+                }
+
+                // RENDER CREW
+                renderCrew(data.crew);
+
+            } catch (err) { console.error(err); }
+        }
+
+        function renderCrew(crewData) {
+            const tbody = document.getElementById('crew-table-body');
+            tbody.innerHTML = ''; 
+            if (!crewData || crewData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" align="center">Database Empty.</td></tr>';
+                return;
+            }
+            crewData.forEach((worker, index) => {
+                const tr = document.createElement('tr');
+                const safeEmail = worker.email; 
+                tr.innerHTML = `<td><b>${worker.name}</b><br><small style="color:#666;">${worker.email}</small></td>`;
+                
+                const tradeTd = document.createElement('td');
+                const tSelect = document.createElement('select');
+                tSelect.id = `trade-${index}`; tSelect.className = "editable";
+                TRADE_OPTIONS.forEach(opt => {
+                    const o = document.createElement('option'); o.value = opt; o.text = opt;
+                    if (worker.trade && worker.trade.trim().toLowerCase() === opt.toLowerCase()) o.selected = true;
+                    tSelect.appendChild(o);
+                });
+                tradeTd.appendChild(tSelect); tr.appendChild(tradeTd);
+
+                const tierTd = document.createElement('td');
+                const pSelect = document.createElement('select');
+                pSelect.id = `tier-${index}`; pSelect.className = "editable";
+                TIER_OPTIONS.forEach(opt => {
+                    const o = document.createElement('option'); o.value = opt; o.text = opt;
+                    if (worker.tier && worker.tier.trim().toLowerCase() === opt.toLowerCase()) o.selected = true;
+                    pSelect.appendChild(o);
+                });
+                tierTd.appendChild(pSelect); tr.appendChild(tierTd);
+
+                tr.innerHTML += `<td>${worker.notes || ''}</td><td align="center"><a href="${worker.folderUrl}" target="_blank" style="text-decoration:none; font-size:1.5rem;">📂</a></td>`;
+                
+                const actionTd = document.createElement('td');
+                actionTd.innerHTML = `<button class="btn btn-update" onclick="saveRow('${safeEmail}', ${index})">SAVE</button><span id="status-${index}" class="status-msg"></span>`;
+                tr.appendChild(actionTd);
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function sendContract(email) {
+            if(!confirm(`Send Master Agreement to ${email}?`)) return;
+            await sendData({ action: 'sendAgreement', email: email });
+        }
+        async function processHire(email, name, trade) {
+            if(!confirm(`Hire ${name}?`)) return;
+            await sendData({ action: 'hireWorker', email: email, name: name, trade: trade });
+        }
+        async function requestDocs(email) {
+            if(!confirm(`Request re-upload from ${email}?`)) return;
+            await sendData({ action: 'requestOnboarding', email: email });
+        }
+        async function saveRow(email, index) {
+            const btn = document.querySelector(`button[onclick="saveRow('${email}', ${index})"]`);
+            if(btn) { btn.innerText = "..."; btn.disabled = true; }
+            try {
+                await fetch(API_URL, { 
+                    method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ 
+                        action: 'updateCrewDetails', email: email, 
+                        trade: document.getElementById(`trade-${index}`).value, 
+                        tier: document.getElementById(`tier-${index}`).value 
+                    }) 
+                });
+                setTimeout(loadData, 1000); 
+            } catch (e) { alert("Error"); if(btn) btn.disabled = false; }
+        }
+        async function sendData(payload) {
+            try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) }); alert("Action Successful!"); loadData(); } catch(e) {}
+        }
+    </script>
+</body>
+</html>
