@@ -5,86 +5,209 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personnel Hub | Well Done ERP</title>
     <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
+    
     <style>
-        :root { --primary: #343E47; --accent: #33B26E; --bg: #f4f7f6; --white: #ffffff; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); padding: 20px; color: var(--primary); }
+        /* GLOBAL VARIABLES: Color Palette and Theme Definitions */
+        :root { 
+            --primary-color: #343E47; 
+            --accent-color: #33B26E; 
+            --action-color: #3498db;
+            --danger-color: #e74c3c;
+            --background-color: #f4f7f6; 
+            --surface-color: #ffffff; 
+        }
+
+        /* BASE TYPOGRAPHY AND RESET */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: var(--background-color); 
+            padding: 20px; 
+            color: var(--primary-color); 
+        }
         
-        .header { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 20px auto; }
-        .card { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 1400px; margin: 0 auto 30px auto; }
+        /* LAYOUT CONTAINERS */
+        .header-container { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            max-width: 1400px; 
+            margin: 0 auto 20px auto; 
+        }
         
-        h2 { border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; color: var(--primary); font-size: 1.4rem; }
+        .content-card { 
+            background: var(--surface-color); 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            max-width: 1400px; 
+            margin: 0 auto 30px auto; 
+        }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95rem; }
-        th { text-align: left; color: #888; font-size: 0.8rem; text-transform: uppercase; padding: 12px 8px; border-bottom: 2px solid #eee; background: #fafafa; }
-        td { padding: 10px 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        h2 { 
+            border-bottom: 2px solid var(--accent-color); 
+            padding-bottom: 10px; 
+            margin-top: 0; 
+            color: var(--primary-color); 
+            font-size: 1.4rem; 
+        }
         
-        .btn { padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 0.75rem; margin-right: 4px; text-transform: uppercase; }
-        .btn-hire { background: var(--accent); } 
+        /* DATA TABLE STYLING */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 10px; 
+            font-size: 0.95rem; 
+        }
+        th { 
+            text-align: left; 
+            color: #888; 
+            font-size: 0.8rem; 
+            text-transform: uppercase; 
+            padding: 12px 8px; 
+            border-bottom: 2px solid #eee; 
+            background: #fafafa; 
+        }
+        td { 
+            padding: 10px 8px; 
+            border-bottom: 1px solid #eee; 
+            vertical-align: middle; 
+        }
+        
+        /* INTERACTIVE ELEMENTS (BUTTONS) */
+        .btn { 
+            padding: 8px 12px; 
+            border: none; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            color: white; 
+            font-size: 0.75rem; 
+            margin-right: 4px; 
+            text-transform: uppercase; 
+            transition: background-color 0.2s ease; 
+        }
+        
+        .btn-hire { background: var(--accent-color); } 
         .btn-hire:hover { background: #28965a; }
-        .btn-contract { background: #3498db; }
-        .btn-contract:hover { background: #2980b9; }
-        .btn-update { background: #3498db; }
         
-        select.editable { padding: 8px; border: 1px solid #ccc; border-radius: 4px; background: #fff; width: 100%; font-size: 0.9rem; }
-        .status-msg { margin-left: 10px; font-size: 0.85rem; font-weight: bold; text-align: center; display: block; }
+        .btn-contract { background: var(--action-color); }
+        .btn-contract:hover { background: #2980b9; }
+        
+        .btn-update { background: var(--primary-color); }
+        .btn-update:hover { background: #2c3e50; }
+
+        .btn-reupload { 
+            background: var(--danger-color); 
+            font-size: 0.65rem; 
+            padding: 5px 8px; 
+            margin-top: 5px; 
+        }
+        .btn-reupload:hover { background: #c0392b; }
+        
+        /* FORM CONTROLS */
+        select.editable-field { 
+            padding: 8px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            background: #fff; 
+            width: 100%; 
+            font-size: 0.9rem; 
+        }
+        
+        /* SYSTEM NOTIFICATION BAR */
+        .system-status-bar { 
+            max-width: 1400px; 
+            margin: 0 auto 15px auto; 
+            padding: 10px; 
+            border-radius: 5px; 
+            text-align: center; 
+            font-weight: bold; 
+            display: none; /* Hidden by default */
+        }
+        .status-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status-loading { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+
+        /* NAVIGATION LINKS */
+        .navigation-link { 
+            text-decoration: none; 
+            color: var(--action-color); 
+            font-weight: bold; 
+            border: 2px solid var(--action-color); 
+            padding: 10px; 
+            border-radius: 5px; 
+            transition: 0.2s; 
+        }
+        .navigation-link:hover { 
+            background: var(--action-color); 
+            color: white; 
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
+    <div class="header-container">
         <h1>Personnel Hub</h1>
-        <a href="project.html" style="text-decoration:none; color:#3498db; font-weight:bold; border: 2px solid #3498db; padding: 10px; border-radius: 5px;">➜ GO TO PROJECT COMMAND</a>
+        <a href="project.html" class="navigation-link">➜ GO TO PROJECT COMMAND</a>
     </div>
 
-    <div id="status-message" class="status-msg"></div>
+    <div id="global-status-display" class="system-status-bar"></div>
 
-    <div class="card">
+    <div class="content-card">
         <h2>1. New Applicants (Inbox)</h2>
         <table>
             <thead>
                 <tr>
-                    <th width="20%">Name / Contact</th>
-                    <th width="20%">Trade / Exp</th>
-                    <th width="20%">Req. Pay / Tools</th>
+                    <th width="20%">Name / Contact Details</th>
+                    <th width="20%">Trade / Experience</th>
+                    <th width="20%">Requested Pay / Tools</th>
                     <th width="10%">Resume</th>
-                    <th width="30%">Actions</th> 
+                    <th width="30%">Administrative Actions</th> 
                 </tr>
             </thead>
-            <tbody id="app-table-body">
-                <tr><td colspan="5" align="center">Loading Applications...</td></tr>
+            <tbody id="applicant-table-body">
+                <tr><td colspan="5" align="center">Establishing connection to database...</td></tr>
             </tbody>
         </table>
     </div>
 
-    <div class="card">
+    <div class="content-card">
         <h2>2. Master Crew List</h2>
-        <table id="crewTable">
+        <table id="crew-list-table">
             <thead>
                 <tr>
-                    <th width="20%">Name / Contact</th>
+                    <th width="20%">Name / Contact Details</th>
                     <th width="20%">Trade Assignment</th>
                     <th width="20%">Pay Tier</th>
-                    <th width="20%">Notes</th>
-                    <th width="5%">Docs</th>
-                    <th width="15%">Action</th> 
+                    <th width="20%">Administrative Notes</th>
+                    <th width="5%">Documents</th>
+                    <th width="15%">Update Action</th> 
                 </tr>
             </thead>
             <tbody id="crew-table-body">
-                <tr><td colspan="6" align="center">Loading Crew Database...</td></tr>
+                <tr><td colspan="6" align="center">Establishing connection to database...</td></tr>
             </tbody>
         </table>
     </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
-    const TRADE_OPTIONS = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
-    const TIER_OPTIONS = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
+    // --- CONFIGURATION: API ENDPOINTS AND CONSTANTS ---
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
+    const TRADE_CATEGORIES = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
+    const PAY_TIERS = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
+    
+    // LINK TO EXTERNAL UPLOAD PAGE (Must match your hosted file location)
+    const CREDENTIAL_UPLOAD_URL = "https://welldoneconstruction.pro/upload-credentials.html"; 
 
-    window.onload = loadData;
+    // --- INITIALIZATION ---
+    window.onload = synchronizeData;
 
-    async function loadData() {
-        const fetchUrl = `${API_URL}?action=getPersonnelData`;
-        const statusDiv = document.getElementById('status-message');
+    // --- FUNCTION: DATA SYNCHRONIZATION ---
+    async function synchronizeData() {
+        updateStatusDisplay("Synchronizing data with Google Engine...", "loading");
+        
+        // Append timestamp to prevent browser caching
+        const fetchUrl = `${GOOGLE_SCRIPT_URL}?action=getPersonnelData&t=${new Date().getTime()}`;
         
         try {
             const response = await fetch(fetchUrl, {
@@ -93,125 +216,190 @@
                 headers: { 'Content-Type': 'text/plain' }
             });
 
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) throw new Error('Network response failure');
             
-            const data = await response.json();
-            console.log("Data loaded:", data);
+            const payload = await response.json();
+            console.log("Database Response:", payload);
             
-            // Populate the tables
-            renderApplicants(data.applicants);
-            renderCrew(data.crew);
+            // Execute Rendering Functions
+            renderApplicantTable(payload.applicants);
+            renderEmployeeTable(payload.crew);
             
-            statusDiv.innerText = "✓ Connected to Google Engine";
-            statusDiv.style.color = "green";
-            setTimeout(() => { statusDiv.innerText = ""; }, 3000);
+            updateStatusDisplay("✓ Database Synchronization Complete", "success");
+            setTimeout(hideStatusDisplay, 2500);
             
         } catch (error) {
-            console.error("Load Error:", error);
-            statusDiv.innerText = "Error connecting to Google Engine. Check Console (F12).";
-            statusDiv.style.color = "red";
+            console.error("Synchronization Error:", error);
+            updateStatusDisplay("Connection Failed. Please check console logs.", "error");
         }
     }
 
-    function renderApplicants(apps) {
-        const tbody = document.getElementById('app-table-body');
-        tbody.innerHTML = '';
-        if (!apps || apps.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" align="center">No new applications.</td></tr>';
+    // --- FUNCTION: RENDER APPLICANT TABLE ---
+    function renderApplicantTable(applicantData) {
+        const tableBody = document.getElementById('applicant-table-body');
+        tableBody.innerHTML = ''; // Clear existing rows
+
+        if (!applicantData || applicantData.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="5" align="center" style="padding:20px; color:#888;">No new applications found in queue.</td></tr>';
             return;
         }
-        apps.forEach(app => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
+
+        applicantData.forEach(app => {
+            const row = document.createElement('tr');
+            const resumeIcon = app.resumeUrl ? `<a href="${app.resumeUrl}" target="_blank" style="text-decoration:none; font-size:1.2rem;">📄</a>` : '-';
+            
+            row.innerHTML = `
                 <td><b>${app.fname} ${app.lname}</b><br><small>${app.email}</small></td>
                 <td>${app.trade}<br><small>${app.exp} yrs exp</small></td>
-                <td>$${app.pay}/hr<br><small>${app.tools || 'No Tools Info'}</small></td>
-                <td align="center"><a href="${app.resumeUrl}" target="_blank" style="text-decoration:none; font-size:1.2rem;">📄</a></td>
+                <td>$${app.pay}/hr<br><small>${app.tools || 'No Tools Listed'}</small></td>
+                <td align="center">${resumeIcon}</td>
                 <td>
-                    <button class="btn btn-contract" onclick="sendContract('${app.email}')">Agreement</button>
-                    <button class="btn btn-hire" onclick="processHire('${app.email}', '${app.fname}', '${app.trade}')">Hire</button>
+                    <button class="btn btn-contract" onclick="executeSendContract('${app.email}')">Agreement</button>
+                    <button class="btn btn-hire" onclick="executeHireProcess('${app.email}', '${app.fname}', '${app.trade}')">Hire</button>
                 </td>
             `;
-            tbody.appendChild(tr);
+            tableBody.appendChild(row);
         });
     }
 
-    function renderCrew(crewData) {
-        const tbody = document.getElementById('crew-table-body');
-        tbody.innerHTML = ''; 
-        if (!crewData || crewData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" align="center">Database Empty.</td></tr>';
+    // --- FUNCTION: RENDER EMPLOYEE TABLE ---
+    function renderEmployeeTable(employeeData) {
+        const tableBody = document.getElementById('crew-table-body');
+        tableBody.innerHTML = ''; 
+
+        if (!employeeData || employeeData.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="6" align="center">Employee database is empty.</td></tr>';
             return;
         }
-        crewData.forEach((worker, index) => {
-            const tr = document.createElement('tr');
-            const safeEmail = worker.email; 
-            tr.innerHTML = `<td><b>${worker.name}</b><br><small style="color:#666;">${worker.email}</small></td>`;
-            
-            const tradeTd = document.createElement('td');
-            const tSelect = document.createElement('select');
-            tSelect.id = `trade-${index}`; tSelect.className = "editable";
-            TRADE_OPTIONS.forEach(opt => {
-                const o = document.createElement('option'); o.value = opt; o.text = opt;
-                if (worker.trade && worker.trade.trim().toLowerCase() === opt.toLowerCase()) o.selected = true;
-                tSelect.appendChild(o);
-            });
-            tradeTd.appendChild(tSelect); tr.appendChild(tradeTd);
 
-            const tierTd = document.createElement('td');
-            const pSelect = document.createElement('select');
-            pSelect.id = `tier-${index}`; pSelect.className = "editable";
-            TIER_OPTIONS.forEach(opt => {
-                const o = document.createElement('option'); o.value = opt; o.text = opt;
-                if (worker.tier && worker.tier.trim().toLowerCase() === opt.toLowerCase()) o.selected = true;
-                pSelect.appendChild(o);
-            });
-            tierTd.appendChild(pSelect); tr.appendChild(tierTd);
-
-            tr.innerHTML += `<td>${worker.notes || ''}</td><td align="center"><a href="${worker.folderUrl}" target="_blank" style="text-decoration:none; font-size:1.5rem;">📂</a></td>`;
+        employeeData.forEach((worker, index) => {
+            const row = document.createElement('tr');
+            const workerEmail = worker.email; 
             
-            const actionTd = document.createElement('td');
-            actionTd.innerHTML = `<button class="btn btn-update" onclick="saveRow('${safeEmail}', ${index})">SAVE</button><span id="status-${index}" class="status-msg"></span>`;
-            tr.appendChild(actionTd);
-            tbody.appendChild(tr);
+            // Column 1: Identity
+            row.innerHTML = `<td><b>${worker.name}</b><br><small style="color:#666;">${worker.email}</small></td>`;
+            
+            // Column 2: Trade Assignment (Dropdown)
+            const tradeCell = document.createElement('td');
+            const tradeSelect = document.createElement('select');
+            tradeSelect.id = `trade-selector-${index}`; 
+            tradeSelect.className = "editable-field";
+            
+            TRADE_CATEGORIES.forEach(option => {
+                const optElement = document.createElement('option'); 
+                optElement.value = option; 
+                optElement.text = option;
+                if (worker.trade && worker.trade.trim().toLowerCase() === option.toLowerCase()) optElement.selected = true;
+                tradeSelect.appendChild(optElement);
+            });
+            tradeCell.appendChild(tradeSelect); 
+            row.appendChild(tradeCell);
+
+            // Column 3: Pay Tier (Dropdown)
+            const tierCell = document.createElement('td');
+            const tierSelect = document.createElement('select');
+            tierSelect.id = `tier-selector-${index}`; 
+            tierSelect.className = "editable-field";
+            
+            PAY_TIERS.forEach(option => {
+                const optElement = document.createElement('option'); 
+                optElement.value = option; 
+                optElement.text = option;
+                if (worker.tier && worker.tier.trim().toLowerCase() === option.toLowerCase()) optElement.selected = true;
+                tierSelect.appendChild(optElement);
+            });
+            tierCell.appendChild(tierSelect); 
+            row.appendChild(tierCell);
+
+            // Column 4 & 5: Notes and Documents (With Re-upload Request)
+            row.innerHTML += `
+                <td>${worker.notes || ''}</td>
+                <td align="center">
+                    <a href="${worker.folderUrl || '#'}" target="_blank" style="text-decoration:none; font-size:1.5rem;">📂</a>
+                    <br>
+                    <button class="btn btn-reupload" onclick="executeReuploadRequest('${workerEmail}', '${worker.name}')">BAD ID?</button>
+                </td>
+            `;
+            
+            // Column 6: Save Action
+            const actionCell = document.createElement('td');
+            actionCell.innerHTML = `<button class="btn btn-update" onclick="executeUpdateRow('${workerEmail}', ${index})">SAVE</button>`;
+            row.appendChild(actionCell);
+            
+            tableBody.appendChild(row);
         });
     }
 
-    async function sendData(payload) {
-        const statusDiv = document.getElementById('status-message');
+    // --- FUNCTION: API POST HANDLER ---
+    async function transmitData(payload) {
+        updateStatusDisplay("Transmitting request to server...", "loading");
         try { 
-            const response = await fetch(API_URL, { 
+            // Use text/plain to bypass complex CORS Preflight checks
+            await fetch(GOOGLE_SCRIPT_URL, { 
                 method: 'POST', 
-                headers: { 'Content-Type': 'text/plain' },
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload) 
             }); 
-            alert("Action Processed!"); 
-            setTimeout(loadData, 1500);
-        } catch(e) {
-            console.error("Post Error:", e);
-            alert("Sent. If it doesn't reflect, refresh in 5 seconds.");
-            loadData();
+            
+            updateStatusDisplay("✓ Action Processed Successfully", "success");
+            setTimeout(synchronizeData, 1500); // Refresh data
+        } catch(error) {
+            console.error("Transmission Error:", error);
+            // Handle Google Apps Script redirect behavior
+            updateStatusDisplay("Request Sent (Refreshing view...)", "loading"); 
+            setTimeout(synchronizeData, 3000);
         }
     }
 
-    async function sendContract(email) {
-        if(!confirm(`Send Master Agreement to ${email}?`)) return;
-        await sendData({ action: 'sendAgreement', email: email });
+    // --- EVENT HANDLERS ---
+
+    async function executeSendContract(email) {
+        if(!confirm(`Confirm: Send Master Agreement to ${email}?`)) return;
+        await transmitData({ action: 'sendAgreement', email: email });
     }
-    async function processHire(email, name, trade) {
-        if(!confirm(`Hire ${name}?`)) return;
-        await sendData({ action: 'hireWorker', email: email, name: name, trade: trade });
+
+    async function executeHireProcess(email, name, trade) {
+        if(!confirm(`Confirm: Hire ${name}?`)) return;
+        await transmitData({ action: 'hireWorker', email: email, name: name, trade: trade });
     }
-    async function saveRow(email, index) {
-        const btn = document.querySelector(`button[onclick="saveRow('${email}', ${index})"]`);
-        if(btn) { btn.innerText = "..."; btn.disabled = true; }
-        await sendData({ 
+
+    async function executeReuploadRequest(email, name) {
+        if(!confirm(`Confirm: Send 'Document Re-upload Request' to ${name}?`)) return;
+        await transmitData({ 
+            action: 'requestReupload', 
+            email: email, 
+            name: name,
+            link: CREDENTIAL_UPLOAD_URL 
+        });
+    }
+
+    async function executeUpdateRow(email, index) {
+        // UI Feedback: Disable button to prevent double-click
+        const button = document.querySelector(`button[onclick="executeUpdateRow('${email}', ${index})"]`);
+        const originalText = button.innerText;
+        button.innerText = "SAVING..."; 
+        button.disabled = true;
+        
+        await transmitData({ 
             action: 'updateCrewDetails', 
             email: email, 
-            trade: document.getElementById(`trade-${index}`).value, 
-            tier: document.getElementById(`tier-${index}`).value 
+            trade: document.getElementById(`trade-selector-${index}`).value, 
+            tier: document.getElementById(`tier-selector-${index}`).value 
         });
-        if(btn) { btn.innerText = "SAVE"; btn.disabled = false; }
+        
+        button.innerText = originalText; 
+        button.disabled = false;
+    }
+
+    // --- UI UTILITY FUNCTIONS ---
+    function updateStatusDisplay(message, type) {
+        const element = document.getElementById('global-status-display');
+        element.innerText = message;
+        element.className = `system-status-bar status-${type}`;
+        element.style.display = 'block';
+    }
+    function hideStatusDisplay() {
+        document.getElementById('global-status-display').style.display = 'none';
     }
 </script>
 </body>
