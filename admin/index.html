@@ -82,40 +82,29 @@
 
     window.onload = loadData;
 
-    async function loadData() {
-        try {
-            const res = await fetch(`${API_URL}?action=getPersonnelData&nocache=${Date.now()}`);
-            const data = await res.json();
-            
-            const appBody = document.getElementById('app-table-body');
-            appBody.innerHTML = '';
-            if (data.applicants && data.applicants.length > 0) {
-                data.applicants.forEach(app => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><b>${app.fname} ${app.lname}</b><br><small>${app.email}</small></td>
-                        <td>${app.trade}<br><small>${app.exp} yrs exp</small></td>
-                        <td>$${app.pay}/hr<br><small>${app.tools}</small></td>
-                        <td>${app.resumeUrl ? `<a href="${app.resumeUrl}" target="_blank" style="background:#eee; padding:5px; border-radius:4px; text-decoration:none;">📄 PDF</a>` : 'None'}</td>
-                        <td>
-                            <button class="btn btn-contract" onclick="sendContract('${app.email}')">📄 CONTRACT</button>
-                            <button class="btn btn-hire" onclick="processHire('${app.email}', '${app.fname} ${app.lname}', '${app.trade}')">✅ HIRE</button>
-                            <button class="btn btn-blur" onclick="requestDocs('${app.email}')">📷 RE-UPLOAD</button>
-                        </td>
-                    `;
-                    appBody.appendChild(tr);
-                });
-            } else {
-                appBody.innerHTML = '<tr><td colspan="5" align="center" style="padding:20px; color:#aaa;">No Pending Applications</td></tr>';
+async function loadData() {
+    const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec?action=getPersonnelData";
+    
+    try {
+        const response = await fetch(API_URL, {
+            method: 'GET',
+            mode: 'cors', // Changed from 'no-cors' to 'cors' because we fixed the script
+            headers: {
+                'Content-Type': 'text/plain' // This prevents the "pre-flight" CORS block
             }
+        });
 
-            renderCrew(data.crew);
-
-        } catch (err) { 
-            console.error("Load Error:", err);
-            document.getElementById('app-table-body').innerHTML = '<tr><td colspan="5" align="center" style="color:red;">Error connecting to Google Engine. Check Console (F12).</td></tr>';
-        }
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        console.log("Data loaded:", data);
+        // ... rest of your display logic
+        
+    } catch (error) {
+        console.error("Load Error:", error);
+        document.getElementById('status-message').innerText = "Error connecting to Google Engine.";
     }
+}
 
     function renderCrew(crewData) {
         const tbody = document.getElementById('crew-table-body');
