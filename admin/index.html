@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Hub | Well Done ERP</title>
+    <title>Personnel Hub | Well Done ERP</title>
+    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <style>
         :root { --primary: #343E47; --accent: #33B26E; --bg: #f4f7f6; --white: #ffffff; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); padding: 20px; color: var(--primary); }
@@ -22,26 +22,20 @@
         .btn { padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 0.75rem; margin-right: 4px; text-transform: uppercase; }
         .btn-hire { background: var(--accent); } 
         .btn-hire:hover { background: #28965a; }
-        
-        .btn-contract { background: #3498db; } /* The Missing Button */
+        .btn-contract { background: #3498db; }
         .btn-contract:hover { background: #2980b9; }
-
         .btn-blur { background: #e67e22; }
         .btn-blur:hover { background: #d35400; }
-        
         .btn-update { background: #3498db; }
         
         select.editable { padding: 8px; border: 1px solid #ccc; border-radius: 4px; background: #fff; width: 100%; font-size: 0.9rem; }
-        
         .status-msg { margin-left: 10px; font-size: 0.85rem; font-weight: bold; }
-        .text-success { color: #27ae60; }
-        .text-error { color: #e74c3c; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>Admin Hub</h1>
+        <h1>Personnel Hub</h1>
         <a href="project.html" style="text-decoration:none; color:#3498db; font-weight:bold; border: 2px solid #3498db; padding: 10px; border-radius: 5px;">➜ GO TO PROJECT COMMAND</a>
     </div>
 
@@ -83,7 +77,6 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
-
         const TRADE_OPTIONS = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
         const TIER_OPTIONS = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
 
@@ -97,7 +90,6 @@
                 // RENDER APPLICANTS
                 const appBody = document.getElementById('app-table-body');
                 appBody.innerHTML = '';
-                
                 if (data.applicants && data.applicants.length > 0) {
                     data.applicants.forEach(app => {
                         const tr = document.createElement('tr');
@@ -165,26 +157,21 @@
             });
         }
 
-        // --- BUTTON ACTIONS ---
-
         async function sendContract(email) {
             if(!confirm(`Send Master Agreement to ${email}?`)) return;
             await sendData({ action: 'sendAgreement', email: email });
         }
-
         async function processHire(email, name, trade) {
             if(!confirm(`Hire ${name}?`)) return;
             await sendData({ action: 'hireWorker', email: email, name: name, trade: trade });
         }
-
         async function requestDocs(email) {
             if(!confirm(`Request re-upload from ${email}?`)) return;
             await sendData({ action: 'requestOnboarding', email: email });
         }
-
         async function saveRow(email, index) {
             const btn = document.querySelector(`button[onclick="saveRow('${email}', ${index})"]`);
-            btn.innerText = "..."; btn.disabled = true;
+            if(btn) { btn.innerText = "..."; btn.disabled = true; }
             try {
                 await fetch(API_URL, { 
                     method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
@@ -194,10 +181,9 @@
                         tier: document.getElementById(`tier-${index}`).value 
                     }) 
                 });
-                loadData();
-            } catch (e) { alert("Error"); btn.disabled = false; }
+                setTimeout(loadData, 1000); 
+            } catch (e) { alert("Error"); if(btn) btn.disabled = false; }
         }
-
         async function sendData(payload) {
             try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) }); alert("Action Successful!"); loadData(); } catch(e) {}
         }
