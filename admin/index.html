@@ -18,18 +18,15 @@
         th { text-align: left; color: #888; font-size: 0.8rem; text-transform: uppercase; padding: 12px 8px; border-bottom: 2px solid #eee; background: #fafafa; }
         td { padding: 10px 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
         
-        /* Buttons */
         .btn { padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 0.75rem; margin-right: 4px; text-transform: uppercase; }
         .btn-hire { background: var(--accent); } 
         .btn-hire:hover { background: #28965a; }
         .btn-contract { background: #3498db; }
         .btn-contract:hover { background: #2980b9; }
-        .btn-blur { background: #e67e22; }
-        .btn-blur:hover { background: #d35400; }
         .btn-update { background: #3498db; }
         
         select.editable { padding: 8px; border: 1px solid #ccc; border-radius: 4px; background: #fff; width: 100%; font-size: 0.9rem; }
-        .status-msg { margin-left: 10px; font-size: 0.85rem; font-weight: bold; }
+        .status-msg { margin-left: 10px; font-size: 0.85rem; font-weight: bold; text-align: center; display: block; }
     </style>
 </head>
 <body>
@@ -38,6 +35,8 @@
         <h1>Personnel Hub</h1>
         <a href="project.html" style="text-decoration:none; color:#3498db; font-weight:bold; border: 2px solid #3498db; padding: 10px; border-radius: 5px;">➜ GO TO PROJECT COMMAND</a>
     </div>
+
+    <div id="status-message" class="status-msg"></div>
 
     <div class="card">
         <h2>1. New Applicants (Inbox)</h2>
@@ -48,7 +47,8 @@
                     <th width="20%">Trade / Exp</th>
                     <th width="20%">Req. Pay / Tools</th>
                     <th width="10%">Resume</th>
-                    <th width="30%">Actions</th> </tr>
+                    <th width="30%">Actions</th> 
+                </tr>
             </thead>
             <tbody id="app-table-body">
                 <tr><td colspan="5" align="center">Loading Applications...</td></tr>
@@ -75,36 +75,66 @@
         </table>
     </div>
 
-    <script>
+<script>
     const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
     const TRADE_OPTIONS = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
     const TIER_OPTIONS = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
 
     window.onload = loadData;
 
-async function loadData() {
-    const API_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec?action=getPersonnelData";
-    
-    try {
-        const response = await fetch(API_URL, {
-            method: 'GET',
-            mode: 'cors', // Changed from 'no-cors' to 'cors' because we fixed the script
-            headers: {
-                'Content-Type': 'text/plain' // This prevents the "pre-flight" CORS block
-            }
-        });
+    async function loadData() {
+        const fetchUrl = `${API_URL}?action=getPersonnelData`;
+        const statusDiv = document.getElementById('status-message');
+        
+        try {
+            const response = await fetch(fetchUrl, {
+                method: 'GET',
+                mode: 'cors',
+                headers: { 'Content-Type': 'text/plain' }
+            });
 
-        if (!response.ok) throw new Error('Network response was not ok');
-        
-        const data = await response.json();
-        console.log("Data loaded:", data);
-        // ... rest of your display logic
-        
-    } catch (error) {
-        console.error("Load Error:", error);
-        document.getElementById('status-message').innerText = "Error connecting to Google Engine.";
+            if (!response.ok) throw new Error('Network response was not ok');
+            
+            const data = await response.json();
+            console.log("Data loaded:", data);
+            
+            // Populate the tables
+            renderApplicants(data.applicants);
+            renderCrew(data.crew);
+            
+            statusDiv.innerText = "✓ Connected to Google Engine";
+            statusDiv.style.color = "green";
+            setTimeout(() => { statusDiv.innerText = ""; }, 3000);
+            
+        } catch (error) {
+            console.error("Load Error:", error);
+            statusDiv.innerText = "Error connecting to Google Engine. Check Console (F12).";
+            statusDiv.style.color = "red";
+        }
     }
-}
+
+    function renderApplicants(apps) {
+        const tbody = document.getElementById('app-table-body');
+        tbody.innerHTML = '';
+        if (!apps || apps.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" align="center">No new applications.</td></tr>';
+            return;
+        }
+        apps.forEach(app => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${app.fname} ${app.lname}</b><br><small>${app.email}</small></td>
+                <td>${app.trade}<br><small>${app.exp} yrs exp</small></td>
+                <td>$${app.pay}/hr<br><small>${app.tools || 'No Tools Info'}</small></td>
+                <td align="center"><a href="${app.resumeUrl}" target="_blank" style="text-decoration:none; font-size:1.2rem;">📄</a></td>
+                <td>
+                    <button class="btn btn-contract" onclick="sendContract('${app.email}')">Agreement</button>
+                    <button class="btn btn-hire" onclick="processHire('${app.email}', '${app.fname}', '${app.trade}')">Hire</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
 
     function renderCrew(crewData) {
         const tbody = document.getElementById('crew-table-body');
@@ -147,6 +177,23 @@ async function loadData() {
         });
     }
 
+    async function sendData(payload) {
+        const statusDiv = document.getElementById('status-message');
+        try { 
+            const response = await fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(payload) 
+            }); 
+            alert("Action Processed!"); 
+            setTimeout(loadData, 1500);
+        } catch(e) {
+            console.error("Post Error:", e);
+            alert("Sent. If it doesn't reflect, refresh in 5 seconds.");
+            loadData();
+        }
+    }
+
     async function sendContract(email) {
         if(!confirm(`Send Master Agreement to ${email}?`)) return;
         await sendData({ action: 'sendAgreement', email: email });
@@ -155,15 +202,9 @@ async function loadData() {
         if(!confirm(`Hire ${name}?`)) return;
         await sendData({ action: 'hireWorker', email: email, name: name, trade: trade });
     }
-    async function requestDocs(email) {
-        if(!confirm(`Request re-upload from ${email}?`)) return;
-        await sendData({ action: 'requestOnboarding', email: email });
-    }
-
     async function saveRow(email, index) {
         const btn = document.querySelector(`button[onclick="saveRow('${email}', ${index})"]`);
         if(btn) { btn.innerText = "..."; btn.disabled = true; }
-        
         await sendData({ 
             action: 'updateCrewDetails', 
             email: email, 
@@ -172,23 +213,6 @@ async function loadData() {
         });
         if(btn) { btn.innerText = "SAVE"; btn.disabled = false; }
     }
-
-    // CLEAN ENGINE COMMUNICATION (No more 'no-cors' crash)
-    async function sendData(payload) {
-        try { 
-            const response = await fetch(API_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'text/plain' }, // Required for Google Scripts
-                body: JSON.stringify(payload) 
-            }); 
-            
-            // Even though Google Script redirects, standard Fetch will now work
-            alert("Action Processed!"); 
-            setTimeout(loadData, 1500); // Give Google Sheet time to update
-        } catch(e) {
-            console.error("Post Error:", e);
-            alert("Success check: Refresh the page in 5 seconds.");
-            loadData();
-        }
-    }
 </script>
+</body>
+</html>
