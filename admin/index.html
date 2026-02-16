@@ -3,30 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personnel Hub | Well Done ERP</title>
+    <title>Administration Dashboard | Well Done Construction</title>
     <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     
     <style>
-        /* GLOBAL VARIABLES: Color Palette and Theme Definitions */
+        /* CSS VARIABLES: Color Definitions */
         :root { 
-            --primary-color: #343E47; 
-            --accent-color: #33B26E; 
-            --action-color: #3498db;
-            --danger-color: #e74c3c;
+            --primary-text-color: #343E47; 
+            --accent-green-color: #33B26E; 
+            --action-blue-color: #3498db;
+            --alert-red-color: #e74c3c;
             --background-color: #f4f7f6; 
-            --surface-color: #ffffff; 
+            --container-white-color: #ffffff; 
         }
 
-        /* BASE TYPOGRAPHY AND RESET */
+        /* DOCUMENT RESET AND TYPOGRAPHY */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             background: var(--background-color); 
             padding: 20px; 
-            color: var(--primary-color); 
+            color: var(--primary-text-color); 
         }
         
         /* LAYOUT CONTAINERS */
-        .header-container { 
+        .header-section { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
@@ -34,8 +34,8 @@
             margin: 0 auto 20px auto; 
         }
         
-        .content-card { 
-            background: var(--surface-color); 
+        .data-container { 
+            background: var(--container-white-color); 
             padding: 20px; 
             border-radius: 8px; 
             box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
@@ -44,14 +44,14 @@
         }
         
         h2 { 
-            border-bottom: 2px solid var(--accent-color); 
+            border-bottom: 2px solid var(--accent-green-color); 
             padding-bottom: 10px; 
             margin-top: 0; 
-            color: var(--primary-color); 
+            color: var(--primary-text-color); 
             font-size: 1.4rem; 
         }
         
-        /* DATA TABLE STYLING */
+        /* TABLE STYLING */
         table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -73,8 +73,8 @@
             vertical-align: middle; 
         }
         
-        /* INTERACTIVE ELEMENTS (BUTTONS) */
-        .btn { 
+        /* BUTTON STYLING */
+        .button-base { 
             padding: 8px 12px; 
             border: none; 
             border-radius: 4px; 
@@ -87,25 +87,25 @@
             transition: background-color 0.2s ease; 
         }
         
-        .btn-hire { background: var(--accent-color); } 
-        .btn-hire:hover { background: #28965a; }
+        .button-hire { background: var(--accent-green-color); } 
+        .button-hire:hover { background: #28965a; }
         
-        .btn-contract { background: var(--action-color); }
-        .btn-contract:hover { background: #2980b9; }
+        .button-contract { background: var(--action-blue-color); }
+        .button-contract:hover { background: #2980b9; }
         
-        .btn-update { background: var(--primary-color); }
-        .btn-update:hover { background: #2c3e50; }
+        .button-save { background: var(--primary-text-color); }
+        .button-save:hover { background: #2c3e50; }
 
-        .btn-reupload { 
-            background: var(--danger-color); 
+        .button-alert { 
+            background: var(--alert-red-color); 
             font-size: 0.65rem; 
             padding: 5px 8px; 
             margin-top: 5px; 
         }
-        .btn-reupload:hover { background: #c0392b; }
+        .button-alert:hover { background: #c0392b; }
         
-        /* FORM CONTROLS */
-        select.editable-field { 
+        /* FORM INPUT STYLING */
+        select.editable-dropdown { 
             padding: 8px; 
             border: 1px solid #ccc; 
             border-radius: 4px; 
@@ -114,292 +114,291 @@
             font-size: 0.9rem; 
         }
         
-        /* SYSTEM NOTIFICATION BAR */
-        .system-status-bar { 
+        /* NOTIFICATION BAR STYLING */
+        .notification-bar { 
             max-width: 1400px; 
             margin: 0 auto 15px auto; 
             padding: 10px; 
             border-radius: 5px; 
             text-align: center; 
             font-weight: bold; 
-            display: none; /* Hidden by default */
+            display: none; 
         }
         .status-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .status-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         .status-loading { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
 
-        /* NAVIGATION LINKS */
-        .navigation-link { 
+        /* NAVIGATION LINK STYLING */
+        .navigation-button { 
             text-decoration: none; 
-            color: var(--action-color); 
+            color: var(--action-blue-color); 
             font-weight: bold; 
-            border: 2px solid var(--action-color); 
+            border: 2px solid var(--action-blue-color); 
             padding: 10px; 
             border-radius: 5px; 
             transition: 0.2s; 
         }
-        .navigation-link:hover { 
-            background: var(--action-color); 
+        .navigation-button:hover { 
+            background: var(--action-blue-color); 
             color: white; 
         }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <h1>Personnel Hub</h1>
-        <a href="project.html" class="navigation-link">➜ GO TO PROJECT COMMAND</a>
+    <div class="header-section">
+        <h1>Administration Dashboard</h1>
+        <a href="project.html" class="navigation-button">➜ PROJECT COMMAND</a>
     </div>
 
-    <div id="global-status-display" class="system-status-bar"></div>
+    <div id="status-notification" class="notification-bar"></div>
 
-    <div class="content-card">
-        <h2>1. New Applicants (Inbox)</h2>
+    <div class="data-container">
+        <h2>Applicant Inbox</h2>
         <table>
             <thead>
                 <tr>
-                    <th width="20%">Name / Contact Details</th>
+                    <th width="20%">Name / Email</th>
                     <th width="20%">Trade / Experience</th>
-                    <th width="20%">Requested Pay / Tools</th>
+                    <th width="20%">Rate / Tools</th>
                     <th width="10%">Resume</th>
-                    <th width="30%">Administrative Actions</th> 
+                    <th width="30%">Administrative Controls</th> 
                 </tr>
             </thead>
-            <tbody id="applicant-table-body">
-                <tr><td colspan="5" align="center">Establishing connection to database...</td></tr>
+            <tbody id="applicant-tbody">
+                <tr><td colspan="5" align="center">Retrieving data from server...</td></tr>
             </tbody>
         </table>
     </div>
 
-    <div class="content-card">
-        <h2>2. Master Crew List</h2>
-        <table id="crew-list-table">
+    <div class="data-container">
+        <h2>Active Crew Database</h2>
+        <table id="crew-table">
             <thead>
                 <tr>
-                    <th width="20%">Name / Contact Details</th>
+                    <th width="20%">Name / Email</th>
                     <th width="20%">Trade Assignment</th>
                     <th width="20%">Pay Tier</th>
-                    <th width="20%">Administrative Notes</th>
-                    <th width="5%">Documents</th>
-                    <th width="15%">Update Action</th> 
+                    <th width="20%">Notes</th>
+                    <th width="5%">Files</th>
+                    <th width="15%">Update</th> 
                 </tr>
             </thead>
-            <tbody id="crew-table-body">
-                <tr><td colspan="6" align="center">Establishing connection to database...</td></tr>
+            <tbody id="crew-tbody">
+                <tr><td colspan="6" align="center">Retrieving data from server...</td></tr>
             </tbody>
         </table>
     </div>
 
 <script>
-    // --- CONFIGURATION: API ENDPOINTS AND CONSTANTS ---
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
-    const TRADE_CATEGORIES = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
-    const PAY_TIERS = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
+    // API CONFIGURATION
+    const ENDPOINT_URL = "https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec";
     
-    // LINK TO EXTERNAL UPLOAD PAGE (Must match your hosted file location)
-    const CREDENTIAL_UPLOAD_URL = "https://welldoneconstruction.pro/upload-credentials.html"; 
+    // DROPDOWN CONSTANTS
+    const TRADE_LIST = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
+    const PAY_SCALE = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
+    
+    // EXTERNAL LINKS (ABSOLUTE PATHS)
+    const UPLOAD_FORM_URL = "https://welldoneconstruction.pro/onboarding.html"; 
 
-    // --- INITIALIZATION ---
-    window.onload = synchronizeData;
+    // LIFECYCLE EVENT: PAGE LOAD
+    window.onload = initializeDashboard;
 
-    // --- FUNCTION: DATA SYNCHRONIZATION ---
-    async function synchronizeData() {
-        updateStatusDisplay("Synchronizing data with Google Engine...", "loading");
+    // FUNCTION: DATA RETRIEVAL
+    async function initializeDashboard() {
+        displayStatus("Connecting to database...", "loading");
         
-        // Append timestamp to prevent browser caching
-        const fetchUrl = `${GOOGLE_SCRIPT_URL}?action=getPersonnelData&t=${new Date().getTime()}`;
+        // Anti-caching timestamp appended to URL
+        const requestUrl = `${ENDPOINT_URL}?action=getPersonnelData&t=${new Date().getTime()}`;
         
         try {
-            const response = await fetch(fetchUrl, {
+            const response = await fetch(requestUrl, {
                 method: 'GET',
                 mode: 'cors',
                 headers: { 'Content-Type': 'text/plain' }
             });
 
-            if (!response.ok) throw new Error('Network response failure');
+            if (!response.ok) throw new Error('Network response failed');
             
             const payload = await response.json();
-            console.log("Database Response:", payload);
+            console.log("Server Payload:", payload);
             
-            // Execute Rendering Functions
-            renderApplicantTable(payload.applicants);
-            renderEmployeeTable(payload.crew);
+            // Render Data Tables
+            populateApplicantTable(payload.applicants);
+            populateCrewTable(payload.crew);
             
-            updateStatusDisplay("✓ Database Synchronization Complete", "success");
-            setTimeout(hideStatusDisplay, 2500);
+            displayStatus("✓ Database Synced", "success");
+            setTimeout(clearStatus, 2500);
             
         } catch (error) {
-            console.error("Synchronization Error:", error);
-            updateStatusDisplay("Connection Failed. Please check console logs.", "error");
+            console.error("Initialization Failed:", error);
+            displayStatus("Connection Error. Check console logs.", "error");
         }
     }
 
-    // --- FUNCTION: RENDER APPLICANT TABLE ---
-    function renderApplicantTable(applicantData) {
-        const tableBody = document.getElementById('applicant-table-body');
-        tableBody.innerHTML = ''; // Clear existing rows
-
-        if (!applicantData || applicantData.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="5" align="center" style="padding:20px; color:#888;">No new applications found in queue.</td></tr>';
-            return;
-        }
-
-        applicantData.forEach(app => {
-            const row = document.createElement('tr');
-            const resumeIcon = app.resumeUrl ? `<a href="${app.resumeUrl}" target="_blank" style="text-decoration:none; font-size:1.2rem;">📄</a>` : '-';
-            
-            row.innerHTML = `
-                <td><b>${app.fname} ${app.lname}</b><br><small>${app.email}</small></td>
-                <td>${app.trade}<br><small>${app.exp} yrs exp</small></td>
-                <td>$${app.pay}/hr<br><small>${app.tools || 'No Tools Listed'}</small></td>
-                <td align="center">${resumeIcon}</td>
-                <td>
-                    <button class="btn btn-contract" onclick="executeSendContract('${app.email}')">Agreement</button>
-                    <button class="btn btn-hire" onclick="executeHireProcess('${app.email}', '${app.fname}', '${app.trade}')">Hire</button>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
-    }
-
-    // --- FUNCTION: RENDER EMPLOYEE TABLE ---
-    function renderEmployeeTable(employeeData) {
-        const tableBody = document.getElementById('crew-table-body');
+    // FUNCTION: RENDER APPLICANT ROWS
+    function populateApplicantTable(dataSet) {
+        const tableBody = document.getElementById('applicant-tbody');
         tableBody.innerHTML = ''; 
 
-        if (!employeeData || employeeData.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="6" align="center">Employee database is empty.</td></tr>';
+        if (!dataSet || dataSet.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="5" align="center" style="padding:20px; color:#888;">No pending applications.</td></tr>';
             return;
         }
 
-        employeeData.forEach((worker, index) => {
-            const row = document.createElement('tr');
-            const workerEmail = worker.email; 
+        dataSet.forEach(record => {
+            const tableRow = document.createElement('tr');
+            const fileLink = record.resumeUrl ? `<a href="${record.resumeUrl}" target="_blank" style="text-decoration:none; font-size:1.2rem;">📄</a>` : '-';
             
-            // Column 1: Identity
-            row.innerHTML = `<td><b>${worker.name}</b><br><small style="color:#666;">${worker.email}</small></td>`;
-            
-            // Column 2: Trade Assignment (Dropdown)
-            const tradeCell = document.createElement('td');
-            const tradeSelect = document.createElement('select');
-            tradeSelect.id = `trade-selector-${index}`; 
-            tradeSelect.className = "editable-field";
-            
-            TRADE_CATEGORIES.forEach(option => {
-                const optElement = document.createElement('option'); 
-                optElement.value = option; 
-                optElement.text = option;
-                if (worker.trade && worker.trade.trim().toLowerCase() === option.toLowerCase()) optElement.selected = true;
-                tradeSelect.appendChild(optElement);
-            });
-            tradeCell.appendChild(tradeSelect); 
-            row.appendChild(tradeCell);
-
-            // Column 3: Pay Tier (Dropdown)
-            const tierCell = document.createElement('td');
-            const tierSelect = document.createElement('select');
-            tierSelect.id = `tier-selector-${index}`; 
-            tierSelect.className = "editable-field";
-            
-            PAY_TIERS.forEach(option => {
-                const optElement = document.createElement('option'); 
-                optElement.value = option; 
-                optElement.text = option;
-                if (worker.tier && worker.tier.trim().toLowerCase() === option.toLowerCase()) optElement.selected = true;
-                tierSelect.appendChild(optElement);
-            });
-            tierCell.appendChild(tierSelect); 
-            row.appendChild(tierCell);
-
-            // Column 4 & 5: Notes and Documents (With Re-upload Request)
-            row.innerHTML += `
-                <td>${worker.notes || ''}</td>
-                <td align="center">
-                    <a href="${worker.folderUrl || '#'}" target="_blank" style="text-decoration:none; font-size:1.5rem;">📂</a>
-                    <br>
-                    <button class="btn btn-reupload" onclick="executeReuploadRequest('${workerEmail}', '${worker.name}')">BAD ID?</button>
+            tableRow.innerHTML = `
+                <td><b>${record.fname} ${record.lname}</b><br><small>${record.email}</small></td>
+                <td>${record.trade}<br><small>${record.exp} yrs exp</small></td>
+                <td>$${record.pay}/hr<br><small>${record.tools || 'None Listed'}</small></td>
+                <td align="center">${fileLink}</td>
+                <td>
+                    <button class="button-base button-contract" onclick="triggerContractEmail('${record.email}')">Agreement</button>
+                    <button class="button-base button-hire" onclick="triggerHireWorkflow('${record.email}', '${record.fname}', '${record.trade}')">Hire</button>
                 </td>
             `;
-            
-            // Column 6: Save Action
-            const actionCell = document.createElement('td');
-            actionCell.innerHTML = `<button class="btn btn-update" onclick="executeUpdateRow('${workerEmail}', ${index})">SAVE</button>`;
-            row.appendChild(actionCell);
-            
-            tableBody.appendChild(row);
+            tableBody.appendChild(tableRow);
         });
     }
 
-    // --- FUNCTION: API POST HANDLER ---
-    async function transmitData(payload) {
-        updateStatusDisplay("Transmitting request to server...", "loading");
+    // FUNCTION: RENDER CREW ROWS
+    function populateCrewTable(dataSet) {
+        const tableBody = document.getElementById('crew-tbody');
+        tableBody.innerHTML = ''; 
+
+        if (!dataSet || dataSet.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="6" align="center">Database empty.</td></tr>';
+            return;
+        }
+
+        dataSet.forEach((record, rowIndex) => {
+            const tableRow = document.createElement('tr');
+            const userEmail = record.email; 
+            
+            // Identity Column
+            tableRow.innerHTML = `<td><b>${record.name}</b><br><small style="color:#666;">${record.email}</small></td>`;
+            
+            // Trade Selector Column
+            const tradeCell = document.createElement('td');
+            const tradeSelect = document.createElement('select');
+            tradeSelect.id = `trade-input-${rowIndex}`; 
+            tradeSelect.className = "editable-dropdown";
+            
+            TRADE_LIST.forEach(item => {
+                const option = document.createElement('option'); 
+                option.value = item; 
+                option.text = item;
+                if (record.trade && record.trade.trim().toLowerCase() === item.toLowerCase()) option.selected = true;
+                tradeSelect.appendChild(option);
+            });
+            tradeCell.appendChild(tradeSelect); 
+            tableRow.appendChild(tradeCell);
+
+            // Pay Tier Selector Column
+            const tierCell = document.createElement('td');
+            const tierSelect = document.createElement('select');
+            tierSelect.id = `tier-input-${rowIndex}`; 
+            tierSelect.className = "editable-dropdown";
+            
+            PAY_SCALE.forEach(item => {
+                const option = document.createElement('option'); 
+                option.value = item; 
+                option.text = item;
+                if (record.tier && record.tier.trim().toLowerCase() === item.toLowerCase()) option.selected = true;
+                tierSelect.appendChild(option);
+            });
+            tierCell.appendChild(tierSelect); 
+            tableRow.appendChild(tierCell);
+
+            // Notes and File Actions
+            tableRow.innerHTML += `
+                <td>${record.notes || ''}</td>
+                <td align="center">
+                    <a href="${record.folderUrl || '#'}" target="_blank" style="text-decoration:none; font-size:1.5rem;">📂</a>
+                    <br>
+                    <button class="button-base button-alert" onclick="triggerReuploadRequest('${userEmail}', '${record.name}')">BAD ID</button>
+                </td>
+            `;
+            
+            // Save Button Column
+            const actionCell = document.createElement('td');
+            actionCell.innerHTML = `<button class="button-base button-save" onclick="saveRecordChanges('${userEmail}', ${rowIndex})">SAVE</button>`;
+            tableRow.appendChild(actionCell);
+            
+            tableBody.appendChild(tableRow);
+        });
+    }
+
+    // FUNCTION: API TRANSMISSION (POST)
+    async function transmitData(dataObject) {
+        displayStatus("Transmitting request...", "loading");
         try { 
-            // Use text/plain to bypass complex CORS Preflight checks
-            await fetch(GOOGLE_SCRIPT_URL, { 
+            await fetch(ENDPOINT_URL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload) 
+                body: JSON.stringify(dataObject) 
             }); 
             
-            updateStatusDisplay("✓ Action Processed Successfully", "success");
-            setTimeout(synchronizeData, 1500); // Refresh data
+            displayStatus("✓ Action Successful", "success");
+            setTimeout(initializeDashboard, 1500); 
         } catch(error) {
             console.error("Transmission Error:", error);
-            // Handle Google Apps Script redirect behavior
-            updateStatusDisplay("Request Sent (Refreshing view...)", "loading"); 
-            setTimeout(synchronizeData, 3000);
+            displayStatus("Request Sent (Refreshing...)", "loading"); 
+            setTimeout(initializeDashboard, 3000);
         }
     }
 
-    // --- EVENT HANDLERS ---
+    // EVENT HANDLERS
 
-    async function executeSendContract(email) {
-        if(!confirm(`Confirm: Send Master Agreement to ${email}?`)) return;
-        await transmitData({ action: 'sendAgreement', email: email });
+    async function triggerContractEmail(emailAddress) {
+        if(!confirm(`Confirm: Send Master Agreement to ${emailAddress}?`)) return;
+        await transmitData({ action: 'sendAgreement', email: emailAddress });
     }
 
-    async function executeHireProcess(email, name, trade) {
+    async function triggerHireWorkflow(emailAddress, name, trade) {
         if(!confirm(`Confirm: Hire ${name}?`)) return;
-        await transmitData({ action: 'hireWorker', email: email, name: name, trade: trade });
+        await transmitData({ action: 'hireWorker', email: emailAddress, name: name, trade: trade });
     }
 
-    async function executeReuploadRequest(email, name) {
+    async function triggerReuploadRequest(emailAddress, name) {
         if(!confirm(`Confirm: Send 'Document Re-upload Request' to ${name}?`)) return;
         await transmitData({ 
             action: 'requestReupload', 
-            email: email, 
+            email: emailAddress, 
             name: name,
-            link: CREDENTIAL_UPLOAD_URL 
+            link: UPLOAD_FORM_URL 
         });
     }
 
-    async function executeUpdateRow(email, index) {
-        // UI Feedback: Disable button to prevent double-click
-        const button = document.querySelector(`button[onclick="executeUpdateRow('${email}', ${index})"]`);
-        const originalText = button.innerText;
+    async function saveRecordChanges(emailAddress, rowIndex) {
+        const button = document.querySelector(`button[onclick="saveRecordChanges('${emailAddress}', ${rowIndex})"]`);
+        const originalLabel = button.innerText;
         button.innerText = "SAVING..."; 
         button.disabled = true;
         
         await transmitData({ 
             action: 'updateCrewDetails', 
-            email: email, 
-            trade: document.getElementById(`trade-selector-${index}`).value, 
-            tier: document.getElementById(`tier-selector-${index}`).value 
+            email: emailAddress, 
+            trade: document.getElementById(`trade-input-${rowIndex}`).value, 
+            tier: document.getElementById(`tier-input-${rowIndex}`).value 
         });
         
-        button.innerText = originalText; 
+        button.innerText = originalLabel; 
         button.disabled = false;
     }
 
-    // --- UI UTILITY FUNCTIONS ---
-    function updateStatusDisplay(message, type) {
-        const element = document.getElementById('global-status-display');
+    // UTILITY FUNCTIONS
+    function displayStatus(message, type) {
+        const element = document.getElementById('status-notification');
         element.innerText = message;
-        element.className = `system-status-bar status-${type}`;
+        element.className = `notification-bar status-${type}`;
         element.style.display = 'block';
     }
-    function hideStatusDisplay() {
-        document.getElementById('global-status-display').style.display = 'none';
+    function clearStatus() {
+        document.getElementById('status-notification').style.display = 'none';
     }
 </script>
 </body>
