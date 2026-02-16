@@ -7,17 +7,17 @@
     <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     
     <style>
-        /* CSS VARIABLES: Color Definitions */
+        /* GLOBAL VARIABLES: Color Palette and Theme Definitions */
         :root { 
             --primary-text-color: #343E47; 
             --accent-green-color: #33B26E; 
             --action-blue-color: #3498db;
             --alert-red-color: #e74c3c;
             --background-color: #f4f7f6; 
-            --container-white-color: #ffffff; 
+            --surface-color: #ffffff; 
         }
 
-        /* DOCUMENT RESET AND TYPOGRAPHY */
+        /* BASE TYPOGRAPHY AND DOCUMENT RESET */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             background: var(--background-color); 
@@ -35,7 +35,7 @@
         }
         
         .data-container { 
-            background: var(--container-white-color); 
+            background: var(--surface-color); 
             padding: 20px; 
             border-radius: 8px; 
             box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
@@ -51,7 +51,7 @@
             font-size: 1.4rem; 
         }
         
-        /* TABLE STYLING */
+        /* DATA TABLE STYLING */
         table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -73,7 +73,7 @@
             vertical-align: middle; 
         }
         
-        /* BUTTON STYLING */
+        /* INTERACTIVE ELEMENTS (BUTTONS) */
         .button-base { 
             padding: 8px 12px; 
             border: none; 
@@ -114,7 +114,7 @@
             font-size: 0.9rem; 
         }
         
-        /* NOTIFICATION BAR STYLING */
+        /* SYSTEM NOTIFICATION BAR */
         .notification-bar { 
             max-width: 1400px; 
             margin: 0 auto 15px auto; 
@@ -158,15 +158,15 @@
         <table>
             <thead>
                 <tr>
-                    <th width="20%">Name / Email</th>
+                    <th width="20%">Name / Contact Details</th>
                     <th width="20%">Trade / Experience</th>
-                    <th width="20%">Rate / Tools</th>
+                    <th width="20%">Requested Pay / Tools</th>
                     <th width="10%">Resume</th>
                     <th width="30%">Administrative Controls</th> 
                 </tr>
             </thead>
             <tbody id="applicant-tbody">
-                <tr><td colspan="5" align="center">Retrieving data from server...</td></tr>
+                <tr><td colspan="5" align="center">Establishing database connection...</td></tr>
             </tbody>
         </table>
     </div>
@@ -179,13 +179,13 @@
                     <th width="20%">Name / Email</th>
                     <th width="20%">Trade Assignment</th>
                     <th width="20%">Pay Tier</th>
-                    <th width="20%">Notes</th>
-                    <th width="5%">Files</th>
-                    <th width="15%">Update</th> 
+                    <th width="20%">Administrative Notes</th>
+                    <th width="5%">Documents</th>
+                    <th width="15%">Commit Change</th> 
                 </tr>
             </thead>
             <tbody id="crew-tbody">
-                <tr><td colspan="6" align="center">Retrieving data from server...</td></tr>
+                <tr><td colspan="6" align="center">Establishing database connection...</td></tr>
             </tbody>
         </table>
     </div>
@@ -204,9 +204,9 @@
     // LIFECYCLE EVENT: PAGE LOAD
     window.onload = initializeDashboard;
 
-    // FUNCTION: DATA RETRIEVAL
+    // FUNCTION: DATA RETRIEVAL (GET)
     async function initializeDashboard() {
-        displayStatus("Connecting to database...", "loading");
+        displayStatus("Synchronizing data with Master Engine...", "loading");
         
         // Anti-caching timestamp appended to URL
         const requestUrl = `${ENDPOINT_URL}?action=getPersonnelData&t=${new Date().getTime()}`;
@@ -218,21 +218,21 @@
                 headers: { 'Content-Type': 'text/plain' }
             });
 
-            if (!response.ok) throw new Error('Network response failed');
+            if (!response.ok) throw new Error('Network response failure');
             
             const payload = await response.json();
-            console.log("Server Payload:", payload);
+            console.log("Database Payload Received:", payload);
             
-            // Render Data Tables
+            // Execute table population
             populateApplicantTable(payload.applicants);
             populateCrewTable(payload.crew);
             
-            displayStatus("✓ Database Synced", "success");
+            displayStatus("✓ Database Synchronization Complete", "success");
             setTimeout(clearStatus, 2500);
             
         } catch (error) {
             console.error("Initialization Failed:", error);
-            displayStatus("Connection Error. Check console logs.", "error");
+            displayStatus("Communication Error. Review Console Logs.", "error");
         }
     }
 
@@ -242,7 +242,7 @@
         tableBody.innerHTML = ''; 
 
         if (!dataSet || dataSet.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="5" align="center" style="padding:20px; color:#888;">No pending applications.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="5" align="center" style="padding:20px; color:#888;">No pending records found.</td></tr>';
             return;
         }
 
@@ -253,7 +253,7 @@
             tableRow.innerHTML = `
                 <td><b>${record.fname} ${record.lname}</b><br><small>${record.email}</small></td>
                 <td>${record.trade}<br><small>${record.exp} yrs exp</small></td>
-                <td>$${record.pay}/hr<br><small>${record.tools || 'None Listed'}</small></td>
+                <td>$${record.pay}/hr<br><small>${record.tools || 'None Specified'}</small></td>
                 <td align="center">${fileLink}</td>
                 <td>
                     <button class="button-base button-contract" onclick="triggerContractEmail('${record.email}')">Agreement</button>
@@ -270,7 +270,7 @@
         tableBody.innerHTML = ''; 
 
         if (!dataSet || dataSet.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="6" align="center">Database empty.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="6" align="center">Personnel database is currently empty.</td></tr>';
             return;
         }
 
@@ -281,7 +281,7 @@
             // Identity Column
             tableRow.innerHTML = `<td><b>${record.name}</b><br><small style="color:#666;">${record.email}</small></td>`;
             
-            // Trade Selector Column
+            // Trade Selector Column (Admin Control)
             const tradeCell = document.createElement('td');
             const tradeSelect = document.createElement('select');
             tradeSelect.id = `trade-input-${rowIndex}`; 
@@ -297,7 +297,7 @@
             tradeCell.appendChild(tradeSelect); 
             tableRow.appendChild(tradeCell);
 
-            // Pay Tier Selector Column
+            // Pay Tier Selector Column (Admin Control)
             const tierCell = document.createElement('td');
             const tierSelect = document.createElement('select');
             tierSelect.id = `tier-input-${rowIndex}`; 
@@ -313,7 +313,7 @@
             tierCell.appendChild(tierSelect); 
             tableRow.appendChild(tierCell);
 
-            // Notes and File Actions
+            // Administrative Notes and Documentation Links
             tableRow.innerHTML += `
                 <td>${record.notes || ''}</td>
                 <td align="center">
@@ -323,7 +323,7 @@
                 </td>
             `;
             
-            // Save Button Column
+            // Save Trigger
             const actionCell = document.createElement('td');
             actionCell.innerHTML = `<button class="button-base button-save" onclick="saveRecordChanges('${userEmail}', ${rowIndex})">SAVE</button>`;
             tableRow.appendChild(actionCell);
@@ -334,7 +334,7 @@
 
     // FUNCTION: API TRANSMISSION (POST)
     async function transmitData(dataObject) {
-        displayStatus("Transmitting request...", "loading");
+        displayStatus("Transmitting update to server...", "loading");
         try { 
             await fetch(ENDPOINT_URL, { 
                 method: 'POST', 
@@ -342,29 +342,28 @@
                 body: JSON.stringify(dataObject) 
             }); 
             
-            displayStatus("✓ Action Successful", "success");
+            displayStatus("✓ Update Successful", "success");
             setTimeout(initializeDashboard, 1500); 
         } catch(error) {
-            console.error("Transmission Error:", error);
-            displayStatus("Request Sent (Refreshing...)", "loading"); 
+            console.error("Transmission Failure:", error);
+            displayStatus("Request Sent (Awaiting server refresh...)", "loading"); 
             setTimeout(initializeDashboard, 3000);
         }
     }
 
     // EVENT HANDLERS
-
     async function triggerContractEmail(emailAddress) {
-        if(!confirm(`Confirm: Send Master Agreement to ${emailAddress}?`)) return;
+        if(!confirm(`Send Master Agreement to ${emailAddress}?`)) return;
         await transmitData({ action: 'sendAgreement', email: emailAddress });
     }
 
     async function triggerHireWorkflow(emailAddress, name, trade) {
-        if(!confirm(`Confirm: Hire ${name}?`)) return;
+        if(!confirm(`Hire ${name}? This will move them to the Crew List.`)) return;
         await transmitData({ action: 'hireWorker', email: emailAddress, name: name, trade: trade });
     }
 
     async function triggerReuploadRequest(emailAddress, name) {
-        if(!confirm(`Confirm: Send 'Document Re-upload Request' to ${name}?`)) return;
+        if(!confirm(`Send blurry document notification to ${name}?`)) return;
         await transmitData({ 
             action: 'requestReupload', 
             email: emailAddress, 
@@ -376,7 +375,7 @@
     async function saveRecordChanges(emailAddress, rowIndex) {
         const button = document.querySelector(`button[onclick="saveRecordChanges('${emailAddress}', ${rowIndex})"]`);
         const originalLabel = button.innerText;
-        button.innerText = "SAVING..."; 
+        button.innerText = "UPDATING..."; 
         button.disabled = true;
         
         await transmitData({ 
@@ -390,7 +389,7 @@
         button.disabled = false;
     }
 
-    // UTILITY FUNCTIONS
+    // UI UTILITY FUNCTIONS
     function displayStatus(message, type) {
         const element = document.getElementById('status-notification');
         element.innerText = message;
