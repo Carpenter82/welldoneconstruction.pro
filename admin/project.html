@@ -7,7 +7,6 @@
     <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     
     <style>
-        /* CSS VARIABLES: THEME DEFINITION */
         :root { 
             --primary-dark: #343E47; 
             --accent-green: #33B26E; 
@@ -18,8 +17,6 @@
         }
 
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--background-grey); padding: 20px; color: var(--primary-dark); margin: 0; }
-        
-        /* LAYOUT ARCHITECTURE */
         .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1200px; margin: auto; }
         .full-width-span { grid-column: span 2; }
         @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } .full-width-span { grid-column: span 1; } }
@@ -28,29 +25,22 @@
         h2 { text-transform: uppercase; letter-spacing: 1px; margin-top: 0; border-bottom: 2px solid var(--accent-green); padding-bottom: 15px; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; }
         .instruction-text { font-size: 0.85rem; color: #7f8c8d; margin-bottom: 20px; }
 
-        /* FORM ELEMENTS */
         label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 0.75rem; color: #6E797F; text-transform: uppercase; }
-        input, textarea, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dcdfe6; border-radius: 6px; box-sizing: border-box; font-size: 0.95rem; transition: border-color 0.2s; }
-        input:focus, textarea:focus { border-color: var(--accent-green); outline: none; }
-
-        /* BUTTON ARCHITECTURE */
-        .btn-primary { width: 100%; padding: 15px; background: var(--primary-dark); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: background 0.3s; }
-        .btn-primary:hover { background: #2c353d; }
-        .btn-success { background: var(--accent-green); }
-        .btn-success:hover { background: #28965a; }
-        .btn-terminate { background: var(--alert-red); padding: 8px 12px; font-size: 0.75rem; width: auto; border: none; color: white; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        input, textarea, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dcdfe6; border-radius: 6px; box-sizing: border-box; font-size: 0.95rem; }
         
-        /* TABS: DISPATCH LOGIC */
+        .btn-primary { width: 100%; padding: 15px; background: var(--primary-dark); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-success { background: var(--accent-green); }
+        .btn-terminate { background: var(--alert-red); padding: 8px 12px; font-size: 0.75rem; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        
         .tab-system { display: flex; margin-bottom: 20px; background: #eee; border-radius: 6px; padding: 4px; }
         .tab-control { flex: 1; padding: 10px; text-align: center; cursor: pointer; border-radius: 4px; font-weight: 600; font-size: 0.85rem; }
-        .tab-control.active { background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: var(--accent-green); }
+        .tab-control.active { background: white; color: var(--accent-green); }
         
-        /* DATA TABLES */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { text-align: left; font-size: 0.7rem; color: #888; text-transform: uppercase; padding-bottom: 10px; border-bottom: 2px solid #eee; }
         td { padding: 12px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
         .hidden-element { display: none; }
-        .navigation-link { text-decoration: none; font-size: 0.85rem; color: var(--action-blue); font-weight: bold; text-transform: uppercase; }
+        .navigation-link { text-decoration: none; font-size: 0.85rem; color: var(--action-blue); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -60,7 +50,6 @@
     </div>
 
     <div class="dashboard-grid">
-        
         <div class="interface-card">
             <h2>1. Project Initialization</h2>
             <p class="instruction-text">Establish new records in the Master Project Log.</p>
@@ -71,28 +60,18 @@
             <label>Physical Address (Triggers Ancestry Logic)</label>
             <input type="text" id="inputAddress" placeholder="Physical Street Address">
             
-            <label>Labor Budget (Total Worker Pay Pool)</label>
+            <label>Labor Budget ($)</label>
             <input type="number" id="inputLaborBudget" placeholder="0.00">
             
-            <label>Required Trade Classification</label>
+            <label>Trade Classification</label>
             <select id="inputRequiredTrade">
                 <option value="General Labor">General Labor</option>
                 <option value="Carpentry">Carpentry</option>
                 <option value="Plumbing">Plumbing</option>
                 <option value="Electrical">Electrical</option>
-                <option value="Flooring">Flooring</option>
-                <option value="Painting">Painting</option>
-                <option value="HVAC">HVAC</option>
             </select>
             
-            <label>Acquisition Source</label>
-            <select id="inputLeadSource">
-                <option value="Referral">Referral</option>
-                <option value="Website">Website</option>
-                <option value="Repeat Client">Repeat Client</option>
-            </select>
-            
-            <label>Detailed Scope of Work</label>
+            <label>Scope of Work</label>
             <textarea id="inputProjectNotes" placeholder="Detailed requirements..."></textarea>
             
             <button class="btn-primary" onclick="processProjectCreation()" id="submitProject">Commit to Master Log</button>
@@ -114,7 +93,7 @@
 
             <div id="panel-targeted">
                 <label>Identify Personnel (Email Search)</label>
-                <input type="email" id="inputWorkerEmail" placeholder="Search Master Crew Database..." list="crewDatalist">
+                <input type="email" id="inputWorkerEmail" placeholder="Search Master Crew..." list="crewDatalist">
                 <datalist id="crewDatalist"></datalist>
                 
                 <label>Direct Instructional Note</label>
@@ -124,17 +103,15 @@
 
             <div id="panel-broadcast" class="hidden-element">
                 <label>Posted Labor Rate ($)</label>
-                <input type="number" id="inputBroadcastRate" placeholder="Calculated from Budget">
-                
+                <input type="number" id="inputBroadcastRate" placeholder="Pay for this mission">
                 <label>Broadcaster Description</label>
-                <textarea id="inputBroadcastNote" rows="3" placeholder="Information visible to all qualified trades..."></textarea>
+                <textarea id="inputBroadcastNote" rows="3" placeholder="Visible to all qualified trades..."></textarea>
                 <button type="button" class="btn-primary btn-success" onclick="transmitPublicBroadcast()" id="submitBroadcast">Post to Available Jobs</button>
             </div>
         </div>
 
         <div class="interface-card full-width-span">
             <h2>3. Operational Oversight</h2>
-            <p class="instruction-text">Monitor active deployments and finalize job completion.</p>
             <table>
                 <thead>
                     <tr>
@@ -146,7 +123,7 @@
                     </tr>
                 </thead>
                 <tbody id="activeDeploymentTable">
-                    <tr><td colspan="5" style="text-align:center; padding:20px;">Synchronizing active deployments...</td></tr>
+                    <tr><td colspan="5" style="text-align:center;">Synchronizing...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -160,11 +137,11 @@
         function toggleDispatchMode(mode) {
             document.querySelectorAll('.tab-control').forEach(t => t.classList.remove('active'));
             if(mode === 'targeted') {
-                document.querySelector('.tab-system .tab-control:nth-child(1)').classList.add('active');
+                document.querySelector('.tab-control:nth-child(1)').classList.add('active');
                 document.getElementById('panel-targeted').classList.remove('hidden-element');
                 document.getElementById('panel-broadcast').classList.add('hidden-element');
             } else {
-                document.querySelector('.tab-system .tab-control:nth-child(2)').classList.add('active');
+                document.querySelector('.tab-control:nth-child(2)').classList.add('active');
                 document.getElementById('panel-targeted').classList.add('hidden-element');
                 document.getElementById('panel-broadcast').classList.remove('hidden-element');
             }
@@ -175,127 +152,71 @@
                 const response = await fetch(`${MASTER_ENGINE_URL}?action=getAdminDashboard&nocache=${Date.now()}`);
                 const payload = await response.json();
                 
-                // POPULATE PROJECT SELECTOR
                 const jobSelector = document.getElementById('selectorActiveJob');
-                if (jobSelector) {
-                    jobSelector.innerHTML = '<option value="" disabled selected>-- Select an Active Project --</option>';
-                    if(payload.jobs && payload.jobs.length > 0) {
-                        payload.jobs.forEach(j => {
-                            const option = document.createElement('option');
-                            option.value = j.id; option.innerText = `[ID: ${j.id}] ${j.address}`;
-                            jobSelector.appendChild(option);
-                        });
-                    }
-                }
+                jobSelector.innerHTML = '<option value="" disabled selected>-- Select an Active Project --</option>';
+                payload.jobs.forEach(j => {
+                    const opt = document.createElement('option');
+                    opt.value = j.id; opt.innerText = `[ID: ${j.id}] ${j.address}`;
+                    jobSelector.appendChild(opt);
+                });
 
-                // POPULATE CREW DATALIST
                 const crewList = document.getElementById('crewDatalist');
                 crewList.innerHTML = '';
-                if(payload.crew) {
-                    payload.crew.forEach(c => {
-                        const option = document.createElement('option');
-                        option.value = c.email; option.innerText = `${c.name} (${c.trade})`;
-                        crewList.appendChild(option);
-                    });
-                }
+                payload.crew.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.email; opt.innerText = `${c.name} (${c.trade})`;
+                    crewList.appendChild(opt);
+                });
 
-                // POPULATE ACTIVE DEPLOYMENTS
                 const deploymentTable = document.getElementById('activeDeploymentTable');
                 deploymentTable.innerHTML = '';
                 if(!payload.active || payload.active.length === 0) {
-                    deploymentTable.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No active deployments detected.</td></tr>';
+                    deploymentTable.innerHTML = '<tr><td colspan="5" style="text-align:center;">No active deployments.</td></tr>';
                 } else {
                     payload.active.forEach(row => {
                         const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td><strong>${row.id}</strong></td>
-                            <td>${row.worker}</td>
-                            <td>${row.note}</td>
-                            <td><span style="color:var(--accent-green); font-weight:bold;">${row.status}</span></td>
-                            <td><button class="btn-terminate" onclick="finalizeJobCompletion('${row.id}', '${row.worker}')">Finalize</button></td>
-                        `;
+                        tr.innerHTML = `<td>${row.id}</td><td>${row.worker}</td><td>${row.note}</td><td style="color:var(--accent-green);">${row.status}</td><td><button class="btn-terminate" onclick="finalizeJob('${row.id}')">Finalize</button></td>`;
                         deploymentTable.appendChild(tr);
                     });
                 }
-            } catch(e) { console.error("Synchronization Error:", e); }
+            } catch(e) { console.error(e); }
         }
 
         async function processProjectCreation() {
-            const button = document.getElementById('submitProject');
-            button.disabled = true; button.innerText = "Calculating Ancestry ID...";
-            
+            const btn = document.getElementById('submitProject');
+            btn.disabled = true; btn.innerText = "Generating Ancestry ID...";
             const payload = {
                 action: 'createProjectLog',
                 client: document.getElementById('inputClientName').value,
                 address: document.getElementById('inputAddress').value,
                 budget: document.getElementById('inputLaborBudget').value,
                 trade: document.getElementById('inputRequiredTrade').value,
-                source: document.getElementById('inputLeadSource').value,
-                notes: document.getElementById('inputProjectNotes').value
+                notes: document.getElementById('inputProjectNotes').value,
+                source: document.getElementById('inputLeadSource').value
             };
-            await transmitPayload(payload, button, "Commit to Master Log");
+            await transmit(payload, btn, "Commit to Master Log");
         }
 
         async function transmitTargetedOffer() {
-            const button = document.getElementById('submitTargeted');
-            const id = document.getElementById('selectorActiveJob').value;
-            const email = document.getElementById('inputWorkerEmail').value;
-            if(!id || !email) return alert("Validation Error: Personnel and Project selection required.");
-            
-            button.disabled = true; button.innerText = "Transmitting Offer...";
+            const btn = document.getElementById('submitTargeted');
             const payload = { 
                 action: 'dispatchDirect', 
-                jobId: id, 
-                email: email, 
+                jobId: document.getElementById('selectorActiveJob').value, 
+                email: document.getElementById('inputWorkerEmail').value, 
                 note: document.getElementById('inputTargetedNote').value 
             };
-            transmitPayload(payload, button, "Send Job Offer");
+            if(!payload.jobId || !payload.email) return alert("Select Project & Personnel");
+            btn.disabled = true; btn.innerText = "Dispatching...";
+            await transmit(payload, btn, "Send Job Offer");
         }
 
-        async function transmitPublicBroadcast() {
-            const button = document.getElementById('submitBroadcast');
-            const id = document.getElementById('selectorActiveJob').value;
-            if(!id) return alert("Validation Error: Project selection required.");
-            
-            button.disabled = true; button.innerText = "Broadcasting...";
-            const payload = { 
-                action: 'postToOpenBoard', 
-                jobId: id, 
-                pay: document.getElementById('inputBroadcastRate').value, 
-                note: document.getElementById('inputBroadcastNote').value 
-            };
-            transmitPayload(payload, button, "Post to Available Jobs");
-        }
-
-        async function finalizeJobCompletion(jobId, workerEmail) {
-            if(!confirm(`Archive Project ID ${jobId} and release personnel?`)) return;
-            const trigger = event.target; trigger.innerText = "..."; trigger.disabled = true;
-            
-            const payload = { action: 'markJobComplete', jobId: jobId, email: workerEmail };
+        async function transmit(payload, btn, originalText) {
             try {
                 await fetch(MASTER_ENGINE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert("Operation Finalized: Personnel status reset to Available.");
-                synchronizeDashboard(); 
-            } catch(e) { alert("System Error: Completion could not be logged."); }
-        }
-
-        async function transmitPayload(payload, button, originalText) {
-            try {
-                await fetch(MASTER_ENGINE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert("Server Synchronization Successful.");
-                if(payload.action === 'createProjectLog') {
-                    document.getElementById('inputClientName').value = '';
-                    document.getElementById('inputAddress').value = '';
-                    document.getElementById('inputProjectNotes').value = '';
-                }
-                synchronizeDashboard(); 
-            } catch (e) { 
-                console.error(e); 
-                alert("Communication Error: Connection to Master Engine failed."); 
-            } finally { 
-                button.disabled = false; 
-                button.innerText = originalText; 
-            }
+                alert("Operation Successful.");
+                synchronizeDashboard();
+            } catch (e) { alert("Error connecting to Engine."); }
+            finally { btn.disabled = false; btn.innerText = originalText; }
         }
     </script>
 </body>
