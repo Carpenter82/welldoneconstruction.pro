@@ -16,13 +16,7 @@
             --surface-color: #ffffff; 
         }
 
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background: var(--background-color); 
-            padding: 20px; 
-            color: var(--primary-text-color); 
-        }
-        
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--background-color); padding: 20px; color: var(--primary-text-color); margin: 0; }
         .header-section { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 20px auto; }
         .data-container { background: var(--surface-color); padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 1400px; margin: 0 auto 30px auto; }
         h2 { border-bottom: 2px solid var(--accent-green-color); padding-bottom: 10px; margin-top: 0; color: var(--primary-text-color); font-size: 1.4rem; }
@@ -41,7 +35,6 @@
         
         .notification-bar { max-width: 1400px; margin: 0 auto 15px auto; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; display: none; }
         .status-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .status-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         .status-loading { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
 
         .navigation-button { text-decoration: none; color: var(--action-blue-color); font-weight: bold; border: 2px solid var(--action-blue-color); padding: 10px; border-radius: 5px; }
@@ -61,34 +54,34 @@
         <table>
             <thead>
                 <tr>
-                    <th width="20%">Name / Contact Details</th>
-                    <th width="15%">Trade / Experience</th>
+                    <th width="20%">Name / Contact</th>
+                    <th width="15%">Trade / Exp</th>
                     <th width="15%">Requested Pay</th>
                     <th width="10%">Resume</th>
-                    <th width="40%">Administrative Controls</th> 
+                    <th width="40%">Controls</th> 
                 </tr>
             </thead>
             <tbody id="applicant-tbody">
-                <tr><td colspan="5" align="center">Establishing database connection...</td></tr>
+                <tr><td colspan="5" align="center">Syncing applicants...</td></tr>
             </tbody>
         </table>
     </div>
 
     <div class="data-container">
-        <h2>Active Crew Database</h2>
+        <h2>Crew List (Active Database)</h2>
         <table id="crew-table">
             <thead>
                 <tr>
                     <th width="20%">Name / Email</th>
                     <th width="20%">Trade Assignment</th>
                     <th width="20%">Pay Tier</th>
-                    <th width="20%">Administrative Notes</th>
-                    <th width="5%">Documents</th>
+                    <th width="20%">Notes</th>
+                    <th width="5%">Docs</th>
                     <th width="15%">Commit Change</th> 
                 </tr>
             </thead>
             <tbody id="crew-tbody">
-                <tr><td colspan="6" align="center">Establishing database connection...</td></tr>
+                <tr><td colspan="6" align="center">Syncing crew...</td></tr>
             </tbody>
         </table>
     </div>
@@ -97,22 +90,19 @@
     const ENDPOINT_URL = "https://script.google.com/macros/s/AKfycbxQhVbb1DVGlY4QUtS_rfRn1gVAlrPfWdaxE_wXefGdcdjKvMLUnypu-yozYsX51oaa/exec";
     const TRADE_LIST = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
     const PAY_SCALE = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
-    const UPLOAD_FORM_URL = "https://welldoneconstruction.pro/onboarding.html"; 
 
     window.onload = initializeDashboard;
 
     async function initializeDashboard() {
-        displayStatus("Synchronizing data...", "loading");
+        displayStatus("Connecting to Master Engine...", "loading");
         try {
-            const response = await fetch(`${ENDPOINT_URL}?action=getPersonnelData&t=${new Date().getTime()}`);
+            const response = await fetch(`${ENDPOINT_URL}?action=getPersonnelData&t=${Date.now()}`);
             const payload = await response.json();
             populateApplicantTable(payload.applicants);
             populateCrewTable(payload.crew);
-            displayStatus("✓ Done", "success");
-            setTimeout(clearStatus, 2500);
-        } catch (error) {
-            displayStatus("Communication Error", "error");
-        }
+            displayStatus("✓ Data Synchronized", "success");
+            setTimeout(clearStatus, 2000);
+        } catch (error) { displayStatus("Error Connecting to Server", "error"); }
     }
 
     function populateApplicantTable(dataSet) {
@@ -126,9 +116,9 @@
                 <td>$${record.pay}/hr</td>
                 <td align="center">${record.resumeUrl ? `<a href="${record.resumeUrl}" target="_blank">📄</a>` : '-'}</td>
                 <td>
-                    <button class="button-base button-contract" onclick="triggerContractEmail('${record.email}')">Agreement</button>
-                    <button class="button-base button-hire" onclick="triggerHireWorkflow('${record.email}', '${record.fname}', '${record.trade}')">Hire</button>
-                    <button class="button-base button-alert" onclick="triggerReuploadRequest('${record.email}', '${record.fname}')">BAD ID</button>
+                    <button class="button-base button-contract" onclick="triggerAction('sendAgreement', '${record.email}')">Agreement</button>
+                    <button class="button-base button-hire" onclick="triggerAction('hireWorker', '${record.email}')">Hire</button>
+                    <button class="button-base button-alert" onclick="triggerAction('requestReupload', '${record.email}')">BAD ID</button>
                 </td>`;
             tableBody.appendChild(row);
         });
@@ -139,54 +129,33 @@
         tableBody.innerHTML = ''; 
         dataSet.forEach((record, rowIndex) => {
             const row = document.createElement('tr');
-            
             let tradeOptions = TRADE_LIST.map(item => `<option value="${item}" ${record.trade === item ? 'selected' : ''}>${item}</option>`).join('');
             let tierOptions = PAY_SCALE.map(item => `<option value="${item}" ${record.tier === item ? 'selected' : ''}>${item}</option>`).join('');
 
             row.innerHTML = `
                 <td><b>${record.name}</b><br><small>${record.email}</small></td>
-                <td><select id="trade-input-${rowIndex}" class="editable-dropdown">${tradeOptions}</select></td>
-                <td><select id="tier-input-${rowIndex}" class="editable-dropdown">${tierOptions}</select></td>
-                <td>${record.notes || ''}</td>
-                <td align="center">
-                    <a href="${record.folderUrl || '#'}" target="_blank" style="text-decoration:none; font-size:1.5rem;">📂</a>
-                </td>
-                <td><button class="button-base button-save" onclick="saveRecordChanges('${record.email}', ${rowIndex})">SAVE</button></td>`;
+                <td><select id="trade-update-${rowIndex}" class="editable-dropdown">${tradeOptions}</select></td>
+                <td><select id="tier-update-${rowIndex}" class="editable-dropdown">${tierOptions}</select></td>
+                <td><small>${record.notes || ''}</small></td>
+                <td align="center"><a href="${record.folderUrl || '#'}" target="_blank">📂</a></td>
+                <td><button class="button-base button-save" onclick="saveCrewChanges('${record.email}', ${rowIndex})">Commit Change</button></td>`;
             tableBody.appendChild(row);
         });
     }
 
-    async function transmitData(dataObject) {
-        displayStatus("Updating Master Engine...", "loading");
-        await fetch(ENDPOINT_URL, { 
-            method: 'POST', 
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(dataObject) 
-        });
-        setTimeout(initializeDashboard, 1500);
+    async function saveCrewChanges(email, rowIndex) {
+        const newTrade = document.getElementById(`trade-update-${rowIndex}`).value;
+        const newTier = document.getElementById(`tier-update-${rowIndex}`).value;
+        if(confirm(`Update ${email}?`)) {
+            await triggerAction('updateCrewDetails', email, { trade: newTrade, tier: newTier });
+        }
     }
 
-    function triggerContractEmail(email) { if(confirm('Send Agreement?')) transmitData({ action: 'sendAgreement', email: email }); }
-    function triggerHireWorkflow(email, name, trade) { if(confirm('Hire worker? This moves them to Crew List.')) transmitData({ action: 'hireWorker', email: email, name: name, trade: trade }); }
-    
-    // Links to onboarding for OSHA and license re-upload [cite: 39]
-    function triggerReuploadRequest(email, name) { 
-        if(confirm('Send Bad ID notification?')) transmitData({ 
-            action: 'requestReupload', 
-            email: email, 
-            name: name, 
-            link: UPLOAD_FORM_URL 
-        }); 
-    }
-    
-    function saveRecordChanges(email, rowIndex) {
-        transmitData({ 
-            action: 'updateCrewDetails', 
-            email: email, 
-            trade: document.getElementById(`trade-input-${rowIndex}`).value, 
-            tier: document.getElementById(`tier-input-${rowIndex}`).value 
-        });
+    async function triggerAction(action, email, extraData = {}) {
+        displayStatus("Updating Master Engine...", "loading");
+        const payload = { action: action, email: email, ...extraData };
+        await fetch(ENDPOINT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        setTimeout(initializeDashboard, 1500);
     }
 
     function displayStatus(msg, type) { 
