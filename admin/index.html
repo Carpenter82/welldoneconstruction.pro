@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     
     <style>
-        /* GLOBAL VARIABLES */
+        /* GLOBAL VARIABLES: Color Palette and Theme Definitions */
         :root { 
             --primary-text-color: #343E47; 
             --accent-green-color: #33B26E; 
@@ -17,7 +17,7 @@
             --surface-color: #ffffff; 
         }
 
-        /* BASE TYPOGRAPHY */
+        /* BASE TYPOGRAPHY AND DOCUMENT RESET */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             background: var(--background-color); 
@@ -25,7 +25,7 @@
             color: var(--primary-text-color); 
         }
         
-        /* LAYOUT */
+        /* LAYOUT CONTAINERS */
         .header-section { 
             display: flex; 
             justify-content: space-between; 
@@ -51,7 +51,7 @@
             font-size: 1.4rem; 
         }
         
-        /* TABLE STYLING */
+        /* DATA TABLE STYLING */
         table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -73,7 +73,7 @@
             vertical-align: middle; 
         }
         
-        /* BUTTONS */
+        /* INTERACTIVE ELEMENTS (BUTTONS) */
         .button-base { 
             padding: 8px 12px; 
             border: none; 
@@ -104,7 +104,7 @@
         }
         .button-alert:hover { background: #c0392b; }
         
-        /* FORM INPUTS */
+        /* FORM INPUT STYLING */
         select.editable-dropdown { 
             padding: 8px; 
             border: 1px solid #ccc; 
@@ -114,7 +114,7 @@
             font-size: 0.9rem; 
         }
         
-        /* NOTIFICATION BAR */
+        /* SYSTEM NOTIFICATION BAR */
         .notification-bar { 
             max-width: 1400px; 
             margin: 0 auto 15px auto; 
@@ -128,7 +128,7 @@
         .status-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         .status-loading { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
 
-        /* NAVIGATION */
+        /* NAVIGATION LINK STYLING */
         .navigation-button { 
             text-decoration: none; 
             color: var(--action-blue-color); 
@@ -198,16 +198,15 @@
     const TRADE_LIST = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
     const PAY_SCALE = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
     
-    // EXTERNAL LINKS
+    // EXTERNAL LINKS (ABSOLUTE PATHS)
     const UPLOAD_FORM_URL = "https://welldoneconstruction.pro/onboarding.html"; 
 
-    // LIFECYCLE EVENT
+    // LIFECYCLE EVENT: PAGE LOAD
     window.onload = initializeDashboard;
 
-    // FUNCTION: DATA RETRIEVAL
+    // FUNCTION: DATA RETRIEVAL (GET)
     async function initializeDashboard() {
         displayStatus("Synchronizing data with Master Engine...", "loading");
-        
         const requestUrl = `${ENDPOINT_URL}?action=getPersonnelData&t=${new Date().getTime()}`;
         
         try {
@@ -216,18 +215,14 @@
                 mode: 'cors',
                 headers: { 'Content-Type': 'text/plain' }
             });
-
             if (!response.ok) throw new Error('Network response failure');
-            
             const payload = await response.json();
-            console.log("Database Payload Received:", payload);
             
             populateApplicantTable(payload.applicants);
             populateCrewTable(payload.crew);
             
             displayStatus("✓ Database Synchronization Complete", "success");
             setTimeout(clearStatus, 2500);
-            
         } catch (error) {
             console.error("Initialization Failed:", error);
             displayStatus("Communication Error. Review Console Logs.", "error");
@@ -262,7 +257,7 @@
         });
     }
 
-    // FUNCTION: RENDER CREW ROWS (FIXED FOR BAD ID BUTTON)
+    // FUNCTION: RENDER CREW ROWS
     function populateCrewTable(dataSet) {
         const tableBody = document.getElementById('crew-tbody');
         tableBody.innerHTML = ''; 
@@ -276,79 +271,44 @@
             const tableRow = document.createElement('tr');
             const userEmail = record.email; 
             
-            // 1. Identity Column
-            const nameCell = document.createElement('td');
-            nameCell.innerHTML = `<b>${record.name}</b><br><small style="color:#666;">${record.email}</small>`;
-            tableRow.appendChild(nameCell);
-            
-            // 2. Trade Selector
-            const tradeCell = document.createElement('td');
-            const tradeSelect = document.createElement('select');
-            tradeSelect.id = `trade-input-${rowIndex}`; 
-            tradeSelect.className = "editable-dropdown";
+            // Generate Trade Options
+            let tradeOptions = '';
             TRADE_LIST.forEach(item => {
-                const option = document.createElement('option'); 
-                option.value = item; 
-                option.text = item;
-                if (record.trade && record.trade.trim().toLowerCase() === item.toLowerCase()) option.selected = true;
-                tradeSelect.appendChild(option);
+                const selected = (record.trade && record.trade.trim().toLowerCase() === item.toLowerCase()) ? 'selected' : '';
+                tradeOptions += `<option value="${item}" ${selected}>${item}</option>`;
             });
-            tradeCell.appendChild(tradeSelect); 
-            tableRow.appendChild(tradeCell);
 
-            // 3. Pay Tier Selector
-            const tierCell = document.createElement('td');
-            const tierSelect = document.createElement('select');
-            tierSelect.id = `tier-input-${rowIndex}`; 
-            tierSelect.className = "editable-dropdown";
+            // Generate Pay Tier Options
+            let tierOptions = '';
             PAY_SCALE.forEach(item => {
-                const option = document.createElement('option'); 
-                option.value = item; 
-                option.text = item;
-                if (record.tier && record.tier.trim().toLowerCase() === item.toLowerCase()) option.selected = true;
-                tierSelect.appendChild(option);
+                const selected = (record.tier && record.tier.trim().toLowerCase() === item.toLowerCase()) ? 'selected' : '';
+                tierOptions += `<option value="${item}" ${selected}>${item}</option>`;
             });
-            tierCell.appendChild(tierSelect); 
-            tableRow.appendChild(tierCell);
-
-            // 4. Notes Column (New distinct cell)
-            const notesCell = document.createElement('td');
-            notesCell.innerText = record.notes || '';
-            tableRow.appendChild(notesCell);
-
-            // 5. Documents & BAD ID Button (New distinct cell)
-            const docsCell = document.createElement('td');
-            docsCell.align = "center";
             
-            const folderLink = document.createElement('a');
-            folderLink.href = record.folderUrl || '#';
-            folderLink.target = "_blank";
-            folderLink.style.textDecoration = "none";
-            folderLink.style.fontSize = "1.5rem";
-            folderLink.innerText = "📂";
-            docsCell.appendChild(folderLink);
-            
-            docsCell.appendChild(document.createElement('br'));
-            
-            const alertBtn = document.createElement('button');
-            alertBtn.className = "button-base button-alert";
-            alertBtn.innerText = "BAD ID";
-            // Safe click handler
-            alertBtn.onclick = function() { triggerReuploadRequest(userEmail, record.name); };
-            
-            docsCell.appendChild(alertBtn);
-            tableRow.appendChild(docsCell);
-            
-            // 6. Save Button
-            const actionCell = document.createElement('td');
-            actionCell.innerHTML = `<button class="button-base button-save" onclick="saveRecordChanges('${userEmail}', ${rowIndex})">SAVE</button>`;
-            tableRow.appendChild(actionCell);
-            
+            // Build the row string exactly as requested, including the BAD ID button
+            tableRow.innerHTML = `
+                <td><b>${record.name}</b><br><small style="color:#666;">${record.email}</small></td>
+                <td>
+                    <select id="trade-input-${rowIndex}" class="editable-dropdown">${tradeOptions}</select>
+                </td>
+                <td>
+                    <select id="tier-input-${rowIndex}" class="editable-dropdown">${tierOptions}</select>
+                </td>
+                <td>${record.notes || ''}</td>
+                <td align="center">
+                    <a href="${record.folderUrl || '#'}" target="_blank" style="text-decoration:none; font-size:1.5rem;">📂</a>
+                    <br>
+                    <button class="button-base button-alert" onclick="triggerReuploadRequest('${userEmail}', '${record.name}')">BAD ID</button>
+                </td>
+                <td>
+                    <button class="button-base button-save" onclick="saveRecordChanges('${userEmail}', ${rowIndex})">SAVE</button>
+                </td>
+            `;
             tableBody.appendChild(tableRow);
         });
     }
 
-    // FUNCTION: API TRANSMISSION
+    // FUNCTION: API TRANSMISSION (POST)
     async function transmitData(dataObject) {
         displayStatus("Transmitting update to server...", "loading");
         try { 
@@ -357,7 +317,6 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(dataObject) 
             }); 
-            
             displayStatus("✓ Update Successful", "success");
             setTimeout(initializeDashboard, 1500); 
         } catch(error) {
@@ -389,20 +348,12 @@
     }
 
     async function saveRecordChanges(emailAddress, rowIndex) {
-        const button = document.querySelector(`button[onclick="saveRecordChanges('${emailAddress}', ${rowIndex})"]`);
-        const originalLabel = button.innerText;
-        button.innerText = "UPDATING..."; 
-        button.disabled = true;
-        
         await transmitData({ 
             action: 'updateCrewDetails', 
             email: emailAddress, 
             trade: document.getElementById(`trade-input-${rowIndex}`).value, 
             tier: document.getElementById(`tier-input-${rowIndex}`).value 
         });
-        
-        button.innerText = originalLabel; 
-        button.disabled = false;
     }
 
     // UI UTILITY FUNCTIONS
