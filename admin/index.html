@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     
     <style>
-        /* GLOBAL VARIABLES: Color Palette and Theme Definitions */
+        /* GLOBAL VARIABLES */
         :root { 
             --primary-text-color: #343E47; 
             --accent-green-color: #33B26E; 
@@ -17,7 +17,7 @@
             --surface-color: #ffffff; 
         }
 
-        /* BASE TYPOGRAPHY AND DOCUMENT RESET */
+        /* BASE TYPOGRAPHY */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             background: var(--background-color); 
@@ -25,7 +25,7 @@
             color: var(--primary-text-color); 
         }
         
-        /* LAYOUT CONTAINERS */
+        /* LAYOUT */
         .header-section { 
             display: flex; 
             justify-content: space-between; 
@@ -51,7 +51,7 @@
             font-size: 1.4rem; 
         }
         
-        /* DATA TABLE STYLING */
+        /* TABLE STYLING */
         table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -73,7 +73,7 @@
             vertical-align: middle; 
         }
         
-        /* INTERACTIVE ELEMENTS (BUTTONS) */
+        /* BUTTONS */
         .button-base { 
             padding: 8px 12px; 
             border: none; 
@@ -104,7 +104,7 @@
         }
         .button-alert:hover { background: #c0392b; }
         
-        /* FORM INPUT STYLING */
+        /* FORM INPUTS */
         select.editable-dropdown { 
             padding: 8px; 
             border: 1px solid #ccc; 
@@ -114,7 +114,7 @@
             font-size: 0.9rem; 
         }
         
-        /* SYSTEM NOTIFICATION BAR */
+        /* NOTIFICATION BAR */
         .notification-bar { 
             max-width: 1400px; 
             margin: 0 auto 15px auto; 
@@ -128,7 +128,7 @@
         .status-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         .status-loading { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
 
-        /* NAVIGATION LINK STYLING */
+        /* NAVIGATION */
         .navigation-button { 
             text-decoration: none; 
             color: var(--action-blue-color); 
@@ -198,17 +198,16 @@
     const TRADE_LIST = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
     const PAY_SCALE = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
     
-    // EXTERNAL LINKS (ABSOLUTE PATHS)
+    // EXTERNAL LINKS
     const UPLOAD_FORM_URL = "https://welldoneconstruction.pro/onboarding.html"; 
 
-    // LIFECYCLE EVENT: PAGE LOAD
+    // LIFECYCLE EVENT
     window.onload = initializeDashboard;
 
-    // FUNCTION: DATA RETRIEVAL (GET)
+    // FUNCTION: DATA RETRIEVAL
     async function initializeDashboard() {
         displayStatus("Synchronizing data with Master Engine...", "loading");
         
-        // Anti-caching timestamp appended to URL
         const requestUrl = `${ENDPOINT_URL}?action=getPersonnelData&t=${new Date().getTime()}`;
         
         try {
@@ -223,7 +222,6 @@
             const payload = await response.json();
             console.log("Database Payload Received:", payload);
             
-            // Execute table population
             populateApplicantTable(payload.applicants);
             populateCrewTable(payload.crew);
             
@@ -264,7 +262,7 @@
         });
     }
 
-    // FUNCTION: RENDER CREW ROWS
+    // FUNCTION: RENDER CREW ROWS (FIXED FOR BAD ID BUTTON)
     function populateCrewTable(dataSet) {
         const tableBody = document.getElementById('crew-tbody');
         tableBody.innerHTML = ''; 
@@ -278,15 +276,16 @@
             const tableRow = document.createElement('tr');
             const userEmail = record.email; 
             
-            // Identity Column
-            tableRow.innerHTML = `<td><b>${record.name}</b><br><small style="color:#666;">${record.email}</small></td>`;
+            // 1. Identity Column
+            const nameCell = document.createElement('td');
+            nameCell.innerHTML = `<b>${record.name}</b><br><small style="color:#666;">${record.email}</small>`;
+            tableRow.appendChild(nameCell);
             
-            // Trade Selector Column (Admin Control)
+            // 2. Trade Selector
             const tradeCell = document.createElement('td');
             const tradeSelect = document.createElement('select');
             tradeSelect.id = `trade-input-${rowIndex}`; 
             tradeSelect.className = "editable-dropdown";
-            
             TRADE_LIST.forEach(item => {
                 const option = document.createElement('option'); 
                 option.value = item; 
@@ -297,12 +296,11 @@
             tradeCell.appendChild(tradeSelect); 
             tableRow.appendChild(tradeCell);
 
-            // Pay Tier Selector Column (Admin Control)
+            // 3. Pay Tier Selector
             const tierCell = document.createElement('td');
             const tierSelect = document.createElement('select');
             tierSelect.id = `tier-input-${rowIndex}`; 
             tierSelect.className = "editable-dropdown";
-            
             PAY_SCALE.forEach(item => {
                 const option = document.createElement('option'); 
                 option.value = item; 
@@ -313,17 +311,35 @@
             tierCell.appendChild(tierSelect); 
             tableRow.appendChild(tierCell);
 
-            // Administrative Notes and Documentation Links
-            tableRow.innerHTML += `
-                <td>${record.notes || ''}</td>
-                <td align="center">
-                    <a href="${record.folderUrl || '#'}" target="_blank" style="text-decoration:none; font-size:1.5rem;">📂</a>
-                    <br>
-                    <button class="button-base button-alert" onclick="triggerReuploadRequest('${userEmail}', '${record.name}')">BAD ID</button>
-                </td>
-            `;
+            // 4. Notes Column (New distinct cell)
+            const notesCell = document.createElement('td');
+            notesCell.innerText = record.notes || '';
+            tableRow.appendChild(notesCell);
+
+            // 5. Documents & BAD ID Button (New distinct cell)
+            const docsCell = document.createElement('td');
+            docsCell.align = "center";
             
-            // Save Trigger
+            const folderLink = document.createElement('a');
+            folderLink.href = record.folderUrl || '#';
+            folderLink.target = "_blank";
+            folderLink.style.textDecoration = "none";
+            folderLink.style.fontSize = "1.5rem";
+            folderLink.innerText = "📂";
+            docsCell.appendChild(folderLink);
+            
+            docsCell.appendChild(document.createElement('br'));
+            
+            const alertBtn = document.createElement('button');
+            alertBtn.className = "button-base button-alert";
+            alertBtn.innerText = "BAD ID";
+            // Safe click handler
+            alertBtn.onclick = function() { triggerReuploadRequest(userEmail, record.name); };
+            
+            docsCell.appendChild(alertBtn);
+            tableRow.appendChild(docsCell);
+            
+            // 6. Save Button
             const actionCell = document.createElement('td');
             actionCell.innerHTML = `<button class="button-base button-save" onclick="saveRecordChanges('${userEmail}', ${rowIndex})">SAVE</button>`;
             tableRow.appendChild(actionCell);
@@ -332,7 +348,7 @@
         });
     }
 
-    // FUNCTION: API TRANSMISSION (POST)
+    // FUNCTION: API TRANSMISSION
     async function transmitData(dataObject) {
         displayStatus("Transmitting update to server...", "loading");
         try { 
