@@ -132,9 +132,9 @@
         </div>
     </div>
 
-    <script>
-        // *** API CONNECTION ***
-        const API_URL = 'https://script.google.com/macros/s/AKfycbw8XGKG-IplahLQo5VLzTnPq6p4mo4-IUgzP4_KtnigsqV2xR_8uscOjv7nLXDFYUbz/exec';
+   <script>
+        // *** API CONNECTION - UPDATED TO MATCH MASTER ENGINE ***
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxQhVbb1DVGlY4QUtS_rfRn1gVAlrPfWdaxE_wXefGdcdjKvMLUnypu-yozYsX51oaa/exec';
         
         // 1. SETUP CANVAS
         const canvas = document.getElementById('sig-canvas');
@@ -202,15 +202,13 @@
 
         // 4. ACTIONS
         document.getElementById('clear-btn').addEventListener('click', () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Correct clear logic
-            // Because of scale, we need to clear the scaled width/height or just use a large number
+            // Clear the scaled width/height
             const rect = canvas.parentElement.getBoundingClientRect();
             ctx.clearRect(0, 0, rect.width, rect.height); 
         });
 
         // 5. NEXT STEP NAVIGATION
         document.getElementById('next-btn').addEventListener('click', () => {
-            // MANUAL REDIRECT
             window.location.href = `../onboarding.html?email=${encodeURIComponent(email)}`;
         });
 
@@ -220,27 +218,25 @@
             btn.innerText = "SECURING SIGNATURE...";
             btn.disabled = true;
 
-            // Simple check if canvas is empty (optional improvement)
-            // For now, we proceed to submit.
-
+            // FIX: Sending the complete data URL so the PDF generator can read it
             const payload = {
                 action: 'saveSignature',
                 email: email,
-                base64: canvas.toDataURL().split(',')[1] 
+                base64: canvas.toDataURL() 
             };
 
             try {
                 await fetch(API_URL, {
-                    method: 'POST', mode: 'no-cors',
+                    method: 'POST', 
+                    mode: 'no-cors',
                     body: JSON.stringify(payload)
                 });
                 
-                // SUCCESS STATE - NO AUTO REDIRECT
+                // SUCCESS STATE
                 handleSuccess();
 
             } catch (error) {
                 console.error(error);
-                // Assume success in no-cors mode if no network error
                 handleSuccess();
             }
         });
@@ -256,5 +252,3 @@
             document.getElementById('next-step-container').style.display = 'block';
         }
     </script>
-</body>
-</html>
