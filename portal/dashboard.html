@@ -6,13 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Worker Portal | Well Done</title>
     <style>
-        :root { --high-vis: #f1c40f; --dark: #000; --active: #33B26E; }
+        :root { --high-vis: #f1c40f; --dark: #000; --active: #33B26E; --panel-bg: #111; }
         body { background: #1a1a1a; color: white; font-family: -apple-system, sans-serif; padding: 0; margin: 0; }
         
         .header { background: var(--high-vis); color: var(--dark); padding: 20px; font-weight: 900; text-align: center; border-bottom: 4px solid #000; letter-spacing: 1px; }
+        .warning-stripes { height: 15px; background: repeating-linear-gradient(45deg, var(--high-vis), var(--high-vis) 20px, #000 20px, #000 40px); }
         
         .container { padding: 15px; max-width: 500px; margin: 0 auto; }
-        .mission-card { background: #000; border: 4px solid var(--high-vis); padding: 25px; border-radius: 12px; margin-top: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        /* NEW: PROFILE BADGE STYLING */
+        .profile-card { background: var(--panel-bg); border: 2px solid #333; border-radius: 8px; padding: 20px; margin-top: 10px; display: none; }
+        .profile-header { display: flex; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px; }
+        .avatar { width: 50px; height: 50px; background: #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; margin-right: 15px; border: 2px solid var(--high-vis); }
+        .profile-name { font-size: 1.2rem; font-weight: 900; margin: 0; text-transform: uppercase; }
+        .profile-email { font-size: 0.8rem; color: #888; margin: 0; }
+        
+        .tag-row { display: flex; gap: 10px; }
+        .tag { background: #222; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: 1px solid #444; color: #ccc; }
+        .tag-tier { border-color: var(--active); color: var(--active); }
+
+        .mission-card { background: #000; border: 4px solid var(--high-vis); padding: 25px; border-radius: 12px; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
         .pay-banner { background: var(--high-vis); color: var(--dark); font-size: 2.2rem; font-weight: 900; text-align: center; padding: 15px; margin: 15px 0; border-radius: 4px; }
         
@@ -23,9 +36,8 @@
         .btn-claim:active { transform: scale(0.96); }
         .btn-claim:disabled { background: #444; color: #888; }
         
-        .idle-msg { text-align: center; padding: 80px 20px; }
-        .idle-msg strong { color: var(--high-vis); font-size: 1.4rem; display: block; margin-bottom: 10px; }
-        .warning-stripes { height: 15px; background: repeating-linear-gradient(45deg, var(--high-vis), var(--high-vis) 20px, #000 20px, #000 40px); }
+        .idle-msg { text-align: center; padding: 60px 20px; background: var(--panel-bg); border-radius: 8px; border: 1px dashed #444; margin-top: 20px; }
+        .idle-msg strong { color: #888; font-size: 1.2rem; display: block; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -36,17 +48,31 @@
     <div class="container">
         <div id="loading" style="text-align:center; margin-top: 50px; font-weight: bold; color: var(--high-vis);">[ ENCRYPTED AUTHENTICATION IN PROGRESS ]</div>
 
+        <div id="profileSection" class="profile-card">
+            <div class="profile-header">
+                <div class="avatar">👤</div>
+                <div>
+                    <h2 id="workerName" class="profile-name">Loading...</h2>
+                    <p id="workerEmail" class="profile-email">---</p>
+                </div>
+            </div>
+            <div class="tag-row">
+                <div class="tag" id="workerTrade">Trade: ---</div>
+                <div class="tag tag-tier" id="workerTier">Tier: ---</div>
+            </div>
+        </div>
+
         <div id="idleState" class="idle-msg" style="display:none;">
             <strong>STATUS: ON-CALL (INACTIVE)</strong>
-            <p style="color: #aaa;">The ancestry engine has no open missions assigned to your ID at this time. Stay tuned for dispatch notifications.</p>
+            <p style="color: #666; font-size: 0.9rem;">The ancestry engine has no open missions assigned to your ID at this time. Stay tuned for dispatch notifications.</p>
         </div>
 
         <div id="missionState" style="display:none;">
             <div class="mission-card">
                 <h2 style="margin:0; text-align:center; color: var(--high-vis); text-transform: uppercase;">Mission Offer Detected</h2>
                 
-                <div class="label">Total Mission Pay (W-2 Lump Sum)</div>
-                <div id="missionPay" class="pay-banner">$0.00</div>
+                <div class="label">Pay Structure</div>
+                <div id="missionPay" class="pay-banner">Standard</div>
 
                 <div class="label">Ancestry Job ID</div>
                 <div id="jobId" class="data">---</div>
@@ -64,8 +90,8 @@
     </div>
 
 <script>
-    // UPDATED DEPLOYMENT ID: Version 134
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec'; 
+    // ✅ CORRECT MASTER ENGINE URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxQhVbb1DVGlY4QUtS_rfRn1gVAlrPfWdaxE_wXefGdcdjKvMLUnypu-yozYsX51oaa/exec'; 
 
     const urlParams = new URLSearchParams(window.location.search);
     const email = urlParams.get('email');
@@ -77,17 +103,25 @@
 
     async function getJob() {
         try {
-            // Note: Requires backend update to handle 'getWorkerJob'
             const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}`);
             const data = await res.json();
             
             document.getElementById('loading').style.display = 'none';
 
+            // 1. POPULATE PROFILE DATA
+            if (data.profile) {
+                document.getElementById('profileSection').style.display = 'block';
+                document.getElementById('workerName').innerText = data.profile.name;
+                document.getElementById('workerEmail').innerText = email;
+                document.getElementById('workerTrade').innerText = data.profile.trade;
+                document.getElementById('workerTier').innerText = data.profile.tier;
+            }
+
+            // 2. POPULATE MISSION DATA
             if (data.jobStatus === "Offered" || data.jobStatus === "Active") {
                 document.getElementById('missionState').style.display = 'block';
                 document.getElementById('jobId').innerText = data.jobId;
                 document.getElementById('address').innerText = data.address;
-                document.getElementById('missionPay').innerText = `$${data.pay}`;
                 document.getElementById('notes').innerText = data.notes || "Follow standard site documentation procedures.";
                 
                 if (data.jobStatus === "Active") {
