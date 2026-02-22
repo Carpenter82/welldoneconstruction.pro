@@ -6,40 +6,89 @@
     <title>Verification Pending | Well Done Construction</title>
     <style>
         body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #f4f7f6;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             color: #333;
+            padding: 20px;
+            box-sizing: border-box; /* Prevents overflow on mobile */
         }
         .card {
             background: white;
             padding: 40px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* Softer, deeper shadow */
             max-width: 500px;
+            width: 100%;
             text-align: center;
         }
-        h1 { color: #2c3e50; margin-bottom: 20px; }
-        .icon { font-size: 50px; color: #27ae60; margin-bottom: 20px; display: block;}
-        p { line-height: 1.6; color: #555; margin-bottom: 15px; }
-        .highlight { color: #d35400; font-weight: bold; }
+        
+        /* Brought over your logo styling */
+        .logo { font-size: 1.5rem; font-weight: bold; margin-bottom: 25px; letter-spacing: 2px; color: #343E47; }
+        .logo span { color: #e67e22; }
+
+        h1 { color: #2c3e50; margin-bottom: 15px; font-size: 1.8rem; }
+        
+        /* Makes the checkmark look like a premium UI element */
+        .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background-color: #e8f8f5;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px auto;
+        }
+        .icon { font-size: 40px; color: #27ae60; }
+        
+        p { line-height: 1.6; color: #555; margin-bottom: 20px; font-size: 1rem; }
+        
+        /* Upgraded the highlight into a status box */
+        .highlight { 
+            background-color: #fdf2e9; 
+            color: #d35400; 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-weight: 500; 
+            font-size: 0.95rem;
+            border-left: 4px solid #e67e22;
+            text-align: left;
+        }
+
+        .close-note {
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: #999;
+        }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <span class="icon">✓</span>
+        <div class="logo">WELL <span>DONE</span></div>
+        
+        <div class="icon-wrapper">
+            <span class="icon">✓</span>
+        </div>
+        
         <h1>Documents Received</h1>
         
-        <p>Thank you. We have received your identification documents and they are currently under review.</p>
+        <p>Thank you! Your identification and safety documents have been securely uploaded to the Well Done HR system.</p>
         
-        <p>Once your information has been verified and you are officially hired, you will receive a welcome email along with a link to access your portal.</p>
+        <p>Our administrative team is currently reviewing your file. Once your credentials are verified, your employee profile will be officially activated.</p>
         
-        <p class="highlight">We will notify you as soon as the verification process is complete.</p>
+        <div class="highlight">
+            <strong>Next Step:</strong> Keep an eye on your email inbox. You will receive a Welcome message with your official Crew Portal link shortly.
+        </div>
+
+        <div class="close-note">
+            You may now securely close this window.
+        </div>
     </div>
 
 </body>
