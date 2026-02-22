@@ -112,8 +112,8 @@
         <div id="status" class="status-msg"></div>
     </div>
 
-   <script>
-    // ✅ I have inserted your specific API URL here:
+  <script>
+    // ✅ Make sure this is your active Deployment URL
     const API_URL = "https://script.google.com/macros/s/AKfycbxQhVbb1DVGlY4QUtS_rfRn1gVAlrPfWdaxE_wXefGdcdjKvMLUnypu-yozYsX51oaa/exec"; 
 
     // 1. Get Identity from URL
@@ -125,7 +125,7 @@
         window.location.href = "../index.html";
     }
 
-    // 2. File Reader Logic
+    // 2. File Reader Logic for Previews
     function setupUploader(inputId, previewId, nameId) {
         const inputElement = document.getElementById(inputId);
         if(!inputElement) return; 
@@ -148,7 +148,18 @@
     setupUploader('file-id', 'preview-id', 'name-id');
     setupUploader('file-osha', 'preview-osha', 'name-osha');
 
-    // 3. Submit Logic
+    // Helper to read file as Base64 Promise
+    const getBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            if (!file) return resolve(null);
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
+        });
+    };
+
+    // 3. Submit Logic (MATCHED TO NEW BACKEND)
     document.getElementById('docForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
@@ -161,59 +172,41 @@
 
         btn.disabled = true;
         btn.textContent = "ENCRYPTING & UPLOADING...";
+        status.textContent = "Processing documents...";
 
-        // Helper to upload a single file
-        const uploadFile = (file, prefix) => {
-            return new Promise((resolve, reject) => {
-                if (!file) return resolve(true); // Skip if no file
-
-                const reader = new FileReader();
-                reader.onload = () => {
-                    let base64 = reader.result;
-                    // Clean the Base64 string for Google Apps Script
-                    if(base64.includes("base64,")) {
-                        base64 = base64.split("base64,")[1];
-                    }
-                    
-                    fetch(API_URL, {
-                        method: "POST",
-                        mode: "no-cors", 
-                        body: JSON.stringify({
-                            action: "uploadPhoto", 
-                            email: email,
-                            base64: base64,
-                            filename: `${prefix}_${file.name}`
-                        })
-                    })
-                    .then(() => resolve(true))
-                    .catch(() => resolve(true)); 
-                };
-                reader.readAsDataURL(file);
-            });
-        };
-
-        // Process files
         try {
-            status.textContent = "Uploading ID Card...";
-            await uploadFile(idFile, "GOV_ID");
-            
-            if (oshaFile) {
-                status.textContent = "Uploading OSHA Card...";
-                await uploadFile(oshaFile, "OSHA_CARD");
-            }
+            // Read both files to base64
+            const idBase64 = await getBase64(idFile);
+            const oshaBase64 = await getBase64(oshaFile);
+
+            // Construct the single payload matching your backend exactly
+            const payload = {
+                action: 'uploadOnboardingDocs',
+                email: email,
+                idBase64: idBase64,
+                oshaBase64: oshaBase64 
+            };
+
+            // Send to Master Engine
+            await fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors", 
+                body: JSON.stringify(payload)
+            });
 
             status.textContent = "Documents Received. Finalizing...";
             status.style.color = "#2ecc71";
             
-            // 🛑 Redirects to the new "Pending" page after 1.5 seconds
+            // Redirects to the Pending page after 1.5 seconds
             setTimeout(() => {
                 window.location.href = "verification-pending.html";
             }, 1500);
 
         } catch (err) {
             console.error(err);
-            status.textContent = "Upload Failed. Try smaller photos.";
+            status.textContent = "Upload Failed. Please check your connection.";
             btn.disabled = false;
+            btn.textContent = "Submit Documents";
         }
     });
 </script>
