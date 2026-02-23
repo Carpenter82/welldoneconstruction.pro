@@ -97,6 +97,16 @@
                 <datalist id="crewDatalist"></datalist>
                 
                 <label>Direct Instructional Note</label>
+                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+    <div style="flex: 1;">
+        <label>Start Date</label>
+        <input type="date" id="inputStartDate">
+    </div>
+    <div style="flex: 1;">
+        <label>Finish Date</label>
+        <input type="date" id="inputFinishDate">
+    </div>
+</div>
                 <textarea id="inputTargetedNote" rows="3" placeholder="Instructions for specific worker..."></textarea>
                 <button type="button" class="btn-primary" onclick="transmitTargetedOffer()" id="submitTargeted">Send Job Offer</button>
             </div>
@@ -201,12 +211,15 @@
 
         async function transmitTargetedOffer() {
             const btn = document.getElementById('submitTargeted');
-            const payload = { 
-                action: 'dispatchDirect', 
-                jobId: document.getElementById('selectorActiveJob').value, 
-                email: document.getElementById('inputWorkerEmail').value, 
-                note: document.getElementById('inputTargetedNote').value 
-            };
+            const payload =const payload = { 
+    action: 'dispatchDirect', 
+    jobId: document.getElementById('selectorActiveJob').value, 
+    email: document.getElementById('inputWorkerEmail').value, 
+    note: document.getElementById('inputTargetedNote').value,
+    startDate: document.getElementById('inputStartDate').value, // NEW
+    finishDate: document.getElementById('inputFinishDate').value // NEW
+};
+if(!payload.jobId || !payload.email || !payload.startDate) return alert("Select Project, Personnel & Start Date");
             if(!payload.jobId || !payload.email) return alert("Select Project & Personnel");
             btn.disabled = true; btn.innerText = "Dispatching...";
             await transmit(payload, btn, "Send Job Offer");
