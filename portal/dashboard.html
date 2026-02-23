@@ -1,1 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Portal | Well Done</title>
+    <style>
+        :root { --high-vis: #f1c40f; --dark: #000; --active: #33B26E; --panel-bg: #111; }
+        body { background: #1a1a1a; color: white; font-family: -apple-system, sans-serif; padding: 0; margin: 0; }
+        
+        .header { background: var(--high-vis); color: var(--dark); padding: 20px; font-weight: 900; text-align: center; border-bottom: 4px solid #000; letter-spacing: 1px; }
+        .warning-stripes { height: 15px; background: repeating-linear-gradient(45deg, var(--high-vis), var(--high-vis) 20px, #000 20px, #000 40px); }
+        
+        .container { padding: 15px; max-width: 500px; margin: 0 auto; }
+        
+        .profile-card { background: var(--panel-bg); border: 2px solid #333; border-radius: 8px; padding: 20px; margin-top: 10px; display: none; }
+        .profile-header { display: flex; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px; }
+        .avatar { width: 50px; height: 50px; background: #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; margin-right: 15px; border: 2px solid var(--high-vis); }
+        .profile-name { font-size: 1.2rem; font-weight: 900; margin: 0; text-transform: uppercase; }
+        .profile-email { font-size: 0.8rem; color: #888; margin: 0; }
+        
+        .tag-row { display: flex; gap: 10px; }
+        .tag { background: #222; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: 1px solid #444; color: #ccc; }
+        .tag-tier { border-color: var(--active); color: var(--active); }
 
+        .mission-card { background: #000; border: 4px solid var(--high-vis); padding: 25px; border-radius: 12px; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .pay-banner { background: var(--high-vis); color: var(--dark); font-size: 2.2rem; font-weight: 900; text-align: center; padding: 15px; margin: 15px 0; border-radius: 4px; }
+        
+        .label { color: var(--high-vis); font-size: 0.8rem; text-transform: uppercase; margin-top: 20px; font-weight: 900; border-left: 3px solid var(--high-vis); padding-left: 10px; }
+        .data { font-size: 1.3rem; padding: 10px 0; font-weight: bold; }
+        
+        .btn-claim { background: var(--high-vis); color: var(--dark); border: none; padding: 22px; width: 100%; font-size: 1.5rem; font-weight: 900; cursor: pointer; border-radius: 8px; margin-top: 30px; transition: all 0.1s; text-transform: uppercase; }
+        .btn-claim:active { transform: scale(0.96); }
+        .btn-claim:disabled { background: #444; color: #888; }
+        
+        .idle-msg { text-align: center; padding: 60px 20px; background: var(--panel-bg); border-radius: 8px; border: 1px dashed #444; margin-top: 20px; }
+        .idle-msg strong { color: #888; font-size: 1.2rem; display: block; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">FIELD OPERATIONS DASHBOARD</div>
+    <div class="warning-stripes"></div>
+
+    <div class="container">
+        <div id="loading" style="text-align:center; margin-top: 50px; font-weight: bold; color: var(--high-vis);">[ ENCRYPTED AUTHENTICATION IN PROGRESS ]</div>
+
+        <div id="profileSection" class="profile-card">
+            <div class="profile-header">
+                <div class="avatar">👤</div>
+                <div>
+                    <h2 id="workerName" class="profile-name">Loading...</h2>
+                    <p id="workerEmail" class="profile-email">---</p>
+                </div>
+            </div>
+            <div class="tag-row">
+                <div class="tag" id="workerTrade">Trade: ---</div>
+                <div class="tag tag-tier" id="workerTier">Tier: ---</div>
+            </div>
+        </div>
+
+        <div id="idleState" class="idle-msg" style="display:none;">
+            <strong>STATUS: ON-CALL (INACTIVE)</strong>
+            <p style="color: #666; font-size: 0.9rem;">The ancestry engine has no open missions assigned to your ID at this time. Stay tuned for dispatch notifications.</p>
+        </div>
+
+        <div id="missionState" style="display:none;">
+            <div class="mission-card">
+                <h2 style="margin:0; text-align:center; color: var(--high-vis); text-transform: uppercase;">Mission Offer Detected</h2>
+                
+                <div class="label">Pay Structure</div>
+                <div id="missionPay" class="pay-banner">Standard</div>
+
+                <div class="label">Ancestry Job ID</div>
+                <div id="jobId" class="data">---</div>
+
+                <div class="label">Site Address</div>
+                <div id="address" class="data">---</div>
+
+                <div class="label">Mission Scope</div>
+                <div id="notes" style="background:#111; padding:15px; border-radius:4px; margin-top:10px; font-size:0.95rem; border: 1px solid #333; line-height: 1.4;">---</div>
+
+                <button id="claimBtn" class="btn-claim" onclick="acceptWork()">CLAIM MISSION</button>
+                <p style="font-size: 11px; text-align: center; margin-top: 20px; color: #666; font-weight: bold;">OFFICIAL DISPATCH: Claiming activates W-2 status and site liability.</p>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // ✅ MASTER ENGINE URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxQhVbb1DVGlY4QUtS_rfRn1gVAlrPfWdaxE_wXefGdcdjKvMLUnypu-yozYsX51oaa/exec'; 
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get('email');
+
+    if (!email) {
+        alert("CRITICAL ERROR: No Email Identity Found.");
+        window.location.href = "index.html";
+    }
+
+    async function getJob() {
+        try {
+            const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}`);
+            const data = await res.json();
+            
+            document.getElementById('loading').style.display = 'none';
+
+            if (data.profile) {
+                document.getElementById('profileSection').style.display = 'block';
+                document.getElementById('workerName').innerText = data.profile.name;
+                document.getElementById('workerEmail').innerText = email;
+                document.getElementById('workerTrade').innerText = data.profile.trade;
+                document.getElementById('workerTier').innerText = data.profile.tier;
+            }
+
+            if (data.jobStatus === "Offered" || data.jobStatus === "Active") {
+                document.getElementById('missionState').style.display = 'block';
+                document.getElementById('idleState').style.display = 'none';
+                document.getElementById('jobId').innerText = data.jobId;
+                document.getElementById('address').innerText = data.address;
+                document.getElementById('notes').innerText = data.notes || "Follow standard site documentation procedures.";
+                
+                if (data.jobStatus === "Active") {
+                    const btn = document.getElementById('claimBtn');
+                    btn.innerText = "RESUME ACTIVE MISSION";
+                    btn.style.background = "var(--active)";
+                    btn.style.color = "#fff";
+                }
+            } else {
+                document.getElementById('missionState').style.display = 'none';
+                document.getElementById('idleState').style.display = 'block';
+            }
+        } catch (e) {
+            document.getElementById('loading').innerText = "DATA SYNC ERROR. REFRESH APP.";
+            console.error(e);
+        }
+    }
+
+    async function acceptWork() {
+        const btn = document.getElementById('claimBtn');
+        const jobId = document.getElementById('jobId').innerText;
+        
+        if(btn.innerText === "RESUME ACTIVE MISSION") {
+            goToChecklist(jobId);
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "ACTIVATING W-2 STATUS...";
+
+        try {
+            // Sending POST to Master Engine
+            const response = await fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'acceptMission',
+                    email: email,
+                    jobId: jobId
+                })
+            });
+
+            alert("MISSION CLAIMED. SYSTEM IS NOW TRACKING SITE ACTIVITY.");
+            goToChecklist(jobId);
+        } catch (e) {
+            // No-cors often returns opaque responses, checking logic here
+            alert("Mission activation signal sent.");
+            goToChecklist(jobId);
+        }
+    }
+
+    function goToChecklist(jobId) {
+        window.location.href = `../checklist/index.html?email=${encodeURIComponent(email)}&jobId=${encodeURIComponent(jobId)}`;
+    }
+
+    window.onload = getJob;
+</script>
+</body>
+</html>
