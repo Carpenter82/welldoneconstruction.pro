@@ -130,6 +130,7 @@
     </div>
 
     <script>
+        // ✅ CORRECT MASTER ENGINE URL
         const MASTER_ENGINE_URL = 'https://script.google.com/macros/s/AKfycbxQhVbb1DVGlY4QUtS_rfRn1gVAlrPfWdaxE_wXefGdcdjKvMLUnypu-yozYsX51oaa/exec';
 
         window.onload = synchronizeDashboard;
@@ -192,7 +193,7 @@
                 budget: document.getElementById('inputLaborBudget').value,
                 trade: document.getElementById('inputRequiredTrade').value,
                 notes: document.getElementById('inputProjectNotes').value,
-                source: document.getElementById('inputLeadSource').value
+                source: "Direct" // FIX: Hardcoded since field was removed from HTML
             };
             await transmit(payload, btn, "Commit to Master Log");
         }
