@@ -211,16 +211,20 @@
 
         async function transmitTargetedOffer() {
             const btn = document.getElementById('submitTargeted');
-            const payload =const payload = { 
-    action: 'dispatchDirect', 
-    jobId: document.getElementById('selectorActiveJob').value, 
-    email: document.getElementById('inputWorkerEmail').value, 
-    note: document.getElementById('inputTargetedNote').value,
-    startDate: document.getElementById('inputStartDate').value, // NEW
-    finishDate: document.getElementById('inputFinishDate').value // NEW
-};
-if(!payload.jobId || !payload.email || !payload.startDate) return alert("Select Project, Personnel & Start Date");
-            if(!payload.jobId || !payload.email) return alert("Select Project & Personnel");
+            
+            // FIXED: Removed duplicate 'const payload ='
+            const payload = { 
+                action: 'dispatchDirect', 
+                jobId: document.getElementById('selectorActiveJob').value, 
+                email: document.getElementById('inputWorkerEmail').value, 
+                note: document.getElementById('inputTargetedNote').value,
+                startDate: document.getElementById('inputStartDate').value, // NEW
+                finishDate: document.getElementById('inputFinishDate').value // NEW
+            };
+            
+            // FIXED: Combined the checks into one clean line
+            if(!payload.jobId || !payload.email || !payload.startDate) return alert("Select Project, Personnel & Start Date");
+            
             btn.disabled = true; btn.innerText = "Dispatching...";
             await transmit(payload, btn, "Send Job Offer");
         }
