@@ -129,7 +129,7 @@
         </div>
     </div>
 
-    <script>
+   <script>
         // ✅ CORRECT MASTER ENGINE URL
         const MASTER_ENGINE_URL = 'https://script.google.com/macros/s/AKfycbxQhVbb1DVGlY4QUtS_rfRn1gVAlrPfWdaxE_wXefGdcdjKvMLUnypu-yozYsX51oaa/exec';
 
@@ -153,6 +153,7 @@
                 const response = await fetch(`${MASTER_ENGINE_URL}?action=getAdminDashboard&nocache=${Date.now()}`);
                 const payload = await response.json();
                 
+                // Populates the Active Project Dropdown
                 const jobSelector = document.getElementById('selectorActiveJob');
                 jobSelector.innerHTML = '<option value="" disabled selected>-- Select an Active Project --</option>';
                 payload.jobs.forEach(j => {
@@ -180,7 +181,7 @@
                         deploymentTable.appendChild(tr);
                     });
                 }
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error("Error fetching dashboard data:", e); }
         }
 
         async function processProjectCreation() {
@@ -193,7 +194,7 @@
                 budget: document.getElementById('inputLaborBudget').value,
                 trade: document.getElementById('inputRequiredTrade').value,
                 notes: document.getElementById('inputProjectNotes').value,
-                source: "Direct" // FIX: Hardcoded since field was removed from HTML
+                source: "Direct" 
             };
             await transmit(payload, btn, "Commit to Master Log");
         }
@@ -211,10 +212,45 @@
             await transmit(payload, btn, "Send Job Offer");
         }
 
+        // ADDED: Missing Broadcast Function
+        async function transmitPublicBroadcast() {
+            const btn = document.getElementById('submitBroadcast');
+            const payload = { 
+                action: 'postToOpenBoard', 
+                jobId: document.getElementById('selectorActiveJob').value, 
+                pay: document.getElementById('inputBroadcastRate').value, 
+                note: document.getElementById('inputBroadcastNote').value 
+            };
+            if(!payload.jobId) return alert("Select an Active Project First");
+            btn.disabled = true; btn.innerText = "Broadcasting...";
+            await transmit(payload, btn, "Post to Available Jobs");
+        }
+
+        // ADDED: Missing Finalize Function
+        async function finalizeJob(jobId) {
+            if(!confirm("Are you sure you want to finalize and close Job #" + jobId + "?")) return;
+            const btn = event.target; // Gets the button clicked
+            btn.disabled = true; btn.innerText = "Closing...";
+            
+            const payload = { action: 'markJobComplete', jobId: jobId };
+            try {
+                await fetch(MASTER_ENGINE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                alert("Job Marked Complete.");
+                synchronizeDashboard(); // Refresh the table
+            } catch (e) { 
+                alert("Error connecting to Engine."); 
+                btn.disabled = false; btn.innerText = "Finalize";
+            }
+        }
+
         async function transmit(payload, btn, originalText) {
             try {
                 await fetch(MASTER_ENGINE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
                 alert("Operation Successful.");
+                
+                // Clear inputs after success
+                document.querySelectorAll('input:not([type="radio"]), textarea').forEach(el => el.value = '');
+                
                 synchronizeDashboard();
             } catch (e) { alert("Error connecting to Engine."); }
             finally { btn.disabled = false; btn.innerText = originalText; }
