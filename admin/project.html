@@ -21,7 +21,7 @@
         .full-width-span { grid-column: span 2; }
         @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } .full-width-span { grid-column: span 1; } }
         
-        .interface-card { background: var(--surface-white); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .interface-card { background: var(--surface-white); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px;}
         h2 { text-transform: uppercase; letter-spacing: 1px; margin-top: 0; border-bottom: 2px solid var(--accent-green); padding-bottom: 15px; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; }
         .instruction-text { font-size: 0.85rem; color: #7f8c8d; margin-bottom: 20px; }
 
@@ -49,234 +49,225 @@
         <a href="index.html" class="navigation-link">⬅ Return to Personnel Hub</a>
     </div>
 
-<div class="interface-card">
-    <h2>1. Project Initialization</h2>
-    <p class="instruction-text">Establish new records in the Master Project Log.</p>
-    
-    <label>Client Identity</label>
-    <input type="text" id="inputClientName" placeholder="Full Client Name">
-    
-    <label>Physical Address and Zip Code (Triggers Ancestry Logic)</label>
-    <input type="text" id="inputAddress" placeholder="123 Main St, Las Vegas, NV 89101">
-    
-    <label>Client Phone (Text/Call)</label>
-    <input type="tel" id="inputClientPhone" placeholder="702-555-0123">
-    
-    <label>Labor Budget ($)</label>
-    <input type="number" id="inputLaborBudget" placeholder="0.00">
-    
-    <label>Trade Classification</label>
-    <select id="inputRequiredTrade">
-        <option value="General Labor">General Labor</option>
-        <option value="Carpentry">Carpentry</option>
-        <option value="Plumbing">Plumbing</option>
-        <option value="Electrical">Electrical</option>
-        <option value="HVAC">HVAC</option>
-        <option value="Painting">Painting</option>
-        <option value="Flooring">Flooring</option>
+<div class="dashboard-grid">
+    <div class="interface-card">
+        <h2>1. Project Initialization</h2>
+        <p class="instruction-text">Establish new records in the Master Project Log.</p>
+        
+        <label>Client Identity</label>
+        <input type="text" id="inputClientName" placeholder="Full Client Name">
+        
+        <label>Physical Address and Zip Code (Triggers Ancestry Logic)</label>
+        <input type="text" id="inputAddress" placeholder="123 Main St, Las Vegas, NV 89101">
+        
+        <label>Client Phone (Text/Call)</label>
+        <input type="tel" id="inputClientPhone" placeholder="702-555-0123">
+        
+        <label>Labor Budget ($)</label>
+        <input type="number" id="inputLaborBudget" placeholder="0.00">
+        
+        <label>Trade Classification</label>
+        <select id="inputRequiredTrade">
+            <option value="General Labor">General Labor</option>
+            <option value="Carpentry">Carpentry</option>
+            <option value="Plumbing">Plumbing</option>
+            <option value="Electrical">Electrical</option>
+            <option value="HVAC">HVAC</option>
+            <option value="Painting">Painting</option>
+            <option value="Flooring">Flooring</option>
         </select>
-    
-    <label>Scope of Work</label>
-    <textarea id="inputProjectNotes" placeholder="Detailed requirements..."></textarea>
-    
-    <button class="btn-primary" onclick="processProjectCreation()" id="submitProject">Commit to Master Log</button>
-</div>
-
-        <div class="interface-card">
-            <h2>2. Resource Dispatch Center</h2>
-            <p class="instruction-text">Review Available Projects and Deploy Personnel.</p>
-            
-            <label>Active Project Selection</label>
-            <select id="selectorActiveJob">
-                <option value="" disabled selected>Retrieving Project Data...</option>
-            </select>
-            
-            <div class="tab-system">
-                <div class="tab-control active" onclick="toggleDispatchMode('targeted')">Targeted Offer</div>
-                <div class="tab-control" onclick="toggleDispatchMode('broadcast')">Public Broadcaster</div>
-            </div>
-
-            <div id="panel-targeted">
-                <label>Identify Personnel (Email Search)</label>
-                <input type="email" id="inputWorkerEmail" placeholder="Search Master Crew..." list="crewDatalist">
-                <datalist id="crewDatalist"></datalist>
-                
-                <label>Direct Instructional Note</label>
-                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-    <div style="flex: 1;">
-        <label>Start Date</label>
-        <input type="date" id="inputStartDate">
+        
+        <label>Scope of Work</label>
+        <textarea id="inputProjectNotes" placeholder="Detailed requirements..."></textarea>
+        
+        <button class="btn-primary" onclick="processProjectCreation()" id="submitProject">Commit to Master Log</button>
     </div>
-    <div style="flex: 1;">
-        <label>Finish Date</label>
-        <input type="date" id="inputFinishDate">
-    </div>
-</div>
-                <textarea id="inputTargetedNote" rows="3" placeholder="Instructions for specific worker..."></textarea>
-                <button type="button" class="btn-primary" onclick="transmitTargetedOffer()" id="submitTargeted">Send Job Offer</button>
-            </div>
 
-            <div id="panel-broadcast" class="hidden-element">
-                <label>Posted Labor Rate ($)</label>
-                <input type="number" id="inputBroadcastRate" placeholder="Pay for this mission">
-                <label>Broadcaster Description</label>
-                <textarea id="inputBroadcastNote" rows="3" placeholder="Visible to all qualified trades..."></textarea>
-                <button type="button" class="btn-primary btn-success" onclick="transmitPublicBroadcast()" id="submitBroadcast">Post to Available Jobs</button>
-            </div>
+    <div class="interface-card">
+        <h2>2. Resource Dispatch Center</h2>
+        <p class="instruction-text">Review Available Projects and Deploy Personnel.</p>
+        
+        <label>Active Project Selection</label>
+        <select id="selectorActiveJob">
+            <option value="" disabled selected>Retrieving Project Data...</option>
+        </select>
+        
+        <div class="tab-system">
+            <div class="tab-control active" onclick="toggleDispatchMode('targeted')">Targeted Offer</div>
+            <div class="tab-control" onclick="toggleDispatchMode('broadcast')">Public Broadcaster</div>
         </div>
 
-        <div class="interface-card full-width-span">
-            <h2>3. Operational Oversight</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Job ID</th>
-                        <th>Personnel</th>
-                        <th>Classification/Note</th>
-                        <th>Status</th>
-                        <th>Finalize</th>
-                    </tr>
-                </thead>
-                <tbody id="activeDeploymentTable">
-                    <tr><td colspan="5" style="text-align:center;">Synchronizing...</td></tr>
-                </tbody>
-            </table>
+        <div id="panel-targeted">
+            <label>Identify Personnel (Email Search)</label>
+            <input type="email" id="inputWorkerEmail" placeholder="Search Master Crew..." list="crewDatalist">
+            <datalist id="crewDatalist"></datalist>
+            
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div style="flex: 1;">
+                    <label>Start Date</label>
+                    <input type="date" id="inputStartDate">
+                </div>
+                <div style="flex: 1;">
+                    <label>Finish Date</label>
+                    <input type="date" id="inputFinishDate">
+                </div>
+            </div>
+            <label>Direct Instructional Note</label>
+            <textarea id="inputTargetedNote" rows="3" placeholder="Instructions for specific worker..."></textarea>
+            <button type="button" class="btn-primary" onclick="transmitTargetedOffer()" id="submitTargeted">Send Job Offer</button>
+        </div>
+
+        <div id="panel-broadcast" class="hidden-element">
+            <label>Posted Labor Rate ($)</label>
+            <input type="number" id="inputBroadcastRate" placeholder="Pay for this mission">
+            <label>Broadcaster Description</label>
+            <textarea id="inputBroadcastNote" rows="3" placeholder="Visible to all qualified trades..."></textarea>
+            <button type="button" class="btn-primary btn-success" onclick="transmitPublicBroadcast()" id="submitBroadcast">Post to Available Jobs</button>
         </div>
     </div>
 
-   <script>
-        // ✅ CORRECT MASTER ENGINE URL
-        const MASTER_ENGINE_URL = 'https://script.google.com/macros/s/AKfycbxQhVbb1DVGlY4QUtS_rfRn1gVAlrPfWdaxE_wXefGdcdjKvMLUnypu-yozYsX51oaa/exec';
+    <div class="interface-card full-width-span">
+        <h2>3. Operational Oversight</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Job ID</th>
+                    <th>Personnel</th>
+                    <th>Classification/Note</th>
+                    <th>Status</th>
+                    <th>Finalize</th>
+                </tr>
+            </thead>
+            <tbody id="activeDeploymentTable">
+                <tr><td colspan="5" style="text-align:center;">Synchronizing...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
-        window.onload = synchronizeDashboard;
+<script>
+    const MASTER_ENGINE_URL = 'https://script.google.com/macros/s/AKfycbxQhVbb1DVGlY4QUtS_rfRn1gVAlrPfWdaxE_wXefGdcdjKvMLUnypu-yozYsX51oaa/exec';
 
-        function toggleDispatchMode(mode) {
-            document.querySelectorAll('.tab-control').forEach(t => t.classList.remove('active'));
-            if(mode === 'targeted') {
-                document.querySelector('.tab-control:nth-child(1)').classList.add('active');
-                document.getElementById('panel-targeted').classList.remove('hidden-element');
-                document.getElementById('panel-broadcast').classList.add('hidden-element');
+    window.onload = synchronizeDashboard;
+
+    function toggleDispatchMode(mode) {
+        document.querySelectorAll('.tab-control').forEach(t => t.classList.remove('active'));
+        if(mode === 'targeted') {
+            document.querySelector('.tab-control:nth-child(1)').classList.add('active');
+            document.getElementById('panel-targeted').classList.remove('hidden-element');
+            document.getElementById('panel-broadcast').classList.add('hidden-element');
+        } else {
+            document.querySelector('.tab-control:nth-child(2)').classList.add('active');
+            document.getElementById('panel-targeted').classList.add('hidden-element');
+            document.getElementById('panel-broadcast').classList.remove('hidden-element');
+        }
+    }
+
+    async function synchronizeDashboard() {
+        try {
+            const response = await fetch(`${MASTER_ENGINE_URL}?action=getAdminDashboard&nocache=${Date.now()}`);
+            const payload = await response.json();
+            
+            const jobSelector = document.getElementById('selectorActiveJob');
+            jobSelector.innerHTML = '<option value="" disabled selected>-- Select an Active Project --</option>';
+            payload.jobs.forEach(j => {
+                const opt = document.createElement('option');
+                opt.value = j.id; opt.innerText = `[ID: ${j.id}] ${j.address}`;
+                jobSelector.appendChild(opt);
+            });
+
+            const crewList = document.getElementById('crewDatalist');
+            crewList.innerHTML = '';
+            payload.crew.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.email; opt.innerText = `${c.name} (${c.trade})`;
+                crewList.appendChild(opt);
+            });
+
+            const deploymentTable = document.getElementById('activeDeploymentTable');
+            deploymentTable.innerHTML = '';
+            if(!payload.active || payload.active.length === 0) {
+                deploymentTable.innerHTML = '<tr><td colspan="5" style="text-align:center;">No active deployments.</td></tr>';
             } else {
-                document.querySelector('.tab-control:nth-child(2)').classList.add('active');
-                document.getElementById('panel-targeted').classList.add('hidden-element');
-                document.getElementById('panel-broadcast').classList.remove('hidden-element');
-            }
-        }
-
-        async function synchronizeDashboard() {
-            try {
-                const response = await fetch(`${MASTER_ENGINE_URL}?action=getAdminDashboard&nocache=${Date.now()}`);
-                const payload = await response.json();
-                
-                // Populates the Active Project Dropdown
-                const jobSelector = document.getElementById('selectorActiveJob');
-                jobSelector.innerHTML = '<option value="" disabled selected>-- Select an Active Project --</option>';
-                payload.jobs.forEach(j => {
-                    const opt = document.createElement('option');
-                    opt.value = j.id; opt.innerText = `[ID: ${j.id}] ${j.address}`;
-                    jobSelector.appendChild(opt);
+                payload.active.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${row.id}</td><td>${row.worker}</td><td>${row.note}</td><td style="color:var(--accent-green); font-weight:bold;">${row.status}</td><td><button class="btn-terminate" onclick="finalizeJob('${row.id}')">Finalize</button></td>`;
+                    deploymentTable.appendChild(tr);
                 });
-
-                const crewList = document.getElementById('crewDatalist');
-                crewList.innerHTML = '';
-                payload.crew.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c.email; opt.innerText = `${c.name} (${c.trade})`;
-                    crewList.appendChild(opt);
-                });
-
-                const deploymentTable = document.getElementById('activeDeploymentTable');
-                deploymentTable.innerHTML = '';
-                if(!payload.active || payload.active.length === 0) {
-                    deploymentTable.innerHTML = '<tr><td colspan="5" style="text-align:center;">No active deployments.</td></tr>';
-                } else {
-                    payload.active.forEach(row => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `<td>${row.id}</td><td>${row.worker}</td><td>${row.note}</td><td style="color:var(--accent-green);">${row.status}</td><td><button class="btn-terminate" onclick="finalizeJob('${row.id}')">Finalize</button></td>`;
-                        deploymentTable.appendChild(tr);
-                    });
-                }
-            } catch(e) { console.error("Error fetching dashboard data:", e); }
-        }
-
-        async function processProjectCreation() {
-            const btn = document.getElementById('submitProject');
-            btn.disabled = true; btn.innerText = "Generating Ancestry ID...";
-            const payload = {
-                action: 'createProjectLog',
-                client: document.getElementById('inputClientName').value,
-                address: document.getElementById('inputAddress').value,
-                budget: document.getElementById('inputLaborBudget').value,
-                trade: document.getElementById('inputRequiredTrade').value,
-                notes: document.getElementById('inputProjectNotes').value,
-                source: "Direct" 
-            };
-            await transmit(payload, btn, "Commit to Master Log");
-        }
-
-        async function transmitTargetedOffer() {
-            const btn = document.getElementById('submitTargeted');
-            
-            // FIXED: Removed duplicate 'const payload ='
-            const payload = { 
-                action: 'dispatchDirect', 
-                jobId: document.getElementById('selectorActiveJob').value, 
-                email: document.getElementById('inputWorkerEmail').value, 
-                note: document.getElementById('inputTargetedNote').value,
-                startDate: document.getElementById('inputStartDate').value, // NEW
-                finishDate: document.getElementById('inputFinishDate').value // NEW
-            };
-            
-            // FIXED: Combined the checks into one clean line
-            if(!payload.jobId || !payload.email || !payload.startDate) return alert("Select Project, Personnel & Start Date");
-            
-            btn.disabled = true; btn.innerText = "Dispatching...";
-            await transmit(payload, btn, "Send Job Offer");
-        }
-
-        // ADDED: Missing Broadcast Function
-        async function transmitPublicBroadcast() {
-            const btn = document.getElementById('submitBroadcast');
-            const payload = { 
-                action: 'postToOpenBoard', 
-                jobId: document.getElementById('selectorActiveJob').value, 
-                pay: document.getElementById('inputBroadcastRate').value, 
-                note: document.getElementById('inputBroadcastNote').value 
-            };
-            if(!payload.jobId) return alert("Select an Active Project First");
-            btn.disabled = true; btn.innerText = "Broadcasting...";
-            await transmit(payload, btn, "Post to Available Jobs");
-        }
-
-        // ADDED: Missing Finalize Function
-        async function finalizeJob(jobId) {
-            if(!confirm("Are you sure you want to finalize and close Job #" + jobId + "?")) return;
-            const btn = event.target; // Gets the button clicked
-            btn.disabled = true; btn.innerText = "Closing...";
-            
-            const payload = { action: 'markJobComplete', jobId: jobId };
-            try {
-                await fetch(MASTER_ENGINE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert("Job Marked Complete.");
-                synchronizeDashboard(); // Refresh the table
-            } catch (e) { 
-                alert("Error connecting to Engine."); 
-                btn.disabled = false; btn.innerText = "Finalize";
             }
-        }
+        } catch(e) { console.error("Error fetching dashboard data:", e); }
+    }
 
-        async function transmit(payload, btn, originalText) {
-            try {
-                await fetch(MASTER_ENGINE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert("Operation Successful.");
-                
-                // Clear inputs after success
-                document.querySelectorAll('input:not([type="radio"]), textarea').forEach(el => el.value = '');
-                
-                synchronizeDashboard();
-            } catch (e) { alert("Error connecting to Engine."); }
-            finally { btn.disabled = false; btn.innerText = originalText; }
+    async function processProjectCreation() {
+        const btn = document.getElementById('submitProject');
+        btn.disabled = true; btn.innerText = "Commiting to Master Log...";
+        const payload = {
+            action: 'createProjectLog',
+            client: document.getElementById('inputClientName').value,
+            address: document.getElementById('inputAddress').value,
+            phone: document.getElementById('inputClientPhone').value, // FIXED: Now sending phone to script
+            budget: document.getElementById('inputLaborBudget').value,
+            trade: document.getElementById('inputRequiredTrade').value,
+            notes: document.getElementById('inputProjectNotes').value,
+            source: "Direct" 
+        };
+        await transmit(payload, btn, "Commit to Master Log");
+    }
+
+    async function transmitTargetedOffer() {
+        const btn = document.getElementById('submitTargeted');
+        const payload = { 
+            action: 'dispatchDirect', 
+            jobId: document.getElementById('selectorActiveJob').value, 
+            email: document.getElementById('inputWorkerEmail').value, 
+            note: document.getElementById('inputTargetedNote').value,
+            startDate: document.getElementById('inputStartDate').value,
+            finishDate: document.getElementById('inputFinishDate').value
+        };
+        
+        if(!payload.jobId || !payload.email || !payload.startDate) return alert("Select Project, Personnel & Start Date");
+        
+        btn.disabled = true; btn.innerText = "Dispatching...";
+        await transmit(payload, btn, "Send Job Offer");
+    }
+
+    async function transmitPublicBroadcast() {
+        const btn = document.getElementById('submitBroadcast');
+        const payload = { 
+            action: 'postToOpenBoard', 
+            jobId: document.getElementById('selectorActiveJob').value, 
+            pay: document.getElementById('inputBroadcastRate').value, 
+            note: document.getElementById('inputBroadcastNote').value 
+        };
+        if(!payload.jobId) return alert("Select an Active Project First");
+        btn.disabled = true; btn.innerText = "Broadcasting...";
+        await transmit(payload, btn, "Post to Available Jobs");
+    }
+
+    async function finalizeJob(jobId) {
+        if(!confirm("Are you sure you want to finalize and close Job #" + jobId + "?")) return;
+        const btn = event.target;
+        btn.disabled = true; btn.innerText = "Closing...";
+        const payload = { action: 'markJobComplete', jobId: jobId };
+        try {
+            await fetch(MASTER_ENGINE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            alert("Job Marked Complete.");
+            synchronizeDashboard();
+        } catch (e) { 
+            alert("Error connecting to Engine."); 
+            btn.disabled = false; btn.innerText = "Finalize";
         }
-    </script>
+    }
+
+    async function transmit(payload, btn, originalText) {
+        try {
+            await fetch(MASTER_ENGINE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            alert("Operation Successful.");
+            document.querySelectorAll('input:not([type="radio"]), textarea').forEach(el => el.value = '');
+            synchronizeDashboard();
+        } catch (e) { alert("Error connecting to Engine."); }
+        finally { btn.disabled = false; btn.innerText = originalText; }
+    }
+</script>
 </body>
 </html>
