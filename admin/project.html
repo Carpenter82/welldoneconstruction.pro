@@ -49,33 +49,43 @@
         <a href="index.html" class="navigation-link">⬅ Return to Personnel Hub</a>
     </div>
 
-    <div class="dashboard-grid">
-        <div class="interface-card">
-            <h2>1. Project Initialization</h2>
-            <p class="instruction-text">Establish new records in the Master Project Log.</p>
-            
-            <label>Client Identity</label>
-            <input type="text" id="inputClientName" placeholder="Full Client Name">
-            
-            <label>Physical Address (Triggers Ancestry Logic)</label>
-            <input type="text" id="inputAddress" placeholder="Physical Street Address">
-            
-            <label>Labor Budget ($)</label>
-            <input type="number" id="inputLaborBudget" placeholder="0.00">
-            
-            <label>Trade Classification</label>
-            <select id="inputRequiredTrade">
-                <option value="General Labor">General Labor</option>
-                <option value="Carpentry">Carpentry</option>
-                <option value="Plumbing">Plumbing</option>
-                <option value="Electrical">Electrical</option>
-            </select>
-            
-            <label>Scope of Work</label>
-            <textarea id="inputProjectNotes" placeholder="Detailed requirements..."></textarea>
-            
-            <button class="btn-primary" onclick="processProjectCreation()" id="submitProject">Commit to Master Log</button>
-        </div>
+<div class="interface-card">
+    <h2>1. Project Initialization</h2>
+    <p class="instruction-text">Establish new records in the Master Project Log.</p>
+    
+    <label>Client Identity</label>
+    <input type="text" id="inputClientName" placeholder="Full Client Name">
+    
+    <label>Physical Address and Zip Code (Triggers Ancestry Logic)</label>
+    <input type="text" id="inputAddress" placeholder="123 Main St, Las Vegas, NV 89101">
+    
+    <label>Client Phone (Text/Call)</label>
+    <input type="tel" id="inputClientPhone" placeholder="702-555-0123">
+    
+    <label>Labor Budget ($)</label>
+    <input type="number" id="inputLaborBudget" placeholder="0.00">
+    
+    <label>Trade Classification</label>
+    <select id="inputRequiredTrade">
+        <option value="General Labor">General Labor</option>
+        <option value="Carpentry">Carpentry</option>
+        <option value="Plumbing">Plumbing</option>
+        <option value="Electrical">Electrical</option>
+        <option value="HVAC">HVAC</option>
+        <option value="Painting">Painting</option>
+        <option value="Drywall/Texture">Drywall/Texture</option>
+        <option value="Flooring/Tile">Flooring/Tile</option>
+        <option value="Roofing">Roofing</option>
+        <option value="Demolition">Demolition</option>
+        <option value="Landscaping">Landscaping</option>
+        <option value="Concrete/Masonry">Concrete/Masonry</option>
+    </select>
+    
+    <label>Scope of Work</label>
+    <textarea id="inputProjectNotes" placeholder="Detailed requirements..."></textarea>
+    
+    <button class="btn-primary" onclick="processProjectCreation()" id="submitProject">Commit to Master Log</button>
+</div>
 
         <div class="interface-card">
             <h2>2. Resource Dispatch Center</h2>
