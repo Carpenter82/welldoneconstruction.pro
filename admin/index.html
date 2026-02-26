@@ -94,16 +94,31 @@
     window.onload = initializeDashboard;
 
     async function initializeDashboard() {
-        displayStatus("Connecting to Master Engine...", "loading");
-        try {
-            const response = await fetch(`${ENDPOINT_URL}?action=getPersonnelData&t=${Date.now()}`);
-            const payload = await response.json();
+    displayStatus("Syncing with Master Engine...", "loading");
+    try {
+        // 'redirect: follow' is the magic key for Google Apps Script GET requests
+        const response = await fetch(`${ENDPOINT_URL}?action=getPersonnelData&t=${Date.now()}`, {
+            method: 'GET',
+            redirect: 'follow' 
+        });
+
+        const payload = await response.json();
+        
+        // Only try to populate if the payload actually has data
+        if (payload.applicants && payload.crew) {
             populateApplicantTable(payload.applicants);
             populateCrewTable(payload.crew);
-            displayStatus("✓ Data Synchronized", "success");
-            setTimeout(clearStatus, 2000);
-        } catch (error) { displayStatus("Error Connecting to Server", "error"); }
+            displayStatus("✓ System Synchronized", "success");
+        } else {
+            displayStatus("Warning: Received Empty Data", "error");
+        }
+        
+        setTimeout(clearStatus, 2000);
+    } catch (error) {
+        console.error("Master Engine Sync Error:", error);
+        displayStatus("Sync Failed: Check Console", "error");
     }
+}
 
     function populateApplicantTable(dataSet) {
         const tableBody = document.getElementById('applicant-tbody');
