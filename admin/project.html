@@ -23,24 +23,30 @@
         
         .interface-card { background: var(--surface-white); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px;}
         h2 { text-transform: uppercase; letter-spacing: 1px; margin-top: 0; border-bottom: 2px solid var(--accent-green); padding-bottom: 15px; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; }
+        h3 { font-size: 0.9rem; color: var(--primary-dark); margin-top: 0; text-transform: uppercase; }
         .instruction-text { font-size: 0.85rem; color: #7f8c8d; margin-bottom: 20px; }
 
         label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 0.75rem; color: #6E797F; text-transform: uppercase; }
         input, textarea, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dcdfe6; border-radius: 6px; box-sizing: border-box; font-size: 0.95rem; }
         
-        .btn-primary { width: 100%; padding: 15px; background: var(--primary-dark); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-primary { width: 100%; padding: 15px; background: var(--primary-dark); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .btn-primary:hover { opacity: 0.9; }
         .btn-success { background: var(--accent-green); }
         .btn-terminate { background: var(--alert-red); padding: 8px 12px; font-size: 0.75rem; color: white; border: none; border-radius: 4px; cursor: pointer; }
         
         .tab-system { display: flex; margin-bottom: 20px; background: #eee; border-radius: 6px; padding: 4px; }
         .tab-control { flex: 1; padding: 10px; text-align: center; cursor: pointer; border-radius: 4px; font-weight: 600; font-size: 0.85rem; }
-        .tab-control.active { background: white; color: var(--accent-green); }
+        .tab-control.active { background: white; color: var(--accent-green); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { text-align: left; font-size: 0.7rem; color: #888; text-transform: uppercase; padding-bottom: 10px; border-bottom: 2px solid #eee; }
         td { padding: 12px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
         .hidden-element { display: none; }
         .navigation-link { text-decoration: none; font-size: 0.85rem; color: var(--action-blue); font-weight: bold; }
+
+        /* New styles for the Two-Key Control Panels */
+        .control-panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; border-top: 2px dashed #eee; padding-top: 20px; }
+        .status-panel { background: #f8faf9; padding: 20px; border-radius: 8px; border: 1px solid #e1e8e5; }
     </style>
 </head>
 <body>
@@ -57,10 +63,9 @@
         <label>Client Identity</label>
         <input type="text" id="inputClientName" placeholder="Full Client Name">
         
-        <label>Physical Address (Click history or type new)</label>
+        <label>Physical Address (Click to pick or type new)</label>
         <input type="text" id="inputAddress" list="addressHistory" placeholder="123 Main St, Las Vegas, NV 89101">
-        <datalist id="addressHistory">
-            </datalist>
+        <datalist id="addressHistory"></datalist>
         
         <label>Client Phone (Text/Call)</label>
         <input type="tel" id="inputClientPhone" placeholder="702-555-0123">
@@ -84,26 +89,6 @@
         
         <button class="btn-primary" onclick="processProjectCreation()" id="submitProject">Commit to Master Log</button>
     </div>
-
-    <div class="interface-card">
-        <h2>2. Financial & Status Management</h2>
-        <p class="instruction-text">Toggle payment status for existing projects.</p>
-        
-        <label>Select Active Project</label>
-        <select id="selectExistingProject">
-            <option value="">-- Load Projects --</option>
-            </select>
-
-        <label>Update Payment Status</label>
-        <select id="updatePaymentStatus">
-            <option value="UNPAID">UNPAID</option>
-            <option value="PAID">PAID</option>
-            <option value="PENDING">PENDING</option>
-        </select>
-
-        <button class="btn-primary" onclick="processPaymentUpdate()" id="submitPayment">Update Payment Status</button>
-    </div>
-</div>
 
     <div class="interface-card">
         <h2>2. Resource Dispatch Center</h2>
@@ -150,6 +135,8 @@
 
     <div class="interface-card full-width-span">
         <h2>3. Operational Oversight</h2>
+        <p class="instruction-text">Monitor field statuses and control the Master Project lifecycles.</p>
+        
         <table>
             <thead>
                 <tr>
@@ -157,13 +144,46 @@
                     <th>Personnel</th>
                     <th>Classification/Note</th>
                     <th>Status</th>
-                    <th>Finalize</th>
+                    <th>Acknowledge</th>
                 </tr>
             </thead>
             <tbody id="activeDeploymentTable">
                 <tr><td colspan="5" style="text-align:center;">Synchronizing...</td></tr>
             </tbody>
         </table>
+
+        <div class="control-panel-grid">
+            <div class="status-panel">
+                <h3>A. Financial Status (Col I)</h3>
+                <label>Select Master Project</label>
+                <select id="selectPaymentProject">
+                    <option value="" disabled selected>Loading...</option>
+                </select>
+                <label>Update Payment Status</label>
+                <select id="updatePaymentStatus">
+                    <option value="UNPAID">UNPAID</option>
+                    <option value="PENDING">PENDING</option>
+                    <option value="PAID">PAID</option>
+                </select>
+                <button class="btn-primary" onclick="processPaymentUpdate()" id="submitPayment">Update Payment</button>
+            </div>
+
+            <div class="status-panel">
+                <h3>B. Master Job Status (Col J)</h3>
+                <label>Select Master Project</label>
+                <select id="selectStatusProject">
+                    <option value="" disabled selected>Loading...</option>
+                </select>
+                <label>Update Project Status</label>
+                <select id="updateJobStatus">
+                    <option value="OPEN">OPEN</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                    <option value="CANCELED">CANCELED</option>
+                </select>
+                <button class="btn-primary btn-success" onclick="processJobStatusUpdate()" id="submitJobStatus">Update Status</button>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -190,14 +210,40 @@
             const response = await fetch(`${MASTER_ENGINE_URL}?action=getAdminDashboard&nocache=${Date.now()}`);
             const payload = await response.json();
             
+            // Populate Address History Datalist
+            const addressList = document.getElementById('addressHistory');
+            addressList.innerHTML = '';
+            if(payload.addresses) {
+                payload.addresses.forEach(addr => {
+                    const opt = document.createElement('option');
+                    opt.value = addr;
+                    addressList.appendChild(opt);
+                });
+            }
+
+            // Populate Project Selectors (Card 2 & Card 3)
             const jobSelector = document.getElementById('selectorActiveJob');
-            jobSelector.innerHTML = '<option value="" disabled selected>-- Select an Active Project --</option>';
+            const paySelector = document.getElementById('selectPaymentProject');
+            const statusSelector = document.getElementById('selectStatusProject');
+            
+            const defaultOpt = '<option value="" disabled selected>-- Select a Project --</option>';
+            jobSelector.innerHTML = defaultOpt;
+            paySelector.innerHTML = defaultOpt;
+            statusSelector.innerHTML = defaultOpt;
+
             payload.jobs.forEach(j => {
-                const opt = document.createElement('option');
-                opt.value = j.id; opt.innerText = `[ID: ${j.id}] ${j.address}`;
-                jobSelector.appendChild(opt);
+                const text = `[ID: ${j.id}] ${j.address}`;
+                
+                const opt1 = document.createElement('option'); opt1.value = j.id; opt1.innerText = text;
+                const opt2 = document.createElement('option'); opt2.value = j.id; opt2.innerText = text;
+                const opt3 = document.createElement('option'); opt3.value = j.id; opt3.innerText = text;
+                
+                jobSelector.appendChild(opt1);
+                paySelector.appendChild(opt2);
+                statusSelector.appendChild(opt3);
             });
 
+            // Populate Crew List
             const crewList = document.getElementById('crewDatalist');
             crewList.innerHTML = '';
             payload.crew.forEach(c => {
@@ -206,6 +252,7 @@
                 crewList.appendChild(opt);
             });
 
+            // Populate Active Deployments Table
             const deploymentTable = document.getElementById('activeDeploymentTable');
             deploymentTable.innerHTML = '';
             if(!payload.active || payload.active.length === 0) {
@@ -213,7 +260,7 @@
             } else {
                 payload.active.forEach(row => {
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${row.id}</td><td>${row.worker}</td><td>${row.note}</td><td style="color:var(--accent-green); font-weight:bold;">${row.status}</td><td><button class="btn-terminate" onclick="finalizeJob('${row.id}')">Finalize</button></td>`;
+                    tr.innerHTML = `<td>${row.id}</td><td>${row.worker}</td><td>${row.note}</td><td style="color:var(--accent-green); font-weight:bold;">${row.status}</td><td><button class="btn-terminate" onclick="finalizeJob('${row.id}')">Dismiss</button></td>`;
                     deploymentTable.appendChild(tr);
                 });
             }
@@ -227,7 +274,7 @@
             action: 'createProjectLog',
             client: document.getElementById('inputClientName').value,
             address: document.getElementById('inputAddress').value,
-            phone: document.getElementById('inputClientPhone').value, // FIXED: Now sending phone to script
+            phone: document.getElementById('inputClientPhone').value, 
             budget: document.getElementById('inputLaborBudget').value,
             trade: document.getElementById('inputRequiredTrade').value,
             notes: document.getElementById('inputProjectNotes').value,
@@ -267,18 +314,44 @@
     }
 
     async function finalizeJob(jobId) {
-        if(!confirm("Are you sure you want to finalize and close Job #" + jobId + "?")) return;
+        if(!confirm("Acknowledge field status for Job #" + jobId + "?")) return;
         const btn = event.target;
-        btn.disabled = true; btn.innerText = "Closing...";
+        btn.disabled = true; btn.innerText = "Clearing...";
         const payload = { action: 'markJobComplete', jobId: jobId };
         try {
             await fetch(MASTER_ENGINE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            alert("Job Marked Complete.");
+            alert("Field deployment finalized.");
             synchronizeDashboard();
         } catch (e) { 
             alert("Error connecting to Engine."); 
-            btn.disabled = false; btn.innerText = "Finalize";
+            btn.disabled = false; btn.innerText = "Dismiss";
         }
+    }
+
+    // NEW: Update Financial Status
+    async function processPaymentUpdate() {
+        const jobId = document.getElementById('selectPaymentProject').value;
+        const newStatus = document.getElementById('updatePaymentStatus').value;
+        const btn = document.getElementById('submitPayment');
+        
+        if(!jobId) return alert("Please select a project first.");
+        btn.disabled = true; btn.innerText = "Updating...";
+        
+        const payload = { action: 'updatePaymentStatus', jobId: jobId, newStatus: newStatus };
+        await transmit(payload, btn, "Update Payment");
+    }
+
+    // NEW: Update Master Job Status
+    async function processJobStatusUpdate() {
+        const jobId = document.getElementById('selectStatusProject').value;
+        const newStatus = document.getElementById('updateJobStatus').value;
+        const btn = document.getElementById('submitJobStatus');
+        
+        if(!jobId) return alert("Please select a project first.");
+        btn.disabled = true; btn.innerText = "Updating...";
+        
+        const payload = { action: 'updateMasterJobStatus', jobId: jobId, newStatus: newStatus };
+        await transmit(payload, btn, "Update Status");
     }
 
     async function transmit(payload, btn, originalText) {
