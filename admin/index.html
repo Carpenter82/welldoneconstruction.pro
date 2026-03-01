@@ -94,31 +94,29 @@
     window.onload = initializeDashboard;
 
     async function initializeDashboard() {
-    displayStatus("Syncing with Master Engine...", "loading");
-    try {
-        // 'redirect: follow' is the magic key for Google Apps Script GET requests
-        const response = await fetch(`${ENDPOINT_URL}?action=getPersonnelData&t=${Date.now()}`, {
-            method: 'GET',
-            redirect: 'follow' 
-        });
+        displayStatus("Syncing with Master Engine...", "loading");
+        try {
+            const response = await fetch(`${ENDPOINT_URL}?action=getPersonnelData&t=${Date.now()}`, {
+                method: 'GET',
+                redirect: 'follow' 
+            });
 
-        const payload = await response.json();
-        
-        // Only try to populate if the payload actually has data
-        if (payload.applicants && payload.crew) {
-            populateApplicantTable(payload.applicants);
-            populateCrewTable(payload.crew);
-            displayStatus("✓ System Synchronized", "success");
-        } else {
-            displayStatus("Warning: Received Empty Data", "error");
+            const payload = await response.json();
+            
+            if (payload.applicants && payload.crew) {
+                populateApplicantTable(payload.applicants);
+                populateCrewTable(payload.crew);
+                displayStatus("✓ System Synchronized", "success");
+            } else {
+                displayStatus("Warning: Received Empty Data", "error");
+            }
+            
+            setTimeout(clearStatus, 2000);
+        } catch (error) {
+            console.error("Master Engine Sync Error:", error);
+            displayStatus("Sync Failed: Check Console", "error");
         }
-        
-        setTimeout(clearStatus, 2000);
-    } catch (error) {
-        console.error("Master Engine Sync Error:", error);
-        displayStatus("Sync Failed: Check Console", "error");
     }
-}
 
     function populateApplicantTable(dataSet) {
         const tableBody = document.getElementById('applicant-tbody');
@@ -128,7 +126,7 @@
             row.innerHTML = `
                 <td><b>${record.fname} ${record.lname}</b><br><small>${record.email}</small></td>
                 <td>${record.trade}<br><small>${record.exp} yrs exp</small></td>
-                <td>$${record.pay}/hr</td>
+                <td>${record.pay || 'N/A'}</td>
                 <td align="center">${record.resumeUrl ? `<a href="${record.resumeUrl}" target="_blank">📄</a>` : '-'}</td>
                 <td>
                     <button class="button-base button-contract" onclick="triggerAction('sendAgreement', '${record.email}')">Agreement</button>
@@ -166,26 +164,23 @@
         }
     }
 
-   async function triggerAction(action, email, extraData = {}) {
-    displayStatus("Updating Master Engine...", "loading");
-    const payload = { action: action, email: email, ...extraData };
-    
-    try {
-        // We use the 'sendBeacon' approach or a standard fetch without no-cors
-        await fetch(ENDPOINT_URL, { 
-            method: 'POST', 
-            body: JSON.stringify(payload) 
-        });
+    async function triggerAction(action, email, extraData = {}) {
+        displayStatus("Updating Master Engine...", "loading");
+        const payload = { action: action, email: email, ...extraData };
         
-        // Wait a beat for Google to process, then refresh
-        displayStatus("✓ Command Sent", "success");
-        setTimeout(initializeDashboard, 2000);
-    } catch (e) {
-        // If it's a CORS error, the action usually actually succeeded
-        displayStatus("Syncing Changes...", "loading");
-        setTimeout(initializeDashboard, 2000);
+        try {
+            await fetch(ENDPOINT_URL, { 
+                method: 'POST', 
+                body: JSON.stringify(payload) 
+            });
+            
+            displayStatus("✓ Command Sent", "success");
+            setTimeout(initializeDashboard, 2000);
+        } catch (e) {
+            displayStatus("Syncing Changes...", "loading");
+            setTimeout(initializeDashboard, 2000);
+        }
     }
-}
 
     function displayStatus(msg, type) { 
         const el = document.getElementById('status-notification');
