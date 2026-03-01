@@ -57,8 +57,10 @@
         <label>Client Identity</label>
         <input type="text" id="inputClientName" placeholder="Full Client Name">
         
-        <label>Physical Address and Zip Code (Triggers Ancestry Logic)</label>
-        <input type="text" id="inputAddress" placeholder="123 Main St, Las Vegas, NV 89101">
+        <label>Physical Address (Click history or type new)</label>
+        <input type="text" id="inputAddress" list="addressHistory" placeholder="123 Main St, Las Vegas, NV 89101">
+        <datalist id="addressHistory">
+            </datalist>
         
         <label>Client Phone (Text/Call)</label>
         <input type="tel" id="inputClientPhone" placeholder="702-555-0123">
@@ -82,6 +84,26 @@
         
         <button class="btn-primary" onclick="processProjectCreation()" id="submitProject">Commit to Master Log</button>
     </div>
+
+    <div class="interface-card">
+        <h2>2. Financial & Status Management</h2>
+        <p class="instruction-text">Toggle payment status for existing projects.</p>
+        
+        <label>Select Active Project</label>
+        <select id="selectExistingProject">
+            <option value="">-- Load Projects --</option>
+            </select>
+
+        <label>Update Payment Status</label>
+        <select id="updatePaymentStatus">
+            <option value="UNPAID">UNPAID</option>
+            <option value="PAID">PAID</option>
+            <option value="PENDING">PENDING</option>
+        </select>
+
+        <button class="btn-primary" onclick="processPaymentUpdate()" id="submitPayment">Update Payment Status</button>
+    </div>
+</div>
 
     <div class="interface-card">
         <h2>2. Resource Dispatch Center</h2>
