@@ -210,10 +210,10 @@
             const response = await fetch(`${MASTER_ENGINE_URL}?action=getAdminDashboard&nocache=${Date.now()}`);
             const payload = await response.json();
             
-            // Populate Address History Datalist
+            // 1. Populate Address History
             const addressList = document.getElementById('addressHistory');
-            addressList.innerHTML = '';
-            if(payload.addresses) {
+            if(addressList && payload.addresses) {
+                addressList.innerHTML = '';
                 payload.addresses.forEach(addr => {
                     const opt = document.createElement('option');
                     opt.value = addr;
@@ -221,55 +221,67 @@
                 });
             }
 
-            // Populate Project Selectors (Card 2 & Card 3)
-            const jobSelector = document.getElementById('selectorActiveJob');
-            const paySelector = document.getElementById('selectPaymentProject');
-            const statusSelector = document.getElementById('selectStatusProject');
-            
+            // 2. Populate Project Selectors (Card 2 & Card 3)
+            // Safety: Check if .jobs exists, otherwise check for .projects (common mismatch)
+            const projects = payload.jobs || payload.projects || [];
+            const jobSelectors = [
+                document.getElementById('selectorActiveJob'),
+                document.getElementById('selectPaymentProject'),
+                document.getElementById('selectStatusProject')
+            ];
+
             const defaultOpt = '<option value="" disabled selected>-- Select a Project --</option>';
-            jobSelector.innerHTML = defaultOpt;
-            paySelector.innerHTML = defaultOpt;
-            statusSelector.innerHTML = defaultOpt;
-
-            payload.jobs.forEach(j => {
-                const text = `[ID: ${j.id}] ${j.address}`;
-                
-                const opt1 = document.createElement('option'); opt1.value = j.id; opt1.innerText = text;
-                const opt2 = document.createElement('option'); opt2.value = j.id; opt2.innerText = text;
-                const opt3 = document.createElement('option'); opt3.value = j.id; opt3.innerText = text;
-                
-                jobSelector.appendChild(opt1);
-                paySelector.appendChild(opt2);
-                statusSelector.appendChild(opt3);
+            jobSelectors.forEach(sel => {
+                if(!sel) return;
+                sel.innerHTML = defaultOpt;
+                projects.forEach(j => {
+                    const opt = document.createElement('option');
+                    opt.value = j.id;
+                    opt.innerText = `[ID: ${j.id}] ${j.address}`;
+                    sel.appendChild(opt);
+                });
             });
 
-            // Populate Crew List
+            // 3. Populate Crew List (for Targeted Dispatch)
             const crewList = document.getElementById('crewDatalist');
-            crewList.innerHTML = '';
-            payload.crew.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.email; opt.innerText = `${c.name} (${c.trade})`;
-                crewList.appendChild(opt);
-            });
-
-            // Populate Active Deployments Table
-            const deploymentTable = document.getElementById('activeDeploymentTable');
-            deploymentTable.innerHTML = '';
-            if(!payload.active || payload.active.length === 0) {
-                deploymentTable.innerHTML = '<tr><td colspan="5" style="text-align:center;">No active deployments.</td></tr>';
-            } else {
-                payload.active.forEach(row => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${row.id}</td><td>${row.worker}</td><td>${row.note}</td><td style="color:var(--accent-green); font-weight:bold;">${row.status}</td><td><button class="btn-terminate" onclick="finalizeJob('${row.id}')">Dismiss</button></td>`;
-                    deploymentTable.appendChild(tr);
+            if(crewList && payload.crew) {
+                crewList.innerHTML = '';
+                payload.crew.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.email;
+                    opt.innerText = `${c.name} (${c.trade})`;
+                    crewList.appendChild(opt);
                 });
             }
-        } catch(e) { console.error("Error fetching dashboard data:", e); }
+
+            // 4. Populate Active Deployments Table
+            const deploymentTable = document.getElementById('activeDeploymentTable');
+            if(deploymentTable) {
+                deploymentTable.innerHTML = '';
+                const activeData = payload.active || payload.alerts || []; // Safety mismatch check
+                
+                if(activeData.length === 0) {
+                    deploymentTable.innerHTML = '<tr><td colspan="5" style="text-align:center;">No active deployments.</td></tr>';
+                } else {
+                    activeData.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row.id}</td>
+                            <td>${row.worker}</td>
+                            <td>${row.note || ''}</td>
+                            <td style="color:var(--accent-green); font-weight:bold;">${row.status}</td>
+                            <td><button class="btn-terminate" onclick="finalizeJob('${row.id}', this)">Dismiss</button></td>`;
+                        deploymentTable.appendChild(tr);
+                    });
+                }
+            }
+        } catch(e) { 
+            console.error("Critical Sync Error:", e); 
+        }
     }
 
     async function processProjectCreation() {
         const btn = document.getElementById('submitProject');
-        btn.disabled = true; btn.innerText = "Commiting to Master Log...";
         const payload = {
             action: 'createProjectLog',
             client: document.getElementById('inputClientName').value,
@@ -280,6 +292,8 @@
             notes: document.getElementById('inputProjectNotes').value,
             source: "Direct" 
         };
+        if(!payload.address) return alert("Address is required.");
+        btn.disabled = true; btn.innerText = "Committing...";
         await transmit(payload, btn, "Commit to Master Log");
     }
 
@@ -300,68 +314,55 @@
         await transmit(payload, btn, "Send Job Offer");
     }
 
-    async function transmitPublicBroadcast() {
-        const btn = document.getElementById('submitBroadcast');
-        const payload = { 
-            action: 'postToOpenBoard', 
-            jobId: document.getElementById('selectorActiveJob').value, 
-            pay: document.getElementById('inputBroadcastRate').value, 
-            note: document.getElementById('inputBroadcastNote').value 
-        };
-        if(!payload.jobId) return alert("Select an Active Project First");
-        btn.disabled = true; btn.innerText = "Broadcasting...";
-        await transmit(payload, btn, "Post to Available Jobs");
-    }
-
-    async function finalizeJob(jobId) {
+    async function finalizeJob(jobId, btnElement) {
         if(!confirm("Acknowledge field status for Job #" + jobId + "?")) return;
-        const btn = event.target;
-        btn.disabled = true; btn.innerText = "Clearing...";
+        btnElement.disabled = true; btnElement.innerText = "Clearing...";
         const payload = { action: 'markJobComplete', jobId: jobId };
         try {
+            // Note: POST to Google Apps Script usually results in a CORS redirect error even if successful
             await fetch(MASTER_ENGINE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            alert("Field deployment finalized.");
-            synchronizeDashboard();
+            setTimeout(() => {
+                alert("Field deployment finalized.");
+                synchronizeDashboard();
+            }, 1000);
         } catch (e) { 
-            alert("Error connecting to Engine."); 
-            btn.disabled = false; btn.innerText = "Dismiss";
+            alert("Connection error."); 
+            btnElement.disabled = false; btnElement.innerText = "Dismiss";
         }
     }
 
-    // NEW: Update Financial Status
+    // UPDATED TRANSMIT: Standardizes the cleanup
+    async function transmit(payload, btn, originalText) {
+        try {
+            await fetch(MASTER_ENGINE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            setTimeout(() => {
+                alert("Operation Sent Successfully.");
+                // Clear inputs except for the address history list
+                document.querySelectorAll('.interface-card input:not([list]), .interface-card textarea').forEach(el => el.value = '');
+                synchronizeDashboard();
+                btn.disabled = false; btn.innerText = originalText;
+            }, 1500);
+        } catch (e) { 
+            alert("Error connecting to Engine."); 
+            btn.disabled = false; btn.innerText = originalText;
+        }
+    }
+
+    // Financial/Status Updates
     async function processPaymentUpdate() {
         const jobId = document.getElementById('selectPaymentProject').value;
         const newStatus = document.getElementById('updatePaymentStatus').value;
         const btn = document.getElementById('submitPayment');
-        
-        if(!jobId) return alert("Please select a project first.");
-        btn.disabled = true; btn.innerText = "Updating...";
-        
-        const payload = { action: 'updatePaymentStatus', jobId: jobId, newStatus: newStatus };
-        await transmit(payload, btn, "Update Payment");
+        if(!jobId) return alert("Select project.");
+        btn.disabled = true; await transmit({ action: 'updatePaymentStatus', jobId, newStatus }, btn, "Update Payment");
     }
 
-    // NEW: Update Master Job Status
     async function processJobStatusUpdate() {
         const jobId = document.getElementById('selectStatusProject').value;
         const newStatus = document.getElementById('updateJobStatus').value;
         const btn = document.getElementById('submitJobStatus');
-        
-        if(!jobId) return alert("Please select a project first.");
-        btn.disabled = true; btn.innerText = "Updating...";
-        
-        const payload = { action: 'updateMasterJobStatus', jobId: jobId, newStatus: newStatus };
-        await transmit(payload, btn, "Update Status");
-    }
-
-    async function transmit(payload, btn, originalText) {
-        try {
-            await fetch(MASTER_ENGINE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            alert("Operation Successful.");
-            document.querySelectorAll('input:not([type="radio"]), textarea').forEach(el => el.value = '');
-            synchronizeDashboard();
-        } catch (e) { alert("Error connecting to Engine."); }
-        finally { btn.disabled = false; btn.innerText = originalText; }
+        if(!jobId) return alert("Select project.");
+        btn.disabled = true; await transmit({ action: 'updateMasterJobStatus', jobId, newStatus }, btn, "Update Status");
     }
 </script>
 </body>
