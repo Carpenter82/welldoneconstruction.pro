@@ -325,21 +325,25 @@
         btn.disabled = true; btn.innerText = "Dispatching...";
         await transmit(payload, btn, "Send Job Offer");
     }
-    async function transmitPublicBroadcast() {
+async function transmitPublicBroadcast() {
         const btn = document.getElementById('submitBroadcast');
         const payload = { 
             action: 'postToOpenBoard', 
             jobId: document.getElementById('selectorActiveJob').value, 
             pay: document.getElementById('inputBroadcastRate').value, 
             note: document.getElementById('inputBroadcastNote').value,
-            startDate: document.getElementById('inputBroadcastStartDate').value, // ADDED
-            finishDate: document.getElementById('inputBroadcastFinishDate').value // ADDED
+            startDate: document.getElementById('inputBroadcastStartDate').value,
+            finishDate: document.getElementById('inputBroadcastFinishDate').value 
         };
 
-        if(!payload.jobId || !payload.startDate) return alert("Select Project & Start Date First");
+        if(!payload.jobId || !payload.startDate) {
+            return alert("Select Project & Start Date First");
+        }
         
-        btn.disabled = true; btn.innerText = "Broadcasting...";
+        btn.disabled = true; 
+        btn.innerText = "Broadcasting...";
         await transmit(payload, btn, "Post to Available Jobs");
+    } // <--- THIS WAS MISSING
 
     async function finalizeJob(jobId, btnElement) {
         if(!confirm("Acknowledge field status for Job #" + jobId + "?")) return;
