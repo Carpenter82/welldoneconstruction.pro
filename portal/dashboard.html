@@ -21,7 +21,6 @@
         
         .container { padding: 15px; max-width: 600px; margin: 0 auto; }
         
-        /* Profile Card Styles */
         .profile-card { background: var(--panel-bg); border: 2px solid var(--border); border-radius: 8px; padding: 20px; margin-top: 10px; }
         .profile-header { display: flex; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 15px; }
         .avatar { width: 50px; height: 50px; background: #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; margin-right: 15px; border: 2px solid var(--high-vis); }
@@ -32,7 +31,6 @@
         .tag { background: #222; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: 1px solid #444; color: #ccc; }
         .tag-accent { border-color: var(--active); color: var(--active); }
 
-        /* Dashboard Grid Layout */
         .dashboard-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
@@ -41,23 +39,29 @@
         }
         @media (max-width: 500px) { .dashboard-grid { grid-template-columns: 1fr; } }
 
-        .status-panel { background: var(--panel-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        .status-panel { background: var(--panel-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
         .panel-header { background: #222; font-size: 0.7rem; font-weight: 900; padding: 10px; text-align: center; border-bottom: 1px solid var(--border); color: #888; letter-spacing: 1px; text-transform: uppercase; }
-        .panel-content { padding: 15px; min-height: 120px; }
+        .panel-content { padding: 15px; flex-grow: 1; }
 
         /* Mission Styles */
-        .mission-offer { border-top: 3px solid var(--high-vis); }
-        .label { color: var(--high-vis); font-size: 0.7rem; text-transform: uppercase; font-weight: 900; margin-bottom: 4px; }
-        .data-point { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; line-height: 1.2; }
+        .mission-offer { border-top: 3px solid var(--high-vis); padding-top: 10px; margin-bottom: 20px; }
+        .label { color: var(--high-vis); font-size: 0.65rem; text-transform: uppercase; font-weight: 900; margin-bottom: 2px; }
+        .data-point { font-size: 1rem; font-weight: bold; margin-bottom: 10px; line-height: 1.2; }
         
         .btn-claim { 
-            background: var(--high-vis); color: var(--dark); border: none; padding: 15px; width: 100%; 
-            font-size: 1.1rem; font-weight: 900; cursor: pointer; border-radius: 4px; margin-top: 10px; 
-            transition: transform 0.1s; text-transform: uppercase; 
+            background: var(--high-vis); color: var(--dark); border: none; padding: 12px; width: 100%; 
+            font-size: 0.9rem; font-weight: 900; cursor: pointer; border-radius: 4px; margin-top: 5px; 
+            transition: 0.2s; text-transform: uppercase; 
         }
-        .btn-claim:active { transform: scale(0.98); }
+        .btn-claim:hover { filter: brightness(1.1); }
+        .btn-claim:disabled { background: #444; color: #888; cursor: not-allowed; }
         
-        .placeholder-text { color: #555; font-size: 0.85rem; line-height: 1.4; }
+        .placeholder-text { color: #555; font-size: 0.85rem; line-height: 1.4; text-align: center; }
+
+        /* Open Board Items */
+        .board-item { border-bottom: 1px solid var(--border); padding: 15px 0; }
+        .board-item:last-child { border-bottom: none; }
+        .pay-badge { float: right; color: var(--active); font-weight: 900; }
     </style>
 </head>
 <body>
@@ -84,11 +88,10 @@
             
             <div class="status-panel">
                 <div class="panel-header">Direct Dispatch</div>
-                <div class="panel-content">
-                    
+                <div class="panel-content" id="directDispatchContent">
                     <div id="idleState">
-                        <strong style="color:var(--high-vis); display:block; margin-bottom:10px;">STATUS: ON-CALL</strong>
-                        <p class="placeholder-text">The ancestry engine has no missions assigned to your ID. Stay tuned for dispatch notifications.</p>
+                        <strong style="color:var(--high-vis); display:block; margin-bottom:10px; text-align:center;">STATUS: ON-CALL</strong>
+                        <p class="placeholder-text">The ancestry engine has no direct missions assigned. Check the Open Board.</p>
                     </div>
 
                     <div id="missionState" style="display:none;" class="mission-offer">
@@ -98,17 +101,15 @@
                         <div id="address" class="data-point">---</div>
                         <button id="claimBtn" class="btn-claim" onclick="acceptWork()">Claim Mission</button>
                     </div>
-
                 </div>
             </div>
 
             <div class="status-panel">
                 <div class="panel-header">Open Board</div>
                 <div class="panel-content">
-                    <strong style="color:#666; display:block; margin-bottom:10px;">AVAILABLE JOBS</strong>
-                    <p class="placeholder-text">System scanning available projects... No public missions currently broadcasting to the open board.</p>
-                    <div style="margin-top:20px; text-align:center; opacity: 0.3;">
-                        <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png" width="40" style="filter: grayscale(1);">
+                    <strong style="color:#666; display:block; margin-bottom:10px;">AVAILABLE MISSIONS</strong>
+                    <div id="openBoardContainer">
+                        <p class="placeholder-text">Scanning for Reno/Sparks projects...</p>
                     </div>
                 </div>
             </div>
@@ -129,18 +130,17 @@
 
     async function refreshData() {
         try {
+            // 1. Fetch Personal Dispatch & Profile
             const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}&nocache=${Date.now()}`);
             const data = await res.json();
             
-            // 1. Profile Mapping (Fixing Col K Index Mapping)
             if (data.profile) {
                 document.getElementById('workerName').innerText = data.profile.name;
                 document.getElementById('workerEmail').innerText = email;
                 document.getElementById('workerTrade').innerText = "Trade: " + data.profile.trade;
-                document.getElementById('workerConsent').innerText = "Consent: " + data.profile.consent;
+                document.getElementById('workerConsent').innerText = "Consent: " + (data.profile.consent || "Pending");
             }
 
-            // 2. Personal Dispatch Logic
             if (data.jobStatus === "Offered" || data.jobStatus === "Active") {
                 document.getElementById('missionState').style.display = 'block';
                 document.getElementById('idleState').style.display = 'none';
@@ -153,13 +153,60 @@
                     btn.style.background = "var(--active)";
                     btn.style.color = "#fff";
                 }
-            } else {
-                document.getElementById('missionState').style.display = 'none';
-                document.getElementById('idleState').style.display = 'block';
             }
+
+            // 2. Fetch Open Board Missions
+            const boardRes = await fetch(`${scriptURL}?action=getOpenBoard&nocache=${Date.now()}`);
+            const boardData = await boardRes.json();
+            renderOpenBoard(boardData.projects || []);
+
         } catch (e) {
             console.error(e);
             document.getElementById('workerName').innerText = "SYNC ERROR";
+        }
+    }
+
+    function renderOpenBoard(projects) {
+        const container = document.getElementById('openBoardContainer');
+        if (projects.length === 0) {
+            container.innerHTML = '<p class="placeholder-text">No public missions currently broadcasting.</p>';
+            return;
+        }
+
+        container.innerHTML = projects.map(p => `
+            <div class="board-item">
+                <span class="pay-badge">$${p.pay}</span>
+                <div class="label">ID: ${p.id} | ${p.trade}</div>
+                <div class="data-point" style="font-size:0.9rem; margin-bottom:5px;">${p.address}</div>
+                <div style="font-size:0.75rem; color:#888; margin-bottom:8px;">${p.note || ''}</div>
+                <button class="btn-claim" onclick="claimPublicMission('${p.id}', this)">Claim Job</button>
+            </div>
+        `).join('');
+    }
+
+    async function claimPublicMission(jobId, btn) {
+        if(!confirm(`Confirm: You are committing to Job #${jobId}. Proceed?`)) return;
+        
+        btn.disabled = true;
+        btn.innerText = "CLAIMING...";
+
+        try {
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    action: 'acceptPublicJob',
+                    email: email,
+                    jobId: jobId
+                })
+            });
+
+            alert("MISSION SECURED. Loading field checklist...");
+            goToChecklist(jobId);
+        } catch (e) {
+            alert("Sync error. Please try again.");
+            btn.disabled = false;
+            btn.innerText = "Claim Job";
         }
     }
 
@@ -179,17 +226,13 @@
             await fetch(scriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
-                body: JSON.stringify({
-                    action: 'acceptMission',
-                    email: email,
-                    jobId: jobId
-                })
+                body: JSON.stringify({ action: 'acceptMission', email: email, jobId: jobId })
             });
 
             alert("MISSION CLAIMED. SYSTEM IS NOW TRACKING ACTIVITY.");
             goToChecklist(jobId);
         } catch (e) {
-            alert("Connection error. Try again.");
+            alert("Connection error.");
             btn.disabled = false;
             btn.innerText = "Claim Mission";
         }
