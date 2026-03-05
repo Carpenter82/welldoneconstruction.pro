@@ -10,15 +10,14 @@
             --high-vis: #f1c40f; 
             --dark: #000; 
             --active: #33B26E; 
+            --prep: #3498db;
             --panel-bg: #111; 
             --border: #333;
         }
         
         body { background: #1a1a1a; color: white; font-family: -apple-system, sans-serif; padding: 0; margin: 0; }
-        
         .header { background: var(--high-vis); color: var(--dark); padding: 20px; font-weight: 900; text-align: center; border-bottom: 4px solid #000; letter-spacing: 1px; }
         .warning-stripes { height: 15px; background: repeating-linear-gradient(45deg, var(--high-vis), var(--high-vis) 20px, #000 20px, #000 40px); }
-        
         .container { padding: 15px; max-width: 600px; margin: 0 auto; }
         
         .profile-card { background: var(--panel-bg); border: 2px solid var(--border); border-radius: 8px; padding: 20px; margin-top: 10px; }
@@ -31,19 +30,13 @@
         .tag { background: #222; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: 1px solid #444; color: #ccc; }
         .tag-accent { border-color: var(--active); color: var(--active); }
 
-        .dashboard-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 15px; 
-            margin-top: 20px;
-        }
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         @media (max-width: 500px) { .dashboard-grid { grid-template-columns: 1fr; } }
 
         .status-panel { background: var(--panel-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
         .panel-header { background: #222; font-size: 0.7rem; font-weight: 900; padding: 10px; text-align: center; border-bottom: 1px solid var(--border); color: #888; letter-spacing: 1px; text-transform: uppercase; }
         .panel-content { padding: 15px; flex-grow: 1; }
 
-        /* Mission Styles */
         .mission-offer { border-top: 3px solid var(--high-vis); padding-top: 10px; margin-bottom: 20px; }
         .label { color: var(--high-vis); font-size: 0.65rem; text-transform: uppercase; font-weight: 900; margin-bottom: 2px; }
         .data-point { font-size: 1rem; font-weight: bold; margin-bottom: 10px; line-height: 1.2; }
@@ -56,9 +49,11 @@
         .btn-claim:hover { filter: brightness(1.1); }
         .btn-claim:disabled { background: #444; color: #888; cursor: not-allowed; }
         
-        .placeholder-text { color: #555; font-size: 0.85rem; line-height: 1.4; text-align: center; }
+        .status-msg { font-size: 0.75rem; font-weight: 900; text-align: center; margin-bottom: 10px; padding: 5px; border-radius: 4px; }
+        .status-prep { background: var(--prep); color: white; }
+        .status-active { background: var(--active); color: white; }
 
-        /* Open Board Items */
+        .placeholder-text { color: #555; font-size: 0.85rem; line-height: 1.4; text-align: center; }
         .board-item { border-bottom: 1px solid var(--border); padding: 15px 0; }
         .board-item:last-child { border-bottom: none; }
         .pay-badge { float: right; color: var(--active); font-weight: 900; }
@@ -87,19 +82,20 @@
         <div class="dashboard-grid">
             
             <div class="status-panel">
-                <div class="panel-header">Direct Dispatch</div>
+                <div class="panel-header">Active Mission</div>
                 <div class="panel-content" id="directDispatchContent">
                     <div id="idleState">
-                        <strong style="color:var(--high-vis); display:block; margin-bottom:10px; text-align:center;">STATUS: ON-CALL</strong>
-                        <p class="placeholder-text">The ancestry engine has no direct missions assigned. Check the Open Board.</p>
+                        <strong style="color:#444; display:block; margin-bottom:10px; text-align:center;">STATUS: STANDBY</strong>
+                        <p class="placeholder-text">No active reservations. Check the Open Board for missions.</p>
                     </div>
 
                     <div id="missionState" style="display:none;" class="mission-offer">
-                        <div class="label">Job ID</div>
+                        <div id="statusLabel" class="status-msg">---</div>
+                        <div class="label">Ancestry Job ID</div>
                         <div id="jobId" class="data-point">---</div>
                         <div class="label">Location</div>
                         <div id="address" class="data-point">---</div>
-                        <button id="claimBtn" class="btn-claim" onclick="acceptWork()">Claim Mission</button>
+                        <button id="actionBtn" class="btn-claim" onclick="handleMissionAction()">Claim Mission</button>
                     </div>
                 </div>
             </div>
@@ -107,9 +103,9 @@
             <div class="status-panel">
                 <div class="panel-header">Open Board</div>
                 <div class="panel-content">
-                    <strong style="color:#666; display:block; margin-bottom:10px;">AVAILABLE MISSIONS</strong>
+                    <strong style="color:#666; display:block; margin-bottom:10px;">AVAILABLE</strong>
                     <div id="openBoardContainer">
-                        <p class="placeholder-text">Scanning for Reno/Sparks projects...</p>
+                        <p class="placeholder-text">Scanning project log...</p>
                     </div>
                 </div>
             </div>
@@ -119,18 +115,17 @@
 
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxQhVbb1DVGlY4QUtS_rfRn1gVAlrPfWdaxE_wXefGdcdjKvMLUnypu-yozYsX51oaa/exec'; 
-
     const urlParams = new URLSearchParams(window.location.search);
     const email = urlParams.get('email');
+    let currentJobStatus = "Idle";
 
     if (!email) {
-        alert("CRITICAL ERROR: Identity context missing. Return to login.");
+        alert("ID Context Missing.");
         window.location.href = "index.html";
     }
 
     async function refreshData() {
         try {
-            // 1. Fetch Personal Dispatch & Profile
             const res = await fetch(`${scriptURL}?action=getWorkerJob&email=${encodeURIComponent(email)}&nocache=${Date.now()}`);
             const data = await res.json();
             
@@ -141,101 +136,92 @@
                 document.getElementById('workerConsent').innerText = "Consent: " + (data.profile.consent || "Pending");
             }
 
-            if (data.jobStatus === "Offered" || data.jobStatus === "Active") {
-                document.getElementById('missionState').style.display = 'block';
-                document.getElementById('idleState').style.display = 'none';
+            const missionUI = document.getElementById('missionState');
+            const idleUI = document.getElementById('idleState');
+            const btn = document.getElementById('actionBtn');
+            const statusLabel = document.getElementById('statusLabel');
+
+            if (data.jobStatus === "Offered" || data.jobStatus === "RESERVED" || data.jobStatus === "Active") {
+                currentJobStatus = data.jobStatus;
+                missionUI.style.display = 'block';
+                idleUI.style.display = 'none';
                 document.getElementById('jobId').innerText = data.jobId;
                 document.getElementById('address').innerText = data.address;
                 
-                if (data.jobStatus === "Active") {
-                    const btn = document.getElementById('claimBtn');
-                    btn.innerText = "Resume Mission";
+                if (data.jobStatus === "Offered") {
+                    statusLabel.innerText = "MISSION PENDING";
+                    statusLabel.className = "status-msg";
+                    btn.innerText = "Accept Mission";
+                    btn.style.background = "var(--high-vis)";
+                } else if (data.jobStatus === "RESERVED") {
+                    statusLabel.innerText = "PHASE: PREP TIME";
+                    statusLabel.className = "status-msg status-prep";
+                    btn.innerText = "I am On-Site: Open Checklist";
+                    btn.style.background = "var(--prep)";
+                    btn.style.color = "white";
+                } else if (data.jobStatus === "Active") {
+                    statusLabel.innerText = "PHASE: ACTIVE WORK";
+                    statusLabel.className = "status-msg status-active";
+                    btn.innerText = "Resume Checklist";
                     btn.style.background = "var(--active)";
-                    btn.style.color = "#fff";
+                    btn.style.color = "white";
                 }
+            } else {
+                missionUI.style.display = 'none';
+                idleUI.style.display = 'block';
             }
 
-            // 2. Fetch Open Board Missions
             const boardRes = await fetch(`${scriptURL}?action=getOpenBoard&nocache=${Date.now()}`);
             const boardData = await boardRes.json();
             renderOpenBoard(boardData.projects || []);
 
-        } catch (e) {
-            console.error(e);
-            document.getElementById('workerName').innerText = "SYNC ERROR";
-        }
+        } catch (e) { console.error(e); }
     }
 
     function renderOpenBoard(projects) {
         const container = document.getElementById('openBoardContainer');
         if (projects.length === 0) {
-            container.innerHTML = '<p class="placeholder-text">No public missions currently broadcasting.</p>';
+            container.innerHTML = '<p class="placeholder-text">No missions broadcasting.</p>';
             return;
         }
-
         container.innerHTML = projects.map(p => `
             <div class="board-item">
                 <span class="pay-badge">$${p.pay}</span>
-                <div class="label">ID: ${p.id} | ${p.trade}</div>
-                <div class="data-point" style="font-size:0.9rem; margin-bottom:5px;">${p.address}</div>
-                <div style="font-size:0.75rem; color:#888; margin-bottom:8px;">${p.note || ''}</div>
-                <button class="btn-claim" onclick="claimPublicMission('${p.id}', this)">Claim Job</button>
+                <div class="label">ID: ${p.id}</div>
+                <div class="data-point" style="font-size:0.85rem;">${p.address}</div>
+                <button class="btn-claim" style="padding:8px; font-size:0.75rem;" onclick="claimPublicMission('${p.id}', this)">Reserve Job</button>
             </div>
         `).join('');
     }
 
-    async function claimPublicMission(jobId, btn) {
-        if(!confirm(`Confirm: You are committing to Job #${jobId}. Proceed?`)) return;
-        
-        btn.disabled = true;
-        btn.innerText = "CLAIMING...";
+    async function handleMissionAction() {
+        const btn = document.getElementById('actionBtn');
+        const jobId = document.getElementById('jobId').innerText;
 
-        try {
+        if (currentJobStatus === "Offered") {
+            if(!confirm("Claim this mission for Prep Time? This locks the job for 3 days.")) return;
+            btn.disabled = true; btn.innerText = "RESERVING...";
             await fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({
-                    action: 'acceptPublicJob',
-                    email: email,
-                    jobId: jobId
-                })
+                method: 'POST', mode: 'no-cors',
+                body: JSON.stringify({ action: 'acceptMission', email: email, jobId: jobId })
             });
-
-            alert("MISSION SECURED. Loading field checklist...");
+            alert("Reserved. Mission is now in PREP TIME.");
+            refreshData();
+        } else {
+            // REDIRECT TO CHECKLIST (Transition to ACTIVE happens at checklist entry)
             goToChecklist(jobId);
-        } catch (e) {
-            alert("Sync error. Please try again.");
-            btn.disabled = false;
-            btn.innerText = "Claim Job";
         }
     }
 
-    async function acceptWork() {
-        const btn = document.getElementById('claimBtn');
-        const jobId = document.getElementById('jobId').innerText;
-        
-        if(btn.innerText === "Resume Mission") {
-            goToChecklist(jobId);
-            return;
-        }
-
-        btn.disabled = true;
-        btn.innerText = "ACTIVATING...";
-
-        try {
-            await fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ action: 'acceptMission', email: email, jobId: jobId })
-            });
-
-            alert("MISSION CLAIMED. SYSTEM IS NOW TRACKING ACTIVITY.");
-            goToChecklist(jobId);
-        } catch (e) {
-            alert("Connection error.");
-            btn.disabled = false;
-            btn.innerText = "Claim Mission";
-        }
+    async function claimPublicMission(jobId, btn) {
+        if(!confirm(`Reserve Job #${jobId}?`)) return;
+        btn.disabled = true; btn.innerText = "...";
+        await fetch(scriptURL, {
+            method: 'POST', mode: 'no-cors',
+            body: JSON.stringify({ action: 'acceptPublicJob', email: email, jobId: jobId })
+        });
+        alert("Job Reserved. See Active Mission panel for Prep details.");
+        refreshData();
     }
 
     function goToChecklist(jobId) {
