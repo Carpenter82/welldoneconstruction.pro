@@ -153,12 +153,18 @@
             const btn = document.getElementById('actionBtn');
             const statusLabel = document.getElementById('statusLabel');
 
+// Look inside refreshData() for this block and update it:
             if (data.jobStatus === "Offered" || data.jobStatus === "RESERVED" || data.jobStatus === "Active") {
                 currentJobStatus = data.jobStatus;
                 missionUI.style.display = 'block';
                 idleUI.style.display = 'none';
+                
+                // Inject all the new data points
                 document.getElementById('jobId').innerText = data.jobId;
                 document.getElementById('address').innerText = data.address;
+                document.getElementById('contactInfo').innerText = data.contact || "N/A";
+                document.getElementById('actionItems').innerText = data.notes || "None";
+                document.getElementById('deadline').innerText = data.deadline || "N/A";
                 
                 if (data.jobStatus === "Offered") {
                     statusLabel.innerText = "MISSION PENDING";
@@ -174,7 +180,7 @@
                 } else if (data.jobStatus === "Active") {
                     statusLabel.innerText = "PHASE: ACTIVE WORK";
                     statusLabel.className = "status-msg status-active";
-                    btn.innerText = "Resume Checklist";
+                    btn.innerText = "Start Mission"; // CHANGED FROM "Resume Checklist"
                     btn.style.background = "var(--active)";
                     btn.style.color = "white";
                 }
