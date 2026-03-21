@@ -118,7 +118,7 @@
         }
     }
 
-    function populateApplicantTable(dataSet) {
+function populateApplicantTable(dataSet) {
         const tableBody = document.getElementById('applicant-tbody');
         tableBody.innerHTML = ''; 
         dataSet.forEach(record => {
@@ -127,6 +127,9 @@
                 <td><b>${record.fname} ${record.lname}</b><br><small>${record.email}</small></td>
                 <td>${record.trade}<br><small>${record.exp} yrs exp</small></td>
                 <td>${record.pay || 'N/A'}</td>
+
+                <td><strong style="color: #33B26E;">${record.status}</strong></td>
+
                 <td align="center">${record.resumeUrl ? `<a href="${record.resumeUrl}" target="_blank">📄</a>` : '-'}</td>
                 <td>
                     <button class="button-base button-contract" onclick="triggerAction('sendAgreement', '${record.email}')">Agreement</button>
