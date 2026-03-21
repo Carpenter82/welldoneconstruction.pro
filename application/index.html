@@ -113,9 +113,9 @@
                 exp: document.getElementById('exp').value,
                 pay: document.getElementById('pay').value,
                 tools: document.getElementById('tools').value,
-                resumeBase64: base64File // <--- Sends the file data here
+                consent: document.getElementById('consent').checked ? "Agreed" : "No", // <-- ADDED THIS
+                resumeBase64: base64File 
             };
-
             try {
                 await fetch(API_URL, {
                     method: 'POST',
