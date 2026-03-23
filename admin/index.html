@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -23,7 +23,7 @@
         
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95rem; }
         th { text-align: left; color: #888; font-size: 0.8rem; text-transform: uppercase; padding: 12px 8px; border-bottom: 2px solid #eee; background: #fafafa; }
-        td { padding: 10px 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        td { padding: 12px 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
         
         .button-base { padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 0.75rem; margin-right: 4px; text-transform: uppercase; transition: background-color 0.2s ease; }
         .button-hire { background: var(--accent-green-color); } 
@@ -56,13 +56,14 @@
                 <tr>
                     <th width="20%">Name / Contact</th>
                     <th width="15%">Trade / Exp</th>
-                    <th width="15%">Requested Pay</th>
-                    <th width="10%">Resume</th>
+                    <th width="10%">Pay</th>
+                    <th width="10%">Status</th>
+                    <th width="5%">Resume</th>
                     <th width="40%">Controls</th> 
                 </tr>
             </thead>
             <tbody id="applicant-tbody">
-                <tr><td colspan="5" align="center">Syncing applicants...</td></tr>
+                <tr><td colspan="6" align="center">Syncing applicants...</td></tr>
             </tbody>
         </table>
     </div>
@@ -100,25 +101,20 @@
                 method: 'GET',
                 redirect: 'follow' 
             });
-
             const payload = await response.json();
             
             if (payload.applicants && payload.crew) {
                 populateApplicantTable(payload.applicants);
                 populateCrewTable(payload.crew);
                 displayStatus("✓ System Synchronized", "success");
-            } else {
-                displayStatus("Warning: Received Empty Data", "error");
             }
-            
             setTimeout(clearStatus, 2000);
         } catch (error) {
-            console.error("Master Engine Sync Error:", error);
-            displayStatus("Sync Failed: Check Console", "error");
+            displayStatus("Sync Failed", "error");
         }
     }
 
-function populateApplicantTable(dataSet) {
+    function populateApplicantTable(dataSet) {
         const tableBody = document.getElementById('applicant-tbody');
         tableBody.innerHTML = ''; 
         dataSet.forEach(record => {
@@ -126,14 +122,12 @@ function populateApplicantTable(dataSet) {
             row.innerHTML = `
                 <td><b>${record.fname} ${record.lname}</b><br><small>${record.email}</small></td>
                 <td>${record.trade}<br><small>${record.exp} yrs exp</small></td>
-                <td>${record.pay || 'N/A'}</td>
-
+                <td>$${record.pay || '0'}</td>
                 <td><strong style="color: #33B26E;">${record.status}</strong></td>
-
                 <td align="center">${record.resumeUrl ? `<a href="${record.resumeUrl}" target="_blank">📄</a>` : '-'}</td>
                 <td>
                     <button class="button-base button-contract" onclick="triggerAction('sendAgreement', '${record.email}')">Agreement</button>
-                    <button class="button-base button-hire" onclick="triggerAction('hireWorker', '${record.email}')">Hire</button>
+                    <button class="button-base button-hire" onclick="triggerAction('hireWorker', '${record.email}', { name: '${record.fname} ${record.lname}', trade: '${record.trade}' })">Hire</button>
                     <button class="button-base button-alert" onclick="triggerAction('requestOnboarding', '${record.email}')">BAD ID</button>
                 </td>`;
             tableBody.appendChild(row);
@@ -163,6 +157,7 @@ function populateApplicantTable(dataSet) {
         const newTrade = document.getElementById(`trade-update-${rowIndex}`).value;
         const newTier = document.getElementById(`tier-update-${rowIndex}`).value;
         if(confirm(`Update ${email}?`)) {
+            // Note: Ensure 'updateCrewDetails' action exists in your .gs script
             await triggerAction('updateCrewDetails', email, { trade: newTrade, tier: newTier });
         }
     }
@@ -170,17 +165,15 @@ function populateApplicantTable(dataSet) {
     async function triggerAction(action, email, extraData = {}) {
         displayStatus("Updating Master Engine...", "loading");
         const payload = { action: action, email: email, ...extraData };
-        
         try {
             await fetch(ENDPOINT_URL, { 
                 method: 'POST', 
+                mode: 'no-cors',
                 body: JSON.stringify(payload) 
             });
-            
             displayStatus("✓ Command Sent", "success");
             setTimeout(initializeDashboard, 2000);
         } catch (e) {
-            displayStatus("Syncing Changes...", "loading");
             setTimeout(initializeDashboard, 2000);
         }
     }
