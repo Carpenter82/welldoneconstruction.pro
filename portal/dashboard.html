@@ -107,7 +107,7 @@
                         <div class="label">Deadline</div>
                         <div id="deadline" class="data-point" style="color:var(--high-vis);">---</div>
 
-                        <button id="actionBtn" class="btn-claim" onclick="handleMissionAction()">Claim Mission</button>
+                        <button id="actionBtn" class="btn-claim" onclick="handleMissionAction()">Action Required</button>
                     </div>
                 </div>
             </div>
@@ -126,6 +126,7 @@
     </div>
 
 <script>
+    // Ensure this URL matches your latest deployment
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxQhVbb1DVGlY4QUtS_rfRn1gVAlrPfWdaxE_wXefGdcdjKvMLUnypu-yozYsX51oaa/exec'; 
     const urlParams = new URLSearchParams(window.location.search);
     const email = urlParams.get('email');
@@ -153,13 +154,11 @@
             const btn = document.getElementById('actionBtn');
             const statusLabel = document.getElementById('statusLabel');
 
-// Look inside refreshData() for this block and update it:
             if (data.jobStatus === "Offered" || data.jobStatus === "RESERVED" || data.jobStatus === "Active") {
                 currentJobStatus = data.jobStatus;
                 missionUI.style.display = 'block';
                 idleUI.style.display = 'none';
                 
-                // Inject all the new data points
                 document.getElementById('jobId').innerText = data.jobId;
                 document.getElementById('address').innerText = data.address;
                 document.getElementById('contactInfo').innerText = data.contact || "N/A";
@@ -171,16 +170,17 @@
                     statusLabel.className = "status-msg";
                     btn.innerText = "Accept Mission";
                     btn.style.background = "var(--high-vis)";
+                    btn.style.color = "var(--dark)";
                 } else if (data.jobStatus === "RESERVED") {
                     statusLabel.innerText = "PHASE: PREP TIME";
                     statusLabel.className = "status-msg status-prep";
-                    btn.innerText = "I am On-Site: Open Checklist";
+                    btn.innerText = "I am On-Site: Work Log";
                     btn.style.background = "var(--prep)";
                     btn.style.color = "white";
                 } else if (data.jobStatus === "Active") {
                     statusLabel.innerText = "PHASE: ACTIVE WORK";
                     statusLabel.className = "status-msg status-active";
-                    btn.innerText = "Start Mission"; // CHANGED FROM "Resume Checklist"
+                    btn.innerText = "Resume Work Log";
                     btn.style.background = "var(--active)";
                     btn.style.color = "white";
                 }
@@ -217,7 +217,7 @@
         const jobId = document.getElementById('jobId').innerText;
 
         if (currentJobStatus === "Offered") {
-            if(!confirm("Claim this mission for Prep Time? This locks the job for 3 days.")) return;
+            if(!confirm("Claim this mission? This locks the job for 3 days of Prep Time.")) return;
             btn.disabled = true; btn.innerText = "RESERVING...";
             await fetch(scriptURL, {
                 method: 'POST', mode: 'no-cors',
@@ -226,7 +226,7 @@
             alert("Reserved. Mission is now in PREP TIME.");
             refreshData();
         } else {
-            // REDIRECT TO CHECKLIST (Transition to ACTIVE happens at checklist entry)
+            // REDIRECT TO WORK LOG / CHECKLIST
             goToChecklist(jobId);
         }
     }
@@ -238,11 +238,12 @@
             method: 'POST', mode: 'no-cors',
             body: JSON.stringify({ action: 'acceptPublicJob', email: email, jobId: jobId })
         });
-        alert("Job Reserved. See Active Mission panel for Prep details.");
+        alert("Job Reserved. Check your Active Mission panel.");
         refreshData();
     }
 
     function goToChecklist(jobId) {
+        // Points to your new Work Log / Checklist page
         window.location.href = `../checklist/index.html?email=${encodeURIComponent(email)}&jobId=${encodeURIComponent(jobId)}`;
     }
 
