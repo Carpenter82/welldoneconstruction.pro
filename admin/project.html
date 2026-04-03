@@ -159,11 +159,12 @@
                     <th>Personnel</th>
                     <th>Classification/Note</th>
                     <th>Status</th>
+                    <th>Client Payment</th>
                     <th>Acknowledge</th>
                 </tr>
             </thead>
             <tbody id="activeDeploymentTable">
-                <tr><td colspan="5" style="text-align:center;">Synchronizing...</td></tr>
+                <tr><td colspan="6" style="text-align:center;">Synchronizing...</td></tr>
             </tbody>
         </table>
 
@@ -263,17 +264,26 @@
             const activeData = payload.active || [];
             
             if(activeData.length === 0) {
-                deploymentTable.innerHTML = '<tr><td colspan="5" style="text-align:center;">No active deployments.</td></tr>';
+                deploymentTable.innerHTML = '<tr><td colspan="6" style="text-align:center;">No active deployments.</td></tr>';
             } else {
                 activeData.forEach(row => {
                     const badgeClass = row.status === 'OFFERED' ? 'badge-offered' : 'badge-accepted';
+                    
+                    // Client Payment Setup
+                    const clientPay = row.clientPay || 'UNKNOWN';
+                    const payColor = clientPay === 'PAID' ? 'var(--accent-green)' : 'var(--alert-red)';
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${row.id}</td>
                         <td style="font-size:0.75rem;">${row.worker}</td>
                         <td>${row.note || ''}</td>
                         <td><span class="status-badge ${badgeClass}">${row.status}</span></td>
-                        <td><button class="btn-terminate" onclick="finalizeJob('${row.id}', this)">Dismiss</button></td>`;
+                        <td><span style="color: ${payColor}; font-weight: bold;">${clientPay}</span></td>
+                        <td style="white-space: nowrap;">
+                            ${clientPay !== 'PAID' ? `<button class="btn-success" style="padding: 8px 12px; font-size: 0.75rem; border: none; border-radius: 4px; color: white; cursor: pointer; margin-right: 5px;" onclick="markJobPaid('${row.id}', this)">Mark Paid</button>` : ''}
+                            <button class="btn-terminate" onclick="finalizeJob('${row.id}', this)">Dismiss</button>
+                        </td>`;
                     deploymentTable.appendChild(tr);
                 });
             }
@@ -331,6 +341,14 @@
         if(!confirm("Acknowledge field status for Job #" + jobId + "?")) return;
         btnElement.disabled = true; btnElement.innerText = "...";
         await transmit({ action: 'markJobComplete', jobId: jobId }, btnElement, "Dismiss");
+    }
+
+    // New Function specifically for the new "Mark Paid" button in the table
+    async function markJobPaid(jobId, btnElement) {
+        if(!confirm(`Mark Job ${jobId} as PAID by the client?`)) return;
+        btnElement.disabled = true; 
+        btnElement.innerText = "...";
+        await transmit({ action: 'updateProjectPayment', jobId: jobId, newStatus: "PAID" }, btnElement, "Mark Paid");
     }
 
     async function transmit(payload, btn, originalText) {
