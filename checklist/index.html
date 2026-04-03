@@ -108,23 +108,51 @@
 
     <div id="gpsStatus" style="color: #e74c3c;">🛰️ WAITING FOR GPS...</div>
 
-    <div class="camera-card">
-        <label for="arrivalPhoto" class="file-label">
-            📷 STEP 1: PHOTO OF ADDRESS<br>
-            <span style="font-size: 0.8rem; font-weight: normal;">(House Number or Mailbox)</span>
-        </label>
-        <input type="file" id="arrivalPhoto" accept="image/*" capture="environment">
-        <img id="prev1" class="preview-img">
+<div class="camera-card">
+    <label for="arrivalPhoto" class="file-label">
+        📷 STEP 1: PHOTO OF ADDRESS
+    </label>
+    <button type="button" class="instr-toggle" id="toggle1">View Photo Instructions</button>
+    
+    <div class="instr-content" id="content1">
+        <h4>How to Confirm You’re at the Right Location:</h4>
+        <p>Take a photo that proves you are at the correct property. Please ensure the photo includes something identifiable, such as the:</p>
+        <ul>
+            <li><strong>House number</strong></li>
+            <li><strong>Mailbox</strong></li>
+            <li><strong>Street sign</strong></li>
+            <li><strong>Front of the property</strong></li>
+        </ul>
+        <div class="instr-note">
+            <strong>Note:</strong> If the exact address isn’t visible, take a clear, wide shot of the location so the property can be easily recognized.
+        </div>
     </div>
 
-    <div class="camera-card">
-        <label for="exitPhoto" class="file-label">
-            📷 STEP 2: PHOTO OF WORK<br>
-            <span style="font-size: 0.8rem; font-weight: normal;">(Finished Product & Clean Site)</span>
-        </label>
-        <input type="file" id="exitPhoto" accept="image/*" capture="environment">
-        <img id="prev2" class="preview-img">
+    <input type="file" id="arrivalPhoto" accept="image/*" capture="environment">
+    <img id="prev1" class="preview-img">
+</div>
+
+<div class="camera-card">
+    <label for="exitPhoto" class="file-label">
+        📷 STEP 2: PHOTO OF WORK
+    </label>
+    <button type="button" class="instr-toggle" id="toggle2">View Photo Instructions</button>
+
+    <div class="instr-content" id="content2">
+        <h4>How to Take a Photo of Completed Work:</h4>
+        <p>Take photos showing that the work is fully complete and the area is clean. Please be sure to include:</p>
+        <ul>
+            <li><strong>The finished work</strong> (from a few different angles)</li>
+            <li><strong>The surrounding area</strong> (to show it has been thoroughly cleaned up)</li>
+        </ul>
+        <div class="instr-note">
+            <strong>Note:</strong> Make sure all photos are clear and show the full result of the finished work.
+        </div>
     </div>
+
+    <input type="file" id="exitPhoto" accept="image/*" capture="environment">
+    <img id="prev2" class="preview-img">
+</div>
 
     <div class="checklist-box">
         <input type="checkbox" id="cleanCheck">
