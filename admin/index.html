@@ -50,6 +50,26 @@
     <div id="status-notification" class="notification-bar"></div>
 
     <div class="data-container">
+        <h2>Accounts Payable (Pending Mission Payouts)</h2>
+        <table id="pay-table">
+            <thead>
+                <tr>
+                    <th width="15%">Date Completed</th>
+                    <th width="20%">Worker Name</th>
+                    <th width="10%">Job ID</th>
+                    <th width="20%">Mission Note</th>
+                    <th width="10%">Pay Amount</th>
+                    <th width="10%">Status</th>
+                    <th width="15%">Controls</th> 
+                </tr>
+            </thead>
+            <tbody id="pay-tbody">
+                <tr><td colspan="7" align="center">Syncing pay roster...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="data-container">
         <h2>Applicant Inbox</h2>
         <table>
             <thead>
@@ -88,7 +108,7 @@
     </div>
 
 <script>
-   const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbxqwDS9Jufsc_2uJkYfjjcLI5QQhcapCCtaq5VgP3o8mAhhxWwcy6051sHGWsmmS2St/exec';
+    const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbxqwDS9Jufsc_2uJkYfjjcLI5QQhcapCCtaq5VgP3o8mAhhxWwcy6051sHGWsmmS2St/exec';
     const TRADE_LIST = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
     const PAY_SCALE = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
 
@@ -106,6 +126,8 @@
             if (payload.applicants && payload.crew) {
                 populateApplicantTable(payload.applicants);
                 populateCrewTable(payload.crew);
+                // NEW: Populate the Pay Roster
+                if (payload.payRoster) populatePayTable(payload.payRoster);
                 displayStatus("✓ System Synchronized", "success");
             }
             setTimeout(clearStatus, 2000);
@@ -153,44 +175,61 @@
         });
     }
 
+    // NEW: Function to render the Pay Roster table
+    function populatePayTable(dataSet) {
+        const tableBody = document.getElementById('pay-tbody');
+        tableBody.innerHTML = ''; 
+        
+        if (dataSet.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="7" align="center">No pending payouts. All caught up!</td></tr>';
+            return;
+        }
+
+        dataSet.forEach(record => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${record.date}</td>
+                <td><b>${record.workerName}</b><br><small>${record.email}</small></td>
+                <td><strong>${record.jobId}</strong></td>
+                <td><small>${record.note}</small></td>
+                <td><strong>$${record.pay}</strong></td>
+                <td><strong style="color: ${record.status === 'PENDING' ? '#e74c3c' : '#33B26E'};">${record.status}</strong></td>
+                <td>
+                    ${record.status === 'PENDING' ? 
+                    `<button class="button-base button-hire" onclick="if(confirm('Mark ${record.jobId} as Paid for ${record.workerName}?')) triggerAction('markWorkerPaid', '${record.email}', { jobId: '${record.jobId}' })">Mark Paid</button>` 
+                    : '<span style="color:#aaa; font-weight:bold; font-size:12px;">✓ SETTLED</span>'}
+                </td>`;
+            tableBody.appendChild(row);
+        });
+    }
+
     async function saveCrewChanges(email, rowIndex) {
         const newTrade = document.getElementById(`trade-update-${rowIndex}`).value;
         const newTier = document.getElementById(`tier-update-${rowIndex}`).value;
         if(confirm(`Update ${email}?`)) {
-            // Note: Ensure 'updateCrewDetails' action exists in your .gs script
             await triggerAction('updateCrewDetails', email, { trade: newTrade, tier: newTier });
         }
     }
 
-async function triggerAction(action, email, extraData = {}) {
-    displayStatus("Updating Master Engine...", "loading");
-    
-    // We package everything into a single object
-    const payload = { action: action, email: email, ...extraData };
-    
-    try {
-        /* KEY FIXES:
-           1. mode: 'no-cors' -> Tells the browser to send the data without waiting for a CORS handshake.
-           2. Content-Type: 'text/plain' -> Prevents the browser from sending an 'OPTIONS' preflight request.
-        */
-        await fetch(ENDPOINT_URL, { 
-            method: 'POST', 
-            mode: 'no-cors', 
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(payload) 
-        });
+    async function triggerAction(action, email, extraData = {}) {
+        displayStatus("Updating Master Engine...", "loading");
+        const payload = { action: action, email: email, ...extraData };
         
-        // Note: With 'no-cors', we cannot read the server's response (it will be 'opaque').
-        // We assume success if the fetch doesn't throw a network error.
-        displayStatus("✓ Command Sent", "success");
-        
-        // Refresh the dashboard after 2 seconds to see the changes
-        setTimeout(initializeDashboard, 2000); 
-    } catch (e) {
-        console.error("Connection Error Detail:", e);
-        displayStatus("Connection Error", "error");
+        try {
+            await fetch(ENDPOINT_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(payload) 
+            });
+            
+            displayStatus("✓ Command Sent", "success");
+            setTimeout(initializeDashboard, 2000); 
+        } catch (e) {
+            console.error("Connection Error Detail:", e);
+            displayStatus("Connection Error", "error");
+        }
     }
-}
 
     function displayStatus(msg, type) { 
         const el = document.getElementById('status-notification');
