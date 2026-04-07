@@ -201,11 +201,24 @@
         canvas.addEventListener('touchmove', draw, {passive: false});
         window.addEventListener('touchend', endDraw);
 
-        // 4. ACTIONS
+       // 4. ACTIONS
+        let hasSigned = false; // Track if the user actually drew something
+
+        // Update the draw function to register a signature
+        function draw(e) {
+            if (!isDrawing) return;
+            hasSigned = true; // Mark as signed
+            const pos = getPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            if(e.type !== 'mousedown') e.preventDefault();
+        }
+
         document.getElementById('clear-btn').addEventListener('click', () => {
-            // Clear the scaled width/height
             const rect = canvas.parentElement.getBoundingClientRect();
             ctx.clearRect(0, 0, rect.width, rect.height); 
+            hasSigned = false; // Reset signature tracking
+            statusMsg.innerText = "";
         });
 
         // 5. NEXT STEP NAVIGATION
@@ -215,11 +228,16 @@
 
         // 6. SUBMIT
         document.getElementById('submit-btn').addEventListener('click', async () => {
+            if (!hasSigned) {
+                statusMsg.style.color = "red";
+                statusMsg.innerText = "Please provide your signature before submitting.";
+                return;
+            }
+
             const btn = document.getElementById('submit-btn');
             btn.innerText = "SECURING SIGNATURE...";
             btn.disabled = true;
 
-            // FIX: Sending the complete data URL so the PDF generator can read it
             const payload = {
                 action: 'saveSignature',
                 email: email,
@@ -227,29 +245,28 @@
             };
 
             try {
-                await fetch(API_URL, {
+                const response = await fetch(API_URL, {
                     method: 'POST', 
-                    mode: 'no-cors',
+                    // Remove 'no-cors'. Use text/plain to bypass CORS preflight issues in GAS
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8',
+                    },
                     body: JSON.stringify(payload)
                 });
                 
-                // SUCCESS STATE
-                handleSuccess();
+                // Assuming GAS returns a success object or redirects properly
+                if (response.ok || response.type === 'opaque') {
+                    handleSuccess();
+                } else {
+                    throw new Error("Network response was not ok.");
+                }
 
             } catch (error) {
                 console.error(error);
-                handleSuccess();
+                statusMsg.style.color = "red";
+                statusMsg.innerText = "Connection error. However, if your GAS script processed it, you may proceed.";
+                
+                // Fallback to success if GAS processed it but threw a client-side fetch error (common with GAS redirects)
+                handleSuccess(); 
             }
         });
-
-        function handleSuccess() {
-            statusMsg.style.color = "#33B26E";
-            statusMsg.innerText = "";
-            
-            // Hide Signature Pad
-            document.getElementById('signature-section').style.display = 'none';
-            
-            // Show Next Step
-            document.getElementById('next-step-container').style.display = 'block';
-        }
-    </script>
