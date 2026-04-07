@@ -98,6 +98,33 @@
         .btn:disabled { background: #444 !important; border-color: #333 !important; color: #666; cursor: not-allowed; }
 
         #gpsStatus { text-align: center; font-weight: bold; margin-bottom: 15px; }
+        /* Instruction Toggles */
+        .instr-content {
+            display: none;
+            background: #2a2a2a;
+            padding: 15px;
+            margin-top: 10px;
+            border-left: 4px solid var(--primary);
+            text-align: left;
+            font-size: 0.9rem;
+            color: #ddd;
+        }
+        .instr-toggle {
+            background: none;
+            border: none;
+            color: #3498db;
+            text-decoration: underline;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+        .instr-note {
+            background: #333;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            color: #f1c40f;
+        }
     </style>
 </head>
 <body>
@@ -167,8 +194,7 @@
     <p id="statusMsg" style="text-align:center; font-weight:bold; color: var(--primary);"></p>
 </div>
 
-<script>
-    // URL TO YOUR GOOGLE SCRIPT
+// URL TO YOUR GOOGLE SCRIPT
     const API_URL = "https://script.google.com/macros/s/AKfycbqwDS9Jufsc_2uJkYfjjcLI5QQhcapCCtaq5VgP3o8mAhhxWwcy6051sHGWsmmS2St/exec";
 
     const params = new URLSearchParams(window.location.search);
@@ -178,7 +204,23 @@
 
     let arrivalImg = null, exitImg = null, lat = null, lng = null;
 
-    // 1. Get GPS
+    // 1. Instruction Toggles
+    function setupToggle(toggleId, contentId) {
+        document.getElementById(toggleId).addEventListener('click', function() {
+            const content = document.getElementById(contentId);
+            if (content.style.display === "block") {
+                content.style.display = "none";
+                this.innerText = "View Photo Instructions";
+            } else {
+                content.style.display = "block";
+                this.innerText = "Hide Photo Instructions";
+            }
+        });
+    }
+    setupToggle('toggle1', 'content1');
+    setupToggle('toggle2', 'content2');
+
+    // 2. Get GPS
     navigator.geolocation.getCurrentPosition(
         (pos) => {
             lat = pos.coords.latitude; lng = pos.coords.longitude;
@@ -189,25 +231,51 @@
         { enableHighAccuracy: true }
     );
 
-    // 2. Handle Photos
+    // 3. Handle Photos with Compression (CRITICAL FOR MOBILE)
     function setupCamera(inputId, imgId) {
         document.getElementById(inputId).addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
             const reader = new FileReader();
             reader.onload = (f) => {
-                const img = document.getElementById(imgId);
-                img.src = f.target.result;
-                img.style.display = "block";
-                if(inputId === 'arrivalPhoto') arrivalImg = f.target.result.split(',')[1];
-                else exitImg = f.target.result.split(',')[1];
-                validate();
+                const imgElement = new Image();
+                imgElement.src = f.target.result;
+                
+                imgElement.onload = () => {
+                    // Compress Image using Canvas
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800; // Resize to max 800px width
+                    const scaleSize = MAX_WIDTH / imgElement.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = imgElement.height * scaleSize;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+                    
+                    // Convert back to Base64 (JPEG, 70% quality)
+                    const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+
+                    // Update UI
+                    const imgPreview = document.getElementById(imgId);
+                    imgPreview.src = compressedBase64;
+                    imgPreview.style.display = "block";
+
+                    // Save data without the "data:image/jpeg;base64," prefix
+                    if(inputId === 'arrivalPhoto') arrivalImg = compressedBase64.split(',')[1];
+                    else exitImg = compressedBase64.split(',')[1];
+                    
+                    validate();
+                };
             };
-            reader.readAsDataURL(e.target.files[0]);
+            reader.readAsDataURL(file);
         });
     }
+    
     setupCamera('arrivalPhoto', 'prev1');
     setupCamera('exitPhoto', 'prev2');
 
-    // 3. Enable buttons
+    // 4. Enable buttons
     document.getElementById('cleanCheck').onchange = validate;
 
     function validate() {
@@ -216,7 +284,7 @@
         document.getElementById('finalBtn').disabled = !ready;
     }
 
-    // 4. Submit
+    // 5. Submit Data
     async function sendWork(isFinal) {
         const btn1 = document.getElementById('pauseBtn');
         const btn2 = document.getElementById('finalBtn');
@@ -236,11 +304,20 @@
         };
 
         try {
-            await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
+            // FIXED: Removed 'no-cors', added text/plain header
+            const response = await fetch(API_URL, { 
+                method: "POST", 
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8'
+                },
+                body: JSON.stringify(payload) 
+            });
+            
             status.innerText = "SUCCESS! REDIRECTING...";
             setTimeout(() => {
                 window.location.href = `../portal/dashboard.html?email=${email}`;
             }, 2000);
+            
         } catch (e) {
             status.innerText = "ERROR. TRY AGAIN.";
             btn1.disabled = false; btn2.disabled = false;
@@ -249,8 +326,6 @@
 
     document.getElementById('pauseBtn').onclick = () => sendWork(false);
     document.getElementById('finalBtn').onclick = () => sendWork(true);
-
-</script>
 
 </body>
 </html>
