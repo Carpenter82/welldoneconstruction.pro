@@ -283,6 +283,7 @@
     }
 
     // 5. Submit Data
+// 5. Submit Data (Bulletproof Version)
     async function sendWork(isFinal) {
         const btn1 = document.getElementById('pauseBtn');
         const btn2 = document.getElementById('finalBtn');
@@ -302,21 +303,30 @@
         };
 
         try {
-            const response = await fetch(API_URL, { 
+            // Using 'no-cors' forces the browser to send the payload to Google Apps Script
+            // without being blocked by strict security policies.
+            await fetch(API_URL, { 
                 method: "POST", 
+                mode: "no-cors", 
                 headers: {
-                    'Content-Type': 'text/plain;charset=utf-8'
+                    'Content-Type': 'text/plain'
                 },
                 body: JSON.stringify(payload) 
             });
             
+            // Because of 'no-cors', we can't read Google's exact reply, 
+            // but if the fetch didn't crash, the data successfully left the building!
+            status.style.color = "#33B26E"; // Turn text green
             status.innerText = "SUCCESS! REDIRECTING...";
+            
             setTimeout(() => {
                 window.location.href = `../portal/dashboard.html?email=${email}`;
             }, 2000);
             
         } catch (e) {
-            status.innerText = "ERROR. TRY AGAIN.";
+            console.error("Upload failed:", e);
+            status.style.color = "#e74c3c"; // Turn text red
+            status.innerText = "NETWORK ERROR. TRY AGAIN.";
             btn1.disabled = false; btn2.disabled = false;
         }
     }
