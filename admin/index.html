@@ -36,6 +36,7 @@
         .notification-bar { max-width: 1400px; margin: 0 auto 15px auto; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; display: none; }
         .status-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .status-loading { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .status-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
         .navigation-button { text-decoration: none; color: var(--action-blue-color); font-weight: bold; border: 2px solid var(--action-blue-color); padding: 10px; border-radius: 5px; }
     </style>
@@ -108,7 +109,8 @@
     </div>
 
 <script>
-    const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbxqwDS9Jufsc_2uJkYfjjcLI5QQhcapCCtaq5VgP3o8mAhhxWwcy6051sHGWsmmS2St/exec';
+    // ✅ FIXED: Removed the rogue 'x' from the URL
+    const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbqwDS9Jufsc_2uJkYfjjcLI5QQhcapCCtaq5VgP3o8mAhhxWwcy6051sHGWsmmS2St/exec';
     const TRADE_LIST = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
     const PAY_SCALE = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
 
@@ -126,7 +128,6 @@
             if (payload.applicants && payload.crew) {
                 populateApplicantTable(payload.applicants);
                 populateCrewTable(payload.crew);
-                // NEW: Populate the Pay Roster
                 if (payload.payRoster) populatePayTable(payload.payRoster);
                 displayStatus("✓ System Synchronized", "success");
             }
@@ -175,7 +176,6 @@
         });
     }
 
-    // NEW: Function to render the Pay Roster table
     function populatePayTable(dataSet) {
         const tableBody = document.getElementById('pay-tbody');
         tableBody.innerHTML = ''; 
@@ -216,18 +216,24 @@
         const payload = { action: action, email: email, ...extraData };
         
         try {
-            await fetch(ENDPOINT_URL, { 
+            // ✅ FIXED: Removed no-cors and updated headers
+            const response = await fetch(ENDPOINT_URL, { 
                 method: 'POST', 
-                mode: 'no-cors', 
-                headers: { 'Content-Type': 'text/plain' },
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload) 
             });
+            
+            const result = await response.json();
+            
+            if (result.status === "error") {
+                throw new Error(result.message || "Backend rejected the action.");
+            }
             
             displayStatus("✓ Command Sent", "success");
             setTimeout(initializeDashboard, 2000); 
         } catch (e) {
             console.error("Connection Error Detail:", e);
-            displayStatus("Connection Error", "error");
+            displayStatus("Error: " + e.message, "error");
         }
     }
 
