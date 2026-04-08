@@ -18,7 +18,7 @@
             font-family: Arial, sans-serif; 
             margin: 0; 
             padding: 20px;
-            font-size: 1.2rem; /* Global Larger Font */
+            font-size: 1.2rem;
         }
 
         .container { max-width: 500px; margin: 0 auto; }
@@ -26,7 +26,6 @@
         h2 { color: var(--primary); text-transform: uppercase; margin-bottom: 5px; font-size: 1.8rem; }
         .sub-head { color: #888; margin-bottom: 25px; font-size: 1rem; }
 
-        /* Big Camera Buttons */
         .camera-card {
             background: #222;
             border: 3px solid #444;
@@ -58,7 +57,6 @@
             border: 2px solid var(--success);
         }
 
-        /* Large Checkbox Area */
         .checklist-box {
             background: #331a1a;
             border: 2px solid #c0392b;
@@ -78,7 +76,6 @@
 
         .check-text { font-weight: bold; color: #ffadad; line-height: 1.2; }
 
-        /* Giant Action Buttons */
         .btn {
             width: 100%;
             padding: 25px;
@@ -98,7 +95,7 @@
         .btn:disabled { background: #444 !important; border-color: #333 !important; color: #666; cursor: not-allowed; }
 
         #gpsStatus { text-align: center; font-weight: bold; margin-bottom: 15px; }
-        /* Instruction Toggles */
+        
         .instr-content {
             display: none;
             background: #2a2a2a;
@@ -135,51 +132,51 @@
 
     <div id="gpsStatus" style="color: #e74c3c;">🛰️ WAITING FOR GPS...</div>
 
-<div class="camera-card">
-    <label for="arrivalPhoto" class="file-label">
-        📷 STEP 1: PHOTO OF ADDRESS
-    </label>
-    <button type="button" class="instr-toggle" id="toggle1">View Photo Instructions</button>
-    
-    <div class="instr-content" id="content1">
-        <h4>How to Confirm You’re at the Right Location:</h4>
-        <p>Take a photo that proves you are at the correct property. Please ensure the photo includes something identifiable, such as the:</p>
-        <ul>
-            <li><strong>House number</strong></li>
-            <li><strong>Mailbox</strong></li>
-            <li><strong>Street sign</strong></li>
-            <li><strong>Front of the property</strong></li>
-        </ul>
-        <div class="instr-note">
-            <strong>Note:</strong> If the exact address isn’t visible, take a clear, wide shot of the location so the property can be easily recognized.
+    <div class="camera-card">
+        <label for="arrivalPhoto" class="file-label">
+            📷 STEP 1: PHOTO OF ADDRESS
+        </label>
+        <button type="button" class="instr-toggle" id="toggle1">View Photo Instructions</button>
+        
+        <div class="instr-content" id="content1">
+            <h4>How to Confirm You’re at the Right Location:</h4>
+            <p>Take a photo that proves you are at the correct property. Please ensure the photo includes something identifiable, such as the:</p>
+            <ul>
+                <li><strong>House number</strong></li>
+                <li><strong>Mailbox</strong></li>
+                <li><strong>Street sign</strong></li>
+                <li><strong>Front of the property</strong></li>
+            </ul>
+            <div class="instr-note">
+                <strong>Note:</strong> If the exact address isn’t visible, take a clear, wide shot of the location so the property can be easily recognized.
+            </div>
         </div>
+
+        <input type="file" id="arrivalPhoto" accept="image/*" capture="environment">
+        <img id="prev1" class="preview-img">
     </div>
 
-    <input type="file" id="arrivalPhoto" accept="image/*" capture="environment">
-    <img id="prev1" class="preview-img">
-</div>
+    <div class="camera-card">
+        <label for="exitPhoto" class="file-label">
+            📷 STEP 2: PHOTO OF WORK
+        </label>
+        <button type="button" class="instr-toggle" id="toggle2">View Photo Instructions</button>
 
-<div class="camera-card">
-    <label for="exitPhoto" class="file-label">
-        📷 STEP 2: PHOTO OF WORK
-    </label>
-    <button type="button" class="instr-toggle" id="toggle2">View Photo Instructions</button>
-
-    <div class="instr-content" id="content2">
-        <h4>How to Take a Photo of Completed Work:</h4>
-        <p>Take photos showing that the work is fully complete and the area is clean. Please be sure to include:</p>
-        <ul>
-            <li><strong>The finished work</strong> (from a few different angles)</li>
-            <li><strong>The surrounding area</strong> (to show it has been thoroughly cleaned up)</li>
-        </ul>
-        <div class="instr-note">
-            <strong>Note:</strong> Make sure all photos are clear and show the full result of the finished work.
+        <div class="instr-content" id="content2">
+            <h4>How to Take a Photo of Completed Work:</h4>
+            <p>Take photos showing that the work is fully complete and the area is clean. Please be sure to include:</p>
+            <ul>
+                <li><strong>The finished work</strong> (from a few different angles)</li>
+                <li><strong>The surrounding area</strong> (to show it has been thoroughly cleaned up)</li>
+            </ul>
+            <div class="instr-note">
+                <strong>Note:</strong> Make sure all photos are clear and show the full result of the finished work.
+            </div>
         </div>
-    </div>
 
-    <input type="file" id="exitPhoto" accept="image/*" capture="environment">
-    <img id="prev2" class="preview-img">
-</div>
+        <input type="file" id="exitPhoto" accept="image/*" capture="environment">
+        <img id="prev2" class="preview-img">
+    </div>
 
     <div class="checklist-box">
         <input type="checkbox" id="cleanCheck">
@@ -194,7 +191,8 @@
     <p id="statusMsg" style="text-align:center; font-weight:bold; color: var(--primary);"></p>
 </div>
 
-// URL TO YOUR GOOGLE SCRIPT
+<script>
+    // URL TO YOUR GOOGLE SCRIPT
     const API_URL = "https://script.google.com/macros/s/AKfycbqwDS9Jufsc_2uJkYfjjcLI5QQhcapCCtaq5VgP3o8mAhhxWwcy6051sHGWsmmS2St/exec";
 
     const params = new URLSearchParams(window.location.search);
@@ -304,7 +302,6 @@
         };
 
         try {
-            // FIXED: Removed 'no-cors', added text/plain header
             const response = await fetch(API_URL, { 
                 method: "POST", 
                 headers: {
@@ -327,5 +324,6 @@
     document.getElementById('pauseBtn').onclick = () => sendWork(false);
     document.getElementById('finalBtn').onclick = () => sendWork(true);
 
+</script>
 </body>
 </html>
