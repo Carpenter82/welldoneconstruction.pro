@@ -99,6 +99,7 @@
                     alert("Error reading file");
                     console.error(err);
                     btn.disabled = false;
+                    btn.innerText = "SUBMIT APPLICATION";
                     return;
                 }
             }
@@ -113,22 +114,32 @@
                 exp: document.getElementById('exp').value,
                 pay: document.getElementById('pay').value,
                 tools: document.getElementById('tools').value,
-                consent: document.getElementById('consent').checked ? "Agreed" : "No", // <-- ADDED THIS
+                consent: document.getElementById('consent').checked ? "Agreed" : "No",
                 resumeBase64: base64File 
             };
+            
             try {
-                await fetch(API_URL, {
+                // ✅ FIXED: Removed no-cors, added text/plain header
+                const response = await fetch(API_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8"
+                    },
                     body: JSON.stringify(payload)
                 });
+                
+                const result = await response.json();
+                
+                if (result.status === "error") {
+                    throw new Error(result.message);
+                }
                 
                 alert("Application Sent! Check Email Shortly.");
                 window.location.href = "../thank-you.html"; // Ensure this page exists!
                 
             } catch (err) {
                 console.error(err);
-                alert("Error connecting.");
+                alert("Error connecting: " + err.message);
                 btn.disabled = false;
                 btn.innerText = "SUBMIT APPLICATION";
             }
