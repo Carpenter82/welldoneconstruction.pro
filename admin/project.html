@@ -199,7 +199,7 @@
 </div>
 
 <script>
-    const MASTER_ENGINE_URL = 'https://script.google.com/macros/s/AKfycbxqwDS9Jufsc_2uJkYfjjcLI5QQhcapCCtaq5VgP3o8mAhhxWwcy6051sHGWsmmS2St/exec';
+    const MASTER_ENGINE_URL = 'https://script.google.com/macros/s/AKfycbqwDS9Jufsc_2uJkYfjjcLI5QQhcapCCtaq5VgP3o8mAhhxWwcy6051sHGWsmmS2St/exec';
 
     window.onload = synchronizeDashboard;
 
@@ -221,7 +221,6 @@
             const response = await fetch(`${MASTER_ENGINE_URL}?action=getAdminDashboard&nocache=${Date.now()}`);
             const payload = await response.json();
             
-            // Populate Address History
             const addressList = document.getElementById('addressHistory');
             addressList.innerHTML = '';
             (payload.addresses || []).forEach(addr => {
@@ -230,7 +229,6 @@
                 addressList.appendChild(opt);
             });
 
-            // Populate Project Selectors
             const projects = payload.jobs || [];
             const jobSelectors = [
                 document.getElementById('selectorActiveJob'),
@@ -248,7 +246,6 @@
                 });
             });
 
-            // Populate Crew
             const crewList = document.getElementById('crewDatalist');
             crewList.innerHTML = '';
             (payload.crew || []).forEach(c => {
@@ -258,7 +255,6 @@
                 crewList.appendChild(opt);
             });
 
-            // Populate Active Table
             const deploymentTable = document.getElementById('activeDeploymentTable');
             deploymentTable.innerHTML = '';
             const activeData = payload.active || [];
@@ -268,8 +264,6 @@
             } else {
                 activeData.forEach(row => {
                     const badgeClass = row.status === 'OFFERED' ? 'badge-offered' : 'badge-accepted';
-                    
-                    // Client Payment Setup
                     const clientPay = row.clientPay || 'UNKNOWN';
                     const payColor = clientPay === 'PAID' ? 'var(--accent-green)' : 'var(--alert-red)';
 
@@ -325,7 +319,7 @@
     async function transmitPublicBroadcast() {
         const btn = document.getElementById('submitBroadcast');
         const payload = { 
-            action: 'broadcastToBoard', // Updated to match AppScript exactly
+            action: 'broadcastToBoard', 
             jobId: document.getElementById('selectorActiveJob').value, 
             pay: document.getElementById('inputBroadcastRate').value, 
             note: document.getElementById('inputBroadcastNote').value,
@@ -343,7 +337,6 @@
         await transmit({ action: 'markJobComplete', jobId: jobId }, btnElement, "Dismiss");
     }
 
-    // New Function specifically for the new "Mark Paid" button in the table
     async function markJobPaid(jobId, btnElement) {
         if(!confirm(`Mark Job ${jobId} as PAID by the client?`)) return;
         btnElement.disabled = true; 
@@ -353,17 +346,26 @@
 
     async function transmit(payload, btn, originalText) {
         try {
-            await fetch(MASTER_ENGINE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            setTimeout(() => {
-                alert("✅ Success: Command Sent");
-                // Clear text inputs but keep selectors
+            const response = await fetch(MASTER_ENGINE_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload) 
+            });
+            
+            const result = await response.json();
+            
+            if (result.status === "success" || result.newId) {
+                alert("✅ Success: Command Processed");
                 document.querySelectorAll('input:not([list]), textarea').forEach(el => el.value = '');
-                synchronizeDashboard();
-                btn.disabled = false; btn.innerText = originalText;
-            }, 1200);
+                await synchronizeDashboard();
+            } else {
+                alert("❌ Engine Error: " + (result.message || "Unknown error"));
+            }
         } catch (e) { 
-            alert("Connection error."); 
-            btn.disabled = false; btn.innerText = originalText;
+            alert("Connection error: Unable to reach Master Engine."); 
+        } finally {
+            btn.disabled = false; 
+            btn.innerText = originalText;
         }
     }
 
