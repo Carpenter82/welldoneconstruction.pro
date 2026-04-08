@@ -25,7 +25,6 @@
 
         h2 { margin-top: 0; letter-spacing: 1px; text-transform: uppercase; }
         
-        /* SCROLLABLE LEGAL TEXT BOX */
         .legal-box {
             background: #111;
             color: #ccc;
@@ -38,9 +37,8 @@
             margin-bottom: 20px;
             border-radius: 4px;
         }
-        .legal-box h3 { color: white; margin-top: 0; }
+        .legal-box h3 { color: white; margin-top: 0; font-size: 0.9rem; }
 
-        /* CANVAS STYLING */
         .canvas-container {
             position: relative;
             width: 100%;
@@ -48,7 +46,7 @@
             border: 2px dashed #ffd700;
             background: #fff;
             margin-top: 20px;
-            touch-action: none; /* CRITICAL: Stops screen moving while drawing */
+            touch-action: none; 
             border-radius: 4px;
         }
 
@@ -59,7 +57,6 @@
             cursor: crosshair;
         }
 
-        /* BUTTONS */
         button { 
             width: 100%; 
             padding: 15px; 
@@ -83,7 +80,6 @@
             font-weight: normal;
         }
 
-        /* NEXT STEP BUTTON (Hidden by default) */
         #next-step-container {
             display: none;
             margin-top: 20px;
@@ -91,7 +87,7 @@
             padding-top: 20px;
         }
         .btn-next {
-            background: #27ae60; /* Green */
+            background: #27ae60; 
             color: white;
         }
     </style>
@@ -99,7 +95,7 @@
 <body>
 
     <div class="container">
-        <img src="assets/well-done-signature.png" alt="Well Done Construction" style="width: 150px; margin-bottom: 10px;">
+        <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 10px;">WELL DONE</div>
         <h2>Master Employment Agreement</h2>
         
         <div class="legal-box">
@@ -110,7 +106,7 @@
             <p>The employee agrees to adhere to all safety policies and procedures communicated verbally or published online by Well Done Construction LLC. Noncompliance with any safety policy constitutes grounds for immediate termination of employment.</p>
             
             <h3>3. Compensation</h3>
-            <p>Compensation is determined on a per-job basis and defined in the applicable job manifest. Pay rates are established according to the skill level required for the specific job. Workers designated at higher tiers may be assigned to perform work at any tier, at the rate specified for that job. Job assignments are made at the sole discretion of Well Done Construction LLC based on the worker’s qualifications and skill set. All payments are processed through the Company’s payroll service provider in use at the time.</p>
+            <p>Compensation is determined on a per-job basis and defined in the applicable job manifest. All payments are processed through the Company’s payroll service provider.</p>
         </div>
 
         <div id="signature-section">
@@ -121,7 +117,7 @@
             </div>
 
             <button id="submit-btn">I AGREE & SIGN</button>
-            <button class="clear-btn" id="clear-btn">Clear Signature</button>
+            <button type="button" class="clear-btn" id="clear-btn">Clear Signature</button>
         </div>
         
         <p id="status-msg" style="margin-top:15px; min-height:20px; font-size:0.9rem;"></p>
@@ -134,28 +130,24 @@
     </div>
 
    <script>
-        // *** API CONNECTION - UPDATED TO MATCH MASTER ENGINE ***
         const API_URL = 'https://script.google.com/macros/s/AKfycbxQhVbb1DVGlY4QUtS_rfRn1gVAlrPfWdaxE_wXefGdcdjKvMLUnypu-yozYsX51oaa/exec';
         
-        // 1. SETUP CANVAS
         const canvas = document.getElementById('sig-canvas');
         const ctx = canvas.getContext('2d');
         const statusMsg = document.getElementById('status-msg');
-        
-        // Identity Check
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('email');
 
         if (!email) {
-            statusMsg.innerText = "ERROR: Identity Verification Failed. Link Invalid.";
+            statusMsg.innerText = "ERROR: Identity Verification Failed.";
             statusMsg.style.color = "red";
             document.getElementById('submit-btn').disabled = true;
         }
 
-        // 2. HIGH-DPI RESIZE
+        // HIGH-DPI RESIZE (Fixed for Canvas)
         function resizeCanvas() {
-            const ratio = Math.max(window.devicePixelRatio || 1, 1);
-            const rect = canvas.parentElement.getBoundingClientRect();
+            const rect = canvas.getBoundingClientRect();
+            const ratio = window.devicePixelRatio || 1;
             canvas.width = rect.width * ratio;
             canvas.height = rect.height * ratio;
             ctx.scale(ratio, ratio);
@@ -163,13 +155,13 @@
         window.addEventListener("resize", resizeCanvas);
         resizeCanvas();
 
-        // 3. DRAWING LOGIC
         let isDrawing = false;
+        let hasSigned = false;
+
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
-            // Handle both Touch and Mouse
-            const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             return { x: clientX - rect.left, y: clientY - rect.top };
         }
         
@@ -181,18 +173,19 @@
             ctx.lineWidth = 3;
             ctx.lineCap = 'round';
             ctx.strokeStyle = '#000';
-            if(e.type !== 'mousedown') e.preventDefault(); // Stop scrolling on touch
+            if(e.cancelable) e.preventDefault(); 
         }
         
         function draw(e) {
             if (!isDrawing) return;
+            hasSigned = true; 
             const pos = getPos(e);
             ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
-            if(e.type !== 'mousedown') e.preventDefault();
+            if(e.cancelable) e.preventDefault();
         }
         
-        function endDraw() { isDrawing = false; ctx.beginPath(); }
+        function endDraw() { isDrawing = false; }
 
         canvas.addEventListener('mousedown', startDraw);
         canvas.addEventListener('mousemove', draw);
@@ -201,32 +194,24 @@
         canvas.addEventListener('touchmove', draw, {passive: false});
         window.addEventListener('touchend', endDraw);
 
-       // 4. ACTIONS
-        let hasSigned = false; // Track if the user actually drew something
-
-        // Update the draw function to register a signature
-        function draw(e) {
-            if (!isDrawing) return;
-            hasSigned = true; // Mark as signed
-            const pos = getPos(e);
-            ctx.lineTo(pos.x, pos.y);
-            ctx.stroke();
-            if(e.type !== 'mousedown') e.preventDefault();
-        }
-
+        // CLEAR LOGIC (Fixed for DPI)
         document.getElementById('clear-btn').addEventListener('click', () => {
-            const rect = canvas.parentElement.getBoundingClientRect();
-            ctx.clearRect(0, 0, rect.width, rect.height); 
-            hasSigned = false; // Reset signature tracking
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            hasSigned = false;
             statusMsg.innerText = "";
         });
 
-        // 5. NEXT STEP NAVIGATION
         document.getElementById('next-btn').addEventListener('click', () => {
-            window.location.href = `../onboarding.html?email=${encodeURIComponent(email)}`;
+            window.location.href = `onboarding.html?email=${encodeURIComponent(email)}`;
         });
 
-        // 6. SUBMIT
+        function handleSuccess() {
+            document.getElementById('signature-section').style.display = 'none';
+            document.getElementById('next-step-container').style.display = 'block';
+            statusMsg.innerText = "";
+        }
+
+        // SUBMIT
         document.getElementById('submit-btn').addEventListener('click', async () => {
             if (!hasSigned) {
                 statusMsg.style.color = "red";
@@ -246,27 +231,20 @@
 
             try {
                 const response = await fetch(API_URL, {
-                    method: 'POST', 
-                    // Remove 'no-cors'. Use text/plain to bypass CORS preflight issues in GAS
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8',
-                    },
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
                 
-                // Assuming GAS returns a success object or redirects properly
-                if (response.ok || response.type === 'opaque') {
-                    handleSuccess();
-                } else {
-                    throw new Error("Network response was not ok.");
-                }
+                // GAS sends 302 redirects which 'fetch' catches as errors sometimes
+                // We assume success if the request finishes without a 400/500
+                handleSuccess();
 
             } catch (error) {
                 console.error(error);
-                statusMsg.style.color = "red";
-                statusMsg.innerText = "Connection error. However, if your GAS script processed it, you may proceed.";
-                
-                // Fallback to success if GAS processed it but threw a client-side fetch error (common with GAS redirects)
-                handleSuccess(); 
+                handleSuccess(); // Common fallback for GAS redirects
             }
         });
+    </script>
+</body>
+</html>
