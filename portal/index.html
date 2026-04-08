@@ -7,13 +7,14 @@
     <link rel="stylesheet" href="../styles.css">
     <title>Worker Login | Well Done</title>
     <style>
-        /* Ensuring internal consistency if styles.css isn't loaded */
         :root {
             --primary: #2c3e50;
             --accent: #33B26E;
             --warning: #c0392b;
         }
         
+        body { font-family: -apple-system, sans-serif; margin: 0; background-color: #f4f7f6; }
+
         .login-input {
             width: 100%;
             padding: 15px;
@@ -36,13 +37,32 @@
             border-radius: 4px;
         }
         .login-btn:hover { background: #34495e; }
+        .login-btn:disabled { background: #95a5a6; cursor: not-allowed; }
+
         .info-list { padding-left: 20px; text-align: left; }
         .info-list li { margin-bottom: 8px; }
         
-        /* Helper classes if not in styles.css */
-        .warehouse-card { background: white; padding: 20px; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 20px; }
-        .poster-header { background: var(--primary); color: white; padding: 10px; font-weight: bold; margin: -20px -20px 20px -20px; border-radius: 6px 6px 0 0; }
-        .warning-stripe { height: 10px; background: repeating-linear-gradient(45deg, #f1c40f, #f1c40f 10px, #000 10px, #000 20px); margin: 10px 0; }
+        .warehouse-card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            border: 2px solid #ddd; 
+            margin-bottom: 20px; 
+            overflow: hidden; /* Added to clip the header */
+        }
+        .poster-header { 
+            background: var(--primary); 
+            color: white; 
+            padding: 10px; 
+            font-weight: bold; 
+            margin: -20px -20px 20px -20px; 
+            border-radius: 0; /* Changed to 0 for a cleaner bleed */
+        }
+        .warning-stripe { 
+            height: 10px; 
+            background: repeating-linear-gradient(45deg, #f1c40f, #f1c40f 10px, #000 10px, #000 20px); 
+            margin: 10px 0; 
+        }
     </style>
 </head>
 <body class="warehouse-theme">
@@ -51,14 +71,13 @@
         <div class="poster-header">WORKER PORTAL LOGIN</div>
         <p>Enter email to view your site assignment.</p>
         
-        <input type="email" id="em" class="login-input" placeholder="worker@email.com" 
-               onkeypress="if(event.key === 'Enter') loginWorker()">
-        
-        <button onclick="loginWorker()" class="login-btn">AUTHENTICATE</button>
+        <form onsubmit="event.preventDefault(); loginWorker();">
+            <input type="email" id="em" class="login-input" placeholder="worker@email.com" required>
+            <button type="submit" id="loginBtn" class="login-btn">AUTHENTICATE</button>
+        </form>
     </div>
 
     <div class="poster-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; padding: 0 20px;">
-        
         <div class="warehouse-card">
             <div class="poster-header">STATUS: W-2 ON-CALL</div>
             <div class="warning-stripe"></div>
@@ -82,18 +101,16 @@
     </div>
 
     <script>
-        // Check for pre-existing email in the URL on load
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const emailParam = urlParams.get('email');
             if (emailParam) {
                 document.getElementById('em').value = emailParam.toLowerCase();
-                // Optionally auto-login if email is present
-                // loginWorker(); 
             }
         };
 
         function loginWorker() {
+            const btn = document.getElementById('loginBtn');
             const emailInput = document.getElementById('em');
             const emailValue = emailInput.value.trim().toLowerCase();
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -104,7 +121,10 @@
                 return;
             }
             
-            // Redirect to the actual dashboard
+            // Visual feedback
+            btn.disabled = true;
+            btn.innerText = "AUTHENTICATING...";
+            
             window.location.href = 'dashboard.html?email=' + encodeURIComponent(emailValue);
         }
     </script>
