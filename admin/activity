@@ -43,7 +43,7 @@
 
   <script>
     // UPDATED DEPLOYMENT ID: Version 134
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzgDKD-WxUrdxIPzyNOQ1Re00tZG23RHaiD0FLzs6Lv07YK916vPEMVx3ivYi9IhYKd/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxqwDS9Jufsc_2uJkYfjjcLI5QQhcapCCtaq5VgP3o8mAhhxWwcy6051sHGWsmmS2St/exec';
     
     async function loadLogs() {
         try {
