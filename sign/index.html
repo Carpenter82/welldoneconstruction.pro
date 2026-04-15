@@ -201,9 +201,11 @@
             statusMsg.innerText = "";
         });
 
-        document.getElementById('next-btn').addEventListener('click', () => {
-            window.location.href = `onboarding.html?email=${encodeURIComponent(email)}`;
-        });
+      document.getElementById('next-btn').addEventListener('click', () => {
+    // This ensures the browser goes exactly where you want it to go
+    const destination = "https://welldoneconstruction.pro/onboarding.html";
+    window.location.href = `${destination}?email=${encodeURIComponent(email)}`;
+});
 
         function handleSuccess() {
             document.getElementById('signature-section').style.display = 'none';
