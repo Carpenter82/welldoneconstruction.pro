@@ -212,14 +212,17 @@
         }
     }
 
-    async function triggerAction(action, email, extraData = {}) {
+async function triggerAction(action, email, extraData = {}) {
         displayStatus("Updating Master Engine...", "loading");
         const payload = { action: action, email: email, ...extraData };
         
         try {
+            // THE FIX: Strict text/plain to bypass the CORS Preflight
             const response = await fetch(ENDPOINT_URL, { 
                 method: 'POST', 
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                headers: { 
+                    'Content-Type': 'text/plain' 
+                },
                 redirect: 'follow', 
                 body: JSON.stringify(payload) 
             });
