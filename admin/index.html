@@ -219,22 +219,18 @@ async function triggerAction(action, email, extraData = {}) {
         try {
             // THE FIX: Strict text/plain to bypass the CORS Preflight
             const response = await fetch(ENDPOINT_URL, { 
-                method: 'POST', 
-                headers: { 
-                    'Content-Type': 'text/plain' 
-                },
-                redirect: 'follow', 
-                body: JSON.stringify(payload) 
-            });
-            
-            const result = await response.json();
-            
-            if (result.status === "error") {
-                throw new Error(result.message || "Backend rejected the action.");
-            }
-            
-            displayStatus("✓ Command Sent", "success");
-            setTimeout(initializeDashboard, 2000); 
+    method: 'POST', 
+    mode: 'no-cors', // <--- Add this line
+    headers: { 
+        'Content-Type': 'text/plain' 
+    },
+    body: JSON.stringify(payload) 
+});
+
+// Since 'no-cors' prevents reading the response, 
+// we assume success if no network error occurred.
+displayStatus("✓ Command Sent", "success");
+setTimeout(initializeDashboard, 2000); 
         } catch (e) {
             console.error("Connection Error Detail:", e);
             displayStatus("Error: " + e.message, "error");
