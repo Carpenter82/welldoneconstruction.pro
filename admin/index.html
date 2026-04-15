@@ -109,8 +109,9 @@
     </div>
 
 <script>
-    // ✅ FIXED: Removed the rogue 'x' from the URL
-    const ENDPOINT_URL = https://script.google.com/macros/s/AKfycbxPPfdpQFWhxEwa849vZ-Uxqp5gkHtxjIAe_YZ9AEk/dev;
+    // ✅ FIXED: Using the production /exec link properly wrapped in quotes
+    const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbxqwDS9Jufsc_2uJkYfjjcLI5QQhcapCCtaq5VgP3o8mAhhxWwcy6051sHGWsmmS2St/exec';
+    
     const TRADE_LIST = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
     const PAY_SCALE = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
 
@@ -216,11 +217,10 @@
         const payload = { action: action, email: email, ...extraData };
         
         try {
-            // ✅ FIXED: Removed no-cors and updated headers
             const response = await fetch(ENDPOINT_URL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                redirect: 'follow', // <-- ADD THIS LINE
+                redirect: 'follow', 
                 body: JSON.stringify(payload) 
             });
             
