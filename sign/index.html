@@ -229,9 +229,8 @@
     action: 'saveSignature',
     email: email,
     base64: canvas.toDataURL(), 
-    agreementHtml: document.querySelector('.legal-box').innerHTML, // Grabs the agreement text to make the PDF
-    idBase64: idBase64String, // You'll need to grab this from a file input
-    oshaBase64: oshaBase64String // You'll need to grab this from a file input (if provided)
+    agreementHtml: document.querySelector('.legal-box').innerHTML
+    // I removed the idBase64 and oshaBase64 lines completely
 };
 
             try {
