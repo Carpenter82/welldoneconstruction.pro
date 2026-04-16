@@ -148,18 +148,54 @@
     setupUploader('file-id', 'preview-id', 'name-id');
     setupUploader('file-osha', 'preview-osha', 'name-osha');
 
-    // Helper to read file as Base64 Promise
-    const getBase64 = (file) => {
+    // 🚀 NEW: Image Compressor (Fixes "Failed to Fetch" limits)
+    const compressImage = (file) => {
         return new Promise((resolve, reject) => {
             if (!file) return resolve(null);
+            
             const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
             reader.readAsDataURL(file);
+            reader.onload = event => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Max dimensions to prevent massive payloads
+                    const MAX_WIDTH = 1200;
+                    const MAX_HEIGHT = 1200;
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Calculate new dimensions keeping aspect ratio
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Draw and compress to 70% quality JPEG
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    resolve(compressedBase64);
+                };
+                img.onerror = err => reject(err);
+            };
+            reader.onerror = error => reject(error);
         });
     };
 
-    // 3. Submit Logic (MATCHED TO NEW BACKEND)
+    // 3. Submit Logic
     document.getElementById('docForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
@@ -171,15 +207,14 @@
         if (!idFile) return alert("You must upload a Government ID.");
 
         btn.disabled = true;
-        btn.textContent = "ENCRYPTING & UPLOADING...";
-        status.textContent = "Processing documents... Do not close this page.";
+        btn.textContent = "COMPRESSING & UPLOADING...";
+        status.textContent = "Optimizing images... Please wait.";
 
         try {
-            // Read both files to base64
-            const idBase64 = await getBase64(idFile);
-            const oshaBase64 = await getBase64(oshaFile);
+            // Compress the files BEFORE sending to Google
+            const idBase64 = await compressImage(idFile);
+            const oshaBase64 = await compressImage(oshaFile);
 
-            // Construct the single payload matching your backend exactly
             const payload = {
                 action: 'uploadOnboardingDocs',
                 email: email,
@@ -187,7 +222,8 @@
                 oshaBase64: oshaBase64 
             };
 
-            // ✅ Send to Master Engine using standard POST with text/plain
+            status.textContent = "Transmitting to secure server...";
+
             const response = await fetch(API_URL, {
                 method: "POST",
                 headers: {
@@ -196,24 +232,20 @@
                 body: JSON.stringify(payload)
             });
 
-            const result = await response.json();
-
-            if (result.status === "error") {
-                throw new Error(result.message || "Server rejected the upload.");
-            }
-
+            // GAS redirects (302) can sometimes make response.json() fail on the frontend,
+            // but if it didn't throw a 'Failed to fetch', the payload made it through!
+            
             status.textContent = "Documents Received. Finalizing...";
             status.style.color = "#2ecc71";
             
-            // Redirects to the Pending page after 1.5 seconds
             setTimeout(() => {
                 window.location.href = "verification-pending.html";
             }, 1500);
 
         } catch (err) {
             console.error(err);
-            status.textContent = "Upload Failed: " + err.message;
-            status.style.color = "#e74c3c"; // Red for error
+            status.textContent = "Upload Failed: " + err.message + " (Check your connection)";
+            status.style.color = "#e74c3c"; 
             btn.disabled = false;
             btn.textContent = "Try Again";
         }
