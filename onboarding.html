@@ -88,7 +88,7 @@
                 <div style="font-size:0.8rem; color:#888;">Driver's License or Passport</div>
                 
                 <label for="file-id" class="custom-upload-btn">Choose Photo</label>
-                <input type="file" id="file-id" accept="image/*" required>
+                <input type="file" id="file-id" accept="image/*">
                 
                 <div id="name-id" class="file-name"></div>
                 <img id="preview-id" class="preview-img">
@@ -210,7 +210,7 @@
         btn.textContent = "COMPRESSING & UPLOADING...";
         status.textContent = "Optimizing images... Please wait.";
 
-  try {
+        try {
             // Compress the files BEFORE sending to Google
             const idBase64 = await compressImage(idFile);
             const oshaBase64 = await compressImage(oshaFile);
@@ -260,6 +260,7 @@
                 btn.textContent = "Try Again";
             }
         }
+    }); // Fixed: Added this missing line back in to close the event listener properly!
 </script>
 </body>
 </html>
