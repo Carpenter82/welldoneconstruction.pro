@@ -4,16 +4,57 @@
     <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../styles.css">
     <title>Worker Login | Well Done</title>
     <style>
         :root {
             --primary: #2c3e50;
             --accent: #33B26E;
             --warning: #c0392b;
+            --background: #f4f7f6;
         }
-        
-        body { font-family: -apple-system, sans-serif; margin: 0; background-color: #f4f7f6; }
+
+        /* Global Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background-color: var(--background); 
+            padding: 20px;
+            color: #333;
+        }
+
+        /* Card Container */
+        .warehouse-card { 
+            background: white; 
+            border-radius: 8px; 
+            border: 2px solid #ddd; 
+            margin-bottom: 20px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* Headers */
+        .poster-header { 
+            background: var(--primary); 
+            color: white; 
+            padding: 15px; 
+            font-weight: bold; 
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        /* Forms & Inputs */
+        form {
+            margin-top: 15px;
+        }
 
         .login-input {
             width: 100%;
@@ -21,9 +62,14 @@
             margin-bottom: 15px;
             border: 2px solid var(--primary);
             font-size: 1rem;
-            box-sizing: border-box;
             border-radius: 4px;
+            outline: none;
         }
+
+        .login-input:focus {
+            border-color: var(--accent);
+        }
+
         .login-btn {
             width: 100%;
             padding: 15px;
@@ -36,67 +82,89 @@
             transition: background 0.2s;
             border-radius: 4px;
         }
+
         .login-btn:hover { background: #34495e; }
         .login-btn:disabled { background: #95a5a6; cursor: not-allowed; }
 
-        .info-list { padding-left: 20px; text-align: left; }
-        .info-list li { margin-bottom: 8px; }
+        /* Status & Lists */
+        .info-list { 
+            padding-left: 20px; 
+            text-align: left; 
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
         
-        .warehouse-card { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            border: 2px solid #ddd; 
-            margin-bottom: 20px; 
-            overflow: hidden; /* Added to clip the header */
-        }
-        .poster-header { 
-            background: var(--primary); 
-            color: white; 
-            padding: 10px; 
-            font-weight: bold; 
-            margin: -20px -20px 20px -20px; 
-            border-radius: 0; /* Changed to 0 for a cleaner bleed */
-        }
+        .info-list li { margin-bottom: 8px; }
+
+        /* Warning Graphics */
         .warning-stripe { 
-            height: 10px; 
+            height: 12px; 
             background: repeating-linear-gradient(45deg, #f1c40f, #f1c40f 10px, #000 10px, #000 20px); 
-            margin: 10px 0; 
+            border-bottom: 2px solid #333;
+            border-top: 2px solid #333;
         }
+
+        .warning-stripe-red {
+            height: 12px; 
+            background: repeating-linear-gradient(45deg, #000, #000 10px, var(--warning) 10px, var(--warning) 20px); 
+            border-bottom: 2px solid #333;
+            border-top: 2px solid #333;
+        }
+
+        /* Layout Grids */
+        .login-container {
+            max-width: 450px; 
+            margin: 40px auto; 
+            text-align: center;
+        }
+
+        .poster-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+        }
+
     </style>
 </head>
 <body class="warehouse-theme">
 
-    <div class="warehouse-card" style="max-width: 450px; margin: 40px auto; text-align: center;">
+    <div class="warehouse-card login-container">
         <div class="poster-header">WORKER PORTAL LOGIN</div>
-        <p>Enter email to view your site assignment.</p>
-        
-        <form onsubmit="event.preventDefault(); loginWorker();">
-            <input type="email" id="em" class="login-input" placeholder="worker@email.com" required>
-            <button type="submit" id="loginBtn" class="login-btn">AUTHENTICATE</button>
-        </form>
+        <div class="card-body">
+            <p style="margin-bottom: 10px; color: #666;">Enter email to view your site assignment.</p>
+            <form onsubmit="event.preventDefault(); loginWorker();">
+                <input type="email" id="em" class="login-input" placeholder="worker@email.com" required>
+                <button type="submit" id="loginBtn" class="login-btn">AUTHENTICATE</button>
+            </form>
+        </div>
     </div>
 
-    <div class="poster-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; padding: 0 20px;">
+    <div class="poster-grid">
         <div class="warehouse-card">
             <div class="poster-header">STATUS: W-2 ON-CALL</div>
             <div class="warning-stripe"></div>
-            <ul class="info-list" style="font-size: 0.9rem;">
-                <li><strong>NO GUARANTEED HOURS:</strong> Work is assigned on an as-needed basis.</li>
-                <li><strong>AT-WILL:</strong> Relationship may be terminated by either party at any time.</li>
-                <li><strong>REPORTING:</strong> All hours must be logged via the portal.</li>
-            </ul>
+            <div class="card-body">
+                <ul class="info-list">
+                    <li><strong>NO GUARANTEED HOURS:</strong> Work is assigned on an as-needed basis.</li>
+                    <li><strong>AT-WILL:</strong> Relationship may be terminated by either party at any time.</li>
+                    <li><strong>REPORTING:</strong> All hours must be logged via the portal.</li>
+                </ul>
+            </div>
         </div>
 
         <div class="warehouse-card" style="border-color: var(--warning);">
             <div class="poster-header" style="background: var(--warning);">ZERO TOLERANCE</div>
-            <p style="text-align:center; font-weight:900; font-size: 0.85rem; letter-spacing: 1px; margin: 10px 0;">
-                SAFETY VIOLATIONS | NO-SHOWS | DRUGS/ALCOHOL
-            </p>
-            <div class="warning-stripe" style="background: repeating-linear-gradient(45deg, #000, #000 10px, var(--warning) 10px, var(--warning) 20px);"></div>
-            <p style="font-size: 0.8rem; text-align: center; color: var(--warning); font-weight: bold;">
-                IMMEDIATE TERMINATION FOR NON-COMPLIANCE
-            </p>
+            <div class="warning-stripe-red"></div>
+            <div class="card-body">
+                <p style="text-align:center; font-weight:900; font-size: 0.9rem; letter-spacing: 1px; margin-bottom: 10px; color: #333;">
+                    SAFETY VIOLATIONS<br>NO-SHOWS<br>DRUGS/ALCOHOL
+                </p>
+                <p style="font-size: 0.85rem; text-align: center; color: var(--warning); font-weight: bold; margin-top: 15px;">
+                    IMMEDIATE TERMINATION FOR NON-COMPLIANCE
+                </p>
+            </div>
         </div>
     </div>
 
