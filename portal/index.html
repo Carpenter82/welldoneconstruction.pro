@@ -96,6 +96,19 @@
         
         .info-list li { margin-bottom: 8px; }
 
+        /* Links */
+        .action-link {
+            color: var(--accent);
+            font-weight: bold;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .action-link:hover {
+            color: #278c56;
+            text-decoration: underline;
+        }
+
         /* Warning Graphics */
         .warning-stripe { 
             height: 12px; 
@@ -124,6 +137,20 @@
             gap: 20px; 
             max-width: 1000px; 
             margin: 0 auto; 
+        }
+
+        .compliance-grid {
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+            margin: 20px 0;
+        }
+
+        .compliance-box {
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 4px; 
+            border: 1px solid #ddd;
         }
 
     </style>
@@ -163,6 +190,49 @@
                 </p>
                 <p style="font-size: 0.85rem; text-align: center; color: var(--warning); font-weight: bold; margin-top: 15px;">
                     IMMEDIATE TERMINATION FOR NON-COMPLIANCE
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="warehouse-card" style="max-width: 1000px; margin: 0 auto 40px auto;">
+        <div class="poster-header">EMPLOYEE RIGHTS & WORKPLACE NOTICES</div>
+        <div class="card-body" style="font-size: 0.9rem; line-height: 1.6;">
+            <p style="margin-bottom: 15px;"><strong>Well Done Construction LLC</strong> is committed to providing all workers with access to required workplace rights information. The following notices are provided in compliance with federal and Nevada labor laws.</p>
+            <p>All workers are encouraged to review these materials.</p>
+
+            <div class="compliance-grid">
+                <div class="compliance-box">
+                    <h4 style="margin-bottom: 5px; color: var(--primary);">Federal Workplace Posters</h4>
+                    <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px; font-style: italic;">(Provided by the U.S. Department of Labor)</p>
+                    <ul class="info-list" style="margin-bottom: 20px;">
+                        <li>Fair Labor Standards Act (FLSA) – Minimum Wage & Overtime</li>
+                        <li>Employee Polygraph Protection Act (EPPA)</li>
+                        <li>Family and Medical Leave Act (FMLA) (if applicable)</li>
+                        <li>Occupational Safety and Health Act (OSHA) – Job Safety and Health</li>
+                    </ul>
+                    <p>👉 <a href="https://www.dol.gov/general/topics/posters" target="_blank" class="action-link">Download all federal posters</a></p>
+                </div>
+
+                <div class="compliance-box">
+                    <h4 style="margin-bottom: 5px; color: var(--primary);">Nevada Workplace Posters</h4>
+                    <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px; font-style: italic;">(Provided by the Nevada Labor Commissioner)</p>
+                    <ul class="info-list" style="margin-bottom: 20px;">
+                        <li>Nevada Minimum Wage</li>
+                        <li>Workers’ Compensation Notice</li>
+                        <li>Unemployment Insurance Notice</li>
+                        <li>Paid Leave / Sick Leave (if applicable)</li>
+                    </ul>
+                    <p>👉 <a href="https://labor.nv.gov/Employer/Posters/" target="_blank" class="action-link">Access Nevada posters</a></p>
+                </div>
+            </div>
+
+            <div style="border-top: 2px solid #ddd; padding-top: 20px; margin-top: 10px;">
+                <h4 style="margin-bottom: 10px; color: var(--primary);">Access & Acknowledgment</h4>
+                <p style="margin-bottom: 10px;">These notices are provided electronically for remote workers. All workers are expected to review these materials. These notices are provided in accordance with applicable labor laws and may be updated periodically.</p>
+                <p style="background: #eef2f5; padding: 15px; border-radius: 4px; border-left: 4px solid var(--accent);">
+                    If you need a printed copy or have questions about your rights, contact:<br>
+                    <strong><a href="mailto:tee@welldoneconstruction.link" class="action-link">Tee - Well Done Construction LLC</a></strong>
                 </p>
             </div>
         </div>
