@@ -6,8 +6,8 @@
     <title>Work Log | Well Done Construction</title>
     <style>
         :root {
-            --primary: #f1c40f; /* High-Vis Yellow */
-            --success: #33B26E; /* Safety Green */
+            --primary: #f1c40f; 
+            --success: #33B26E; 
             --dark: #1a1a1a;
             --text: #ffffff;
         }
@@ -40,20 +40,31 @@
             background: #333;
             border: 2px dashed var(--primary);
             color: var(--primary);
-            padding: 30px 10px;
+            padding: 20px 10px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 1.3rem;
+            font-size: 1.1rem;
+            transition: 0.2s;
         }
 
+        .file-label:active { background: #444; }
+        
         input[type="file"] { display: none; }
 
-        .preview-img {
-            width: 100%;
+        /* The Multi-Photo Gallery Grid */
+        .thumb-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
             margin-top: 15px;
-            border-radius: 8px;
-            display: none;
+        }
+
+        .thumb-img {
+            width: 100%;
+            aspect-ratio: 1; /* Makes them perfect squares */
+            object-fit: cover; /* Prevents stretching */
+            border-radius: 6px;
             border: 2px solid var(--success);
         }
 
@@ -67,61 +78,25 @@
             align-items: center;
         }
 
-        input[type="checkbox"] {
-            width: 40px;
-            height: 40px;
-            margin-right: 15px;
-            cursor: pointer;
-        }
-
+        input[type="checkbox"] { width: 40px; height: 40px; margin-right: 15px; cursor: pointer; }
         .check-text { font-weight: bold; color: #ffadad; line-height: 1.2; }
 
         .btn {
-            width: 100%;
-            padding: 25px;
-            font-size: 1.4rem;
-            font-weight: 900;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-            transition: 0.2s;
+            width: 100%; padding: 25px; font-size: 1.4rem; font-weight: 900;
+            border: none; border-radius: 12px; cursor: pointer; text-transform: uppercase;
+            margin-bottom: 15px; transition: 0.2s;
         }
 
         .btn-pause { background: #34495e; color: white; border-bottom: 5px solid #2c3e50; }
         .btn-final { background: var(--success); color: white; border-bottom: 5px solid #27ae60; }
-
         .btn:disabled { background: #444 !important; border-color: #333 !important; color: #666; cursor: not-allowed; }
 
         #gpsStatus { text-align: center; font-weight: bold; margin-bottom: 15px; }
         
-        .instr-content {
-            display: none;
-            background: #2a2a2a;
-            padding: 15px;
-            margin-top: 10px;
-            border-left: 4px solid var(--primary);
-            text-align: left;
-            font-size: 0.9rem;
-            color: #ddd;
-        }
-        .instr-toggle {
-            background: none;
-            border: none;
-            color: #3498db;
-            text-decoration: underline;
-            cursor: pointer;
-            margin-top: 10px;
-            font-size: 1rem;
-        }
-        .instr-note {
-            background: #333;
-            padding: 10px;
-            border-radius: 4px;
-            margin-top: 10px;
-            color: #f1c40f;
-        }
+        /* Instructions CSS */
+        .instr-content { display: none; background: #2a2a2a; padding: 15px; margin-top: 10px; border-left: 4px solid var(--primary); text-align: left; font-size: 0.9rem; color: #ddd; }
+        .instr-toggle { background: none; border: none; color: #3498db; text-decoration: underline; cursor: pointer; margin-top: 10px; font-size: 1rem; }
+        .instr-note { background: #333; padding: 10px; border-radius: 4px; margin-top: 10px; color: #f1c40f; }
     </style>
 </head>
 <body>
@@ -134,48 +109,36 @@
 
     <div class="camera-card">
         <label for="arrivalPhoto" class="file-label">
-            📷 STEP 1: PHOTO OF ADDRESS
+            📷 STEP 1: ADD ARRIVAL PHOTO<br>
+            <span style="font-size: 0.8rem; font-weight: normal; color: #aaa;">(Tap multiple times for more photos)</span>
         </label>
-        <button type="button" class="instr-toggle" id="toggle1">View Photo Instructions</button>
         
-        <div class="instr-content" id="content1">
-            <h4 style="margin-top: 0;">How to Confirm You’re at the Right Location:</h4>
-            <p>Take a photo that proves you are at the correct property. Please ensure the photo includes something identifiable, such as the:</p>
-            <ul>
-                <li><strong>House number</strong></li>
-                <li><strong>Mailbox</strong></li>
-                <li><strong>Street sign</strong></li>
-                <li><strong>Front of the property</strong></li>
-            </ul>
-            <div class="instr-note">
-                <strong>Note:</strong> If the exact address isn’t visible, take a clear, wide shot of the location so the property can be easily recognized.
-            </div>
-        </div>
+        <input type="file" id="arrivalPhoto" accept="image/*" capture="environment" multiple>
+        
+        <div id="arrivalGallery" class="thumb-grid"></div>
 
-        <input type="file" id="arrivalPhoto" accept="image/*" capture="environment">
-        <img id="prev1" class="preview-img">
+        <button type="button" class="instr-toggle" id="toggle1">View Photo Instructions</button>
+        <div class="instr-content" id="content1">
+            <h4 style="margin-top: 0;">Confirm You’re at the Right Location:</h4>
+            <p>Take a photo that proves you are at the correct property: House number, Mailbox, or full property shot.</p>
+        </div>
     </div>
 
     <div class="camera-card">
         <label for="exitPhoto" class="file-label">
-            📷 STEP 2: PHOTO OF WORK
+            📷 STEP 2: ADD FINISHED PHOTO<br>
+            <span style="font-size: 0.8rem; font-weight: normal; color: #aaa;">(Tap multiple times for more photos)</span>
         </label>
+        
+        <input type="file" id="exitPhoto" accept="image/*" capture="environment" multiple>
+        
+        <div id="exitGallery" class="thumb-grid"></div>
+
         <button type="button" class="instr-toggle" id="toggle2">View Photo Instructions</button>
-
         <div class="instr-content" id="content2">
-            <h4 style="margin-top: 0;">How to Take a Photo of Completed Work:</h4>
-            <p>Take photos showing that the work is fully complete and the area is clean. Please be sure to include:</p>
-            <ul>
-                <li><strong>The finished work</strong> (from a few different angles)</li>
-                <li><strong>The surrounding area</strong> (to show it has been thoroughly cleaned up)</li>
-            </ul>
-            <div class="instr-note">
-                <strong>Note:</strong> Make sure all photos are clear and show the full result of the finished work.
-            </div>
+            <h4 style="margin-top: 0;">Completed Work:</h4>
+            <p>Take photos from multiple angles showing the finished work and a clean surrounding area.</p>
         </div>
-
-        <input type="file" id="exitPhoto" accept="image/*" capture="environment">
-        <img id="prev2" class="preview-img">
     </div>
 
     <div class="checklist-box">
@@ -192,15 +155,25 @@
 </div>
 
 <script>
-    // URL TO YOUR GOOGLE SCRIPT
+    // ==========================================
+    // CONFIGURATION (Fixing your 404 error here!)
+    // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbxqwDS9Jufsc_2uJkYfjjcLI5QQhcapCCtaq5VgP3o8mAhhxWwcy6051sHGWsmmS2St/exec";
+    
+    // Change this to the EXACT absolute URL of your dashboard page.
+    const DASHBOARD_URL = "https://welldoneconstruction.pro/dashboard.html"; 
+
+    // ==========================================
 
     const params = new URLSearchParams(window.location.search);
     const email = params.get('email');
     const jobId = params.get('jobId');
     document.getElementById('jobIdDisplay').innerText = jobId || "UNKNOWN";
 
-    let arrivalImg = null, exitImg = null, lat = null, lng = null;
+    // We now use ARRAYS to hold multiple photos
+    let arrivalPhotosArray = [];
+    let exitPhotosArray = []; 
+    let lat = null, lng = null;
 
     // 1. Instruction Toggles
     function setupToggle(toggleId, contentId) {
@@ -229,103 +202,108 @@
         { enableHighAccuracy: true }
     );
 
-    // 3. Handle Photos with Compression (CRITICAL FOR MOBILE)
-    function setupCamera(inputId, imgId) {
+    // 3. Multi-Photo Engine with Canvas Compression
+    function setupCameraGallery(inputId, galleryId, storageArray) {
         document.getElementById(inputId).addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
 
-            const reader = new FileReader();
-            reader.onload = (f) => {
-                const imgElement = new Image();
-                imgElement.src = f.target.result;
-                
-                imgElement.onload = () => {
-                    // Compress Image using Canvas
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 800; // Resize to max 800px width
-                    const scaleSize = MAX_WIDTH / imgElement.width;
-                    canvas.width = MAX_WIDTH;
-                    canvas.height = imgElement.height * scaleSize;
-
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+            // Process each photo chosen/taken
+            for (let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = (f) => {
+                    const imgElement = new Image();
+                    imgElement.src = f.target.result;
                     
-                    // Convert back to Base64 (JPEG, 70% quality)
-                    const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+                    imgElement.onload = () => {
+                        // Compress
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800; 
+                        const scaleSize = MAX_WIDTH / imgElement.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = imgElement.height * scaleSize;
 
-                    // Update UI
-                    const imgPreview = document.getElementById(imgId);
-                    imgPreview.src = compressedBase64;
-                    imgPreview.style.display = "block";
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+                        
+                        // Convert to Base64 JPEG
+                        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
 
-                    // Save data without the "data:image/jpeg;base64," prefix
-                    if(inputId === 'arrivalPhoto') arrivalImg = compressedBase64.split(',')[1];
-                    else exitImg = compressedBase64.split(',')[1];
-                    
-                    validate();
+                        // Save clean data to our array
+                        const cleanBase64 = compressedBase64.split(',')[1];
+                        storageArray.push(cleanBase64);
+
+                        // Add a thumbnail to the gallery grid on screen
+                        const thumb = document.createElement('img');
+                        thumb.src = compressedBase64;
+                        thumb.className = "thumb-img";
+                        document.getElementById(galleryId).appendChild(thumb);
+                        
+                        validate(); // Check if buttons should unlock
+                    };
                 };
-            };
-            reader.readAsDataURL(file);
+                reader.readAsDataURL(files[i]);
+            }
+            
+            // Reset the input so they can click the button again to add MORE photos
+            e.target.value = "";
         });
     }
     
-    setupCamera('arrivalPhoto', 'prev1');
-    setupCamera('exitPhoto', 'prev2');
+    // Attach the engine to both buttons
+    setupCameraGallery('arrivalPhoto', 'arrivalGallery', arrivalPhotosArray);
+    setupCameraGallery('exitPhoto', 'exitGallery', exitPhotosArray);
 
-    // 4. Enable buttons
+    // 4. Enable buttons (Requires AT LEAST 1 photo in each array)
     document.getElementById('cleanCheck').onchange = validate;
 
     function validate() {
-        const ready = arrivalImg && exitImg && document.getElementById('cleanCheck').checked;
+        const ready = arrivalPhotosArray.length > 0 && 
+                      exitPhotosArray.length > 0 && 
+                      document.getElementById('cleanCheck').checked;
+                      
         document.getElementById('pauseBtn').disabled = !ready;
         document.getElementById('finalBtn').disabled = !ready;
     }
 
-    // 5. Submit Data (Bulletproof Version)
+    // 5. Submit Data
     async function sendWork(isFinal) {
         const btn1 = document.getElementById('pauseBtn');
         const btn2 = document.getElementById('finalBtn');
         const status = document.getElementById('statusMsg');
 
         btn1.disabled = true; btn2.disabled = true;
-        status.innerText = "UPLOADING... PLEASE WAIT";
+        status.innerText = "UPLOADING MULTIPLE PHOTOS... PLEASE WAIT";
 
         const payload = {
             action: "logWork",
             email: email,
             ancestryID: jobId,
-            entryPhoto: arrivalImg,
-            exitPhoto: exitImg,
+            entryPhoto: arrivalPhotosArray, // Now sending the whole list!
+            exitPhoto: exitPhotosArray,     // Now sending the whole list!
             isFinal: isFinal,
             lat: lat, lng: lng
         };
 
         try {
-            // Using 'no-cors' forces the browser to send the payload to Google Apps Script
-            // without being blocked by strict security policies.
             await fetch(API_URL, { 
                 method: "POST", 
                 mode: "no-cors", 
-                headers: {
-                    'Content-Type': 'text/plain'
-                },
+                headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify(payload) 
             });
             
-            // Because of 'no-cors', we can't read Google's exact reply, 
-            // but if the fetch didn't crash, the data successfully left the building!
-            status.style.color = "#33B26E"; // Turn text green
+            status.style.color = "#33B26E";
             status.innerText = "SUCCESS! REDIRECTING...";
             
+            // Fixed the 404 issue using the absolute URL variable defined at the top
             setTimeout(() => {
-                // FIXED REDIRECT PATH: Goes up one level directly to the dashboard
-                window.location.href = `../dashboard.html?email=${encodeURIComponent(email)}`;
+                window.location.href = `${DASHBOARD_URL}?email=${encodeURIComponent(email)}`;
             }, 2000);
             
         } catch (e) {
             console.error("Upload failed:", e);
-            status.style.color = "#e74c3c"; // Turn text red
+            status.style.color = "#e74c3c";
             status.innerText = "NETWORK ERROR. TRY AGAIN.";
             btn1.disabled = false; btn2.disabled = false;
         }
