@@ -17,6 +17,13 @@
         }
 
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--background-color); padding: 20px; color: var(--primary-text-color); margin: 0; }
+        
+        /* SECURITY GATE OVERLAY */
+        #securityGate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary-text-color); display: flex; align-items: center; justify-content: center; z-index: 999; }
+        .login-box { background: white; padding: 40px; border-radius: 8px; text-align: center; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .login-box input { width: 100%; padding: 15px; margin: 15px 0; border: 1px solid #ccc; box-sizing: border-box; border-radius: 4px; }
+        .hidden { display: none !important; }
+
         .header-section { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 20px auto; }
         .data-container { background: var(--surface-color); padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 1400px; margin: 0 auto 30px auto; }
         h2 { border-bottom: 2px solid var(--accent-green-color); padding-bottom: 10px; margin-top: 0; color: var(--primary-text-color); font-size: 1.4rem; }
@@ -39,73 +46,90 @@
         .status-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
         .navigation-button { text-decoration: none; color: var(--action-blue-color); font-weight: bold; border: 2px solid var(--action-blue-color); padding: 10px; border-radius: 5px; }
+        .lock-button { background: transparent; border: 1px solid #ccc; color: var(--primary-text-color); padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 10px; transition: 0.2s; }
+        .lock-button:hover { background: #eee; }
     </style>
 </head>
 <body>
 
-    <div class="header-section">
-        <h1>Administration Dashboard</h1>
-        <a href="project.html" class="navigation-button">➜ PROJECT COMMAND</a>
+    <div id="securityGate">
+        <div class="login-box">
+            <h2 style="color:var(--primary-text-color); margin-top:0; border:none;">SECURE LOGIN</h2>
+            <p style="font-size:0.8rem; color:#888;">Enter Admin Token</p>
+            <input type="password" id="adminPass" placeholder="******">
+            <button class="button-base button-hire" style="width:100%; padding: 12px;" onclick="authenticate()">ACCESS HUB</button>
+        </div>
     </div>
 
-    <div id="status-notification" class="notification-bar"></div>
+    <div id="app" class="hidden">
+        
+        <div class="header-section">
+            <h1>Administration Dashboard</h1>
+            <div>
+                <a href="project.html" class="navigation-button">➜ PROJECT COMMAND</a>
+                <button onclick="logout()" class="lock-button">🔒 LOCK</button>
+            </div>
+        </div>
 
-    <div class="data-container">
-        <h2>Accounts Payable (Pending Mission Payouts)</h2>
-        <table id="pay-table">
-            <thead>
-                <tr>
-                    <th width="15%">Date Completed</th>
-                    <th width="20%">Worker Name</th>
-                    <th width="10%">Job ID</th>
-                    <th width="20%">Mission Note</th>
-                    <th width="10%">Pay Amount</th>
-                    <th width="10%">Status</th>
-                    <th width="15%">Controls</th> 
-                </tr>
-            </thead>
-            <tbody id="pay-tbody">
-                <tr><td colspan="7" align="center">Syncing pay roster...</td></tr>
-            </tbody>
-        </table>
-    </div>
+        <div id="status-notification" class="notification-bar"></div>
 
-    <div class="data-container">
-        <h2>Applicant Inbox</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th width="20%">Name / Contact</th>
-                    <th width="15%">Trade / Exp</th>
-                    <th width="10%">Pay</th>
-                    <th width="10%">Status</th>
-                    <th width="5%">Resume</th>
-                    <th width="40%">Controls</th> 
-                </tr>
-            </thead>
-            <tbody id="applicant-tbody">
-                <tr><td colspan="6" align="center">Syncing applicants...</td></tr>
-            </tbody>
-        </table>
-    </div>
+        <div class="data-container">
+            <h2>Accounts Payable (Pending Mission Payouts)</h2>
+            <table id="pay-table">
+                <thead>
+                    <tr>
+                        <th width="15%">Date Completed</th>
+                        <th width="20%">Worker Name</th>
+                        <th width="10%">Job ID</th>
+                        <th width="20%">Mission Note</th>
+                        <th width="10%">Pay Amount</th>
+                        <th width="10%">Status</th>
+                        <th width="15%">Controls</th> 
+                    </tr>
+                </thead>
+                <tbody id="pay-tbody">
+                    <tr><td colspan="7" align="center">Syncing pay roster...</td></tr>
+                </tbody>
+            </table>
+        </div>
 
-    <div class="data-container">
-        <h2>Crew List (Active Database)</h2>
-        <table id="crew-table">
-            <thead>
-                <tr>
-                    <th width="20%">Name / Email</th>
-                    <th width="20%">Trade Assignment</th>
-                    <th width="20%">Pay Tier</th>
-                    <th width="20%">Notes</th>
-                    <th width="5%">Docs</th>
-                    <th width="15%">Commit Change</th> 
-                </tr>
-            </thead>
-            <tbody id="crew-tbody">
-                <tr><td colspan="6" align="center">Syncing crew...</td></tr>
-            </tbody>
-        </table>
+        <div class="data-container">
+            <h2>Applicant Inbox</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="20%">Name / Contact</th>
+                        <th width="15%">Trade / Exp</th>
+                        <th width="10%">Pay</th>
+                        <th width="10%">Status</th>
+                        <th width="5%">Resume</th>
+                        <th width="40%">Controls</th> 
+                    </tr>
+                </thead>
+                <tbody id="applicant-tbody">
+                    <tr><td colspan="6" align="center">Syncing applicants...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="data-container">
+            <h2>Crew List (Active Database)</h2>
+            <table id="crew-table">
+                <thead>
+                    <tr>
+                        <th width="20%">Name / Email</th>
+                        <th width="20%">Trade Assignment</th>
+                        <th width="20%">Pay Tier</th>
+                        <th width="20%">Notes</th>
+                        <th width="5%">Docs</th>
+                        <th width="15%">Commit Change</th> 
+                    </tr>
+                </thead>
+                <tbody id="crew-tbody">
+                    <tr><td colspan="6" align="center">Syncing crew...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
 <script>
@@ -115,7 +139,35 @@
     const TRADE_LIST = ["General Labor", "Carpentry", "Plumbing", "Electrical", "Flooring", "Painting", "HVAC"];
     const PAY_SCALE = ["T1 ($20-25)", "T2 ($26-35)", "T3 ($36+)"];
 
-    window.onload = initializeDashboard;
+    // --- SECURITY MEMORY CHECK ---
+    window.onload = function() {
+        const savedToken = localStorage.getItem("WD_ADMIN_ACCESS");
+        if(savedToken === "GRANTED") {
+            unlockGate();
+        }
+    };
+
+    function authenticate() {
+        const pass = document.getElementById('adminPass').value;
+        if(pass === "WellDone2025") { 
+            localStorage.setItem("WD_ADMIN_ACCESS", "GRANTED");
+            unlockGate();
+        } else {
+            alert("Unauthorized Access.");
+        }
+    }
+
+    function unlockGate() {
+        document.getElementById('securityGate').style.display = 'none';
+        document.getElementById('app').classList.remove('hidden');
+        initializeDashboard(); // Load data ONLY after unlocking
+    }
+
+    function logout() {
+        localStorage.removeItem("WD_ADMIN_ACCESS");
+        location.reload();
+    }
+    // -----------------------------
 
     async function initializeDashboard() {
         displayStatus("Syncing with Master Engine...", "loading");
@@ -212,25 +264,25 @@
         }
     }
 
-async function triggerAction(action, email, extraData = {}) {
+    async function triggerAction(action, email, extraData = {}) {
         displayStatus("Updating Master Engine...", "loading");
         const payload = { action: action, email: email, ...extraData };
         
         try {
             // THE FIX: Strict text/plain to bypass the CORS Preflight
             const response = await fetch(ENDPOINT_URL, { 
-    method: 'POST', 
-    mode: 'no-cors', // <--- Add this line
-    headers: { 
-        'Content-Type': 'text/plain' 
-    },
-    body: JSON.stringify(payload) 
-});
+                method: 'POST', 
+                mode: 'no-cors', 
+                headers: { 
+                    'Content-Type': 'text/plain' 
+                },
+                body: JSON.stringify(payload) 
+            });
 
-// Since 'no-cors' prevents reading the response, 
-// we assume success if no network error occurred.
-displayStatus("✓ Command Sent", "success");
-setTimeout(initializeDashboard, 2000); 
+            // Since 'no-cors' prevents reading the response, 
+            // we assume success if no network error occurred.
+            displayStatus("✓ Command Sent", "success");
+            setTimeout(initializeDashboard, 2000); 
         } catch (e) {
             console.error("Connection Error Detail:", e);
             displayStatus("Error: " + e.message, "error");
