@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worker Portal | Well Done Construction</title>
-    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
+    <title>Work Log & Checklist | Well Done Construction</title>
     <style>
         :root { 
             --high-vis: #f1c40f; 
@@ -13,271 +12,269 @@
             --prep: #3498db;
             --panel-bg: #111; 
             --border: #333;
+            --danger: #e74c3c;
         }
         
         body { background: #1a1a1a; color: white; font-family: -apple-system, sans-serif; padding: 0; margin: 0; }
-        .header { background: var(--high-vis); color: var(--dark); padding: 20px; font-weight: 900; text-align: center; border-bottom: 4px solid #000; letter-spacing: 1px; }
-        .warning-stripes { height: 15px; background: repeating-linear-gradient(45deg, var(--high-vis), var(--high-vis) 20px, #000 20px, #000 40px); }
-        .container { padding: 15px; max-width: 600px; margin: 0 auto; }
+        .header { background: var(--dark); color: white; padding: 15px; font-weight: 900; text-align: center; border-bottom: 2px solid var(--high-vis); font-size: 1.1rem; }
+        .warning-stripes { height: 8px; background: repeating-linear-gradient(45deg, var(--high-vis), var(--high-vis) 10px, #000 10px, #000 20px); }
+        .container { padding: 15px; max-width: 500px; margin: 0 auto; }
         
-        .profile-card { background: var(--panel-bg); border: 2px solid var(--border); border-radius: 8px; padding: 20px; margin-top: 10px; }
-        .profile-header { display: flex; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 15px; }
-        .avatar { width: 50px; height: 50px; background: #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; margin-right: 15px; border: 2px solid var(--high-vis); }
-        .profile-name { font-size: 1.2rem; font-weight: 900; margin: 0; text-transform: uppercase; }
-        .profile-email { font-size: 0.8rem; color: #888; margin: 0; }
+        .card { background: var(--panel-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 15px; }
+        .job-banner { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; }
+        .job-id { font-weight: 900; color: var(--high-vis); font-size: 1.2rem; }
         
-        .tag-row { display: flex; gap: 10px; }
-        .tag { background: #222; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: 1px solid #444; color: #ccc; }
-        .tag-accent { border-color: var(--active); color: var(--active); }
-
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        @media (max-width: 500px) { .dashboard-grid { grid-template-columns: 1fr; } }
-
-        .status-panel { background: var(--panel-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
-        .panel-header { background: #222; font-size: 0.7rem; font-weight: 900; padding: 10px; text-align: center; border-bottom: 1px solid var(--border); color: #888; letter-spacing: 1px; text-transform: uppercase; }
-        .panel-content { padding: 15px; flex-grow: 1; }
-
-        .mission-offer { border-top: 3px solid var(--high-vis); padding-top: 10px; margin-bottom: 20px; }
-        .label { color: var(--high-vis); font-size: 0.65rem; text-transform: uppercase; font-weight: 900; margin-bottom: 2px; }
-        .data-point { font-size: 1rem; font-weight: bold; margin-bottom: 10px; line-height: 1.2; }
+        .status-badge { font-size: 0.75rem; font-weight: bold; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; text-align: center;}
+        .status-off { background: #333; color: #888; }
+        .status-on { background: var(--active); color: white; animation: pulse 1.5s infinite; }
         
-        .btn-claim { 
-            background: var(--high-vis); color: var(--dark); border: none; padding: 12px; width: 100%; 
-            font-size: 0.9rem; font-weight: 900; cursor: pointer; border-radius: 4px; margin-top: 5px; 
-            transition: 0.2s; text-transform: uppercase; 
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
         }
-        .btn-claim:hover { filter: brightness(1.1); }
-        .btn-claim:disabled { background: #444; color: #888; cursor: not-allowed; }
-        
-        .status-msg { font-size: 0.75rem; font-weight: 900; text-align: center; margin-bottom: 10px; padding: 5px; border-radius: 4px; }
-        .status-prep { background: var(--prep); color: white; }
-        .status-active { background: var(--active); color: white; }
 
-        .placeholder-text { color: #555; font-size: 0.85rem; line-height: 1.4; text-align: center; }
-        .board-item { border-bottom: 1px solid var(--border); padding: 15px 0; }
-        .board-item:last-child { border-bottom: none; }
-        .pay-badge { float: right; color: var(--active); font-weight: 900; }
+        .step-title { font-size: 0.85rem; font-weight: 900; text-transform: uppercase; color: #888; letter-spacing: 1px; margin-bottom: 10px; }
+        
+        .file-input-wrapper { position: relative; margin-bottom: 15px; }
+        .file-label { display: block; background: #222; border: 1px dashed #555; padding: 15px; text-align: center; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        .file-label:hover { border-color: var(--high-vis); }
+        .file-input { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        .preview-img { width: 100%; max-height: 150px; object-fit: cover; border-radius: 4px; margin-top: 10px; display: none; border: 1px solid var(--border); }
+
+        .btn { width: 100%; padding: 14px; font-size: 0.95rem; font-weight: 900; border: none; border-radius: 4px; cursor: pointer; text-transform: uppercase; margin-bottom: 10px; transition: 0.2s; }
+        .btn-start { background: var(--high-vis); color: var(--dark); }
+        .btn-stop { background: var(--danger); color: white; }
+        .btn-submit { background: var(--active); color: white; }
+        .btn:disabled { background: #444 !important; color: #777 !important; cursor: not-allowed; }
+
+        .radio-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        .radio-label { flex: 1; background: #222; border: 1px solid var(--border); padding: 12px; text-align: center; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+        .radio-input { display: none; }
+        .radio-input:checked + .radio-label { border-color: var(--high-vis); color: var(--high-vis); background: #2a2510; }
+        
+        .time-display { font-family: monospace; font-size: 0.8rem; color: #aaa; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <div class="header">FIELD OPERATIONS DASHBOARD</div>
+    <div class="header">FIELD TIME & EVIDENCE LOG</div>
     <div class="warning-stripes"></div>
 
     <div class="container">
-        <div id="profileSection" class="profile-card">
-            <div class="profile-header">
-                <div class="avatar">👤</div>
+        <!-- Shift Controls Card -->
+        <div class="card">
+            <div class="job-banner">
                 <div>
-                    <h2 id="workerName" class="profile-name">Authenticating...</h2>
-                    <p id="workerEmail" class="profile-email">---</p>
+                    <div id="displayJobId" class="job-id">JOB #---</div>
+                    <div id="displayEmail" style="font-size: 0.75rem; color:#888;">---</div>
                 </div>
+                <div id="shiftStatus" class="status-badge status-off">Off Clock</div>
             </div>
-            <div class="tag-row">
-                <div class="tag" id="workerTrade">Trade: ---</div>
-                <div class="tag tag-accent" id="workerConsent">Consent: ---</div>
-            </div>
-        </div>
 
-        <div class="dashboard-grid">
-            
-            <div class="status-panel">
-                <div class="panel-header">Active Mission</div>
-                <div class="panel-content" id="directDispatchContent">
-                    <div id="idleState">
-                        <strong style="color:#444; display:block; margin-bottom:10px; text-align:center;">STATUS: STANDBY</strong>
-                        <p class="placeholder-text">No active reservations. Check the Open Board for missions.</p>
-                    </div>
-
-                    <div id="missionState" style="display:none;" class="mission-offer">
-                        <div id="statusLabel" class="status-msg">---</div>
-                        
-                        <div class="label">Ancestry Job ID</div>
-                        <div id="jobId" class="data-point">---</div>
-                        
-                        <div class="label">Location</div>
-                        <div id="address" class="data-point">---</div>
-                        
-                        <div class="label">On-Site Contact</div>
-                        <div id="contactInfo" class="data-point">---</div>
-                        
-                        <div class="label">Action Items</div>
-                        <div id="actionItems" class="data-point">---</div>
-                        
-                        <div class="label">Deadline</div>
-                        <div id="deadline" class="data-point" style="color:var(--high-vis);">---</div>
-
-                        <button id="actionBtn" class="btn-claim" onclick="handleMissionAction()">Action Required</button>
-                    </div>
+            <!-- BUTTON 1: CLOCK IN -->
+            <div id="clockInSection">
+                <div class="step-title">Step 1: Log Site Arrival</div>
+                <div class="file-input-wrapper">
+                    <label class="file-label" id="arrivalFileLabel">📸 Take Arrival Photo</label>
+                    <input type="file" accept="image/*" capture="camera" class="file-input" id="arrivalFile" onchange="processImage(this, 'arrival')">
+                    <img id="arrivalPreview" class="preview-img">
                 </div>
+                <button id="clockInBtn" class="btn btn-start" onclick="clockIn()" disabled>Clock In & Begin Work</button>
             </div>
 
-            <div class="status-panel">
-                <div class="panel-header">Open Board</div>
-                <div class="panel-content">
-                    <strong style="color:#666; display:block; margin-bottom:10px;">AVAILABLE</strong>
-                    <div id="openBoardContainer">
-                        <p class="placeholder-text">Scanning project log...</p>
-                    </div>
+            <!-- BUTTON 2: CLOCK OUT -->
+            <div id="clockOutSection" style="display: none;">
+                <div class="step-title">Step 2: Log Site Departure</div>
+                <div class="time-display" id="clockInTimeDisplay">Clocked In At: --:--</div>
+                <br>
+                <div class="file-input-wrapper">
+                    <label class="file-label" id="exitFileLabel">📸 Take Exit Photo</label>
+                    <input type="file" accept="image/*" capture="camera" class="file-input" id="exitFile" onchange="processImage(this, 'exit')">
+                    <img id="exitPreview" class="preview-img">
                 </div>
-            </div>
 
+                <div class="step-title">Mission Status Options</div>
+                <div class="radio-group">
+                    <input type="radio" name="isFinal" id="statusPause" value="false" checked class="radio-input">
+                    <label for="statusPause" class="radio-label">Pause<br><span style="font-size:0.65rem; font-weight:normal; color:#888;">Returning Tomorrow</span></label>
+
+                    <input type="radio" name="isFinal" id="statusComplete" value="true" class="radio-input">
+                    <label for="statusComplete" class="radio-label">Complete<br><span style="font-size:0.65rem; font-weight:normal; color:#888;">Mission Finished</span></label>
+                </div>
+
+                <button id="clockOutBtn" class="btn btn-stop" onclick="clockOut()" disabled>End Shift & Submit Evidence</button>
+            </div>
         </div>
     </div>
 
 <script>
-    // ✅ Defines the API URL correctly
-    const API_URL = "https://script.google.com/macros/s/AKfycbxqwDS9Jufsc_2uJkYfjjcLI5QQhcapCCtaq5VgP3o8mAhhxWwcy6051sHGWsmmS2St/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbxqwDS9Jufsc_2uJkYfjjcLI5QQhcapCCtaq5VgP3o8mAhhxWwcy6051sHGWsmmS2St/exec";
     const urlParams = new URLSearchParams(window.location.search);
     const email = urlParams.get('email');
-    let currentJobStatus = "Idle";
+    const jobId = urlParams.get('jobId');
 
-    if (!email) {
-        alert("ID Context Missing.");
-        window.location.href = "index.html";
-    }
+    // State placeholders
+    let localData = {
+        isClockedIn: false,
+        clockInTime: null,
+        arrivalBase64: null,
+        exitBase64: null,
+        lat: null,
+        lng: null
+    };
 
-    async function refreshData() {
-        try {
-            // ✅ Fixed variable reference
-            const res = await fetch(`${API_URL}?action=getWorkerJob&email=${encodeURIComponent(email)}&nocache=${Date.now()}`);
-            const data = await res.json();
-            
-            if (data.profile) {
-                document.getElementById('workerName').innerText = data.profile.name;
-                document.getElementById('workerEmail').innerText = email;
-                document.getElementById('workerTrade').innerText = "Trade: " + data.profile.trade;
-                document.getElementById('workerConsent').innerText = "Consent: " + (data.profile.consent || "Pending");
-            }
-
-            const missionUI = document.getElementById('missionState');
-            const idleUI = document.getElementById('idleState');
-            const btn = document.getElementById('actionBtn');
-            const statusLabel = document.getElementById('statusLabel');
-
-            if (data.jobStatus === "Offered" || data.jobStatus === "RESERVED" || data.jobStatus === "Active") {
-                currentJobStatus = data.jobStatus;
-                missionUI.style.display = 'block';
-                idleUI.style.display = 'none';
-                
-                document.getElementById('jobId').innerText = data.jobId;
-                document.getElementById('address').innerText = data.address;
-                document.getElementById('contactInfo').innerText = data.contact || "N/A";
-                document.getElementById('actionItems').innerText = data.notes || "None";
-                document.getElementById('deadline').innerText = data.deadline || "N/A";
-                
-                if (data.jobStatus === "Offered") {
-                    statusLabel.innerText = "MISSION PENDING";
-                    statusLabel.className = "status-msg";
-                    btn.innerText = "Accept Mission";
-                    btn.style.background = "var(--high-vis)";
-                    btn.style.color = "var(--dark)";
-                } else if (data.jobStatus === "RESERVED") {
-                    statusLabel.innerText = "PHASE: PREP TIME";
-                    statusLabel.className = "status-msg status-prep";
-                    btn.innerText = "I am On-Site: Work Log";
-                    btn.style.background = "var(--prep)";
-                    btn.style.color = "white";
-                } else if (data.jobStatus === "Active") {
-                    statusLabel.innerText = "PHASE: ACTIVE WORK";
-                    statusLabel.className = "status-msg status-active";
-                    btn.innerText = "Resume Work Log";
-                    btn.style.background = "var(--active)";
-                    btn.style.color = "white";
-                }
-            } else {
-                missionUI.style.display = 'none';
-                idleUI.style.display = 'block';
-            }
-
-            // ✅ Fixed variable reference
-            const boardRes = await fetch(`${API_URL}?action=getOpenBoard&nocache=${Date.now()}`);
-            const boardData = await boardRes.json();
-            renderOpenBoard(boardData.projects || []);
-
-        } catch (e) { 
-            console.error("Fetch Error: ", e); 
-        }
-    }
-
-    function renderOpenBoard(projects) {
-        const container = document.getElementById('openBoardContainer');
-        if (projects.length === 0) {
-            container.innerHTML = '<p class="placeholder-text">No missions broadcasting.</p>';
+    // Load State on Init
+    window.onload = function() {
+        if (!email || !jobId) {
+            alert("Context error: Missing email or Job ID parameters.");
             return;
         }
-        container.innerHTML = projects.map(p => `
-            <div class="board-item">
-                <span class="pay-badge">$${p.pay}</span>
-                <div class="label">ID: ${p.id}</div>
-                <div class="data-point" style="font-size:0.85rem;">${p.address}</div>
-                <button class="btn-claim" style="padding:8px; font-size:0.75rem;" onclick="claimPublicMission('${p.id}', this)">Reserve Job</button>
-            </div>
-        `).join('');
-    }
+        document.getElementById('displayJobId').innerText = "JOB #" + jobId;
+        document.getElementById('displayEmail').innerText = email;
 
-    async function handleMissionAction() {
-        const btn = document.getElementById('actionBtn');
-        const jobId = document.getElementById('jobId').innerText;
-
-        if (currentJobStatus === "Offered") {
-            if(!confirm("Claim this mission? This locks the job for 3 days of Prep Time.")) return;
-            btn.disabled = true; 
-            btn.innerText = "RESERVING...";
-            
-            try {
-                // ✅ Using text/plain instead of no-cors so we can read backend errors
-                const res = await fetch(API_URL, {
-                    method: 'POST', 
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ action: 'acceptMission', email: email, jobId: jobId })
-                });
-                
-                const responseData = await res.json();
-                if(responseData.status === "error") throw new Error(responseData.message);
-
-                alert("Reserved. Mission is now in PREP TIME.");
-                refreshData();
-            } catch (err) {
-                alert("Failed to reserve job: " + err.message);
-                btn.disabled = false;
-                btn.innerText = "Accept Mission";
+        // Sync with local storage using unique keys for this job/worker context
+        const savedState = localStorage.getItem(`shift_${email}_${jobId}`);
+        if(savedState) {
+            localData = JSON.parse(savedState);
+            if(localData.isClockedIn) {
+                restoreActiveShiftUI();
             }
-        } else {
-            goToChecklist(jobId);
         }
+    };
+
+    // Compress images to keep payload size safely clear of Google's limits
+    function processImage(input, type) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // Max dimension constraint
+                const max_size = 1000; 
+                if (width > height && width > max_size) { height *= max_size / width; width = max_size; }
+                else if (height > max_size) { width *= max_size / height; height = max_size; }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2adapter-context', { alpha: false });
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+                // Convert to compressed JPEG data string
+                const base64 = canvas.toDataURL('image/jpeg', 0.7);
+                
+                if(type === 'arrival') {
+                    localData.arrivalBase64 = base64;
+                    document.getElementById('arrivalPreview').src = base64;
+                    document.getElementById('arrivalPreview').style.display = 'block';
+                    document.getElementById('arrivalFileLabel').innerText = "✅ Photo Captured";
+                    document.getElementById('clockInBtn').disabled = false;
+                } else {
+                    localData.exitBase64 = base64;
+                    document.getElementById('exitPreview').src = base64;
+                    document.getElementById('exitPreview').style.display = 'block';
+                    document.getElementById('exitFileLabel').innerText = "✅ Photo Captured";
+                    document.getElementById('clockOutBtn').disabled = false;
+                }
+                saveState();
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
     }
 
-    async function claimPublicMission(jobId, btn) {
-        if(!confirm(`Reserve Job #${jobId}?`)) return;
-        btn.disabled = true; 
-        btn.innerText = "...";
+    function clockIn() {
+        if (!navigator.geolocation) {
+            alert("GPS location tracking required to clock in on this job.");
+            return;
+        }
+
+        document.getElementById('clockInBtn').disabled = true;
+        document.getElementById('clockInBtn').innerText = "Capturing GPS...";
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                localData.isClockedIn = true;
+                localData.clockInTime = new Date().toISOString();
+                localData.lat = position.coords.latitude;
+                localData.lng = position.coords.longitude;
+                saveState();
+                restoreActiveShiftUI();
+            },
+            (error) => {
+                alert("GPS Error: Could not verify location. Please check phone settings and try again.");
+                document.getElementById('clockInBtn').disabled = false;
+                document.getElementById('clockInBtn').innerText = "Clock In & Begin Work";
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
+
+    function restoreActiveShiftUI() {
+        document.getElementById('clockInSection').style.display = 'none';
+        document.getElementById('clockOutSection').style.display = 'block';
         
+        const statusBadge = document.getElementById('shiftStatus');
+        statusBadge.innerText = "On Clock";
+        statusBadge.className = "status-badge status-on";
+
+        const startTime = new Date(localData.clockInTime);
+        document.getElementById('clockInTimeDisplay').innerText = `Clocked In At: ${startTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+    }
+
+    async function clockOut() {
+        const btn = document.getElementById('clockOutBtn');
+        btn.disabled = true;
+        btn.innerText = "Encrypting & Uploading Logs...";
+
+        const isFinalSelection = document.getElementById('statusComplete').checked;
+
+        // Package up structured data matching your v17.2 engine parameters exactly
+        const payload = {
+            action: "logWork",
+            email: email,
+            ancestryID: jobId,
+            entryPhoto: [localData.arrivalBase64], // Backend parses arrays
+            exitPhoto: [localData.exitBase64],
+            lat: localData.lat,
+            lng: localData.lng,
+            isFinal: isFinalSelection,
+            clockInTime: localData.clockInTime, // Compliance metrics
+            clockOutTime: new Date().toISOString() // Compliance metrics
+        };
+
         try {
-            // ✅ Using text/plain instead of no-cors
-            const res = await fetch(API_URL, {
-                method: 'POST', 
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ action: 'acceptPublicJob', email: email, jobId: jobId })
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { "Content-Type": "text/plain;charset=utf-8" }, // Bypasses CORS redirects
+                body: JSON.stringify(payload)
             });
 
-            const responseData = await res.json();
-            if(responseData.status === "error") throw new Error(responseData.message);
-
-            alert("Job Reserved. Check your Active Mission panel.");
-            refreshData();
-        } catch(err) {
-            alert("Failed to claim job: " + err.message);
+            const result = await response.json();
+            
+            if (result.status === "success") {
+                alert("Shift verified successfully. Evidence filed to your project log.");
+                localStorage.removeItem(`shift_${email}_${jobId}`); // Safely purge cached state
+                window.location.href = `../portal/index.html?email=${encodeURIComponent(email)}`;
+            } else {
+                throw new Error(result.message || "Unknown gateway error.");
+            }
+        } catch (err) {
+            alert("Transmission Error: " + err.message);
             btn.disabled = false;
-            btn.innerText = "Reserve Job";
+            btn.innerText = "End Shift & Submit Evidence";
         }
     }
 
-    function goToChecklist(jobId) {
-        window.location.href = `../checklist/index.html?email=${encodeURIComponent(email)}&jobId=${encodeURIComponent(jobId)}`;
+    function saveState() {
+        localStorage.setItem(`shift_${email}_${jobId}`, JSON.stringify(localData));
     }
-
-    window.onload = refreshData;
 </script>
 </body>
 </html>
