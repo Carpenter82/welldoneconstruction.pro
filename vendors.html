@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Preferred Vendor Network | Well Done Construction</title>
+
+    <!-- Mobile App Shell & Viewport Lockdown -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#343E47">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- iOS / Safari Standalone Mode -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Well Done">
+    <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
+
+    <!-- Favicon & Analytics -->
+    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
+    <script src="https://analytics.ahrefs.com/analytics.js" data-key="TtjzlCimDmnI8Hx+acCKoA" async></script>
+
+    <style>
+        :root {
+            --primary: #343E47;   /* Slate - Structural */
+            --accent: #33B26E;    /* Green - Vetted/Go */
+            --bg-dark: #4b5563;   /* Slate Background */
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: var(--bg-dark);
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            overscroll-behavior-y: contain;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* HEADER */
+        header {
+            background: white;
+            padding: 16px 20px;
+            text-align: center;
+            border-bottom: 4px solid var(--primary);
+            position: relative;
+        }
+
+        .back-nav {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .back-nav:hover { color: var(--accent); }
+
+        .logo {
+            max-width: 150px; 
+            width: 100%;
+            height: auto;
+            vertical-align: middle;
+        }
+
+        /* CONTAINER */
+        .main-container {
+            flex: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .page-intro {
+            text-align: center;
+            margin-bottom: 36px;
+            color: white;
+        }
+
+        .page-intro h1 {
+            font-size: 1.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin: 0 0 10px;
+            color: white;
+        }
+
+        .page-intro p {
+            color: #d1d5db;
+            font-size: 0.95rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* POSTCARD GRID */
+        .vendor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 28px;
+        }
+
+        /* POSTCARD CARD STRUCTURE */
+        .postcard {
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .postcard:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 32px rgba(0,0,0,0.28);
+        }
+
+        /* TOP POSTCARD PHOTO */
+        .postcard-img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            background-color: var(--primary);
+            overflow: hidden;
+        }
+
+        .postcard-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* VETTED BADGE OVERLAY */
+        .vetted-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #ffffff;
+            color: var(--accent);
+            padding: 5px 10px;
+            font-size: 0.72rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.75px;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* POSTCARD BODY */
+        .postcard-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .category-tag {
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .postcard-body h2 {
+            margin: 0 0 12px;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary);
+        }
+
+        /* 2-3 SENTENCE ENDORSEMENT */
+        .endorsement {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.55;
+            margin: 0 0 20px;
+            border-left: 3px solid var(--accent);
+            padding-left: 12px;
+            font-style: normal;
+        }
+
+        .btn-vendor {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 48px;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            border: 2px solid var(--primary);
+            box-sizing: border-box;
+            transition: background-color 0.2s;
+        }
+
+        .btn-vendor:hover {
+            background-color: #233040;
+            border-color: #233040;
+        }
+
+        /* MONETIZATION INTAKE CARD */
+        .postcard-apply {
+            background: #2c353d;
+            border: 2px dashed #5d6d7e;
+            color: white;
+        }
+
+        .postcard-apply h2 { color: white; }
+        .postcard-apply .endorsement {
+            border-left-color: #bdc3c7;
+            color: #d1d5db;
+        }
+
+        .btn-apply-slot {
+            background-color: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+        }
+
+        .btn-apply-slot:hover {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        /* FOOTER */
+        footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 30px 20px;
+            border-top: 1px solid #5d6d7e;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #bdc3c7;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="back-nav">&larr; Back</a>
+        <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction" class="logo">
+    </header>
+
+    <div class="main-container">
+        
+        <div class="page-intro">
+            <h1>Preferred Vendor Network</h1>
+            <p>Vetted trade suppliers, field tooling, and commercial partners verified by Well Done Construction LLC.</p>
+        </div>
+
+        <div class="vendor-grid">
+
+            <!-- VENDOR POSTCARD 1 (Active Partner Offer) -->
+            <div class="postcard">
+                <div class="postcard-img-wrapper">
+                    <!-- Replace with a high-res photo of their warehouse, logo banner, or storefront -->
+                    <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=700&q=80" alt="Partner Name" class="postcard-img">
+                    <span class="vetted-badge">&#10003; Vetted Vendor</span>
+                </div>
+                <div class="postcard-body">
+                    <div>
+                        <span class="category-tag">Field Software & Infrastructure</span>
+                        <h2>Partner Business Name</h2>
+                        <p class="endorsement">
+                            These guys solve our material tracking snags without the usual field headaches. Their customer service picks up on the second ring, and their commercial turnaround keeps our crews on schedule. If you want seamless execution on site, set up a commercial account with them.
+                        </p>
+                    </div>
+                    <div>
+                        <a href="YOUR_AFFILIATE_LINK_HERE" target="_blank" rel="sponsored nofollow noopener" class="btn-vendor">Open Vendor Account &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VENDOR POSTCARD 2 (Template for Next Partner) -->
+            <div class="postcard">
+                <div class="postcard-img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=700&q=80" alt="Tool Supply" class="postcard-img">
+                    <span class="vetted-badge">&#10003; Vetted Vendor</span>
+                </div>
+                <div class="postcard-body">
+                    <div>
+                        <span class="category-tag">Trade Materials & Fasteners</span>
+                        <h2>Midwest Supply Yards</h2>
+                        <p class="endorsement">
+                            Our primary resource for structural fasteners and custom lumber orders. Deliveries drop directly on the slab on time, and their bulk commercial rates protect project margins. A verified partner for all tier-grade framing packages.
+                        </p>
+                    </div>
+                    <div>
+                        <a href="YOUR_AFFILIATE_LINK_HERE" target="_blank" rel="sponsored nofollow noopener" class="btn-vendor">View Catalog &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INBOUND MONETIZATION CARD (How businesses apply to pay you) -->
+            <div class="postcard postcard-apply">
+                <div class="postcard-img-wrapper" style="background: #1f262d; display: flex; align-items: center; justify-content: center;">
+                    <div style="font-size: 2.5rem; color: #5d6d7e;">&#129309;</div>
+                    <span class="vetted-badge" style="background: var(--primary); color: white;">Placement Open</span>
+                </div>
+                <div class="postcard-body">
+                    <div>
+                        <span class="category-tag" style="color: #bdc3c7;">Commercial Directory</span>
+                        <h2>Become A Preferred Vendor</h2>
+                        <p class="endorsement">
+                            Put your building materials, heavy equipment, or commercial trade services directly in front of active project managers, crews, and regional tradesmen. Every card is operator-vetted and pinned directly to our active portal.
+                        </p>
+                    </div>
+                    <div>
+                        <a href="mailto:admin@welldoneconstruction.link?subject=Preferred%20Vendor%20Application" class="btn-vendor btn-apply-slot">Apply For Listing</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <footer>
+        &copy; 2026 Well Done Construction LLC. Preferred Trade Supply Network. Authorized Operational Assets.
+    </footer>
+
+</body>
+</html>
