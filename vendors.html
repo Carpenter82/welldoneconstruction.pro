@@ -114,7 +114,6 @@
             gap: 28px;
         }
 
-        /* POSTCARD CARD STRUCTURE */
         .postcard {
             background: var(--card-bg);
             border-radius: 10px;
@@ -131,23 +130,29 @@
             box-shadow: 0 16px 32px rgba(0,0,0,0.28);
         }
 
-        /* TOP POSTCARD PHOTO */
+        /* STANDARDIZED MEDIA STAGE */
         .postcard-img-wrapper {
             position: relative;
             width: 100%;
-            height: 180px;
-            background-color: var(--primary);
-            overflow: hidden;
+            height: 160px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            box-sizing: border-box;
         }
 
         .postcard-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            max-height: 120px;
+            max-width: 80%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
             display: block;
         }
 
-        /* VETTED BADGE OVERLAY */
         .vetted-badge {
             position: absolute;
             top: 12px;
@@ -161,9 +166,6 @@
             letter-spacing: 0.75px;
             border-radius: 4px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
 
         /* POSTCARD BODY */
@@ -192,7 +194,6 @@
             color: var(--primary);
         }
 
-        /* 2-3 SENTENCE ENDORSEMENT */
         .endorsement {
             color: var(--text-muted);
             font-size: 0.92rem;
@@ -200,7 +201,6 @@
             margin: 0 0 20px;
             border-left: 3px solid var(--accent);
             padding-left: 12px;
-            font-style: normal;
         }
 
         .btn-vendor {
@@ -227,7 +227,7 @@
             border-color: #233040;
         }
 
-        /* MONETIZATION INTAKE CARD */
+        /* INBOUND MONETIZATION CARD */
         .postcard-apply {
             background: #2c353d;
             border: 2px dashed #5d6d7e;
@@ -266,7 +266,7 @@
 <body>
 
     <header>
-        <a href="/" class="back-nav">&larr; Back</a>
+        <a href="/" class="back-nav">&larr; Portal</a>
         <img src="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-header-e1762587869482.png" alt="Well Done Construction" class="logo">
     </header>
 
@@ -279,10 +279,10 @@
 
         <div class="vendor-grid">
 
-           <!-- VENDOR POSTCARD 1: SORO -->
+            <!-- VENDOR POSTCARD: SORO AUTOMATION -->
             <div class="postcard">
-                <div class="postcard-img-wrapper" style="background: #5b4bda; display: flex; align-items: center; justify-content: center;">
-                    <img src="soro.png" alt="Soro Automation" class="postcard-img" style="object-fit: contain; max-height: 140px; padding: 20px;">
+                <div class="postcard-img-wrapper">
+                    <img src="/assets/vendors/soro.png" alt="Soro Automation Mascot" class="postcard-img">
                     <span class="vetted-badge">&#10003; Vetted Vendor</span>
                 </div>
                 <div class="postcard-body">
@@ -295,57 +295,3 @@
                     </div>
                     <div>
                         <a href="https://trysoro.com/?linkId=lp_196551&sourceId=well-done-construction-llc&tenantId=soro" target="_blank" rel="sponsored nofollow noopener" class="btn-vendor">Deploy Soro &rarr;</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- VENDOR POSTCARD 2 (Template for Next Partner) -->
-            <div class="postcard">
-                <div class="postcard-img-wrapper">
-                    <img src="https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=700&q=80" alt="Tool Supply" class="postcard-img">
-                    <span class="vetted-badge">&#10003; Vetted Vendor</span>
-                </div>
-                <div class="postcard-body">
-                    <div>
-                        <span class="category-tag">Trade Materials & Fasteners</span>
-                        <h2>Midwest Supply Yards</h2>
-                        <p class="endorsement">
-                            Our primary resource for structural fasteners and custom lumber orders. Deliveries drop directly on the slab on time, and their bulk commercial rates protect project margins. A verified partner for all tier-grade framing packages.
-                        </p>
-                    </div>
-                    <div>
-                        <a href="YOUR_AFFILIATE_LINK_HERE" target="_blank" rel="sponsored nofollow noopener" class="btn-vendor">View Catalog &rarr;</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- INBOUND MONETIZATION CARD (How businesses apply to pay you) -->
-            <div class="postcard postcard-apply">
-                <div class="postcard-img-wrapper" style="background: #1f262d; display: flex; align-items: center; justify-content: center;">
-                    <div style="font-size: 2.5rem; color: #5d6d7e;">&#129309;</div>
-                    <span class="vetted-badge" style="background: var(--primary); color: white;">Placement Open</span>
-                </div>
-                <div class="postcard-body">
-                    <div>
-                        <span class="category-tag" style="color: #bdc3c7;">Commercial Directory</span>
-                        <h2>Become A Preferred Vendor</h2>
-                        <p class="endorsement">
-                            Put your building materials, heavy equipment, or commercial trade services directly in front of active project managers, crews, and regional tradesmen. Every card is operator-vetted and pinned directly to our active portal.
-                        </p>
-                    </div>
-                    <div>
-                        <a href="mailto:admin@welldoneconstruction.link?subject=Preferred%20Vendor%20Application" class="btn-vendor btn-apply-slot">Apply For Listing</a>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-    <footer>
-        &copy; 2026 Well Done Construction LLC. Preferred Trade Supply Network. Authorized Operational Assets.
-    </footer>
-
-</body>
-</html>
