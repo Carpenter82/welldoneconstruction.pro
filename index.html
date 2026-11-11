@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://analytics.ahrefs.com/analytics.js" data-key="TtjzlCimDmnI8Hx+acCKoA" async></script>
     <title>Well Done Construction | Field Operations</title>
+
+    <!-- Mobile PWA & Viewport Lockdown -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#343E47">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- iOS / Safari Standalone Shell -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Well Done">
+    <link rel="apple-touch-icon" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
+
+    <!-- Favicon & Tracking -->
+    <link rel="icon" type="image/png" href="https://welldoneconstruction.link/wp-content/uploads/2025/11/well-done-construction-favicon.png">
+    <script src="https://analytics.ahrefs.com/analytics.js" data-key="TtjzlCimDmnI8Hx+acCKoA" async></script>
+
     <style>
         :root {
             --primary: #343E47;   /* Slate - Structural */
@@ -20,7 +33,14 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            background-color: var(--bg-dark); /* Darker Grey Background */
+            background-color: var(--bg-dark);
+            
+            /* Mobile Field App Optimizations */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            overscroll-behavior-y: contain;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* HEADER */
@@ -43,7 +63,6 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            /* Ensures cards stretch to equal height */
             align-items: stretch; 
             gap: 30px;
             padding: 60px 20px;
@@ -62,8 +81,6 @@
             min-width: 300px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             transition: transform 0.2s;
-            
-            /* Logic to align buttons at bottom */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -90,16 +107,20 @@
         }
 
         .btn {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             width: 100%;
-            padding: 18px;
+            min-height: 52px; /* Thumb-friendly field tap target */
+            padding: 16px;
             font-size: 1rem;
             font-weight: 800;
             text-transform: uppercase;
             text-decoration: none;
             border-radius: 4px;
             letter-spacing: 1px;
-            box-sizing: border-box; /* Ensures padding doesn't break width */
+            box-sizing: border-box;
+            cursor: pointer;
         }
 
         /* Apply Button */
@@ -117,7 +138,6 @@
             border: 2px solid var(--primary);
         }
         .btn-portal:hover { background-color: #ebedef; }
-
 
         /* FOOTER - "THE BOOKS" */
         footer {
