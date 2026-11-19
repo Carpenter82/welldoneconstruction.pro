@@ -6,68 +6,18 @@
     <title>Upload Credentials | Well Done</title>
     <style>
         body { text-align: center; background-color: #1a1a1a; color: #fff; font-family: -apple-system, sans-serif; padding: 20px; }
-        
         .container { max-width: 500px; margin: 0 auto; }
-        
         .logo { font-size: 1.5rem; font-weight: bold; margin-bottom: 20px; letter-spacing: 2px; }
         .logo span { color: #e67e22; }
-
-        .upload-zone {
-            background: #222;
-            border: 2px dashed #444;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            position: relative;
-        }
-
+        .upload-zone { background: #222; border: 2px dashed #444; padding: 20px; margin-bottom: 20px; border-radius: 8px; position: relative; }
         .upload-icon { font-size: 2rem; color: #666; margin-bottom: 10px; }
-        
-        /* Hidden real input */
         input[type="file"] { display: none; }
-
-        /* Custom Label acts as button */
-        .custom-upload-btn {
-            background: #444;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: inline-block;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            transition: background 0.3s;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
+        .custom-upload-btn { background: #444; color: white; padding: 10px 20px; border-radius: 4px; cursor: pointer; display: inline-block; margin-top: 10px; font-size: 0.9rem; transition: background 0.3s; text-transform: uppercase; font-weight: bold; }
         .custom-upload-btn:hover { background: #555; }
-
-        .preview-img {
-            max-width: 100%;
-            max-height: 150px;
-            margin-top: 15px;
-            display: none; /* Hidden until file selected */
-            border: 1px solid #e67e22;
-            border-radius: 4px;
-        }
-
+        .preview-img { max-width: 100%; max-height: 150px; margin-top: 15px; display: none; border: 1px solid #e67e22; border-radius: 4px; }
         .file-name { color: #e67e22; font-size: 0.8rem; margin-top: 5px; }
-
-        #submitBtn {
-            width: 100%;
-            padding: 15px;
-            background-color: #e67e22;
-            color: white;
-            border: none;
-            font-weight: bold;
-            font-size: 1.1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            text-transform: uppercase;
-            margin-top: 10px;
-        }
+        #submitBtn { width: 100%; padding: 15px; background-color: #e67e22; color: white; border: none; font-weight: bold; font-size: 1.1rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         #submitBtn:disabled { background-color: #555; cursor: not-allowed; }
-        
         .status-msg { margin-top: 20px; font-weight: bold; min-height: 24px; color: #ccc; }
     </style>
 </head>
@@ -81,15 +31,12 @@
         </p>
 
         <form id="docForm">
-            
             <div class="upload-zone" id="zone-id">
                 <div class="upload-icon">🪪</div>
                 <div style="font-weight:bold;">GOVERNMENT ID</div>
                 <div style="font-size:0.8rem; color:#888;">Driver's License or Passport</div>
-                
                 <label for="file-id" class="custom-upload-btn">Choose Photo</label>
                 <input type="file" id="file-id" accept="image/*">
-                
                 <div id="name-id" class="file-name"></div>
                 <img id="preview-id" class="preview-img">
             </div>
@@ -98,10 +45,8 @@
                 <div class="upload-icon">⛑️</div>
                 <div style="font-weight:bold;">OSHA / SAFETY CARD</div>
                 <div style="font-size:0.8rem; color:#888;">OSHA 10, OSHA 30, or SST</div>
-                
                 <label for="file-osha" class="custom-upload-btn">Choose Photo</label>
                 <input type="file" id="file-osha" accept="image/*">
-                
                 <div id="name-osha" class="file-name"></div>
                 <img id="preview-osha" class="preview-img">
             </div>
@@ -121,8 +66,8 @@
     const email = urlParams.get('email');
 
     if (!email) {
-        alert("Session Error. Redirecting to start.");
-        window.location.href = "../index.html";
+        alert("Session Error: No email provided. Redirecting to start.");
+        window.location.href = "index.html"; // Fixed: Routes cleanly to root
     }
 
     // 2. File Reader Logic for Previews
@@ -162,13 +107,11 @@
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     
-                    // Max dimensions to prevent massive payloads
                     const MAX_WIDTH = 1200;
                     const MAX_HEIGHT = 1200;
                     let width = img.width;
                     let height = img.height;
 
-                    // Calculate new dimensions keeping aspect ratio
                     if (width > height) {
                         if (width > MAX_WIDTH) {
                             height *= MAX_WIDTH / width;
@@ -184,7 +127,6 @@
                     canvas.width = width;
                     canvas.height = height;
                     
-                    // Draw and compress to 70% quality JPEG
                     ctx.drawImage(img, 0, 0, width, height);
                     const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
                     resolve(compressedBase64);
@@ -198,69 +140,4 @@
     // 3. Submit Logic
     document.getElementById('docForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const btn = document.getElementById('submitBtn');
-        const status = document.getElementById('status');
-        
-        const idFile = document.getElementById('file-id').files[0];
-        const oshaFile = document.getElementById('file-osha').files[0];
-
-        if (!idFile) return alert("You must upload a Government ID.");
-
-        btn.disabled = true;
-        btn.textContent = "COMPRESSING & UPLOADING...";
-        status.textContent = "Optimizing images... Please wait.";
-
-        try {
-            // Compress the files BEFORE sending to Google
-            const idBase64 = await compressImage(idFile);
-            const oshaBase64 = await compressImage(oshaFile);
-
-            const payload = {
-                action: 'uploadOnboardingDocs',
-                email: email,
-                idBase64: idBase64,
-                oshaBase64: oshaBase64 
-            };
-
-            status.textContent = "Transmitting to secure server...";
-
-            const response = await fetch(API_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8",
-                },
-                body: JSON.stringify(payload)
-            });
-
-            // If it succeeds normally
-            status.textContent = "Documents Received. Finalizing...";
-            status.style.color = "#2ecc71";
-            setTimeout(() => {
-                window.location.href = "verification-pending.html";
-            }, 1500);
-
-        } catch (err) {
-            // THE FIX: Catch the false "Failed to fetch" CORS error
-            if (err.message.includes("Failed to fetch") || err.name === 'TypeError') {
-                console.warn("Caught Google Redirect CORS error. Assuming payload success.");
-                
-                // Force the success state anyway!
-                status.textContent = "Documents Received. Finalizing...";
-                status.style.color = "#2ecc71"; 
-                setTimeout(() => {
-                    window.location.href = "verification-pending.html";
-                }, 1500);
-                
-            } else {
-                // If it's a REAL error (like image compression failing)
-                console.error(err);
-                status.textContent = "Upload Failed: " + err.message;
-                status.style.color = "#e74c3c"; 
-                btn.disabled = false;
-                btn.textContent = "Try Again";
-            }
-        }
-    }); // Fixed: Added this missing line back in to close the event listener properly!
-</script>
-</body>
-</html>
+        const btn = document.getElementById('submitBtn
